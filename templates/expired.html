@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Undangan Telah Berakhir</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=DM+Sans:wght@300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d0d;color:#fff;font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;}
+.wrap{max-width:380px;}
+.icon{font-size:3rem;margin-bottom:1.5rem;opacity:.4;}
+.names{font-family:'Cormorant Garamond',serif;font-size:2rem;font-style:italic;color:rgba(255,255,255,.7);margin-bottom:.75rem;}
+.msg{font-size:.82rem;color:rgba(255,255,255,.3);line-height:1.9;margin-bottom:2rem;}
+.divider{width:40px;height:1px;background:rgba(255,255,255,.1);margin:1.5rem auto;}
+.home{display:inline-block;padding:.65rem 1.5rem;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);text-decoration:none;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;transition:all .3s;border-radius:2px;}
+.home:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.6);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="icon">🌸</div>
+  <div class="names">{{ inv.groom_name }} & {{ inv.bride_name }}</div>
+  <div class="divider"></div>
+  <p class="msg">Undangan digital ini telah berakhir masa aktifnya.<br>Terima kasih atas doa dan kehadiran Anda dalam hari istimewa kami.</p>
+  <a href="/" class="home">← Kembali ke Beranda</a>
+</div>
+</body>
+</html>

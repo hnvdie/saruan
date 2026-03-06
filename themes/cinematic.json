@@ -1,0 +1,15 @@
+{
+  "id": "cinematic",
+  "name": "Cinematic Gold",
+  "description": "Mewah, sinematik, dominasi hitam dan emas dengan efek cahaya dramatis",
+  "preview_color": "#0d0d0d",
+  "accent_color": "#c9a84c",
+  "skeleton": "cinematic",
+  "tags": [
+    "luxury",
+    "dark",
+    "gold",
+    "elegant"
+  ],
+  "demo_photos": []
+}

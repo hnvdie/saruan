@@ -1,0 +1,9 @@
+{
+  "id": "firefly",
+  "name": "Firefly Garden",
+  "description": "Malam bertabur kunang-kunang, nuansa gelap romantis dengan partikel bercahaya",
+  "preview_color": "#0a0f1e",
+  "accent_color": "#a8e063",
+  "skeleton": "fullpage_scroll",
+  "tags": ["dark", "romantic", "nature", "animated"]
+}

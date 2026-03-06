@@ -1,0 +1,9 @@
+{
+  "id": "sakura",
+  "name": "Sakura Dream",
+  "description": "Bunga sakura berjatuhan, nuansa Jepang yang lembut dan puitis",
+  "preview_color": "#fff0f5",
+  "accent_color": "#e8638c",
+  "skeleton": "storybook",
+  "tags": ["light", "japanese", "floral", "animated", "soft"]
+}

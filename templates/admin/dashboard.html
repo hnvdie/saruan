@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — Admin UndanganKita</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#c9a84c;--red:#e53935;--green:#43a047;--bg:#f7f7f5;--border:#e8e8e4;}
+body{font-family:'DM Sans',sans-serif;font-weight:300;background:var(--bg);color:#1a1a1a;}
+a{text-decoration:none;color:inherit;}
+
+/* HEADER */
+.header{background:#fff;border-bottom:1px solid var(--border);padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:1rem;font-weight:500;}
+.logo span{color:var(--gold);}
+.header-right{display:flex;gap:1rem;align-items:center;}
+.header-right a{font-size:.78rem;color:#888;transition:color .2s;}
+.header-right a:hover{color:#1a1a1a;}
+.logout-btn{color:var(--red) !important;}
+
+/* FLASH */
+.flash{padding:.75rem 1.5rem;font-size:.82rem;}
+.flash.success{background:#e8f5e9;color:#2e7d32;border-bottom:1px solid #c8e6c9;}
+.flash.info{background:#e3f2fd;color:#1565c0;border-bottom:1px solid #bbdefb;}
+.flash.warning{background:#fff8e1;color:#e65100;border-bottom:1px solid #ffe082;}
+
+/* LAYOUT */
+.container{max-width:1200px;margin:0 auto;padding:1.5rem;}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;}
+.page-title{font-size:1.3rem;font-weight:400;}
+.page-sub{font-size:.78rem;color:#888;margin-top:.2rem;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.25rem;}
+.stat-num{font-size:1.8rem;font-weight:300;color:#1a1a1a;line-height:1;}
+.stat-label{font-size:.7rem;color:#888;letter-spacing:.06em;text-transform:uppercase;margin-top:.3rem;}
+
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;}
+.card-head{padding:.9rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:.82rem;font-weight:500;letter-spacing:.04em;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:#888;font-weight:400;padding:.7rem 1.25rem;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+td{padding:.8rem 1.25rem;border-bottom:1px solid #f5f5f5;font-size:.82rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:3px;font-size:.67rem;letter-spacing:.06em;text-transform:uppercase;font-weight:400;}
+.badge-theme{background:#f0f0f0;color:#555;}
+.badge-active{background:#e8f5e9;color:#2e7d32;}
+.badge-expired{background:#ffebee;color:#c62828;}
+.badge-soon{background:#fff8e1;color:#e65100;}
+
+/* ACTIONS */
+.actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.4rem .85rem;border-radius:3px;font-size:.75rem;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;}
+.btn-sm{padding:.3rem .65rem;font-size:.7rem;}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.btn-primary:hover{background:#333;}
+.btn-gold{background:var(--gold);color:#000;border-color:var(--gold);}
+.btn-gold:hover{opacity:.9;}
+.btn-ghost{background:transparent;border-color:#ddd;color:#555;}
+.btn-ghost:hover{border-color:#aaa;color:#1a1a1a;}
+.btn-danger{background:transparent;border-color:#ffcdd2;color:var(--red);}
+.btn-danger:hover{background:#ffebee;}
+.btn-extend{background:transparent;border-color:#c8e6c9;color:var(--green);}
+.btn-extend:hover{background:#e8f5e9;}
+
+/* DAYS LEFT */
+.days-chip{font-size:.68rem;color:#888;}
+.days-chip.urgent{color:var(--red);}
+
+/* THEME MANAGER */
+.theme-manager-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;padding:1.25rem;}
+.theme-manage-card{border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.theme-manage-preview{height:90px;display:flex;align-items:center;justify-content:center;position:relative;}
+.theme-manage-body{padding:.85rem;}
+.theme-manage-name{font-size:.85rem;font-weight:500;margin-bottom:.5rem;}
+.demo-photos-strip{display:flex;gap:.3rem;margin:.5rem 0;flex-wrap:wrap;}
+.demo-photo-thumb{
+  width:40px;height:40px;object-fit:cover;border-radius:3px;cursor:pointer;
+  border:1px solid var(--border);position:relative;
+}
+.demo-upload-area{
+  border:1px dashed #ccc;border-radius:4px;padding:.5rem;text-align:center;
+  font-size:.68rem;color:#aaa;cursor:pointer;transition:all .2s;margin-top:.5rem;
+}
+.demo-upload-area:hover{border-color:var(--gold);color:var(--gold);}
+.demo-file-input{display:none;}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 2rem;color:#aaa;}
+.empty p{margin-bottom:1rem;font-size:.88rem;}
+
+/* WA LINK */
+.wa-link{display:inline-flex;align-items:center;gap:.4rem;background:#25d366;color:#fff;padding:.35rem .8rem;border-radius:3px;font-size:.72rem;}
+.wa-link:hover{opacity:.9;}
+
+@media(max-width:600px){
+  .page-head{flex-direction:column;align-items:flex-start;gap:.75rem;}
+  table{font-size:.76rem;}
+  td,th{padding:.6rem .75rem;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="/admin" class="logo">Undangan<span>Kita</span> <span style="color:#ccc;font-weight:300;font-size:.85rem">/ Admin</span></a>
+  <div class="header-right">
+    <a href="/" target="_blank">← Lihat Situs</a>
+    <a href="/themes" target="_blank">Katalog Tema</a>
+    <a href="/admin/logout" class="logout-btn">Keluar</a>
+  </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="container">
+
+  <div class="page-head">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Kelola semua undangan digital</div>
+    </div>
+    <a href="/admin/create" class="btn btn-primary">+ Buat Undangan Baru</a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num">{{ invitations|length }}</div><div class="stat-label">Total Aktif</div></div>
+    <div class="stat"><div class="stat-num">{{ total_rsvp }}</div><div class="stat-label">Total RSVP</div></div>
+    <div class="stat"><div class="stat-num">{{ themes|length }}</div><div class="stat-label">Tema Tersedia</div></div>
+    <div class="stat"><div class="stat-num">{{ invitations|selectattr('is_expired')|list|length }}</div><div class="stat-label">Sudah Expired</div></div>
+  </div>
+
+  <!-- INVITATIONS TABLE -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Semua Undangan</div>
+    </div>
+    {% if invitations %}
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Pasangan</th><th>Tema</th><th>Tanggal</th>
+        <th>Link</th><th>RSVP</th><th>Expired</th><th>Aksi</th>
+      </tr></thead>
+      <tbody>
+      {% for inv in invitations %}
+      <tr>
+        <td><strong>{{ inv.groom_name }} & {{ inv.bride_name }}</strong><br>
+          <span style="font-size:.7rem;color:#aaa">Dibuat {{ inv.created_at[:10] }}</span></td>
+        <td><span class="badge badge-theme">{{ inv.theme_id }}</span></td>
+        <td style="white-space:nowrap;font-size:.78rem">{{ inv.resepsi_date or '—' }}</td>
+        <td>
+          <a href="/i/{{ inv.slug }}" target="_blank" style="color:var(--gold);font-size:.75rem">/i/{{ inv.slug }}</a>
+        </td>
+        <td style="text-align:center;font-weight:500">{{ inv.rsvp_count }}</td>
+        <td>
+          {% if inv.is_expired %}
+            <span class="badge badge-expired">Expired</span>
+          {% elif inv.expires_at %}
+            {% set dl = inv.expires_at | days_left %}
+            {% if dl is not none %}
+              {% if dl <= 30 %}
+                <span class="badge badge-soon">{{ dl }}h lagi</span>
+              {% else %}
+                <span class="badge badge-active">{{ dl }}h lagi</span>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <span style="color:#ccc;font-size:.72rem">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="actions">
+            <a href="/i/{{ inv.slug }}" target="_blank" class="btn btn-ghost btn-sm">👁 Lihat</a>
+            <a href="/admin/edit/{{ inv.id }}" class="btn btn-ghost btn-sm">✏️ Edit</a>
+            <form method="post" action="/admin/extend/{{ inv.id }}" style="display:inline">
+              <button type="submit" class="btn btn-extend btn-sm">+1 Tahun</button>
+            </form>
+            <form method="post" action="/admin/delete/{{ inv.id }}" style="display:inline"
+                  onsubmit="return confirm('Hapus undangan {{ inv.groom_name }} & {{ inv.bride_name }}?')">
+              <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="empty">
+      <p>Belum ada undangan. Mulai buat sekarang!</p>
+      <a href="/admin/create" class="btn btn-primary">Buat Undangan Pertama</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- THEME MANAGER -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Manajemen Tema & Foto Demo</div>
+      <span style="font-size:.72rem;color:#aaa">Upload foto demo yang ditampilkan di halaman katalog tema</span>
+    </div>
+    <div class="theme-manager-grid">
+      {% for theme in themes %}
+      <div class="theme-manage-card">
+        <div class="theme-manage-preview" style="background:{{ theme.preview_color }}">
+          <span style="font-family:'Cormorant Garamond',serif;font-style:italic;color:{{ theme.accent_color }};font-size:1.1rem">
+            {{ theme.name }}
+          </span>
+        </div>
+        <div class="theme-manage-body">
+          <div class="theme-manage-name">{{ theme.name }}</div>
+          <!-- Demo photos list -->
+          <div class="demo-photos-strip" id="strip-{{ theme.id }}">
+            {% for photo in theme.get('demo_photos', []) %}
+            <div style="position:relative;display:inline-block">
+              <img src="{{ photo }}" class="demo-photo-thumb" title="Klik untuk hapus"
+                   onclick="deleteDemoPhoto('{{ theme.id }}','{{ photo }}',this.parentElement)">
+              <span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:none">×</span>
+            </div>
+            {% endfor %}
+          </div>
+          <label class="demo-upload-area" for="demofile-{{ theme.id }}">
+            📸 Upload foto demo
+            <input type="file" id="demofile-{{ theme.id }}" class="demo-file-input"
+                   accept=".jpg,.jpeg,.png,.webp" multiple
+                   onchange="uploadDemoPhotos('{{ theme.id }}',this)">
+          </label>
+          <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap">
+            <a href="/preview/{{ theme.id }}" target="_blank" class="btn btn-ghost btn-sm">Demo</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function uploadDemoPhotos(themeId, input){
+  const fd = new FormData();
+  for(let i=0;i<input.files.length;i++) fd.append(`photo${i}`, input.files[i]);
+  const r = await fetch(`/admin/theme-demo/${themeId}`, {method:'POST', body:fd});
+  const d = await r.json();
+  if(d.success && d.urls){
+    const strip = document.getElementById(`strip-${themeId}`);
+    d.urls.forEach(url => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
+      wrap.innerHTML = `<img src="${url}" class="demo-photo-thumb" title="Klik untuk hapus"
+        onclick="deleteDemoPhoto('${themeId}','${url}',this.parentElement)">
+        <span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:none">×</span>`;
+      strip.appendChild(wrap);
+    });
+  }
+  input.value = '';
+}
+
+async function deleteDemoPhoto(themeId, photo, el){
+  if(!confirm('Hapus foto demo ini?')) return;
+  const r = await fetch(`/admin/theme-demo/${themeId}/delete`,{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({photo})
+  });
+  if((await r.json()).success) el.remove();
+}
+</script>
+</body>
+</html>

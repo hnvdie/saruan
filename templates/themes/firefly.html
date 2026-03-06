@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }} — Undangan Pernikahan</title>
+<meta property="og:title" content="{{ inv.groom_name }} & {{ inv.bride_name }}">
+<meta property="og:description" content="Kami mengundang kehadiran Anda dalam hari bahagia kami">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+/* FIREFLY GARDEN */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060d12;--bg2:#0a1520;
+  --green:#a8e063;--gold:#e8c97a;
+  --white:#f0f8e8;--muted:rgba(240,248,232,.4);
+  --serif:'Cormorant Garamond',serif;--sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+#firefly-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+
+/* ENVELOPE INTRO */
+#envelope-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s;}
+#envelope-screen.hidden{opacity:0;visibility:hidden;}
+.envelope-wrap{position:relative;width:260px;height:180px;cursor:pointer;}
+.env-body{width:100%;height:100%;background:linear-gradient(135deg,#0f2318,#1a3a25);border-radius:4px;border:1px solid rgba(168,224,99,.2);position:relative;overflow:hidden;}
+.env-flap{position:absolute;top:0;left:0;right:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-top:90px solid #0d1f15;transform-origin:top;transition:transform .6s cubic-bezier(.4,0,.2,1);}
+.env-flap.open{transform:rotateX(180deg);}
+.env-seal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border:1px solid var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;color:var(--green);background:var(--bg);z-index:2;}
+.env-letter{position:absolute;bottom:-100%;left:10%;right:10%;height:90%;background:linear-gradient(to bottom,#f5ede8,#f0e8e0);border-radius:3px 3px 0 0;transition:bottom .6s .2s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;}
+.env-letter.open{bottom:0;}
+.env-letter-text{font-family:var(--serif);font-size:1rem;color:#2a1810;text-align:center;font-style:italic;padding:1rem;}
+.env-cta{margin-top:2rem;font-size:.7rem;letter-spacing:.35em;text-transform:uppercase;color:var(--green);opacity:.7;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+main{position:relative;z-index:1;}
+section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 1.5rem;position:relative;}
+
+/* HERO */
+#hero{background:radial-gradient(ellipse at 50% 60%,#0d2918 0%,var(--bg) 70%);}
+.hero-bismillah{font-family:var(--serif);font-size:1.4rem;color:var(--muted);margin-bottom:3rem;text-align:center;opacity:0;animation:fadeUp .8s .3s ease forwards;}
+.hero-together{font-size:.7rem;letter-spacing:.5em;text-transform:uppercase;color:var(--green);margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s .5s ease forwards;}
+.hero-names{font-family:var(--serif);font-size:clamp(3rem,12vw,6rem);font-weight:300;line-height:.9;text-align:center;color:var(--white);opacity:0;animation:fadeUp .8s .7s ease forwards;}
+.hero-names span{display:block;font-style:italic;color:var(--green);}
+.hero-names .ampersand{font-size:.4em;color:var(--muted);font-style:normal;display:block;margin:.2em 0;}
+.hero-date-bar{margin-top:3rem;display:flex;align-items:center;gap:1.5rem;opacity:0;animation:fadeUp .8s 1s ease forwards;}
+.hero-date-bar .line{flex:1;height:1px;background:rgba(168,224,99,.2);}
+.hero-date-text{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);}
+.scroll-hint{position:absolute;bottom:2rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;color:var(--muted);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;animation:bounce 2s ease infinite;}
+.scroll-hint::after{content:'';width:1px;height:40px;background:linear-gradient(to bottom,rgba(168,224,99,.4),transparent);}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* COUPLE */
+#couple{background:linear-gradient(to bottom,var(--bg),var(--bg2),var(--bg));}
+.couple-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;max-width:700px;width:100%;}
+.couple-card{text-align:center;}
+.couple-photo{width:120px;height:120px;border-radius:50%;border:2px solid rgba(168,224,99,.3);margin:0 auto 1.2rem;background:linear-gradient(135deg,#1a3a25,#0d2018);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.5rem;color:var(--green);font-style:italic;overflow:hidden;}
+.couple-photo img{width:100%;height:100%;object-fit:cover;}
+.couple-role{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green);opacity:.7;margin-bottom:.5rem;}
+.couple-name{font-family:var(--serif);font-size:1.6rem;font-weight:400;font-style:italic;color:var(--white);}
+.couple-full{font-size:.75rem;color:var(--muted);margin-top:.3rem;line-height:1.5;}
+.couple-parents{font-size:.72rem;color:rgba(240,248,232,.3);margin-top:.8rem;line-height:1.7;}
+.couple-divider{font-family:var(--serif);font-size:2rem;color:var(--green);opacity:.5;}
+
+/* EVENT */
+#event{background:var(--bg2);}
+.section-eyebrow{font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--green);opacity:.7;margin-bottom:1.5rem;text-align:center;}
+.section-heading{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:300;font-style:italic;text-align:center;color:var(--white);margin-bottom:3.5rem;}
+.events-stack{display:flex;flex-direction:column;gap:1.5rem;width:100%;max-width:520px;}
+.event-card{border:1px solid rgba(168,224,99,.15);border-radius:4px;padding:2rem;background:rgba(168,224,99,.03);position:relative;overflow:hidden;}
+.event-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--green),transparent);}
+.event-type{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green);margin-bottom:.75rem;}
+.event-name{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--white);margin-bottom:1rem;}
+.event-detail{font-size:.8rem;color:var(--muted);line-height:2;display:flex;flex-direction:column;gap:.2rem;}
+.event-detail span{display:flex;align-items:flex-start;gap:.75rem;}
+.maps-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.25rem;padding:.6rem 1.25rem;border:1px solid rgba(168,224,99,.3);color:var(--green);text-decoration:none;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;transition:all .3s;border-radius:2px;}
+.maps-btn:hover{background:rgba(168,224,99,.1);}
+
+/* COUNTDOWN */
+#countdown{background:var(--bg);}
+.countdown-display{display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;margin-top:2rem;}
+.countdown-block{display:flex;flex-direction:column;align-items:center;min-width:70px;}
+.countdown-num{font-family:var(--serif);font-size:clamp(3rem,8vw,5rem);font-weight:300;color:var(--green);line-height:1;}
+.countdown-label{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;}
+.countdown-sep{font-family:var(--serif);font-size:3rem;color:rgba(168,224,99,.2);align-self:flex-start;margin-top:.5rem;}
+
+/* ── GALLERY SECTION ── */
+#gallery{background:var(--bg2);min-height:auto;padding:5rem 1.5rem;}
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:.6rem;
+  width:100%;max-width:520px;
+  margin-top:2rem;
+}
+.gallery-grid.count-1{grid-template-columns:1fr;}
+.gallery-grid.count-3 .gallery-item:first-child{grid-column:1/-1;}
+.gallery-grid.count-4{grid-template-columns:repeat(2,1fr);}
+.gallery-item{
+  aspect-ratio:4/3;
+  overflow:hidden;
+  border-radius:3px;
+  border:1px solid rgba(168,224,99,.1);
+  cursor:pointer;
+  position:relative;
+}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+.gallery-item:hover img{transform:scale(1.05);}
+/* Full-screen lightbox */
+#lightbox{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,.95);
+  align-items:center;justify-content:center;
+}
+#lightbox.open{display:flex;}
+#lightbox img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:2px;}
+#lightbox-close{position:absolute;top:1.5rem;right:1.5rem;font-size:1.5rem;color:rgba(255,255,255,.5);cursor:pointer;transition:color .2s;}
+#lightbox-close:hover{color:#fff;}
+#lightbox-prev,#lightbox-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);
+  font-size:1.5rem;padding:.5rem .9rem;cursor:pointer;border-radius:2px;
+  transition:all .2s;
+}
+#lightbox-prev:hover,#lightbox-next:hover{background:rgba(255,255,255,.15);color:#fff;}
+#lightbox-prev{left:1rem;}
+#lightbox-next{right:1rem;}
+#lightbox-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.15em;}
+
+/* STORY */
+#story{background:linear-gradient(to bottom,var(--bg2),var(--bg));}
+.story-text{font-family:var(--serif);font-size:clamp(1rem,2.5vw,1.25rem);font-style:italic;line-height:2;color:var(--muted);max-width:540px;text-align:center;position:relative;}
+.story-text::before{content:'"';font-size:6rem;color:rgba(168,224,99,.1);position:absolute;top:-2rem;left:-1rem;font-family:var(--serif);line-height:1;}
+
+/* RSVP */
+#rsvp{background:var(--bg2);}
+.rsvp-form{width:100%;max-width:460px;}
+.form-group{margin-bottom:1.25rem;}
+.form-label{display:block;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.form-input{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(168,224,99,.15);color:var(--white);font-family:var(--sans);font-size:.85rem;outline:none;transition:border .3s;border-radius:2px;}
+.form-input:focus{border-color:rgba(168,224,99,.4);}
+.form-input option{background:var(--bg2);}
+textarea.form-input{resize:vertical;min-height:80px;}
+.submit-btn{width:100%;padding:1rem;background:transparent;border:1px solid var(--green);color:var(--green);font-family:var(--sans);font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;transition:all .3s;border-radius:2px;}
+.submit-btn:hover{background:var(--green);color:var(--bg);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+.rsvp-list{margin-top:3rem;width:100%;max-width:460px;}
+.rsvp-list-title{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(168,224,99,.1);}
+.rsvp-item{padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:flex-start;gap:1rem;}
+.rsvp-avatar{width:36px;height:36px;border-radius:50%;background:rgba(168,224,99,.1);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;color:var(--green);flex-shrink:0;}
+.rsvp-name{font-size:.82rem;color:var(--white);margin-bottom:.2rem;}
+.rsvp-msg{font-size:.75rem;color:var(--muted);line-height:1.5;font-style:italic;}
+.rsvp-badge{display:inline-block;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:.15rem .5rem;border-radius:2px;margin-left:.5rem;}
+.rsvp-badge.hadir{background:rgba(168,224,99,.15);color:var(--green);}
+.rsvp-badge.tidak{background:rgba(255,100,100,.1);color:#ff8888;}
+.success-msg{display:none;text-align:center;padding:1.5rem;border:1px solid rgba(168,224,99,.2);color:var(--green);font-family:var(--serif);font-style:italic;font-size:1.1rem;border-radius:2px;}
+
+/* GIFT */
+#gift{background:var(--bg);}
+.gift-cards{display:flex;flex-direction:column;gap:1rem;width:100%;max-width:400px;}
+.gift-card{padding:1.5rem;border:1px solid rgba(168,224,99,.12);border-radius:4px;background:rgba(168,224,99,.02);}
+.gift-type{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green);opacity:.7;margin-bottom:.75rem;}
+.gift-bank{font-size:1rem;font-weight:400;margin-bottom:.3rem;}
+.gift-num{font-family:var(--serif);font-size:1.3rem;letter-spacing:.05em;color:var(--gold);margin-bottom:.2rem;}
+.gift-name{font-size:.78rem;color:var(--muted);}
+.copy-btn{margin-top:1rem;padding:.5rem 1rem;background:transparent;border:1px solid rgba(168,224,99,.2);color:var(--muted);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .3s;border-radius:2px;}
+.copy-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* CLOSING */
+#closing{background:radial-gradient(ellipse at 50% 50%,#0d2918,var(--bg));text-align:center;}
+.closing-names{font-family:var(--serif);font-size:clamp(2rem,6vw,3.5rem);font-style:italic;color:var(--white);margin-bottom:1rem;}
+.closing-msg{font-size:.8rem;color:var(--muted);line-height:2;max-width:400px;margin:0 auto 2.5rem;}
+.hashtag{font-family:var(--serif);font-size:1.2rem;color:var(--green);opacity:.6;}
+.ornament{color:rgba(168,224,99,.2);font-size:1.5rem;letter-spacing:.5rem;text-align:center;margin:1.5rem 0;}
+
+/* MUSIC FAB */
+#music-fab{position:fixed;bottom:1.5rem;right:1.5rem;width:46px;height:46px;border-radius:50%;background:rgba(168,224,99,.15);border:1px solid rgba(168,224,99,.3);color:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;transition:all .3s;backdrop-filter:blur(8px);font-size:1.1rem;}
+#music-fab:hover{background:rgba(168,224,99,.25);}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:480px){
+  .couple-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
+  .couple-divider{transform:rotate(90deg);}
+  .countdown-display{gap:1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="firefly-canvas"></canvas>
+
+<!-- ENVELOPE INTRO -->
+<div id="envelope-screen">
+  <div style="text-align:center;margin-bottom:2rem">
+    <div style="font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(168,224,99,.5);margin-bottom:.5rem">Kepada Yth.</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:rgba(240,248,232,.8)">Tamu Undangan</div>
+  </div>
+  <div class="envelope-wrap" onclick="openEnvelope()">
+    <div class="env-body">
+      <div class="env-letter" id="env-letter">
+        <div class="env-letter-text">{{ inv.groom_name }}<br>&amp;<br>{{ inv.bride_name }}</div>
+      </div>
+    </div>
+    <div class="env-flap" id="env-flap"></div>
+    <div class="env-seal">✦</div>
+  </div>
+  <p class="env-cta">Ketuk untuk membuka</p>
+</div>
+
+<main id="main-content" style="display:none">
+
+<section id="hero">
+  <p class="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p>
+  <div class="hero-together">Bersama dalam suka &amp; duka</div>
+  <div class="hero-names">
+    <span>{{ inv.groom_name }}</span>
+    <span class="ampersand">&amp;</span>
+    <span>{{ inv.bride_name }}</span>
+  </div>
+  <div class="hero-date-bar">
+    <div class="line"></div>
+    <div class="hero-date-text">{{ inv.resepsi_date | format_date }}</div>
+    <div class="line"></div>
+  </div>
+  <div class="scroll-hint">Gulir ke bawah</div>
+</section>
+
+<section id="couple">
+  <div class="section-eyebrow reveal">Mempelai</div>
+  <div class="couple-grid reveal">
+    <div class="couple-card">
+      <div class="couple-photo">{{ inv.groom_name[0] }}</div>
+      <div class="couple-role">Mempelai Pria</div>
+      <div class="couple-name">{{ inv.groom_name }}</div>
+      {% if inv.groom_full %}<div class="couple-full">{{ inv.groom_full }}</div>{% endif %}
+      {% if inv.groom_parents %}<div class="couple-parents">Putra dari<br>{{ inv.groom_parents }}</div>{% endif %}
+    </div>
+    <div class="couple-divider">✦</div>
+    <div class="couple-card">
+      <div class="couple-photo">{{ inv.bride_name[0] }}</div>
+      <div class="couple-role">Mempelai Wanita</div>
+      <div class="couple-name">{{ inv.bride_name }}</div>
+      {% if inv.bride_full %}<div class="couple-full">{{ inv.bride_full }}</div>{% endif %}
+      {% if inv.bride_parents %}<div class="couple-parents">Putri dari<br>{{ inv.bride_parents }}</div>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section id="event">
+  <div class="section-eyebrow reveal">Rangkaian Acara</div>
+  <h2 class="section-heading reveal">Hari Istimewa Kami</h2>
+  <div class="events-stack">
+    {% if inv.akad_date %}
+    <div class="event-card reveal">
+      <div class="event-type">Akad Nikah</div>
+      <div class="event-name">{{ inv.akad_venue }}</div>
+      <div class="event-detail">
+        <span><span>📅</span>{{ inv.akad_date | format_date }}</span>
+        <span><span>🕐</span>{{ inv.akad_time }} WIB</span>
+        <span><span>📍</span>{{ inv.akad_address }}</span>
+      </div>
+      {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="maps-btn">🗺 Buka Maps</a>{% endif %}
+    </div>
+    {% endif %}
+    {% if inv.resepsi_date %}
+    <div class="event-card reveal">
+      <div class="event-type">Resepsi Pernikahan</div>
+      <div class="event-name">{{ inv.resepsi_venue }}</div>
+      <div class="event-detail">
+        <span><span>📅</span>{{ inv.resepsi_date | format_date }}</span>
+        <span><span>🕐</span>{{ inv.resepsi_time }} WIB</span>
+        <span><span>📍</span>{{ inv.resepsi_address }}</span>
+      </div>
+      {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="maps-btn">🗺 Buka Maps</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="countdown">
+  <div class="section-eyebrow reveal">Menghitung Hari</div>
+  <h2 class="section-heading reveal">Kami Menantikan Kehadiranmu</h2>
+  <div class="countdown-display reveal">
+    <div class="countdown-block"><div class="countdown-num" id="cd-days">--</div><div class="countdown-label">Hari</div></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-block"><div class="countdown-num" id="cd-hours">--</div><div class="countdown-label">Jam</div></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-block"><div class="countdown-num" id="cd-mins">--</div><div class="countdown-label">Menit</div></div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-block"><div class="countdown-num" id="cd-secs">--</div><div class="countdown-label">Detik</div></div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+{% if photos %}
+<section id="gallery">
+  <div class="section-eyebrow reveal">Foto Prewed</div>
+  <h2 class="section-heading reveal">Momen Bersama</h2>
+  {% set pc = photos|length %}
+  <div class="gallery-grid reveal {% if pc == 1 %}count-1{% elif pc == 3 %}count-3{% elif pc >= 4 %}count-4{% endif %}">
+    {% for p in photos %}
+    <div class="gallery-item" onclick="openLightbox({{ loop.index0 }})">
+      <img src="{{ photo_src(p) }}" alt="Foto prewed {{ loop.index }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if inv.love_story %}
+<section id="story">
+  <div class="section-eyebrow reveal">Kisah Kami</div>
+  <h2 class="section-heading reveal">Love Story</h2>
+  <p class="story-text reveal">{{ inv.love_story }}</p>
+</section>
+{% endif %}
+
+<section id="rsvp">
+  <div class="section-eyebrow reveal">Konfirmasi Kehadiran</div>
+  <h2 class="section-heading reveal">RSVP</h2>
+  <div class="rsvp-form reveal">
+    <div id="rsvp-success" class="success-msg">✦ Terima kasih telah mengkonfirmasi kehadiran Anda ✦</div>
+    <div id="rsvp-form-inner">
+      <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" class="form-input" id="rsvp-name" placeholder="Masukkan nama Anda"></div>
+      <div class="form-group"><label class="form-label">Kehadiran</label>
+        <select class="form-input" id="rsvp-attendance">
+          <option value="hadir">✓ Insya Allah Hadir</option>
+          <option value="tidak">✗ Tidak Dapat Hadir</option>
+          <option value="ragu">? Masih Belum Pasti</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Jumlah Tamu</label>
+        <select class="form-input" id="rsvp-count">
+          {% for n in range(1,6) %}<option value="{{ n }}">{{ n }} orang</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Ucapan &amp; Doa</label><textarea class="form-input" id="rsvp-message" placeholder="Tuliskan ucapan untuk kedua mempelai..."></textarea></div>
+      <button class="submit-btn" onclick="submitRSVP('{{ inv.id }}')">Kirim Konfirmasi</button>
+    </div>
+  </div>
+  {% if rsvp_list %}
+  <div class="rsvp-list reveal">
+    <div class="rsvp-list-title">Ucapan &amp; Doa — {{ rsvp_list|length }} tamu</div>
+    {% for r in rsvp_list %}
+    <div class="rsvp-item">
+      <div class="rsvp-avatar">{{ r.guest_name[0] }}</div>
+      <div>
+        <div class="rsvp-name">{{ r.guest_name }}<span class="rsvp-badge {{ 'hadir' if r.attendance=='hadir' else 'tidak' }}">{{ '✓ Hadir' if r.attendance=='hadir' else ('✗ Tidak' if r.attendance=='tidak' else '? Belum') }}</span></div>
+        {% if r.message %}<div class="rsvp-msg">{{ r.message }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+{% if gifts %}
+<section id="gift">
+  <div class="section-eyebrow reveal">Hadiah Pernikahan</div>
+  <h2 class="section-heading reveal">Wedding Gift</h2>
+  <div class="gift-cards">
+    {% for g in gifts %}{% if g.bank_name %}
+    <div class="gift-card reveal">
+      <div class="gift-type">Transfer Bank</div>
+      <div class="gift-bank">{{ g.bank_name }}</div>
+      <div class="gift-num">{{ g.account_number }}</div>
+      <div class="gift-name">a.n. {{ g.account_name }}</div>
+      <button class="copy-btn" onclick="copyText('{{ g.account_number }}',this)">Salin Nomor Rekening</button>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section id="closing">
+  <div class="ornament reveal">✦ ✦ ✦</div>
+  <div class="closing-names reveal">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <p class="closing-msg reveal">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
+  <div class="ornament reveal">✦</div>
+  <p class="hashtag reveal">#{{ inv.groom_name }}dan{{ inv.bride_name }}</p>
+</section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightboxOutside(event)">
+  <span id="lightbox-close" onclick="closeLightbox()">✕</span>
+  <button id="lightbox-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lightbox-img" src="" alt="">
+  <button id="lightbox-next" onclick="lbNav(1)">›</button>
+  <div id="lightbox-counter"></div>
+</div>
+
+{% if inv.music_url %}
+<div id="music-fab" onclick="toggleMusic()">♪</div>
+<audio id="bg-music" src="{{ inv.music_url }}" loop></audio>
+{% endif %}
+
+<script>
+// FIREFLY CANVAS
+(function(){
+  const c=document.getElementById('firefly-canvas'),ctx=c.getContext('2d');
+  let W,H,flies=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  function mk(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*2.5+.5,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,alpha:0,phase:Math.random()*Math.PI*2,speed:Math.random()*.02+.01,color:Math.random()>.5?[168,224,99]:[232,201,122]};}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    flies.forEach(f=>{
+      f.phase+=f.speed;f.alpha=(Math.sin(f.phase)*.5+.5)*.7;
+      f.x+=f.vx+Math.sin(f.phase*.5)*.3;f.y+=f.vy+Math.cos(f.phase*.7)*.2;
+      if(f.x<0)f.x=W;if(f.x>W)f.x=0;if(f.y<0)f.y=H;if(f.y>H)f.y=0;
+      const[r,g,b]=f.color,gr=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r*8);
+      gr.addColorStop(0,`rgba(${r},${g},${b},${f.alpha*.4})`);gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
+      ctx.beginPath();ctx.arc(f.x,f.y,f.r*8,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+      ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fillStyle=`rgba(${r},${g},${b},${f.alpha})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);resize();flies=Array.from({length:80},mk);draw();
+})();
+
+// ENVELOPE
+function openEnvelope(){
+  document.getElementById('env-flap').classList.add('open');
+  document.getElementById('env-letter').classList.add('open');
+  setTimeout(()=>{
+    document.getElementById('envelope-screen').classList.add('hidden');
+    document.getElementById('main-content').style.display='block';
+    document.getElementById('bg-music')?.play().catch(()=>{});
+    initReveal();startCountdown();
+  },900);
+}
+
+function initReveal(){
+  const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');});},{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+function startCountdown(){
+  const t=new Date('{{ inv.resepsi_date }}T{{ inv.resepsi_time }}:00');
+  function up(){
+    const d=t-new Date();if(d<=0)return;
+    document.getElementById('cd-days').textContent=Math.floor(d/86400000);
+    document.getElementById('cd-hours').textContent=Math.floor((d%86400000)/3600000);
+    document.getElementById('cd-mins').textContent=Math.floor((d%3600000)/60000);
+    document.getElementById('cd-secs').textContent=Math.floor((d%60000)/1000);
+  }
+  up();setInterval(up,1000);
+}
+
+// LIGHTBOX
+const lbPhotos = [{% for p in photos %}"{{ photo_src(p) }}"{% if not loop.last %},{% endif %}{% endfor %}];
+let lbIdx=0;
+function openLightbox(i){
+  lbIdx=i;document.getElementById('lightbox-img').src=lbPhotos[i];
+  document.getElementById('lightbox-counter').textContent=`${i+1} / ${lbPhotos.length}`;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('lightbox-prev').style.display=lbPhotos.length>1?'':'none';
+  document.getElementById('lightbox-next').style.display=lbPhotos.length>1?'':'none';
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function closeLightboxOutside(e){if(e.target===document.getElementById('lightbox'))closeLightbox();}
+function lbNav(d){lbIdx=(lbIdx+d+lbPhotos.length)%lbPhotos.length;openLightbox(lbIdx);}
+document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);});
+
+async function submitRSVP(id){
+  const name=document.getElementById('rsvp-name').value.trim();
+  if(!name){alert('Mohon masukkan nama Anda');return;}
+  const btn=document.querySelector('.submit-btn');btn.disabled=true;btn.textContent='Mengirim...';
+  try{
+    const r=await fetch(`/rsvp/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,attendance:document.getElementById('rsvp-attendance').value,count:parseInt(document.getElementById('rsvp-count').value),message:document.getElementById('rsvp-message').value})});
+    if(r.ok){document.getElementById('rsvp-form-inner').style.display='none';document.getElementById('rsvp-success').style.display='block';}
+  }catch(e){btn.disabled=false;btn.textContent='Kirim Konfirmasi';}
+}
+function copyText(t,btn){navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='✓ Tersalin!';setTimeout(()=>btn.textContent=o,2000);});}
+function toggleMusic(){const m=document.getElementById('bg-music'),f=document.getElementById('music-fab');if(!m)return;m.paused?m.play():m.pause();}
+</script>
+</body>
+</html>
