@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@300;400;600&family=Jost:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   ABADI
+   Midnight navy · Celestial silver · Ivory lunar · Burgundy
+═══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+:root{
+  --void:#04060f;
+  --night:#070d1e;
+  --navy:#0b1228;
+  --deep:#111a38;
+  --dusk:#1a2548;
+  --mid:#253560;
+  --astral:#3a4f8a;
+
+  --silver:#c8cfe0;
+  --silver2:#dde3ef;
+  --silver3:#eef0f6;
+  --mist:#f4f5f8;
+
+  --ivory:#f8f3ea;
+  --lunar:#f0e8d8;
+  --cream:#e8ddc8;
+  --parch:#ddd0b4;
+
+  --burg:#6b1a2a;
+  --burg2:#8a2438;
+  --burg3:#a83850;
+  --rose-d:#c45e70;
+  --rose-l:#e8a0b0;
+
+  --star:#fff8e8;
+  --gold-s:#d4b86a;
+  --gold-s2:#e8d090;
+  --gold-s3:#f4e4b4;
+
+  --text-h:#f4f5f8;
+  --text-m:#c8cfe0;
+  --text-l:#8a95b4;
+  --text-d:#4a5578;
+
+  --serif:'Cormorant Garamond',serif;
+  --display:'Cinzel',serif;
+  --title:'Cinzel Decorative',serif;
+  --sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--night);color:var(--text-h);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+
+/* ══════════════════════════
+   INTRO — Celestial Gate
+══════════════════════════ */
+#intro{
+  position:fixed;inset:0;z-index:2000;
+  background:radial-gradient(ellipse at 50% 35%, #0d1530 0%, var(--void) 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;overflow:hidden;
+}
+
+/* Star canvas for intro */
+#intro-stars{position:absolute;inset:0;pointer-events:none;}
+
+/* Nebula clouds */
+.nebula{
+  position:absolute;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse,var(--c) 0%,transparent 70%);
+  animation:nebulaBreath ease-in-out infinite;
+}
+@keyframes nebulaBreath{0%,100%{transform:scale(1) translate(0,0);opacity:var(--op);}50%{transform:scale(1.1) translate(var(--dx),var(--dy));opacity:calc(var(--op)*.7);}}
+
+/* Constellation lines SVG */
+.constellation{
+  position:absolute;width:100%;height:100%;
+  opacity:.12;pointer-events:none;
+}
+
+/* Central celestial ornament */
+.gate-wrap{
+  position:relative;width:210px;height:210px;
+  margin-bottom:2.5rem;
+}
+.gate-ring{
+  position:absolute;border-radius:50%;
+  border-style:solid;
+  animation:gateRotate linear infinite;
+}
+.gate-ring-1{
+  inset:0;border-width:1px;
+  border-color:rgba(200,207,224,.2);
+  animation-duration:25s;
+}
+.gate-ring-2{
+  inset:16px;border-width:1px;
+  border-color:rgba(212,184,106,.15);
+  animation-duration:18s;animation-direction:reverse;
+  border-style:dashed;
+}
+.gate-ring-3{
+  inset:32px;border-width:1px;
+  border-color:rgba(200,207,224,.1);
+  animation-duration:35s;
+}
+@keyframes gateRotate{to{transform:rotate(360deg);}}
+
+/* Star points on ring 1 */
+.gate-ring-1::before{
+  content:'✦ · · · · ✦ · · · · ✦ · · · · ✦';
+  position:absolute;inset:-10px;
+  font-size:.38rem;letter-spacing:1.15em;color:rgba(200,207,224,.25);
+  display:flex;align-items:center;justify-content:center;
+  white-space:nowrap;overflow:hidden;
+}
+
+.gate-center{
+  position:absolute;inset:48px;border-radius:50%;
+  background:radial-gradient(ellipse at 40% 35%,rgba(107,26,42,.25),rgba(7,13,30,.9));
+  border:1px solid rgba(200,207,224,.1);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.gate-center::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 0%,rgba(212,184,106,.12),transparent 60%);
+}
+.gate-star{
+  font-family:var(--serif);font-size:2.6rem;font-style:italic;
+  color:var(--gold-s2);opacity:0;
+  animation:starAppear .9s 2s ease forwards;
+  position:relative;z-index:1;
+  text-shadow:0 0 20px rgba(212,184,106,.4);
+}
+@keyframes starAppear{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+
+/* Shooting star */
+.shooting-star{
+  position:absolute;top:15%;left:-5%;
+  width:120px;height:1px;
+  background:linear-gradient(to right,transparent,rgba(255,248,232,.8),transparent);
+  transform:rotate(-25deg);
+  animation:shootAcross 4s 1s ease-out forwards;
+  opacity:0;
+}
+@keyframes shootAcross{
+  0%{left:-10%;opacity:0;}
+  10%{opacity:1;}
+  80%{opacity:.4;}
+  100%{left:110%;opacity:0;}
+}
+.shooting-star::after{
+  content:'';position:absolute;right:0;top:-1px;
+  width:4px;height:3px;border-radius:50%;
+  background:rgba(255,248,232,.9);
+  box-shadow:0 0 6px rgba(255,248,232,.7);
+}
+
+.intro-eyebrow{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.7em;
+  text-transform:uppercase;color:var(--gold-s);opacity:0;
+  animation:celestialRise .8s 1.2s ease forwards;
+  text-align:center;margin-bottom:.8rem;
+}
+.intro-title{
+  font-family:var(--title);font-size:clamp(2rem,7vw,3.2rem);
+  color:var(--silver2);opacity:0;
+  animation:celestialRise .9s 1.6s ease forwards;
+  text-align:center;letter-spacing:.12em;
+  text-shadow:0 0 40px rgba(200,207,224,.15);
+}
+.intro-names{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.1rem,4vw,1.7rem);
+  color:var(--gold-s2);opacity:0;
+  animation:celestialRise .8s 2.1s ease forwards;
+  text-align:center;margin-top:.6rem;letter-spacing:.05em;
+}
+.intro-tap{
+  margin-top:2rem;font-family:var(--display);font-size:.48rem;
+  letter-spacing:.6em;text-transform:uppercase;
+  color:var(--text-d);opacity:0;
+  animation:celestialRise .6s 2.8s ease forwards,starPulse 2.5s 3.4s ease infinite;
+  text-align:center;
+}
+@keyframes celestialRise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes starPulse{0%,100%{opacity:.2;}50%{opacity:.65;}}
+
+#intro.out{animation:gateClose .9s ease forwards;}
+@keyframes gateClose{
+  0%{opacity:1;transform:scale(1);}
+  30%{opacity:.8;transform:scale(.99);}
+  100%{opacity:0;transform:scale(1.06);visibility:hidden;}
+}
+
+/* ══════════════════════════
+   MAIN STAR FIELD
+══════════════════════════ */
+#star-canvas{position:fixed;inset:0;pointer-events:none;z-index:1;}
+
+/* ══════════════════════════
+   GLOBAL
+══════════════════════════ */
+main{position:relative;z-index:2;}
+section{padding:6rem 2rem;position:relative;}
+.s-eyebrow{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.7em;
+  text-transform:uppercase;color:var(--gold-s);opacity:.55;margin-bottom:1rem;
+}
+.s-title{
+  font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:300;color:var(--text-h);margin-bottom:2rem;line-height:1.15;
+}
+.s-title em{color:var(--gold-s2);font-style:italic;}
+
+/* Celestial rule */
+.cel-rule{
+  display:flex;align-items:center;gap:1rem;
+  margin:1.5rem auto 2.5rem;max-width:300px;
+}
+.cel-rule-line{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(200,207,224,.25),transparent);}
+.cel-rule-star{font-family:var(--serif);font-size:1rem;color:var(--gold-s);opacity:.5;}
+
+/* ══════════════════════════
+   HERO — photo under night sky
+══════════════════════════ */
+#hero{
+  height:100vh;min-height:600px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:0;
+}
+.hero-sky{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,var(--void) 0%,var(--navy) 50%,var(--dusk) 100%);
+}
+/* Photo — clear and prominent */
+.hero-photo{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center top;
+  opacity:.74;
+}
+/* Night sky gradient over top portion */
+.hero-sky-top{
+  position:absolute;top:0;left:0;right:0;height:28%;
+  background:linear-gradient(to bottom,rgba(4,6,15,.8) 0%,rgba(4,6,15,.35) 60%,transparent 100%);
+}
+/* Deep shadow bottom for text */
+.hero-shadow-b{
+  position:absolute;bottom:0;left:0;right:0;height:50%;
+  background:linear-gradient(to top,rgba(4,6,15,.88) 0%,rgba(7,13,30,.5) 45%,transparent 100%);
+}
+/* Subtle burgundy vignette sides */
+.hero-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(107,26,42,.12) 100%);
+}
+
+.hero-content{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:2.8rem 2rem;z-index:3;
+}
+.hero-label{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.7em;
+  text-transform:uppercase;color:rgba(255,248,232,.4);
+  margin-bottom:.8rem;display:block;
+  opacity:0;animation:celestialRise .8s .3s ease forwards;
+}
+.hero-names{
+  opacity:0;animation:celestialRise 1s .5s ease forwards;
+}
+.hero-groom{
+  font-family:var(--serif);font-size:clamp(2.6rem,12vw,6rem);
+  font-style:italic;font-weight:600;color:var(--mist);
+  line-height:.9;display:block;letter-spacing:-.01em;
+  text-shadow:0 4px 30px rgba(4,6,15,.7),0 0 60px rgba(200,207,224,.08);
+}
+.hero-amp{
+  font-family:var(--serif);font-size:clamp(.9rem,3vw,1.5rem);
+  font-style:italic;color:var(--gold-s2);
+  display:inline-block;margin:.35em .4em;letter-spacing:.1em;
+}
+.hero-bride{
+  font-family:var(--serif);font-size:clamp(2.6rem,12vw,6rem);
+  font-style:italic;font-weight:600;color:var(--gold-s3);
+  line-height:.9;display:block;letter-spacing:-.01em;
+  text-shadow:0 4px 30px rgba(4,6,15,.7),0 0 60px rgba(212,184,106,.1);
+}
+.hero-dateline{
+  margin-top:1.2rem;display:flex;align-items:center;gap:1.2rem;
+  opacity:0;animation:celestialRise .7s 1s ease forwards;
+}
+.hdl-line{width:30px;height:1px;background:rgba(200,207,224,.2);}
+.hdl-date{
+  font-family:var(--display);font-size:.5rem;
+  letter-spacing:.5em;color:rgba(200,207,224,.4);
+}
+/* Top center: constellation ornament */
+.hero-top-ornament{
+  position:absolute;top:1.5rem;left:50%;transform:translateX(-50%);
+  z-index:3;text-align:center;
+  opacity:0;animation:celestialRise .6s 1.6s ease forwards;
+}
+.hero-orn-text{
+  font-family:var(--display);font-size:.42rem;letter-spacing:.6em;
+  color:rgba(255,248,232,.2);text-transform:uppercase;
+}
+
+/* Vertical label on right */
+.hero-v-label{
+  position:absolute;right:1.4rem;top:50%;transform:translateY(-50%);
+  z-index:3;
+  font-family:var(--display);font-size:.4rem;letter-spacing:.45em;
+  color:rgba(200,207,224,.2);text-transform:uppercase;
+  writing-mode:vertical-rl;
+  opacity:0;animation:celestialRise .6s 2s ease forwards;
+}
+
+/* ══════════════════════════
+   VERSE — sacred dark panel
+══════════════════════════ */
+#verse{
+  background:linear-gradient(170deg,var(--void) 0%,var(--night) 50%,var(--void) 100%);
+  text-align:center;padding:7rem 2rem;position:relative;overflow:hidden;
+}
+/* constellation pattern */
+.verse-constellation{
+  position:absolute;inset:0;pointer-events:none;opacity:.07;
+}
+.verse-burg-glow{
+  position:absolute;top:50%;left:50%;
+  width:400px;height:200px;margin:-100px -200px;
+  background:radial-gradient(ellipse,rgba(107,26,42,.25),transparent 70%);
+  pointer-events:none;
+}
+.verse-frame{
+  max-width:480px;margin:0 auto;
+  border:1px solid rgba(200,207,224,.08);
+  padding:3rem 2rem;position:relative;
+}
+/* Gold corner ornaments */
+.verse-frame::before,.verse-frame::after{
+  content:'';position:absolute;
+  width:28px;height:28px;
+  border-color:rgba(212,184,106,.3);border-style:solid;
+}
+.verse-frame::before{top:-1px;left:-1px;border-width:1.5px 0 0 1.5px;}
+.verse-frame::after{bottom:-1px;right:-1px;border-width:0 1.5px 1.5px 0;}
+/* Inner corner other sides */
+.verse-frame-inner{
+  position:absolute;inset:0;pointer-events:none;
+}
+.verse-frame-inner::before,.verse-frame-inner::after{
+  content:'';position:absolute;
+  width:28px;height:28px;
+  border-color:rgba(212,184,106,.15);border-style:solid;
+}
+.verse-frame-inner::before{top:-1px;right:-1px;border-width:1.5px 1.5px 0 0;}
+.verse-frame-inner::after{bottom:-1px;left:-1px;border-width:0 0 1.5px 1.5px;}
+
+.verse-arabic{
+  font-family:var(--serif);font-size:clamp(1.1rem,3.5vw,1.6rem);
+  color:var(--gold-s2);line-height:2.4;direction:rtl;
+  margin-bottom:1.8rem;
+  opacity:0;transform:translateY(16px);transition:all 1s ease;
+}
+.verse-arabic.visible{opacity:1;transform:none;}
+.verse-trans{
+  font-family:var(--serif);font-style:italic;font-size:.95rem;
+  color:var(--text-m);max-width:420px;margin:0 auto 1.2rem;
+  line-height:2.1;
+  opacity:0;transform:translateY(14px);transition:all 1s .25s ease;
+}
+.verse-trans.visible{opacity:1;transform:none;}
+.verse-src{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.5em;
+  text-transform:uppercase;color:var(--gold-s);
+  opacity:0;transition:all .8s .5s ease;
+}
+.verse-src.visible{opacity:.5;}
+.verse-caption{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1rem,3vw,1.4rem);color:var(--silver);
+  margin-top:2.5rem;opacity:0;
+  transition:all .9s .7s ease;
+}
+.verse-caption.visible{opacity:.45;}
+
+/* ══════════════════════════
+   COUPLE — starlit cards
+══════════════════════════ */
+#couple{
+  background:var(--night);padding:6.5rem 1.5rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.couple-cards{width:100%;max-width:430px;display:flex;flex-direction:column;gap:1px;}
+.person-card{
+  padding:2.2rem 2rem;
+  background:linear-gradient(145deg,rgba(17,26,56,.9),rgba(7,13,30,.95));
+  border:1px solid rgba(200,207,224,.07);
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(22px);transition:all .9s ease;
+}
+.person-card.visible{opacity:1;transform:none;}
+/* Gradient top bar */
+.person-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent 0%,var(--gold-s) 40%,var(--silver) 60%,transparent 100%);
+  opacity:.4;
+}
+.bride-card::before{
+  background:linear-gradient(90deg,transparent 0%,var(--burg3) 40%,var(--rose-l) 60%,transparent 100%);
+}
+/* Background constellation numbers */
+.pc-bg-num{
+  position:absolute;right:.8rem;bottom:-.2rem;
+  font-family:var(--title);font-size:4rem;
+  color:rgba(200,207,224,.025);line-height:1;pointer-events:none;
+}
+.bride-card .pc-bg-num{color:rgba(107,26,42,.04);}
+
+/* Faint glow */
+.person-card::after{
+  content:'';position:absolute;top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle at top right,rgba(212,184,106,.05),transparent 70%);
+  pointer-events:none;
+}
+.bride-card::after{background:radial-gradient(circle at top right,rgba(164,56,80,.06),transparent 70%);}
+
+.pc-role{
+  font-family:var(--display);font-size:.46rem;letter-spacing:.55em;
+  text-transform:uppercase;color:var(--gold-s);opacity:.6;margin-bottom:.9rem;
+}
+.bride-card .pc-role{color:var(--rose-d);}
+.pc-name{
+  font-family:var(--serif);font-style:italic;font-size:2.1rem;
+  color:var(--text-h);margin-bottom:.35rem;line-height:1.2;
+  letter-spacing:.01em;
+}
+.pc-full{font-size:.8rem;color:var(--text-m);margin-bottom:.65rem;font-weight:200;}
+.pc-parents{
+  font-size:.73rem;color:var(--text-l);line-height:1.9;
+  border-top:1px solid rgba(200,207,224,.05);padding-top:.6rem;margin-top:.3rem;
+}
+.pc-parents-lbl{
+  font-family:var(--display);font-size:.44rem;letter-spacing:.45em;
+  text-transform:uppercase;color:var(--gold-s);display:block;
+  margin-bottom:.25rem;opacity:.5;
+}
+.bride-card .pc-parents-lbl{color:var(--rose-d);}
+
+/* Joiner */
+.card-join{
+  width:100%;max-width:430px;height:32px;
+  background:linear-gradient(180deg,rgba(17,26,56,.9),rgba(17,26,56,.9));
+  border-left:1px solid rgba(200,207,224,.07);
+  border-right:1px solid rgba(200,207,224,.07);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.card-join::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,var(--gold-s),var(--rose-d));
+  transform:translateX(-50%);opacity:.2;
+}
+.card-join-sym{
+  font-family:var(--serif);font-size:.85rem;
+  color:var(--gold-s);opacity:.3;z-index:1;
+  font-style:italic;letter-spacing:.15em;
+}
+
+/* ══════════════════════════
+   EVENT — CENTER TIMELINE
+══════════════════════════ */
+#event{
+  background:linear-gradient(180deg,var(--void),var(--navy) 30%,var(--deep) 70%,var(--void));
+  padding:6.5rem 0;display:flex;flex-direction:column;align-items:center;
+}
+#event .s-eyebrow,#event .s-title{padding:0 2rem;text-align:center;}
+
+.vtl-wrap{width:100%;max-width:480px;position:relative;padding:2rem 1.5rem;}
+.vtl-wrap::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--gold-s) 15%,var(--silver) 50%,var(--gold-s) 85%,transparent);
+  transform:translateX(-50%);opacity:.25;
+}
+.vtl-item{
+  display:grid;grid-template-columns:1fr 32px 1fr;
+  align-items:start;margin-bottom:4rem;
+  opacity:0;transform:translateY(22px);transition:all .85s ease;
+}
+.vtl-item.visible{opacity:1;transform:none;}
+.vtl-item.v-left .vtl-content{grid-column:1;text-align:right;padding-right:2rem;}
+.vtl-item.v-left .vtl-dot-col{grid-column:2;}
+.vtl-item.v-left .vtl-empty{grid-column:3;}
+.vtl-item.v-right .vtl-empty{grid-column:1;}
+.vtl-item.v-right .vtl-dot-col{grid-column:2;}
+.vtl-item.v-right .vtl-content{grid-column:3;text-align:left;padding-left:2rem;}
+.vtl-dot-col{display:flex;justify-content:center;padding-top:.4rem;}
+.vtl-dot{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--night);border:1.5px solid var(--gold-s);
+  box-shadow:0 0 0 4px rgba(212,184,106,.08),0 0 10px rgba(212,184,106,.15);
+  flex-shrink:0;
+}
+.vtl-item.v-right .vtl-dot{
+  border-color:var(--silver);
+  box-shadow:0 0 0 4px rgba(200,207,224,.06),0 0 10px rgba(200,207,224,.1);
+}
+.vtl-tag{
+  font-family:var(--display);font-size:.46rem;letter-spacing:.5em;
+  text-transform:uppercase;color:var(--gold-s);opacity:.6;margin-bottom:.5rem;
+}
+.vtl-item.v-right .vtl-tag{color:var(--silver);}
+.vtl-event-name{
+  font-family:var(--serif);font-size:1.25rem;font-style:italic;
+  color:var(--text-h);margin-bottom:.8rem;line-height:1.3;
+}
+.vtl-info{font-family:var(--sans);font-size:.75rem;color:var(--text-m);line-height:2.1;font-weight:200;}
+.vtl-row{display:flex;align-items:flex-start;gap:.4rem;justify-content:flex-end;}
+.vtl-item.v-right .vtl-row{justify-content:flex-start;}
+.vtl-link{
+  display:inline-block;margin-top:.8rem;
+  font-family:var(--display);font-size:.46rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--gold-s);text-decoration:none;
+  border-bottom:1px solid rgba(212,184,106,.2);transition:all .3s;
+}
+.vtl-link:hover{color:var(--gold-s2);border-bottom-color:rgba(212,184,106,.5);}
+
+/* ══════════════════════════
+   SCHEDULE
+══════════════════════════ */
+#schedule{
+  background:linear-gradient(170deg,var(--deep),var(--navy) 50%,var(--deep));
+  padding:6.5rem 1.8rem;display:flex;flex-direction:column;align-items:center;
+}
+.sch-wrap{width:100%;max-width:460px;position:relative;}
+.sch-wrap::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,transparent,rgba(200,207,224,.12),transparent);
+  transform:translateX(-50%);
+}
+.sch-item{
+  display:grid;grid-template-columns:1fr 24px 1fr;
+  gap:.5rem;margin-bottom:2.5rem;align-items:center;
+  opacity:0;transition:all .7s ease;
+}
+.sch-item.visible{opacity:1;}
+.sch-item.s-left .sch-content{grid-column:1;text-align:right;}
+.sch-item.s-left .sch-mid{grid-column:2;}
+.sch-item.s-left .sch-tcol{grid-column:3;}
+.sch-item.s-right .sch-tcol{grid-column:1;text-align:right;}
+.sch-item.s-right .sch-mid{grid-column:2;}
+.sch-item.s-right .sch-content{grid-column:3;}
+.sch-mid{display:flex;justify-content:center;}
+.sch-dot{width:7px;height:7px;border-radius:50%;background:var(--night);border:1px solid rgba(212,184,106,.35);}
+.sch-time{
+  font-family:var(--serif);font-size:1.5rem;font-style:italic;
+  color:var(--gold-s2);line-height:1;
+}
+.sch-label{
+  font-family:var(--display);font-size:.7rem;font-weight:400;
+  color:var(--text-h);margin-bottom:.25rem;letter-spacing:.03em;
+}
+.sch-desc{font-size:.68rem;color:var(--text-l);line-height:1.8;font-weight:200;}
+
+/* ══════════════════════════
+   GALLERY — celestial frames
+══════════════════════════ */
+#gallery{
+  background:var(--void);padding:6.5rem 0;
+  display:flex;flex-direction:column;align-items:center;
+}
+#gallery .s-eyebrow,#gallery .s-title{padding:0 2rem;text-align:center;}
+
+.gallery-hero-ab{
+  width:100%;max-width:500px;padding:0 1.5rem;margin-bottom:.6rem;
+}
+.ab-frame{
+  position:relative;cursor:pointer;
+  box-shadow:0 16px 70px rgba(4,6,15,.7),0 2px 20px rgba(212,184,106,.08);
+  transition:transform .4s ease;
+}
+.ab-frame:hover{transform:translateY(-3px);}
+/* Corner star ornaments */
+.ab-corner{
+  position:absolute;width:20px;height:20px;z-index:2;pointer-events:none;
+}
+.ab-corner::before,.ab-corner::after{
+  content:'';position:absolute;background:var(--gold-s);opacity:.35;
+}
+.ab-corner.tl{top:4px;left:4px;}
+.ab-corner.tr{top:4px;right:4px;}
+.ab-corner.bl{bottom:4px;left:4px;}
+.ab-corner.br{bottom:4px;right:4px;}
+.ab-corner.tl::before,.ab-corner.tr::before{top:0;left:0;right:0;height:1.5px;}
+.ab-corner.bl::before,.ab-corner.br::before{bottom:0;left:0;right:0;height:1.5px;}
+.ab-corner.tl::after,.ab-corner.bl::after{top:0;bottom:0;left:0;width:1.5px;}
+.ab-corner.tr::after,.ab-corner.br::after{top:0;bottom:0;right:0;width:1.5px;}
+
+.ab-hero-img{width:100%;aspect-ratio:4/3;overflow:hidden;display:block;}
+.ab-hero-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .7s ease;
+  filter:contrast(1.05) saturate(.95);
+}
+.ab-frame:hover .ab-hero-img img{transform:scale(1.03);}
+/* subtle star overlay on hero photo */
+.ab-photo-overlay{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(212,184,106,.04),transparent 60%);
+  pointer-events:none;z-index:1;
+}
+
+/* Strip */
+.gallery-strip{
+  width:100%;overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:.6rem 1.5rem;display:flex;gap:.5rem;
+}
+.gallery-strip::-webkit-scrollbar{display:none;}
+.gs-ab{
+  flex-shrink:0;overflow:hidden;cursor:pointer;position:relative;
+  border:1px solid rgba(200,207,224,.07);
+}
+.gs-ab:nth-child(odd){width:148px;height:180px;margin-top:12px;}
+.gs-ab:nth-child(even){width:158px;height:194px;}
+.gs-ab img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease;filter:contrast(1.03) saturate(.94);
+}
+.gs-ab:hover img{transform:scale(1.06);}
+
+/* grid fallback */
+.gallery-grid-ab{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:.5rem;width:100%;max-width:500px;padding:0 1.5rem;
+}
+.gallery-grid-ab .gab{overflow:hidden;cursor:pointer;border:1px solid rgba(200,207,224,.06);}
+.gallery-grid-ab .gab:first-child{grid-column:1/-1;aspect-ratio:16/7;}
+.gallery-grid-ab .gab:not(:first-child){aspect-ratio:1;}
+.gallery-grid-ab .gab img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;filter:contrast(1.04) saturate(.93);}
+.gallery-grid-ab .gab:hover img{transform:scale(1.05);}
+
+/* ══════════════════════════
+   COUNTDOWN
+══════════════════════════ */
+#countdown{
+  background:linear-gradient(160deg,var(--deep),var(--dusk) 50%,var(--deep));
+  padding:6.5rem 1.8rem;display:flex;flex-direction:column;
+  align-items:center;text-align:center;position:relative;overflow:hidden;
+}
+/* Orrery bg */
+.cd-orrery{
+  position:absolute;top:50%;left:50%;
+  width:340px;height:340px;margin:-170px;
+  border-radius:50%;border:1px solid rgba(200,207,224,.04);
+  pointer-events:none;
+}
+.cd-orrery::before{
+  content:'';position:absolute;inset:30px;border-radius:50%;
+  border:1px solid rgba(212,184,106,.03);
+}
+.cd-orrery::after{
+  content:'';position:absolute;inset:60px;border-radius:50%;
+  border:1px solid rgba(107,26,42,.04);
+}
+.cd-row{
+  display:flex;margin-top:2.5rem;
+  border:1px solid rgba(200,207,224,.08);
+  position:relative;z-index:1;
+  opacity:0;transform:translateY(18px);transition:all .9s ease;
+}
+.cd-row.visible{opacity:1;transform:none;}
+.cd-block{
+  padding:2rem 1.8rem;
+  border-right:1px solid rgba(200,207,224,.06);
+  min-width:80px;
+  background:rgba(7,13,30,.4);
+}
+.cd-block:last-child{border-right:none;}
+.cd-num{
+  font-family:var(--serif);font-size:clamp(2.2rem,7vw,3rem);
+  font-style:italic;color:var(--gold-s2);line-height:1;font-weight:400;
+  text-shadow:0 0 20px rgba(212,184,106,.2);
+}
+.cd-label{
+  font-family:var(--display);font-size:.45rem;letter-spacing:.4em;
+  text-transform:uppercase;color:var(--text-d);margin-top:.45rem;display:block;
+}
+
+/* ══════════════════════════
+   LOVE STORY
+══════════════════════════ */
+#story{
+  background:var(--night);padding:6.5rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.story-ab{
+  max-width:480px;width:100%;
+  padding:2.5rem 2rem;position:relative;
+  border:1px solid rgba(200,207,224,.07);
+  background:linear-gradient(145deg,rgba(17,26,56,.6),rgba(7,13,30,.8));
+}
+.story-ab::before{
+  content:'"';font-family:var(--serif);font-size:6rem;
+  color:rgba(212,184,106,.08);
+  position:absolute;top:.2rem;left:1.2rem;line-height:1;
+}
+.story-body{
+  font-family:var(--serif);font-style:italic;
+  font-size:1rem;color:var(--text-m);line-height:2.2;position:relative;z-index:1;
+}
+
+/* ══════════════════════════
+   RSVP
+══════════════════════════ */
+#rsvp{
+  background:linear-gradient(170deg,var(--void),var(--night));
+  padding:6.5rem 1.8rem;display:flex;flex-direction:column;align-items:center;
+}
+.rsvp-ab{width:100%;max-width:460px;}
+.ab-label{
+  display:block;font-family:var(--display);font-size:.46rem;
+  letter-spacing:.55em;text-transform:uppercase;
+  color:var(--gold-s);opacity:.55;margin-bottom:.4rem;
+}
+.ab-input{
+  width:100%;padding:.9rem 0;background:transparent;
+  border:none;border-bottom:1px solid rgba(200,207,224,.12);
+  color:var(--text-h);font-family:var(--serif);font-style:italic;
+  font-size:.88rem;outline:none;transition:border-color .3s;margin-bottom:1.6rem;
+  font-weight:300;
+}
+.ab-input:focus{border-bottom-color:rgba(212,184,106,.4);}
+.ab-input::placeholder{color:var(--text-d);font-style:italic;}
+.ab-input option{background:var(--navy);}
+.ab-btn{
+  width:100%;padding:1.15rem;
+  background:transparent;
+  border:1px solid rgba(200,207,224,.15);
+  color:var(--silver2);font-family:var(--display);
+  font-size:.48rem;letter-spacing:.6em;text-transform:uppercase;
+  cursor:pointer;transition:all .35s;margin-top:.5rem;
+  position:relative;overflow:hidden;
+}
+.ab-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(212,184,106,.06),transparent);
+  transform:translateX(-100%);transition:transform .5s ease;
+}
+.ab-btn:hover{border-color:rgba(212,184,106,.35);color:var(--gold-s2);}
+.ab-btn:hover::before{transform:translateX(100%);}
+.ab-btn:disabled{opacity:.4;}
+.ab-success{
+  display:none;text-align:center;padding:3rem 1rem;
+  border:1px solid rgba(200,207,224,.07);
+}
+.ab-success-star{
+  font-family:var(--serif);font-size:2.5rem;color:var(--gold-s2);
+  margin-bottom:1rem;
+  animation:starPulse 2s ease-in-out infinite;
+}
+.ab-success-text{
+  font-family:var(--serif);font-style:italic;
+  color:var(--text-m);font-size:1rem;line-height:2;
+}
+.ab-rsvp-list{margin-top:3rem;}
+.ab-rsvp-head{
+  font-family:var(--display);font-size:.46rem;letter-spacing:.5em;
+  text-transform:uppercase;color:var(--text-d);
+  padding-bottom:1rem;border-bottom:1px solid rgba(200,207,224,.06);margin-bottom:1rem;
+}
+.ab-rsvp-item{
+  padding:.9rem 0;border-bottom:1px solid rgba(200,207,224,.04);
+  display:flex;gap:1rem;align-items:flex-start;
+}
+.ab-init{
+  width:32px;height:32px;
+  border:1px solid rgba(212,184,106,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;color:var(--gold-s);font-size:.9rem;flex-shrink:0;
+}
+.ab-guest-name{font-size:.82rem;color:var(--text-h);margin-bottom:.2rem;font-weight:300;}
+.ab-guest-msg{font-family:var(--serif);font-style:italic;font-size:.76rem;color:var(--text-l);line-height:1.7;}
+.ab-badge{
+  font-family:var(--display);font-size:.43rem;letter-spacing:.1em;padding:.1rem .4rem;margin-left:.3rem;
+}
+.ab-badge.hadir{color:var(--gold-s);border:1px solid rgba(212,184,106,.2);}
+.ab-badge.tidak{color:var(--text-d);border:1px solid rgba(74,85,120,.2);}
+
+/* ══════════════════════════
+   GIFT
+══════════════════════════ */
+#gift{
+  background:var(--night);padding:6.5rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.gift-row{width:100%;max-width:460px;display:flex;flex-direction:column;gap:.8rem;}
+.gift-item{
+  padding:1.8rem;
+  background:linear-gradient(145deg,rgba(17,26,56,.8),rgba(7,13,30,.9));
+  border:1px solid rgba(200,207,224,.07);position:relative;overflow:hidden;
+}
+/* Gold shimmer line left */
+.gift-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,transparent,var(--gold-s),var(--burg3),transparent);
+  opacity:.4;
+}
+.gi-type{font-family:var(--display);font-size:.46rem;letter-spacing:.5em;color:var(--gold-s);opacity:.5;margin-bottom:.6rem;}
+.gi-bank{font-size:.9rem;color:var(--text-h);font-weight:300;margin-bottom:.3rem;}
+.gi-num{font-family:var(--serif);font-style:italic;font-size:1.5rem;color:var(--gold-s2);letter-spacing:.04em;margin-bottom:.25rem;}
+.gi-name{font-size:.73rem;color:var(--text-l);}
+.gi-copy{
+  margin-top:.8rem;background:transparent;
+  border:1px solid rgba(200,207,224,.12);
+  color:var(--text-l);padding:.4rem .9rem;
+  font-family:var(--display);font-size:.46rem;letter-spacing:.2em;
+  text-transform:uppercase;cursor:pointer;transition:all .3s;
+}
+.gi-copy:hover{border-color:rgba(212,184,106,.3);color:var(--gold-s);}
+
+/* ══════════════════════════
+   CLOSING
+══════════════════════════ */
+#closing{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:5rem 2rem;text-align:center;
+  background:radial-gradient(ellipse at 50% 35%,#0d1530 0%,var(--void) 65%);
+  position:relative;overflow:hidden;
+}
+#closing-star-field{position:absolute;inset:0;pointer-events:none;}
+
+/* Radiant burst behind monogram */
+.closing-burst{
+  position:absolute;top:50%;left:50%;
+  width:300px;height:300px;margin:-150px;
+  background:radial-gradient(circle,rgba(212,184,106,.06) 0%,rgba(107,26,42,.04) 40%,transparent 70%);
+  border-radius:50%;pointer-events:none;
+  animation:burstPulse 5s ease-in-out infinite;
+}
+@keyframes burstPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.15);opacity:1;}}
+
+.closing-monogram{
+  font-family:var(--title);font-size:4.5rem;
+  color:var(--gold-s);opacity:.08;line-height:1;
+  margin-bottom:-1.8rem;position:relative;z-index:1;
+}
+.closing-names{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.9rem,5.5vw,3rem);
+  color:var(--text-h);margin-bottom:.5rem;position:relative;z-index:1;
+  text-shadow:0 0 40px rgba(200,207,224,.08);
+}
+.closing-rule{
+  width:100px;height:1px;margin:.8rem auto 1.5rem;
+  background:linear-gradient(to right,transparent,var(--gold-s),transparent);
+  opacity:.4;position:relative;z-index:1;
+}
+.closing-doa{
+  font-family:var(--serif);font-style:italic;font-size:.97rem;
+  color:var(--text-m);max-width:390px;line-height:2.2;margin-bottom:1.5rem;
+  position:relative;z-index:1;
+}
+.closing-thanks{
+  font-family:var(--sans);font-size:.75rem;color:var(--text-l);
+  line-height:2;max-width:350px;margin:0 auto 2rem;
+  position:relative;z-index:1;font-weight:200;
+}
+.closing-ht{
+  font-family:var(--serif);font-style:italic;
+  color:var(--gold-s);opacity:.45;font-size:1.1rem;position:relative;z-index:1;
+}
+.closing-mark{
+  font-family:var(--title);font-size:.48rem;letter-spacing:.6em;
+  color:var(--gold-s);opacity:.18;margin-top:1.8rem;
+  text-transform:uppercase;position:relative;z-index:1;
+}
+
+/* ══════════════════════════
+   LIGHTBOX
+══════════════════════════ */
+#lightbox{
+  display:none;position:fixed;inset:0;z-index:3000;
+  background:rgba(4,6,15,.98);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(14px);
+}
+#lightbox.open{display:flex;}
+#lightbox img{
+  max-width:90vw;max-height:85vh;object-fit:contain;
+  box-shadow:0 20px 80px rgba(0,0,0,.8),0 0 0 1px rgba(212,184,106,.08);
+}
+#lb-close{
+  position:absolute;top:1.5rem;right:1.5rem;
+  font-family:var(--display);font-size:.65rem;letter-spacing:.2em;
+  color:rgba(200,207,224,.3);cursor:pointer;transition:color .25s;
+}
+#lb-close:hover{color:var(--gold-s);}
+#lb-prev,#lb-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(212,184,106,.04);border:1px solid rgba(212,184,106,.1);
+  color:rgba(200,207,224,.4);font-size:1.3rem;
+  padding:.5rem .8rem;cursor:pointer;transition:all .25s;
+}
+#lb-prev:hover,#lb-next:hover{background:rgba(212,184,106,.08);color:var(--gold-s2);}
+#lb-prev{left:1rem;}#lb-next{right:1rem;}
+#lb-counter{
+  position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  font-family:var(--display);font-size:.48rem;letter-spacing:.35em;
+  color:rgba(200,207,224,.2);
+}
+
+/* MUSIC FAB */
+#music-fab{
+  position:fixed;bottom:1.5rem;right:1.5rem;width:46px;height:46px;
+  border:1px solid rgba(212,184,106,.2);
+  background:rgba(7,13,30,.88);backdrop-filter:blur(10px);
+  color:var(--gold-s);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:100;transition:all .3s;
+  box-shadow:0 4px 20px rgba(4,6,15,.5);font-size:.95rem;
+}
+#music-fab:hover{background:rgba(212,184,106,.08);border-color:rgba(212,184,106,.4);}
+
+/* REVEALS */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .85s ease,transform .85s ease;}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-l{opacity:0;transform:translateX(-26px);transition:opacity .85s ease,transform .85s ease;}
+.reveal-l.visible{opacity:1;transform:none;}
+.reveal-r{opacity:0;transform:translateX(26px);transition:opacity .85s ease,transform .85s ease;}
+.reveal-r.visible{opacity:1;transform:none;}
+.reveal-s{opacity:0;transform:scale(.93);transition:opacity .85s ease,transform .85s ease;}
+.reveal-s.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+
+<!-- INTRO -->
+<div id="intro" onclick="openIntro()">
+  <canvas id="intro-stars" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+
+  <div class="nebula" style="width:350px;height:200px;top:-40px;right:-60px;--c:rgba(107,26,42,.15);--op:.7;--dx:-30px;--dy:20px;animation-duration:9s;"></div>
+  <div class="nebula" style="width:300px;height:300px;bottom:-80px;left:-60px;--c:rgba(58,79,138,.12);--op:.6;--dx:20px;--dy:-15px;animation-duration:12s;animation-delay:2s;"></div>
+  <div class="nebula" style="width:250px;height:150px;top:30%;right:5%;--c:rgba(212,184,106,.06);--op:.5;--dx:-10px;--dy:20px;animation-duration:15s;animation-delay:4s;"></div>
+
+  <div class="shooting-star"></div>
+
+  <div class="gate-wrap">
+    <div class="gate-ring gate-ring-1"></div>
+    <div class="gate-ring gate-ring-2"></div>
+    <div class="gate-ring gate-ring-3"></div>
+    <div class="gate-center">
+      <div class="gate-star">✦</div>
+    </div>
+  </div>
+
+  <div class="intro-eyebrow">Undangan Pernikahan</div>
+  <div class="intro-title">Abadi</div>
+  <div class="intro-names">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <div class="intro-tap">Sentuh untuk membuka</div>
+</div>
+
+<main id="main-content" style="display:none">
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-sky"></div>
+  {% if photos %}
+  <div class="hero-photo" style="background-image:url('{{ photo_src(photos[0]) }}')"></div>
+  {% endif %}
+  <div class="hero-sky-top"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-shadow-b"></div>
+
+  <div class="hero-top-ornament">
+    <div class="hero-orn-text">✦ &nbsp; Selamanya &amp; Abadi &nbsp; ✦</div>
+  </div>
+
+  <div class="hero-content">
+    <span class="hero-label">Undangan Pernikahan</span>
+    <div class="hero-names">
+      <span class="hero-groom">{{ inv.groom_name }}</span>
+      <span class="hero-amp">&amp;</span>
+      <span class="hero-bride">{{ inv.bride_name }}</span>
+    </div>
+    <div class="hero-dateline">
+      <div class="hdl-line"></div>
+      <div class="hdl-date">{{ inv.resepsi_date | format_date }}</div>
+    </div>
+  </div>
+  <div class="hero-v-label">Cinta · Abadi · Suci</div>
+</section>
+
+<!-- VERSE -->
+<section id="verse">
+  <svg class="verse-constellation" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+    <circle cx="40" cy="60" r="1.2" fill="rgba(200,207,224,.5)"/>
+    <circle cx="120" cy="30" r=".8" fill="rgba(200,207,224,.4)"/>
+    <circle cx="200" cy="80" r="1" fill="rgba(212,184,106,.4)"/>
+    <circle cx="280" cy="40" r=".9" fill="rgba(200,207,224,.35)"/>
+    <circle cx="360" cy="70" r="1.1" fill="rgba(200,207,224,.45)"/>
+    <circle cx="80" cy="120" r=".7" fill="rgba(200,207,224,.3)"/>
+    <circle cx="320" cy="100" r=".8" fill="rgba(212,184,106,.3)"/>
+    <line x1="40" y1="60" x2="120" y2="30" stroke="rgba(200,207,224,.15)" stroke-width=".5"/>
+    <line x1="120" y1="30" x2="200" y2="80" stroke="rgba(200,207,224,.1)" stroke-width=".5"/>
+    <line x1="200" y1="80" x2="280" y2="40" stroke="rgba(212,184,106,.12)" stroke-width=".5"/>
+    <line x1="280" y1="40" x2="360" y2="70" stroke="rgba(200,207,224,.1)" stroke-width=".5"/>
+  </svg>
+  <div class="verse-burg-glow"></div>
+  <div class="s-eyebrow reveal" style="text-align:center;">Firman Allah</div>
+  <div class="verse-frame">
+    <div class="verse-frame-inner"></div>
+    <div class="verse-arabic reveal">
+      وَمِنْ اٰيٰتِهٖٓ اَنْ خَلَقَ لَكُمْ مِّنْ اَنْفُسِكُمْ اَزْوَاجًا لِّتَسْكُنُوْٓا اِلَيْهَا وَجَعَلَ بَيْنَكُمْ مَّوَدَّةً وَّرَحْمَةً
+    </div>
+    <div class="verse-trans reveal">
+      "Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
+    </div>
+    <div class="verse-src reveal">QS. Ar-Rum : 21</div>
+  </div>
+  <div class="cel-rule reveal"><div class="cel-rule-line"></div><div class="cel-rule-star">✦</div><div class="cel-rule-line"></div></div>
+  <div class="verse-caption reveal">seperti bintang yang sinarnya menembus keabadian</div>
+</section>
+
+<!-- COUPLE -->
+<section id="couple">
+  <div class="s-eyebrow reveal" style="text-align:center;">Kedua Mempelai</div>
+  <h2 class="s-title reveal" style="text-align:center;">Dua Jiwa <em>Abadi</em></h2>
+  <div class="cel-rule reveal"><div class="cel-rule-line"></div><div class="cel-rule-star">✦</div><div class="cel-rule-line"></div></div>
+  <div class="couple-cards">
+    <div class="person-card reveal-l">
+      <div class="pc-bg-num">I</div>
+      <div class="pc-role">Mempelai Pria</div>
+      <div class="pc-name">{{ inv.groom_name }}</div>
+      {% if inv.groom_full %}<div class="pc-full">{{ inv.groom_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.groom_parents %}
+      <div class="pc-parents">
+        <span class="pc-parents-lbl">Putra dari</span>
+        {{ inv.groom_parents }}
+      </div>
+      {% endif %}
+    </div>
+    <div class="card-join reveal">
+      <div class="card-join-sym">&amp;</div>
+    </div>
+    <div class="person-card bride-card reveal-r">
+      <div class="pc-bg-num">II</div>
+      <div class="pc-role">Mempelai Wanita</div>
+      <div class="pc-name">{{ inv.bride_name }}</div>
+      {% if inv.bride_full %}<div class="pc-full">{{ inv.bride_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.bride_parents %}
+      <div class="pc-parents">
+        <span class="pc-parents-lbl">Putri dari</span>
+        {{ inv.bride_parents }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- EVENT -->
+<section id="event">
+  <div class="s-eyebrow reveal" style="text-align:center;">Rangkaian Acara</div>
+  <h2 class="s-title reveal" style="text-align:center;">Hari yang <em>Tak Terlupakan</em></h2>
+  <div class="cel-rule reveal"><div class="cel-rule-line"></div><div class="cel-rule-star">✦</div><div class="cel-rule-line"></div></div>
+  <div class="vtl-wrap">
+    {% if inv.akad_date %}
+    <div class="vtl-item v-left">
+      <div class="vtl-content">
+        <div class="vtl-tag">I — Akad Nikah</div>
+        <div class="vtl-event-name">{{ inv.akad_venue }}</div>
+        <div class="vtl-info">
+          <div class="vtl-row">📅&nbsp;{{ inv.akad_date | format_date }}</div>
+          <div class="vtl-row">🕐&nbsp;{{ inv.akad_time }} WIB</div>
+          <div class="vtl-row">📍&nbsp;{{ inv.akad_address }}</div>
+        </div>
+        {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="vtl-link" style="float:right;">Lihat Maps →</a>{% endif %}
+      </div>
+      <div class="vtl-dot-col"><div class="vtl-dot"></div></div>
+      <div class="vtl-empty"></div>
+    </div>
+    {% endif %}
+    {% if inv.resepsi_date %}
+    <div class="vtl-item v-right">
+      <div class="vtl-empty"></div>
+      <div class="vtl-dot-col"><div class="vtl-dot"></div></div>
+      <div class="vtl-content">
+        <div class="vtl-tag">II — Resepsi</div>
+        <div class="vtl-event-name">{{ inv.resepsi_venue }}</div>
+        <div class="vtl-info">
+          <div class="vtl-row" style="justify-content:flex-start;">📅&nbsp;{{ inv.resepsi_date | format_date }}</div>
+          <div class="vtl-row" style="justify-content:flex-start;">🕐&nbsp;{{ inv.resepsi_time }} WIB</div>
+          <div class="vtl-row" style="justify-content:flex-start;">📍&nbsp;{{ inv.resepsi_address }}</div>
+        </div>
+        {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="vtl-link">Lihat Maps →</a>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- MAP -->
+{% if inv.maps_embed %}
+<div style="background:var(--void);padding:0 1.8rem 5rem;display:flex;flex-direction:column;align-items:center;">
+  <div class="s-eyebrow reveal" style="text-align:center;padding-top:1rem;">Lokasi</div>
+  <div class="reveal" style="width:100%;max-width:480px;border:1px solid rgba(200,207,224,.07);box-shadow:0 4px 30px rgba(4,6,15,.6);overflow:hidden;">
+    <iframe src="{{ inv.maps_embed }}" width="100%" height="260" style="border:none;display:block;filter:grayscale(30%) invert(1) hue-rotate(180deg) brightness(.85) saturate(.8);" allowfullscreen loading="lazy"></iframe>
+  </div>
+</div>
+{% endif %}
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div class="s-eyebrow reveal" style="text-align:center;">Jadwal</div>
+  <h2 class="s-title reveal" style="text-align:center;">Susunan <em>Acara</em></h2>
+  <div class="cel-rule reveal"><div class="cel-rule-line"></div><div class="cel-rule-star">✦</div><div class="cel-rule-line"></div></div>
+  <div class="sch-wrap">
+    <div class="sch-item s-left">
+      <div class="sch-content">
+        <div class="sch-label">Persiapan & Kedatangan</div>
+        <div class="sch-desc">Pengantin dan keluarga bersiap menyambut tamu dengan penuh kemuliaan</div>
+      </div>
+      <div class="sch-mid"><div class="sch-dot"></div></div>
+      <div class="sch-tcol"><div class="sch-time">08.00</div></div>
+    </div>
+    <div class="sch-item s-right">
+      <div class="sch-tcol" style="text-align:right;"><div class="sch-time">10.00</div></div>
+      <div class="sch-mid"><div class="sch-dot" style="border-color:rgba(200,207,224,.35);"></div></div>
+      <div class="sch-content">
+        <div class="sch-label">Akad Nikah</div>
+        <div class="sch-desc">Pembukaan · Ayat Suci Al-Qur'an · Khutbah Nikah · Ijab Kabul · Doa</div>
+      </div>
+    </div>
+    <div class="sch-item s-left">
+      <div class="sch-content">
+        <div class="sch-label">Resepsi Pernikahan</div>
+        <div class="sch-desc">Sambutan keluarga · Hiburan · Tarian tradisional · Makan bersama</div>
+      </div>
+      <div class="sch-mid"><div class="sch-dot"></div></div>
+      <div class="sch-tcol"><div class="sch-time">11.00</div></div>
+    </div>
+    <div class="sch-item s-right">
+      <div class="sch-tcol" style="text-align:right;"><div class="sch-time">14.00</div></div>
+      <div class="sch-mid"><div class="sch-dot" style="border-color:rgba(200,207,224,.35);"></div></div>
+      <div class="sch-content">
+        <div class="sch-label">Acara Puncak</div>
+        <div class="sch-desc">Hiburan · Makan siang · Momen-momen yang akan dikenang selamanya</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown">
+  <div class="cd-orrery"></div>
+  <div class="s-eyebrow reveal" style="text-align:center;">Menghitung Waktu</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Hitungan Mundur</em></h2>
+  <div class="cd-row reveal">
+    <div class="cd-block"><div class="cd-num" id="cd-days">--</div><span class="cd-label">Hari</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-hours">--</div><span class="cd-label">Jam</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-mins">--</div><span class="cd-label">Menit</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-secs">--</div><span class="cd-label">Detik</span></div>
+  </div>
+  <p class="reveal" style="margin-top:1.5rem;font-family:var(--serif);font-style:italic;font-size:.9rem;color:var(--text-d);text-align:center;">
+    saat itu tiba, bintang-bintang pun akan menjadi saksi...
+  </p>
+</section>
+
+<!-- GALLERY -->
+{% if photos %}
+<section id="gallery">
+  <div class="s-eyebrow reveal" style="text-align:center;">Foto Prewed</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Abadi dalam Gambar</em></h2>
+  <div class="cel-rule reveal"><div class="cel-rule-line"></div><div class="cel-rule-star">✦</div><div class="cel-rule-line"></div></div>
+  {% if photos|length >= 3 %}
+  <div class="gallery-hero-ab reveal-s">
+    <div class="ab-frame" onclick="openLightbox(0)">
+      <div class="ab-corner tl"></div>
+      <div class="ab-corner tr"></div>
+      <div class="ab-corner bl"></div>
+      <div class="ab-corner br"></div>
+      <div class="ab-hero-img"><img src="{{ photo_src(photos[0]) }}" alt="Foto 1" loading="lazy"></div>
+      <div class="ab-photo-overlay"></div>
+    </div>
+  </div>
+  <div class="gallery-strip">
+    {% for p in photos[1:] %}
+    <div class="gs-ab" onclick="openLightbox({{ loop.index }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index+1 }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  <p style="text-align:center;font-family:var(--display);font-size:.45rem;color:var(--text-d);letter-spacing:.4em;margin-top:.4rem;text-transform:uppercase;padding:0 1.5rem;">← Geser untuk lihat semua →</p>
+  {% else %}
+  <div class="gallery-grid-ab reveal">
+    {% for p in photos %}
+    <div class="gab" onclick="openLightbox({{ loop.index0 }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- LOVE STORY -->
+{% if inv.love_story %}
+<section id="story">
+  <div class="s-eyebrow reveal">Kisah Kami</div>
+  <h2 class="s-title reveal"><em>Love Story</em></h2>
+  <div class="story-ab reveal">
+    <div class="story-body">{{ inv.love_story }}</div>
+  </div>
+</section>
+{% endif %}
+
+<!-- RSVP -->
+<section id="rsvp">
+  <div class="s-eyebrow reveal" style="text-align:center;">Konfirmasi Kehadiran</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>RSVP</em></h2>
+  <p class="reveal" style="font-family:var(--serif);font-style:italic;font-size:.9rem;color:var(--text-l);text-align:center;margin-bottom:2.5rem;line-height:2;max-width:390px;">
+    Kehadiran dan doa tulusmu akan menjadi bagian<br>dari kenangan abadi kami.
+  </p>
+  <div class="rsvp-ab">
+    <div id="ab-success" class="ab-success">
+      <div class="ab-success-star">✦</div>
+      <div class="ab-success-text">Terima kasih atas doa dan konfirmasi kehadiranmu.<br>Sampai jumpa di hari yang penuh kemuliaan itu.</div>
+    </div>
+    <div id="ab-form">
+      <div><label class="ab-label">Nama Lengkap</label><input class="ab-input" id="r-name" type="text" placeholder="Tulis nama Anda..."></div>
+      <div><label class="ab-label">Kehadiran</label>
+        <select class="ab-input" id="r-att"><option value="hadir">Insya Allah Hadir</option><option value="tidak">Tidak Dapat Hadir</option><option value="ragu">Masih Belum Pasti</option></select>
+      </div>
+      <div><label class="ab-label">Jumlah Tamu</label>
+        <select class="ab-input" id="r-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div><label class="ab-label">Ucapan & Doa</label><input class="ab-input" id="r-msg" type="text" placeholder="Sampaikan ucapan Anda..."></div>
+      <button class="ab-btn" onclick="submitRSVP('{{ inv.id }}')">Kirim Konfirmasi</button>
+    </div>
+    {% if rsvp_list %}
+    <div class="ab-rsvp-list">
+      <div class="ab-rsvp-head">{{ rsvp_list|length }} Tamu Mengonfirmasi</div>
+      {% for r in rsvp_list %}
+      <div class="ab-rsvp-item">
+        <div class="ab-init">{{ r.guest_name[0] }}</div>
+        <div>
+          <div class="ab-guest-name">{{ r.guest_name }}<span class="ab-badge {{ 'hadir' if r.attendance=='hadir' else 'tidak' }}">{{ 'Hadir' if r.attendance=='hadir' else ('Tidak' if r.attendance=='tidak' else 'Belum') }}</span></div>
+          {% if r.message %}<div class="ab-guest-msg">{{ r.message }}</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- GIFT -->
+{% if gifts %}
+<section id="gift">
+  <div class="s-eyebrow reveal" style="text-align:center;">Hadiah</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Wedding Gift</em></h2>
+  <p class="reveal" style="font-family:var(--serif);font-style:italic;font-size:.87rem;color:var(--text-l);text-align:center;margin-bottom:2rem;line-height:1.9;">
+    Doa tulus dari kalian adalah hadiah paling berharga bagi kami.
+  </p>
+  <div class="gift-row">
+    {% for g in gifts %}{% if g.bank_name %}
+    <div class="gift-item reveal">
+      <div class="gi-type">Transfer Bank</div>
+      <div class="gi-bank">{{ g.bank_name }}</div>
+      <div class="gi-num">{{ g.account_number }}</div>
+      <div class="gi-name">a.n. {{ g.account_name }}</div>
+      <button class="gi-copy" onclick="copyText('{{ g.account_number }}',this)">Salin Nomor</button>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- CLOSING -->
+<section id="closing">
+  <canvas id="closing-star-field"></canvas>
+  <div class="closing-burst"></div>
+  <div class="closing-monogram reveal">{{ inv.groom_name[0] }}{{ inv.bride_name[0] }}</div>
+  <div class="closing-names reveal">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <div class="closing-rule reveal"></div>
+  <p class="closing-doa reveal">
+    "Ya Allah, jadikanlah cinta kami seperti bintang yang tak pernah padam — abadi dalam ridha-Mu, kekal dalam rahmat-Mu, dan bersatu kembali di surga-Mu."
+  </p>
+  <p class="closing-thanks reveal">
+    Dengan segenap kerendahan hati dan penuh harapan, kami memohon doa restu Bapak/Ibu/Saudara/i sekalian. Semoga Allah SWT menjadikan perjalanan ini penuh keberkahan yang tak berkesudahan.
+  </p>
+  <div class="closing-ht reveal">#{{ inv.groom_name }}dan{{ inv.bride_name }}</div>
+  <div class="closing-mark reveal">✦ &nbsp; Abadi &nbsp; ✦</div>
+</section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="lbOutside(event)">
+  <span id="lb-close" onclick="closeLb()">ESC</span>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-counter"></div>
+</div>
+{% if inv.music_url %}
+<div id="music-fab" onclick="toggleMusic()">♪</div>
+<audio id="bg-music" src="{{ inv.music_url }}" loop></audio>
+{% endif %}
+
+<script>
+/* ══ STAR RENDERER — shared function ══ */
+function makeStars(canvas, count, opts={}){
+  const ctx=canvas.getContext('2d');
+  let W,H,stars=[];
+  const {twinkle=true,drift=false,colors=['#fff8e8','#c8cfe0','#d4b86a']}=opts;
+  function resize(){
+    W=canvas.width=canvas.offsetWidth||innerWidth;
+    H=canvas.height=canvas.offsetHeight||innerHeight;
+  }
+  function init(){
+    resize();
+    stars=Array.from({length:count},()=>({
+      x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()*1.4+.3,
+      alpha:Math.random()*.7+.1,
+      dAlpha:(Math.random()*.006+.001)*(Math.random()<.5?1:-1),
+      col:colors[Math.floor(Math.random()*colors.length)],
+      vx:drift?(Math.random()-.5)*.08:0,
+      vy:drift?(Math.random()-.5)*.04:0,
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      if(twinkle){
+        s.alpha+=s.dAlpha;
+        if(s.alpha>1||s.alpha<.05)s.dAlpha*=-1;
+        s.alpha=Math.max(.05,Math.min(1,s.alpha));
+      }
+      if(drift){s.x+=s.vx;s.y+=s.vy;if(s.x<0)s.x=W;if(s.x>W)s.x=0;if(s.y<0)s.y=H;if(s.y>H)s.y=0;}
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.col+(Math.round(s.alpha*255).toString(16).padStart(2,'0'));
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();init();});
+  init();draw();
+}
+
+/* Intro stars */
+makeStars(document.getElementById('intro-stars'),110,{twinkle:true,drift:true});
+
+/* Main star canvas */
+makeStars(document.getElementById('star-canvas'),80,{twinkle:true,drift:true,colors:['rgba(255,248,232,.6)','rgba(200,207,224,.5)','rgba(212,184,106,.4)']});
+
+/* ══ OPEN INTRO ══ */
+function openIntro(){
+  document.getElementById('intro').classList.add('out');
+  setTimeout(()=>{
+    document.getElementById('intro').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    document.getElementById('bg-music')?.play().catch(()=>{});
+    initReveal();startCountdown();animateSch();
+    // closing stars
+    const cc=document.getElementById('closing-star-field');
+    if(cc){
+      cc.style.position='absolute';cc.style.inset='0';
+      cc.style.width='100%';cc.style.height='100%';
+      makeStars(cc,70,{twinkle:true});
+    }
+  },900);
+}
+
+/* ══ REVEAL ══ */
+function initReveal(){
+  const obs=new IntersectionObserver(e=>{
+    e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');});
+  },{threshold:.1});
+  document.querySelectorAll(
+    '.reveal,.reveal-l,.reveal-r,.reveal-s,.vtl-item,.person-card,.card-join,.verse-arabic,.verse-trans,.verse-src,.verse-caption,.cd-row'
+  ).forEach(el=>obs.observe(el));
+}
+function animateSch(){
+  const obs=new IntersectionObserver(e=>{
+    e.forEach((x,i)=>{if(x.isIntersecting)setTimeout(()=>x.target.classList.add('visible'),i*110);});
+  },{threshold:.1});
+  document.querySelectorAll('.sch-item').forEach(el=>obs.observe(el));
+}
+
+/* ══ COUNTDOWN ══ */
+function startCountdown(){
+  const t=new Date('{{ inv.resepsi_date }}T{{ inv.resepsi_time }}:00');
+  function up(){
+    const d=t-new Date();if(d<=0)return;
+    document.getElementById('cd-days').textContent=Math.floor(d/86400000);
+    document.getElementById('cd-hours').textContent=String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-mins').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-secs').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  up();setInterval(up,1000);
+}
+
+/* ══ LIGHTBOX ══ */
+const lbPhotos=[{% for p in photos %}"{{ photo_src(p) }}"{% if not loop.last %},{% endif %}{% endfor %}];
+let lbIdx=0;
+function openLightbox(i){
+  lbIdx=i;document.getElementById('lb-img').src=lbPhotos[i];
+  document.getElementById('lb-counter').textContent=`${i+1} / ${lbPhotos.length}`;
+  document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';
+  ['lb-prev','lb-next'].forEach(id=>document.getElementById(id).style.display=lbPhotos.length>1?'':'none');
+}
+function closeLb(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function lbOutside(e){if(e.target===document.getElementById('lightbox'))closeLb();}
+function lbNav(d){lbIdx=(lbIdx+d+lbPhotos.length)%lbPhotos.length;openLightbox(lbIdx);}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lightbox').classList.contains('open'))return;
+  if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);
+});
+
+/* ══ RSVP ══ */
+async function submitRSVP(id){
+  const name=document.getElementById('r-name').value.trim();
+  if(!name){alert('Masukkan nama Anda');return;}
+  const btn=document.querySelector('.ab-btn');btn.disabled=true;btn.textContent='Mengirim...';
+  try{
+    const r=await fetch(`/rsvp/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,attendance:document.getElementById('r-att').value,count:parseInt(document.getElementById('r-count').value),message:document.getElementById('r-msg').value})});
+    if(r.ok){document.getElementById('ab-form').style.display='none';document.getElementById('ab-success').style.display='block';}
+  }catch(e){btn.disabled=false;btn.textContent='Kirim Konfirmasi';}
+}
+function copyText(t,btn){navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='✓ Tersalin';setTimeout(()=>btn.textContent=o,2000);});}
+function toggleMusic(){
+  const m=document.getElementById('bg-music');if(!m)return;
+  if(m.paused){m.play();document.getElementById('music-fab').textContent='♫';}
+  else{m.pause();document.getElementById('music-fab').textContent='♪';}
+}
+</script>
+<script>document.querySelectorAll("img").forEach(img=>{img.addEventListener("contextmenu",e=>e.preventDefault());img.addEventListener("dragstart",e=>e.preventDefault());});</script>
+</body>
+</html>
+

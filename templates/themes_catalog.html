@@ -48,15 +48,61 @@ nav{position:sticky;top:0;z-index:100;padding:.82rem 2rem;display:flex;align-ite
 /* CAROUSEL */
 .tc-car{position:relative;height:125px;overflow:hidden;background:var(--off);}
 .tc-slides{display:flex;height:100%;transition:transform .35s ease;}
-.tc-slide{flex-shrink:0;width:100%;height:100%;object-fit:cover;display:block;}
+
+/* .tc-slide{flex-shrink:0;width:100%;height:100%;object-fit:cover;display:block;} */
+
+
 .tc-placeholder{flex-shrink:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:1rem;}
 .tc-arr{position:absolute;top:50%;transform:translateY(-50%);width:22px;height:22px;background:rgba(255,255,255,.85);border:none;border-radius:50%;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;z-index:2;-webkit-tap-highlight-color:transparent;}
+
 .tc-car:hover .tc-arr{opacity:1;}
+
 .tc-arr.prev{left:.35rem;}
 .tc-arr.next{right:.35rem;}
 .tc-dots{position:absolute;bottom:.32rem;left:50%;transform:translateX(-50%);display:flex;gap:.22rem;z-index:2;}
 .tc-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:background .2s;}
 .tc-dot.active{background:#fff;}
+
+
+.tc-car{
+  position:relative;
+  height:auto;  /* biar fleksibel */
+  min-height:100px;
+  max-height:150px;
+  overflow:hidden;
+  background:var(--off);
+  display:flex;
+  align-items:center;
+}
+
+.tc-slides{
+  display:flex;
+  height:100%;
+  width:100%;
+  transition:transform .35s ease;
+}
+
+.tc-slide{
+  flex-shrink:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;  /* contain biar ga crop */
+  display:block;
+}
+
+/* biar placeholder juga rapi */
+.tc-placeholder{
+  flex-shrink:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:1rem;
+  background:#f0f0f0;
+}
 
 /* CARD BODY */
 .tc-body{padding:.7rem .8rem;}

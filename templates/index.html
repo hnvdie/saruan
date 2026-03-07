@@ -76,9 +76,46 @@ nav{
 .themes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;}
 .theme-card{border:1px solid var(--border);border-radius:3px;overflow:hidden;transition:border-color .2s,transform .25s;display:block;}
 .theme-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-3px);}
-.tc-preview{height:85px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-.tc-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8;}
-.tc-label{position:relative;z-index:1;font-family:var(--serif);font-style:italic;font-size:.85rem;text-shadow:0 1px 4px rgba(0,0,0,.3);}
+
+
+.tc-preview{
+  height:auto;  /* biar tinggi menyesuaikan gambar */
+  min-height:85px;  /* minimal 85px */
+  max-height:150px; /* batasi maksimal biar gak terlalu besar */
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f5f5f5; /* background kalau gambar kosong */
+}
+
+.tc-preview img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* contain = gambar utuh, cover = crop */
+  opacity:.8;
+  position:relative; /* hapus absolute */
+  inset:auto; /* reset inset */
+}
+
+
+
+.tc-label{
+  position:absolute;
+  bottom:5px;
+  left:8px;
+  z-index:2;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:.7rem;
+  color:white;
+  background:rgba(0,0,0,0.3);
+  padding:2px 8px;
+  border-radius:2px;
+  backdrop-filter:blur(2px); /* efek kaca doff keren */
+}
+
 .tc-body{padding:.65rem .75rem;background:var(--white);}
 .tc-name{font-size:.78rem;font-weight:400;color:var(--ink);margin-bottom:.2rem;}
 .tc-price{font-size:.7rem;color:var(--gold);margin-bottom:.28rem;min-height:.9rem;}
@@ -167,7 +204,7 @@ footer{padding:1.4rem 2rem;border-top:1px solid var(--border);display:flex;align
     <a href="/themes" class="sec-link">Lihat semua →</a>
   </div>
   <div class="themes-grid">
-    {% for theme in themes %}
+    {% for theme in themes[:6]  %}
     {% set first_photo = theme.get('demo_photos', [None])[0] %}
     <div class="theme-card reveal">
       <div class="tc-preview" style="background:{{ theme.get('preview_color','#eee') }}">
