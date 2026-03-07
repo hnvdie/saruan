@@ -5,5 +5,13 @@
   "preview_color": "#0a0f1e",
   "accent_color": "#a8e063",
   "skeleton": "fullpage_scroll",
-  "tags": ["dark", "romantic", "nature", "animated"]
+  "tags": [
+    "dark",
+    "romantic",
+    "nature",
+    "animated"
+  ],
+  "demo_photos": [
+    "/static/themes/firefly/demo_648bbc9e.jpg"
+  ]
 }
