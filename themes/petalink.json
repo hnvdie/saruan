@@ -5,8 +5,18 @@
   "preview_color": "#f7f1e8",
   "accent_color": "#8b5e3c",
   "skeleton": "storybook_scroll",
-  "tags": ["light", "elegant", "cultural", "floral", "animated"],
-  "price": 0,
-  "price_label": "",
-  "demo_photos": []
+  "tags": [
+    "light",
+    "elegant",
+    "cultural",
+    "floral",
+    "animated"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "demo_photos": [
+    "/static/themes/petalink/demo_f5cffcb0.jpg"
+  ],
+  "price_original": 75000,
+  "price_note": ""
 }

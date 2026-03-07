@@ -1,0 +1,22 @@
+{
+  "id": "bersahaja",
+  "name": "Bersahaja",
+  "description": "Tema pernikahan sederhana yang hangat dengan sentuhan alam — dedaunan, kayu, dan kesan bersahaja. Dilengkapi animasi daun jatuh, floating elements, dan efek transisi yang lembut.",
+  "preview_color": "#f4f1ea",
+  "accent_color": "#7f9f7f",
+  "skeleton": "storybook_scroll",
+  "tags": [
+    "light",
+    "nature",
+    "minimalis",
+    "animated",
+    "earthy"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "demo_photos": [
+    "/static/themes/bersahaja/demo_1.jpg"
+  ],
+  "price_original": 75000,
+  "price_note": ""
+}

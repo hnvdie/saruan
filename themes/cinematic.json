@@ -5,5 +5,17 @@
   "preview_color": "#0d0d0d",
   "accent_color": "#c9a84c",
   "skeleton": "cinematic",
-  "tags": ["luxury", "dark", "gold", "elegant"]
+  "tags": [
+    "luxury",
+    "dark",
+    "gold",
+    "elegant"
+  ],
+  "demo_photos": [
+    "/static/themes/cinematic/demo_f705d6a1.jpg"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "price_original": 75000,
+  "price_note": ""
 }

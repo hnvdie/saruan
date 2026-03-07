@@ -1,0 +1,50 @@
+{
+  "id": "bluesky",
+  "name": "Blue Sky",
+  "description": "Elegan, romantis, dan bersahaja. Nuansa langit sore, ivory hangat, dan kelopak bunga lembut — untuk pernikahan yang penuh cinta dan kesederhanaan bermartabat.",
+  "preview_color": "#8fb4cc",
+  "accent_color": "#c9978a",
+  "skeleton": "bluesky",
+  "tags": [
+    "romantic",
+    "vintage",
+    "warm",
+    "elegant",
+    "soft",
+    "aesthetic"
+  ],
+  "demo_photos": [
+    "/static/themes/bluesky/demo_cover.jpg"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "price_original": 75000,
+  "price_note": "",
+  "palette": {
+    "ivory": "#f9f5ee",
+    "sky": "#8fb4cc",
+    "rose": "#c9978a",
+    "sage": "#9aaf96",
+    "mocha": "#6b4f3a",
+    "brown": "#4a3728"
+  },
+  "fonts": {
+    "display": "Dancing Script",
+    "serif": "Cormorant Garamond",
+    "sans": "Jost"
+  },
+  "features": [
+    "envelope_intro",
+    "floating_petals",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_bg",
+    "asymmetric_gallery",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music"
+  ]
+}
