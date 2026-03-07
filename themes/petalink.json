@@ -1,0 +1,12 @@
+{
+  "id": "petalink",
+  "name": "Petal & Ink",
+  "description": "Estetika kaligrafi Jawa modern dengan ornamen SVG buatan sendiri — bunga teratai, batik motif, dan tinta mengalir",
+  "preview_color": "#f7f1e8",
+  "accent_color": "#8b5e3c",
+  "skeleton": "storybook_scroll",
+  "tags": ["light", "elegant", "cultural", "floral", "animated"],
+  "price": 0,
+  "price_label": "",
+  "demo_photos": []
+}

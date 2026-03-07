@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   PETAL & INK — Kaligrafi Modern
+   All visuals: custom SVG assets
+   Interactions: click ripple, hover bloom
+═══════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+:root{
+  --cream:#f7f1e8;--parchment:#ede5d4;--ink:#2c1f0e;
+  --brown:#8b5e3c;--rust:#b5623b;--gold:#c8a050;
+  --sage:#6b8c6f;--dustpink:#d4907a;
+  --serif:'Libre Baskerville',serif;--sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+
+/* ─── CLICK RIPPLE ─── */
+.ripple-container{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;}
+.ripple{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,160,80,.25),transparent 70%);
+  transform:scale(0);animation:rippleOut .8s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes rippleOut{to{transform:scale(1);opacity:0}}
+
+/* ─── SVG DEFS (reusable) ─── */
+.svg-defs{position:absolute;width:0;height:0;overflow:hidden;}
+
+/* ─── INTRO SCREEN ─── */
+#intro{
+  position:fixed;inset:0;background:var(--parchment);z-index:2000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity 1s ease,visibility 1s;
+  overflow:hidden;
+}
+#intro.out{opacity:0;visibility:hidden;}
+.intro-lotus{animation:floatSvg 4s ease-in-out infinite;}
+@keyframes floatSvg{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.intro-names{
+  font-family:var(--serif);font-size:clamp(1.8rem,6vw,3rem);
+  font-style:italic;color:var(--ink);margin-top:2rem;text-align:center;
+  opacity:0;animation:inkDrop 1s .5s ease forwards;
+}
+@keyframes inkDrop{from{opacity:0;filter:blur(6px);letter-spacing:.5em}to{opacity:1;filter:none;letter-spacing:.03em}}
+.intro-sub{
+  font-size:.6rem;letter-spacing:.55em;text-transform:uppercase;
+  color:var(--brown);opacity:0;animation:fadeUp .8s 1.2s ease forwards;margin-top:.75rem;
+}
+.intro-tap{
+  position:absolute;bottom:3rem;font-size:.6rem;letter-spacing:.35em;
+  text-transform:uppercase;color:rgba(44,31,14,.3);
+  animation:fadeUp .5s 2s ease both,pulse2 2s 2.5s ease infinite;
+}
+@keyframes pulse2{0%,100%{opacity:.3}50%{opacity:.8}}
+/* Ink drip effect on intro bg */
+.intro-drip{position:absolute;top:0;width:3px;background:linear-gradient(to bottom,transparent,rgba(44,31,14,.06),transparent);animation:drip linear infinite;}
+@keyframes drip{from{top:-100%;height:60%}to{top:110%;height:60%}}
+
+main{position:relative;z-index:1;}
+
+/* ─── SVG ORNAMENT COMPONENTS ─── */
+.ornament-svg{display:block;margin:0 auto;}
+.section-ornament{text-align:center;margin-bottom:1.5rem;}
+
+/* ─── SECTIONS BASE ─── */
+section{padding:5.5rem 1.5rem;position:relative;overflow:hidden;}
+.s-tag{
+  font-size:.58rem;letter-spacing:.5em;text-transform:uppercase;
+  color:var(--brown);opacity:.6;text-align:center;margin-bottom:.6rem;
+}
+.s-title{
+  font-family:var(--serif);font-size:clamp(1.8rem,4.5vw,2.8rem);
+  font-style:italic;color:var(--ink);text-align:center;margin-bottom:2.5rem;
+  font-weight:400;
+}
+
+/* ─── HERO ─── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  background:var(--parchment);
+  position:relative;
+}
+/* Batik corner SVG decorations */
+.batik-corner{position:absolute;opacity:.12;}
+.batik-corner.tl{top:0;left:0;}
+.batik-corner.tr{top:0;right:0;transform:scaleX(-1);}
+.batik-corner.bl{bottom:0;left:0;transform:scaleY(-1);}
+.batik-corner.br{bottom:0;right:0;transform:scale(-1);}
+.hero-kaligrafi{
+  font-family:var(--serif);font-size:.85rem;font-style:italic;
+  color:var(--brown);letter-spacing:.1em;opacity:.7;margin-bottom:2rem;
+  opacity:0;animation:fadeUp .8s .2s ease forwards;
+}
+.hero-main{opacity:0;animation:fadeUp .8s .5s ease forwards;}
+.hero-groom{font-family:var(--serif);font-size:clamp(2.5rem,10vw,5.5rem);font-weight:400;line-height:.9;color:var(--ink);}
+.hero-amp{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2.5rem);font-style:italic;color:var(--brown);display:block;margin:.35em 0;}
+.hero-bride{font-family:var(--serif);font-size:clamp(2.5rem,10vw,5.5rem);font-weight:700;font-style:italic;line-height:.9;color:var(--rust);}
+.hero-lotus-divider{margin:2.5rem 0;opacity:0;animation:fadeUp .8s .8s ease forwards;}
+.hero-date{
+  font-size:.7rem;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--brown);opacity:0;animation:fadeUp .8s 1s ease forwards;
+}
+
+/* ─── COUPLE ─── */
+#couple{background:var(--cream);}
+.couple-grid{display:grid;grid-template-columns:1fr 80px 1fr;gap:1rem;align-items:start;max-width:600px;margin:0 auto;}
+.person-card{padding:1.5rem;background:var(--parchment);border-radius:3px;position:relative;overflow:hidden;}
+.person-card::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238b5e3c' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3Ccircle cx='30' cy='30' r='10'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:.5;}
+.p-role{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--brown);opacity:.7;margin-bottom:.5rem;}
+.p-name{font-family:var(--serif);font-size:1.4rem;font-style:italic;color:var(--ink);margin-bottom:.3rem;}
+.p-full{font-size:.74rem;color:var(--brown);opacity:.8;}
+.p-parents{font-size:.7rem;color:rgba(44,31,14,.5);margin-top:.5rem;line-height:1.8;}
+.couple-center{display:flex;align-items:center;justify-content:center;}
+
+/* ─── EVENT ─── */
+#event{background:var(--parchment);}
+/* Paper card style */
+.event-paper{
+  background:var(--cream);max-width:520px;margin:0 auto 1.25rem;
+  padding:2rem 2rem 2rem 3rem;
+  border:1px solid rgba(139,94,60,.12);
+  border-radius:3px;
+  position:relative;
+  box-shadow:2px 3px 12px rgba(44,31,14,.06);
+}
+/* Red margin line */
+.event-paper::before{content:'';position:absolute;left:1.75rem;top:0;bottom:0;width:1px;background:rgba(181,98,59,.2);}
+/* Stamp-like type badge */
+.ep-stamp{
+  display:inline-block;border:1.5px solid var(--rust);color:var(--rust);
+  font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;
+  padding:.2rem .6rem;border-radius:2px;margin-bottom:.9rem;
+  font-family:var(--sans);
+}
+.ep-name{font-family:var(--serif);font-size:1.3rem;color:var(--ink);margin-bottom:.9rem;}
+.ep-info{font-size:.78rem;color:var(--brown);line-height:2.2;display:flex;flex-direction:column;}
+.ep-info span{display:flex;gap:.7rem;align-items:flex-start;}
+.ep-maps{
+  display:inline-flex;align-items:center;gap:.4rem;margin-top:1rem;
+  padding:.5rem 1rem;background:var(--rust);color:#fff;
+  text-decoration:none;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  border-radius:2px;transition:background .2s;
+}
+.ep-maps:hover{background:var(--brown);}
+
+/* Google Maps embed */
+.maps-embed-wrap{
+  width:100%;max-width:520px;margin:0 auto 1.25rem;
+  border:1px solid rgba(139,94,60,.12);border-radius:3px;overflow:hidden;
+  box-shadow:2px 3px 12px rgba(44,31,14,.06);
+}
+.maps-embed-wrap iframe{width:100%;height:240px;border:none;display:block;}
+
+/* ─── COUNTDOWN ─── */
+#countdown{background:var(--cream);text-align:center;}
+.cd-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
+.cd-item{text-align:center;}
+.cd-box{
+  width:72px;height:72px;border:1.5px solid rgba(139,94,60,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:1.8rem;color:var(--brown);
+  background:var(--parchment);position:relative;overflow:hidden;
+}
+.cd-box::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,160,80,.08),transparent);}
+.cd-label{font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--brown);opacity:.6;margin-top:.4rem;}
+.cd-sep{font-family:var(--serif);font-size:1.5rem;color:var(--gold);opacity:.5;align-self:flex-start;margin-top:.6rem;}
+
+/* ─── GALLERY ─── */
+#gallery{background:var(--parchment);}
+/* Masonry-inspired 2-col layout with staggered heights */
+.gallery-masonry{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:.6rem;
+  max-width:520px;margin:2rem auto 0;
+}
+.gallery-masonry .g-item:nth-child(3n+1){grid-row:span 1;}
+.gallery-masonry .g-item:nth-child(3n+2){margin-top:1rem;}
+.g-item{
+  border:3px solid var(--cream);overflow:hidden;
+  box-shadow:0 2px 12px rgba(44,31,14,.08);
+  cursor:pointer;position:relative;
+  border-radius:2px;
+  transition:transform .3s,box-shadow .3s;
+}
+.g-item:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(44,31,14,.12);}
+.g-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+/* Hover bloom overlay */
+.g-item::after{
+  content:'✦';position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(139,94,60,.15);color:rgba(255,255,255,.8);
+  font-size:1.5rem;opacity:0;transition:opacity .3s;
+}
+.g-item:hover::after{opacity:1;}
+
+/* Horizontal strip for many photos */
+.gallery-strip{
+  display:flex;gap:.6rem;overflow-x:auto;padding:2rem 1.5rem .5rem;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.gallery-strip::-webkit-scrollbar{display:none;}
+.gallery-strip .g-item{flex-shrink:0;width:180px;height:220px;}
+.gallery-strip .g-item img{width:100%;height:100%;object-fit:cover;aspect-ratio:unset;}
+
+/* LIGHTBOX */
+#lightbox{display:none;position:fixed;inset:0;z-index:3000;background:rgba(44,31,14,.95);align-items:center;justify-content:center;}
+#lightbox.open{display:flex;}
+#lb-img{max-width:92vw;max-height:88vh;object-fit:contain;border:3px solid rgba(200,160,80,.2);}
+#lb-close{position:absolute;top:1.5rem;right:1.5rem;font-size:1.4rem;color:rgba(255,255,255,.4);cursor:pointer;transition:color .2s;}
+#lb-close:hover{color:#fff;}
+#lb-prev,#lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(200,160,80,.1);border:1px solid rgba(200,160,80,.2);color:rgba(255,255,255,.5);font-size:1.4rem;padding:.45rem .8rem;cursor:pointer;border-radius:2px;transition:all .2s;}
+#lb-prev:hover,#lb-next:hover{background:rgba(200,160,80,.25);color:#fff;}
+#lb-prev{left:1rem;}#lb-next{right:1rem;}
+#lb-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.65rem;color:rgba(255,255,255,.3);letter-spacing:.2em;}
+
+/* ─── STORY ─── */
+#story{background:var(--cream);}
+.story-paper{
+  max-width:520px;margin:0 auto;
+  background:var(--parchment);
+  padding:2.5rem;
+  box-shadow:inset 0 1px 3px rgba(44,31,14,.05), 0 3px 16px rgba(44,31,14,.07);
+  position:relative;
+}
+.story-paper::before{
+  content:'"';font-family:var(--serif);font-size:8rem;
+  color:rgba(139,94,60,.08);position:absolute;top:-1rem;left:.5rem;
+  line-height:1;
+}
+.story-text{
+  font-family:var(--serif);font-size:1rem;font-style:italic;
+  line-height:2.2;color:rgba(44,31,14,.7);position:relative;
+}
+
+/* ─── RSVP ─── */
+#rsvp{background:var(--parchment);}
+.rsvp-paper{
+  max-width:480px;margin:0 auto;
+  background:var(--cream);padding:2.5rem;
+  border:1px solid rgba(139,94,60,.1);
+  box-shadow:0 3px 16px rgba(44,31,14,.07);
+}
+.rsvp-success{display:none;text-align:center;padding:2rem 0;}
+.rsvp-success-lotus{font-size:2rem;margin-bottom:1rem;}
+.rsvp-success-text{font-family:var(--serif);font-style:italic;color:var(--brown);}
+.rp-group{margin-bottom:1.25rem;}
+.rp-label{display:block;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--brown);opacity:.7;margin-bottom:.4rem;}
+.rp-input{
+  width:100%;padding:.8rem 1rem;
+  border:1px solid rgba(139,94,60,.2);border-bottom:2px solid rgba(139,94,60,.2);
+  border-radius:2px;background:var(--cream);
+  font-family:var(--sans);font-size:.85rem;font-weight:300;color:var(--ink);
+  outline:none;transition:border-color .2s;
+}
+.rp-input:focus{border-color:var(--brown);}
+.rp-input option{background:var(--cream);}
+textarea.rp-input{resize:vertical;min-height:80px;}
+.rp-btn{
+  width:100%;padding:.95rem;
+  background:var(--ink);color:var(--cream);border:none;
+  font-family:var(--sans);font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;
+  cursor:pointer;transition:background .2s;margin-top:.25rem;border-radius:2px;
+}
+.rp-btn:hover{background:var(--brown);}
+.rp-btn:disabled{opacity:.4;}
+.rsvp-list{margin-top:2rem;}
+.rsvp-list-head{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--brown);opacity:.6;padding-bottom:.75rem;border-bottom:1px solid rgba(139,94,60,.1);margin-bottom:.75rem;}
+.rsvp-item{padding:.85rem 0;border-bottom:1px solid rgba(139,94,60,.06);display:flex;gap:.9rem;align-items:flex-start;}
+.rsvp-init{width:34px;height:34px;background:var(--parchment);border:1px solid rgba(139,94,60,.15);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;color:var(--brown);font-size:.9rem;flex-shrink:0;border-radius:2px;}
+.rsvp-guest-name{font-size:.82rem;color:var(--ink);margin-bottom:.2rem;}
+.rsvp-guest-msg{font-size:.73rem;color:var(--brown);opacity:.8;font-style:italic;line-height:1.6;}
+.rsvp-badge{font-size:.54rem;letter-spacing:.1em;padding:.12rem .4rem;border-radius:2px;margin-left:.4rem;}
+.rsvp-badge.hadir{background:rgba(107,140,111,.1);color:var(--sage);}
+.rsvp-badge.tidak{background:rgba(139,94,60,.08);color:var(--brown);}
+
+/* ─── GIFT ─── */
+#gift{background:var(--cream);}
+.gift-card{max-width:480px;margin:0 auto .75rem;padding:1.75rem;background:var(--parchment);border:1px solid rgba(139,94,60,.1);border-radius:2px;}
+.gift-type{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--brown);opacity:.6;margin-bottom:.7rem;}
+.gift-bank{font-size:1rem;font-weight:400;color:var(--ink);margin-bottom:.35rem;}
+.gift-num{font-family:var(--serif);font-size:1.4rem;color:var(--rust);letter-spacing:.05em;margin-bottom:.2rem;}
+.gift-name{font-size:.73rem;color:var(--brown);}
+.gift-copy{margin-top:1rem;padding:.5rem 1.1rem;background:transparent;border:1px solid rgba(139,94,60,.25);color:var(--brown);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;}
+.gift-copy:hover{background:var(--brown);color:var(--cream);}
+
+/* ─── CLOSING ─── */
+#closing{
+  min-height:80vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(to bottom,var(--parchment),var(--cream));
+  padding:5rem 2rem;
+}
+.closing-names{font-family:var(--serif);font-size:clamp(2rem,7vw,3.5rem);font-style:italic;color:var(--ink);margin:1.5rem 0 1rem;}
+.closing-msg{font-size:.78rem;color:var(--brown);line-height:2.2;max-width:380px;margin:0 auto 2rem;}
+.closing-ht{font-family:var(--serif);font-style:italic;color:var(--rust);opacity:.5;font-size:1rem;}
+
+/* ─── MUSIC FAB ─── */
+#music-fab{position:fixed;bottom:1.5rem;right:1.5rem;width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--cream);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;box-shadow:0 4px 16px rgba(44,31,14,.25);font-size:1rem;transition:all .2s;}
+#music-fab:hover{background:var(--brown);transform:scale(1.1);}
+
+/* ─── REVEAL ─── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+@media(max-width:500px){
+  .couple-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
+  .couple-center{transform:rotate(90deg);margin:.5rem 0;}
+  .cd-box{width:62px;height:62px;font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- RIPPLE CONTAINER -->
+<div class="ripple-container" id="rippleContainer"></div>
+
+<!-- ── INTRO SCREEN ── -->
+<div id="intro" onclick="openIntro(event)">
+  <!-- Ink drips -->
+  <div class="intro-drip" style="left:15%;animation-duration:3s;animation-delay:0s;width:2px;opacity:.5"></div>
+  <div class="intro-drip" style="left:35%;animation-duration:4s;animation-delay:.8s;width:1px;opacity:.3"></div>
+  <div class="intro-drip" style="left:65%;animation-duration:2.5s;animation-delay:.3s;width:2px;opacity:.4"></div>
+  <div class="intro-drip" style="left:82%;animation-duration:3.5s;animation-delay:1.2s;width:1px;opacity:.3"></div>
+
+  <!-- Lotus SVG -->
+  <svg class="intro-lotus" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Petals -->
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(45 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(90 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(135 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(180 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(225 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(270 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(315 60 60)"/>
+    <!-- Center -->
+    <circle cx="60" cy="60" r="14" fill="#f7f1e8"/>
+    <circle cx="60" cy="60" r="10" fill="#8b5e3c" opacity=".4"/>
+    <circle cx="60" cy="60" r="5" fill="#c8a050"/>
+  </svg>
+
+  <div class="intro-names">{{ inv.groom_name }}<br><em style="font-size:.6em;color:var(--brown)">&amp;</em><br>{{ inv.bride_name }}</div>
+  <div class="intro-sub">Undangan Pernikahan</div>
+  <div class="intro-tap">Sentuh untuk membuka</div>
+</div>
+
+<main id="main-content" style="display:none">
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <!-- Batik corner decorations -->
+  <svg class="batik-corner tl" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0,0 Q80,0 80,80 Q80,0 160,0 Z" fill="#8b5e3c" opacity=".4"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".3"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#c8a050" stroke-width=".5" opacity=".4"/>
+    <circle cx="0" cy="0" r="20" fill="none" stroke="#8b5e3c" stroke-width=".5" opacity=".3"/>
+    <!-- Batik petals -->
+    <ellipse cx="30" cy="10" rx="8" ry="20" fill="#c8a050" opacity=".2" transform="rotate(-30 30 10)"/>
+    <ellipse cx="10" cy="30" rx="8" ry="20" fill="#8b5e3c" opacity=".2" transform="rotate(60 10 30)"/>
+  </svg>
+  <svg class="batik-corner tr" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0,0 Q80,0 80,80 Q80,0 160,0 Z" fill="#8b5e3c" opacity=".4"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".3"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#c8a050" stroke-width=".5" opacity=".4"/>
+    <ellipse cx="30" cy="10" rx="8" ry="20" fill="#c8a050" opacity=".2" transform="rotate(-30 30 10)"/>
+  </svg>
+  <svg class="batik-corner bl" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0,0 Q80,0 80,80 Q80,0 160,0 Z" fill="#8b5e3c" opacity=".4"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".3"/>
+  </svg>
+  <svg class="batik-corner br" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0,0 Q80,0 80,80 Q80,0 160,0 Z" fill="#8b5e3c" opacity=".4"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".3"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#c8a050" stroke-width=".5" opacity=".4"/>
+  </svg>
+
+  <p class="hero-kaligrafi">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p>
+
+  <div class="hero-main">
+    <div class="hero-groom">{{ inv.groom_name }}</div>
+    <div class="hero-amp">&amp;</div>
+    <div class="hero-bride">{{ inv.bride_name }}</div>
+  </div>
+
+  <!-- Lotus divider SVG -->
+  <div class="hero-lotus-divider">
+    <svg width="280" height="40" viewBox="0 0 280 40" fill="none">
+      <line x1="0" y1="20" x2="105" y2="20" stroke="#c8a050" stroke-width=".8" stroke-dasharray="3 5" opacity=".5"/>
+      <line x1="175" y1="20" x2="280" y2="20" stroke="#c8a050" stroke-width=".8" stroke-dasharray="3 5" opacity=".5"/>
+      <!-- Center lotus mini -->
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5"/>
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5" transform="rotate(60 140 20)"/>
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5" transform="rotate(120 140 20)"/>
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5" transform="rotate(180 140 20)"/>
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5" transform="rotate(240 140 20)"/>
+      <ellipse cx="140" cy="25" rx="6" ry="12" fill="#c8a050" opacity=".5" transform="rotate(300 140 20)"/>
+      <circle cx="140" cy="20" r="4" fill="#8b5e3c" opacity=".5"/>
+      <circle cx="140" cy="20" r="2" fill="#c8a050"/>
+    </svg>
+  </div>
+
+  <div class="hero-date">{{ inv.resepsi_date | format_date }}</div>
+</section>
+
+<!-- ── COUPLE ── -->
+<section id="couple">
+  <!-- Decorative top border SVG -->
+  <div style="text-align:center;margin-bottom:2.5rem" class="reveal">
+    <svg width="200" height="24" viewBox="0 0 200 24">
+      <line x1="0" y1="12" x2="80" y2="12" stroke="#c8a050" stroke-width=".8" opacity=".4"/>
+      <line x1="120" y1="12" x2="200" y2="12" stroke="#c8a050" stroke-width=".8" opacity=".4"/>
+      <polygon points="100,2 108,12 100,22 92,12" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".5"/>
+      <circle cx="100" cy="12" r="3" fill="#c8a050" opacity=".6"/>
+    </svg>
+  </div>
+  <div class="s-tag">Mempelai</div>
+  <h2 class="s-title reveal">Kedua Mempelai</h2>
+  <div class="couple-grid">
+    <div class="person-card reveal">
+      <div class="p-role">Mempelai Pria</div>
+      <div class="p-name">{{ inv.groom_name }}</div>
+      {% if inv.groom_full %}<div class="p-full">{{ inv.groom_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.groom_parents %}<div class="p-parents">Putra dari<br>{{ inv.groom_parents }}</div>{% endif %}
+    </div>
+    <div class="couple-center reveal">
+      <!-- Center SVG ornament -->
+      <svg width="60" height="80" viewBox="0 0 60 80">
+        <line x1="30" y1="0" x2="30" y2="30" stroke="#c8a050" stroke-width=".8" opacity=".5"/>
+        <circle cx="30" cy="40" r="8" fill="none" stroke="#8b5e3c" stroke-width="1" opacity=".5"/>
+        <circle cx="30" cy="40" r="4" fill="#c8a050" opacity=".4"/>
+        <line x1="30" y1="50" x2="30" y2="80" stroke="#c8a050" stroke-width=".8" opacity=".5"/>
+        <text x="30" y="44" text-anchor="middle" font-family="serif" font-size="8" fill="#8b5e3c" opacity=".6">&amp;</text>
+      </svg>
+    </div>
+    <div class="person-card reveal">
+      <div class="p-role">Mempelai Wanita</div>
+      <div class="p-name">{{ inv.bride_name }}</div>
+      {% if inv.bride_full %}<div class="p-full">{{ inv.bride_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.bride_parents %}<div class="p-parents">Putri dari<br>{{ inv.bride_parents }}</div>{% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ── EVENT ── -->
+<section id="event">
+  <div class="s-tag">Rangkaian Acara</div>
+  <h2 class="s-title reveal">Hari Istimewa Kami</h2>
+  {% if inv.akad_date %}
+  <div class="event-paper reveal">
+    <div class="ep-stamp">I — Akad Nikah</div>
+    <div class="ep-name">{{ inv.akad_venue }}</div>
+    <div class="ep-info">
+      <span>📅 {{ inv.akad_date | format_date }}</span>
+      <span>🕐 {{ inv.akad_time }} WIB</span>
+      <span>📍 {{ inv.akad_address }}</span>
+    </div>
+    {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="ep-maps">🗺 Buka Maps</a>{% endif %}
+  </div>
+  {% endif %}
+  {% if inv.resepsi_date %}
+  <div class="event-paper reveal">
+    <div class="ep-stamp">II — Resepsi Pernikahan</div>
+    <div class="ep-name">{{ inv.resepsi_venue }}</div>
+    <div class="ep-info">
+      <span>📅 {{ inv.resepsi_date | format_date }}</span>
+      <span>🕐 {{ inv.resepsi_time }} WIB</span>
+      <span>📍 {{ inv.resepsi_address }}</span>
+    </div>
+    {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="ep-maps">🗺 Buka Maps</a>{% endif %}
+  </div>
+  {% endif %}
+  <!-- Maps Embed -->
+  {% if inv.maps_embed %}
+  <div class="maps-embed-wrap reveal">
+    <iframe src="{{ inv.maps_embed }}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  {% endif %}
+</section>
+
+<!-- ── COUNTDOWN ── -->
+<section id="countdown">
+  <div class="s-tag">Menghitung Hari</div>
+  <h2 class="s-title reveal">Kami Menantikan Kehadiran Anda</h2>
+  <div class="cd-row reveal">
+    <div class="cd-item"><div class="cd-box" id="cd-days">--</div><div class="cd-label">Hari</div></div>
+    <div class="cd-sep">·</div>
+    <div class="cd-item"><div class="cd-box" id="cd-hours">--</div><div class="cd-label">Jam</div></div>
+    <div class="cd-sep">·</div>
+    <div class="cd-item"><div class="cd-box" id="cd-mins">--</div><div class="cd-label">Menit</div></div>
+    <div class="cd-sep">·</div>
+    <div class="cd-item"><div class="cd-box" id="cd-secs">--</div><div class="cd-label">Detik</div></div>
+  </div>
+</section>
+
+<!-- ── GALLERY ── -->
+{% if photos %}
+<section id="gallery">
+  <div class="s-tag">Foto Prewed</div>
+  <h2 class="s-title reveal">Momen Bersama</h2>
+  {% set pc = photos|length %}
+  {% if pc >= 5 %}
+  <div class="gallery-strip reveal">
+    {% for p in photos %}
+    <div class="g-item" onclick="openLightbox({{ loop.index0 }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  <p style="text-align:center;font-size:.65rem;color:var(--brown);opacity:.5;margin-top:.5rem;letter-spacing:.15em">← Geser →</p>
+  {% else %}
+  <div class="gallery-masonry reveal {% if pc==1 %}single{% endif %}">
+    {% for p in photos %}
+    <div class="g-item" onclick="openLightbox({{ loop.index0 }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- ── STORY ── -->
+{% if inv.love_story %}
+<section id="story">
+  <div class="s-tag">Kisah Kami</div>
+  <h2 class="s-title reveal">Love Story</h2>
+  <div class="story-paper reveal">
+    <p class="story-text">{{ inv.love_story }}</p>
+  </div>
+</section>
+{% endif %}
+
+<!-- ── RSVP ── -->
+<section id="rsvp">
+  <div class="s-tag">Konfirmasi Kehadiran</div>
+  <h2 class="s-title reveal">RSVP</h2>
+  <div class="rsvp-paper reveal">
+    <div id="rsvp-success" class="rsvp-success">
+      <div class="rsvp-success-lotus">
+        <svg width="50" height="50" viewBox="0 0 120 120">
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7"/>
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(60 60 60)"/>
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(120 60 60)"/>
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(180 60 60)"/>
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(240 60 60)"/>
+          <ellipse cx="60" cy="70" rx="12" ry="28" fill="#c8a050" opacity=".7" transform="rotate(300 60 60)"/>
+          <circle cx="60" cy="60" r="10" fill="#f7f1e8"/>
+          <circle cx="60" cy="60" r="5" fill="#c8a050"/>
+        </svg>
+      </div>
+      <div class="rsvp-success-text">Terima kasih, kami menantikan kehadiran Anda ✦</div>
+    </div>
+    <div id="rsvp-form-inner">
+      <div class="rp-group"><label class="rp-label">Nama Lengkap</label><input class="rp-input" id="r-name" type="text" placeholder="Masukkan nama Anda"></div>
+      <div class="rp-group"><label class="rp-label">Kehadiran</label>
+        <select class="rp-input" id="r-att">
+          <option value="hadir">✦ Insya Allah Hadir</option>
+          <option value="tidak">Tidak Dapat Hadir</option>
+          <option value="ragu">Masih Belum Pasti</option>
+        </select>
+      </div>
+      <div class="rp-group"><label class="rp-label">Jumlah Tamu</label>
+        <select class="rp-input" id="r-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div class="rp-group"><label class="rp-label">Ucapan &amp; Doa</label><textarea class="rp-input" id="r-msg" placeholder="Tuliskan ucapan untuk kedua mempelai..."></textarea></div>
+      <button class="rp-btn" onclick="submitRSVP('{{ inv.id }}')">Kirim Konfirmasi</button>
+    </div>
+    {% if rsvp_list %}
+    <div class="rsvp-list">
+      <div class="rsvp-list-head">{{ rsvp_list|length }} Tamu Mengonfirmasi Kehadiran</div>
+      {% for r in rsvp_list %}
+      <div class="rsvp-item">
+        <div class="rsvp-init">{{ r.guest_name[0] }}</div>
+        <div>
+          <div class="rsvp-guest-name">{{ r.guest_name }}<span class="rsvp-badge {{ 'hadir' if r.attendance=='hadir' else 'tidak' }}">{{ 'Hadir' if r.attendance=='hadir' else ('Tidak' if r.attendance=='tidak' else 'Belum') }}</span></div>
+          {% if r.message %}<div class="rsvp-guest-msg">{{ r.message }}</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ── GIFT ── -->
+{% if gifts %}
+<section id="gift">
+  <div class="s-tag">Hadiah Pernikahan</div>
+  <h2 class="s-title reveal">Wedding Gift</h2>
+  {% for g in gifts %}{% if g.bank_name %}
+  <div class="gift-card reveal">
+    <div class="gift-type">Transfer Bank</div>
+    <div class="gift-bank">{{ g.bank_name }}</div>
+    <div class="gift-num">{{ g.account_number }}</div>
+    <div class="gift-name">a.n. {{ g.account_name }}</div>
+    <button class="gift-copy" onclick="copyText('{{ g.account_number }}',this)">Salin Nomor</button>
+  </div>
+  {% endif %}{% endfor %}
+</section>
+{% endif %}
+
+<!-- ── CLOSING ── -->
+<section id="closing">
+  <!-- Closing lotus big -->
+  <svg width="80" height="80" viewBox="0 0 120 120" class="reveal" style="opacity:.3">
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(45 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(90 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(135 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(180 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(225 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(270 60 60)"/>
+    <ellipse cx="60" cy="70" rx="12" ry="28" fill="#8b5e3c" transform="rotate(315 60 60)"/>
+    <circle cx="60" cy="60" r="14" fill="#f7f1e8"/>
+    <circle cx="60" cy="60" r="5" fill="#c8a050"/>
+  </svg>
+  <div class="closing-names reveal">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <p class="closing-msg reveal">Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
+  <div class="closing-ht reveal">#{{ inv.groom_name }}dan{{ inv.bride_name }}</div>
+</section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="lbOutside(event)">
+  <span id="lb-close" onclick="closeLb()">✕</span>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-counter"></div>
+</div>
+
+{% if inv.music_url %}
+<div id="music-fab" onclick="toggleMusic()">♪</div>
+<audio id="bg-music" src="{{ inv.music_url }}" loop></audio>
+{% endif %}
+
+<script>
+// CLICK RIPPLE everywhere
+document.addEventListener('click', e => {
+  const c = document.getElementById('rippleContainer');
+  const r = document.createElement('div');
+  const size = Math.random()*120+80;
+  r.className = 'ripple';
+  r.style.cssText = `left:${e.clientX-size/2}px;top:${e.clientY-size/2}px;width:${size}px;height:${size}px`;
+  c.appendChild(r);
+  setTimeout(()=>r.remove(), 800);
+});
+
+// INTRO
+function openIntro(e){
+  // ripple at click
+  document.getElementById('intro').classList.add('out');
+  setTimeout(()=>{
+    document.getElementById('intro').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    document.getElementById('bg-music')?.play().catch(()=>{});
+    initReveal(); startCountdown();
+  }, 1000);
+}
+function initReveal(){
+  const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');});},{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+function startCountdown(){
+  const t=new Date('{{ inv.resepsi_date }}T{{ inv.resepsi_time }}:00');
+  function up(){const d=t-new Date();if(d<=0)return;document.getElementById('cd-days').textContent=Math.floor(d/86400000);document.getElementById('cd-hours').textContent=Math.floor((d%86400000)/3600000);document.getElementById('cd-mins').textContent=Math.floor((d%3600000)/60000);document.getElementById('cd-secs').textContent=Math.floor((d%60000)/1000);}
+  up();setInterval(up,1000);
+}
+
+// LIGHTBOX
+const lbPhotos=[{% for p in photos %}"{{ photo_src(p) }}"{% if not loop.last %},{% endif %}{% endfor %}];
+let lbIdx=0;
+function openLightbox(i){lbIdx=i;document.getElementById('lb-img').src=lbPhotos[i];document.getElementById('lb-counter').textContent=`${i+1} / ${lbPhotos.length}`;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';['lb-prev','lb-next'].forEach(id=>document.getElementById(id).style.display=lbPhotos.length>1?'':'none');}
+function closeLb(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function lbOutside(e){if(e.target===document.getElementById('lightbox'))closeLb();}
+function lbNav(d){lbIdx=(lbIdx+d+lbPhotos.length)%lbPhotos.length;openLightbox(lbIdx);}
+document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);});
+
+async function submitRSVP(id){
+  const name=document.getElementById('r-name').value.trim();if(!name){alert('Masukkan nama Anda');return;}
+  const btn=document.querySelector('.rp-btn');btn.disabled=true;btn.textContent='Mengirim...';
+  try{const r=await fetch(`/rsvp/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,attendance:document.getElementById('r-att').value,count:parseInt(document.getElementById('r-count').value),message:document.getElementById('r-msg').value})});
+  if(r.ok){document.getElementById('rsvp-form-inner').style.display='none';document.getElementById('rsvp-success').style.display='block';}}
+  catch(e){btn.disabled=false;btn.textContent='Kirim Konfirmasi';}
+}
+function copyText(t,btn){navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='✓ Tersalin';setTimeout(()=>btn.textContent=o,2000);});}
+function toggleMusic(){const m=document.getElementById('bg-music');if(!m)return;m.paused?m.play():m.pause();}
+</script>
+<script>document.querySelectorAll("img").forEach(img=>{img.addEventListener("contextmenu",e=>e.preventDefault());img.addEventListener("dragstart",e=>e.preventDefault());});</script>
+</body>
+</html>

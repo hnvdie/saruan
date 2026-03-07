@@ -1,0 +1,11 @@
+{% extends "errors/base.html" %}
+{% block title %}429 — Terlalu Banyak Permintaan{% endblock %}
+{% block content %}
+<div class="error-code">429</div>
+<div class="error-icon">⏳</div>
+<div class="error-title">Terlalu Banyak Permintaan</div>
+<p class="error-msg">
+  Kamu mengirim terlalu banyak permintaan dalam waktu singkat.<br>
+  Tunggu beberapa menit lalu coba lagi.
+</p>
+{% endblock %}

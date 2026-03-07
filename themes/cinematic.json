@@ -5,11 +5,5 @@
   "preview_color": "#0d0d0d",
   "accent_color": "#c9a84c",
   "skeleton": "cinematic",
-  "tags": [
-    "luxury",
-    "dark",
-    "gold",
-    "elegant"
-  ],
-  "demo_photos": []
+  "tags": ["luxury", "dark", "gold", "elegant"]
 }

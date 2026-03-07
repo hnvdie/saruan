@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{% block title %}Error{% endblock %} — UndanganKita</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'DM Sans',sans-serif;font-weight:300;
+  background:#fafaf8;color:#1a1a1a;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:2rem;
+}
+.wrap{max-width:480px;text-align:center;}
+.error-code{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(5rem,20vw,9rem);
+  font-weight:300;color:#f0ece4;
+  line-height:1;margin-bottom:-1rem;
+  user-select:none;
+}
+.error-icon{font-size:2rem;margin-bottom:1rem;}
+.error-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-style:italic;font-weight:300;
+  color:#1a1a1a;margin-bottom:.75rem;
+}
+.error-msg{font-size:.82rem;color:#888;line-height:1.9;margin-bottom:2.5rem;}
+.divider{width:40px;height:1px;background:#e0dbd2;margin:1.5rem auto;}
+.btn-home{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.75rem;
+  border:1px solid #d0c8bc;
+  color:#666;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;
+  text-decoration:none;transition:all .2s;border-radius:2px;
+}
+.btn-home:hover{border-color:#a09080;color:#1a1a1a;background:#f5f0e8;}
+.btn-back{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.72rem;color:#aaa;text-decoration:none;
+  margin-top:1rem;letter-spacing:.05em;transition:color .2s;
+}
+.btn-back:hover{color:#666;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  {% block content %}{% endblock %}
+  <div class="divider"></div>
+  <a href="/" class="btn-home">← Kembali ke Beranda</a><br>
+  <a href="javascript:history.back()" class="btn-back">↩ Halaman sebelumnya</a>
+</div>
+</body>
+</html>

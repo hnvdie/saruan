@@ -136,6 +136,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
           <input class="form-input" type="text" name="bride_parents" value="{{ form.get('bride_parents','') }}" placeholder="Bapak ... & Ibu ...">
         </div>
       </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
+        <input type="checkbox" name="show_parents" id="show_parents" value="1" checked style="width:16px;height:16px;accent-color:var(--gold)">
+        <label for="show_parents" style="font-size:.78rem;color:#555;text-transform:none;letter-spacing:0;cursor:pointer">Tampilkan nama orang tua di undangan</label>
+      </div>
       <div class="form-group">
         <label>Slug URL *</label>
         <input class="form-input" type="text" name="slug" value="{{ form.get('slug','') }}" required placeholder="rizky-amara-2025">
@@ -164,6 +168,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div class="form-group"><label>Nama Venue</label><input class="form-input" type="text" name="resepsi_venue" value="{{ form.get('resepsi_venue','') }}" placeholder="Grand Ballroom Hotel ..."></div>
       <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="resepsi_address" value="{{ form.get('resepsi_address','') }}" placeholder="Jl. ..."></div>
       <div class="form-group"><label>Link Google Maps</label><input class="form-input" type="url" name="maps_url" value="{{ form.get('maps_url','') }}" placeholder="https://maps.google.com/..."></div>
+      <div class="form-group"><label>Maps Embed URL <span style="color:#bbb;font-weight:300">(opsional — auto-generate dari link di atas)</span></label><input class="form-input" type="text" name="maps_embed" value="{{ form.get('maps_embed','') }}" placeholder="Kosongkan untuk auto-generate dari link Maps"><div class="helper">Jika diisi, peta akan tampil langsung di halaman undangan (embed). Format: https://maps.google.com/maps?q=...&output=embed</div></div>
     </div>
 
     <!-- FOTO PREWED -->

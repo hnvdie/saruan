@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>{{ inv.groom_name }} & {{ inv.bride_name }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Nunito:wght@200;300;400;600&display=swap" rel="stylesheet">
 <style>
 /* SAKURA DREAM */
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
 :root{--bg:#fff8fb;--bg2:#fff0f5;--pink:#e8638c;--rose:#c94070;--blush:#f9d0de;--mauve:#9e4060;--white:#ffffff;--text:#2d1520;--muted:#b07080;--serif:'Shippori Mincho',serif;--sans:'Nunito',sans-serif;}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
@@ -243,7 +244,7 @@ textarea.sk-input{resize:vertical;min-height:80px;}
         <div class="couple-role-sk">Mempelai Pria</div>
         <div class="couple-name-sk">{{ inv.groom_name }}</div>
         {% if inv.groom_full %}<div class="couple-full-sk">{{ inv.groom_full }}</div>{% endif %}
-        {% if inv.groom_parents %}<div class="couple-parents-sk">Putra dari {{ inv.groom_parents }}</div>{% endif %}
+        {% if inv.show_parents and inv.groom_parents %}<div class="couple-parents-sk">Putra dari {{ inv.groom_parents }}</div>{% endif %}
       </div>
     </div>
     <div class="couple-card-sk reveal">
@@ -252,7 +253,7 @@ textarea.sk-input{resize:vertical;min-height:80px;}
         <div class="couple-role-sk">Mempelai Wanita</div>
         <div class="couple-name-sk">{{ inv.bride_name }}</div>
         {% if inv.bride_full %}<div class="couple-full-sk">{{ inv.bride_full }}</div>{% endif %}
-        {% if inv.bride_parents %}<div class="couple-parents-sk">Putri dari {{ inv.bride_parents }}</div>{% endif %}
+        {% if inv.show_parents and inv.bride_parents %}<div class="couple-parents-sk">Putri dari {{ inv.bride_parents }}</div>{% endif %}
       </div>
     </div>
   </div>
@@ -291,6 +292,16 @@ textarea.sk-input{resize:vertical;min-height:80px;}
     {% endif %}
   </div>
 </section>
+
+{% if inv.maps_embed %}
+<section style="min-height:auto;padding:0 1.5rem 3rem;background:var(--bg2)">
+  <div class="s-kana" style="padding-top:3rem">地図</div>
+  <div class="s-eye reveal">Lokasi Venue</div>
+  <div style="width:100%;max-width:480px;margin:1rem auto 0;border:2px solid rgba(232,99,140,.12);border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(232,99,140,.06)" class="reveal">
+    <iframe src="{{ inv.maps_embed }}" width="100%" height="260" style="border:none;display:block" allowfullscreen loading="lazy"></iframe>
+  </div>
+</section>
+{% endif %}
 
 <section id="countdown">
   <div class="s-kana">カウントダウン</div>
@@ -489,5 +500,6 @@ async function submitRSVP(id){
 function copyText(t,btn){navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='✓ Tersalin!';setTimeout(()=>btn.textContent=o,2000);});}
 function toggleMusic(){const m=document.getElementById('bg-music');if(!m)return;m.paused?m.play():m.pause();}
 </script>
+<script>document.querySelectorAll("img").forEach(img=>{img.addEventListener("contextmenu",e=>e.preventDefault());img.addEventListener("dragstart",e=>e.preventDefault());});</script>
 </body>
 </html>

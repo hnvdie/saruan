@@ -108,6 +108,10 @@ textarea.form-input{resize:vertical;min-height:80px;}
         <div class="form-group"><label>Orang Tua Pria</label><input class="form-input" type="text" name="groom_parents" value="{{ inv.groom_parents or '' }}"></div>
         <div class="form-group"><label>Orang Tua Wanita</label><input class="form-input" type="text" name="bride_parents" value="{{ inv.bride_parents or '' }}"></div>
       </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
+        <input type="checkbox" name="show_parents" id="show_parents" value="1" {{ 'checked' if inv.show_parents != 0 else '' }} style="width:16px;height:16px;accent-color:var(--gold)">
+        <label for="show_parents" style="font-size:.78rem;color:#555;text-transform:none;letter-spacing:0;cursor:pointer">Tampilkan nama orang tua di undangan</label>
+      </div>
     </div>
 
     <!-- AKAD -->
@@ -131,6 +135,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
       <div class="form-group"><label>Venue</label><input class="form-input" type="text" name="resepsi_venue" value="{{ inv.resepsi_venue or '' }}"></div>
       <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="resepsi_address" value="{{ inv.resepsi_address or '' }}"></div>
       <div class="form-group"><label>Link Google Maps</label><input class="form-input" type="url" name="maps_url" value="{{ inv.maps_url or '' }}"></div>
+      <div class="form-group"><label>Maps Embed URL <span style="color:#bbb;font-weight:300">(auto-generate dari link di atas jika kosong)</span></label><input class="form-input" type="text" name="maps_embed" value="{{ inv.maps_embed or '' }}" placeholder="Kosongkan untuk auto-generate"><div class="helper">Peta tampil langsung di halaman undangan jika diisi.</div></div>
     </div>
 
     <!-- FOTO -->
