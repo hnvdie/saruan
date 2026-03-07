@@ -293,11 +293,12 @@ def preview_theme(theme_id):
     photos = [{'filename': p, 'is_url': 1, 'id': i} for i, p in enumerate(demo_photos)]
     dummy = dict(
         id='preview', slug='preview', theme_id=theme_id,
-        groom_name='Rizky', bride_name='Amara',
-        groom_full='Muhammad Rizky Pratama, S.T.',
-        bride_full='Amara Putri Sanjaya, S.Kom.',
-        groom_parents='Bapak Hendra & Ibu Dewi Hartono',
-        bride_parents='Bapak Santoso & Ibu Lestari Wulandari',
+        groom_name = 'Zaid',
+        bride_name = 'Zainab',
+        groom_full = 'Zaid bin Haritsah',
+        bride_full = 'Zainab binti Jahsy',
+        groom_parents = 'Haritsah bin Syurahbil & Su’da binti Tsa’labah',
+        bride_parents = 'Jahsy bin Ri’ab & Umamah binti Abdul Muththalib',
         show_parents=1,
         akad_date='2025-12-20', akad_time='08:00',
         akad_venue='Masjid Al-Ikhlas',

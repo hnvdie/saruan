@@ -1,0 +1,54 @@
+{
+  "id": "ceritakita",
+  "name": "Cerita Kita",
+  "description": "Hangat, personal, dan penuh cerita. Nuansa buku harian tua dengan sage green, linen cream, dan terracotta — seperti membaca kisah cinta yang ditulis tangan, halaman demi halaman.",
+  "preview_color": "#7a9e7e",
+  "accent_color": "#c4704a",
+  "skeleton": "ceritakita",
+  "tags": [
+    "warm",
+    "personal",
+    "storytelling",
+    "scrapbook",
+    "handwritten",
+    "romantic"
+  ],
+  "demo_photos": [
+    "/static/themes/ceritakita/demo_cover.jpg"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "price_original": 75000,
+  "price_note": "",
+  "palette": {
+    "linen": "#f7f0e4",
+    "sage": "#7a9e7e",
+    "terra": "#c4704a",
+    "olive": "#6b7c4a",
+    "brown": "#4a3420",
+    "dust": "#b8a878"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "body": "Lora",
+    "hand": "Caveat",
+    "sans": "Jost"
+  },
+  "features": [
+    "book_intro",
+    "paper_scraps",
+    "paper_texture_bg",
+    "bismillah_opening",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_clear",
+    "polaroid_gallery",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music",
+    "washi_tape_dividers"
+  ]
+}

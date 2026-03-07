@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marcellus&family=Sacramento&family=Jost:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   SEJIWA
+   Forest mist · Silk gold · Sacred white · Zen
+═══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+:root{
+  --mist:#f4f0ea;
+  --silk:#faf7f2;
+  --cream:#f0ebe0;
+  --parch:#e8e0d0;
+  --stone:#d8d0c0;
+  --forest:#2c4a35;
+  --forest2:#3d6348;
+  --forest3:#527a5e;
+  --moss:#6e8f72;
+  --fern:#9ab89e;
+  --sage:#c2d4c6;
+  --mist-g:#e4ede6;
+  --gold:#b8943c;
+  --gold2:#c8a84e;
+  --gold3:#ddc06a;
+  --gold4:#f0dfa0;
+  --sand:#d4c48a;
+  --text:#1e2e22;
+  --text2:#3d5242;
+  --text3:#6e8a74;
+  --text4:#a0b4a4;
+  --serif:'EB Garamond',serif;
+  --display:'Marcellus',serif;
+  --script:'Sacramento',cursive;
+  --sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--silk);color:var(--text);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+
+/* silk texture overlay */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='silk'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23silk)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity:.5;mix-blend-mode:multiply;
+}
+
+/* ══════════════════════════
+   INTRO — Enso Circle
+══════════════════════════ */
+#intro{
+  position:fixed;inset:0;z-index:2000;
+  background:radial-gradient(ellipse at 50% 45%,#e8ece4 0%,var(--silk) 60%,#ddd8ce 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;overflow:hidden;
+}
+
+/* SVG enso drawn on load */
+.enso-wrap{position:relative;width:200px;height:200px;margin-bottom:2.5rem;}
+.enso-svg{position:absolute;inset:0;width:100%;height:100%;}
+.enso-circle{
+  fill:none;stroke:var(--forest);stroke-width:2.5;stroke-linecap:round;
+  stroke-dasharray:565;stroke-dashoffset:565;
+  animation:ensoDraw 2s .4s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes ensoDraw{to{stroke-dashoffset:0;}}
+.enso-inner-text{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.enso-kanji{
+  font-family:var(--serif);font-size:2.8rem;font-style:italic;
+  color:var(--forest);opacity:0;
+  animation:zenFade .8s 1.8s ease forwards;
+  line-height:1;
+}
+.enso-sub{
+  font-family:var(--display);font-size:.42rem;letter-spacing:.5em;
+  text-transform:uppercase;color:var(--text3);margin-top:.5rem;
+  opacity:0;animation:zenFade .6s 2.2s ease forwards;
+}
+@keyframes zenFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* Floating mist circles */
+.mist-orb{
+  position:absolute;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(194,212,198,.35),transparent 70%);
+  animation:mistDrift ease-in-out infinite;
+}
+@keyframes mistDrift{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(var(--dx),var(--dy)) scale(1.08);}}
+
+.intro-title{
+  font-family:var(--script);font-size:clamp(2.5rem,8vw,4rem);
+  color:var(--forest);opacity:0;
+  animation:zenFade .9s 2s ease forwards;
+  text-align:center;line-height:1.1;
+}
+.intro-names{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1rem,4vw,1.5rem);
+  color:var(--text3);opacity:0;
+  animation:zenFade .7s 2.5s ease forwards;
+  text-align:center;margin-top:.5rem;letter-spacing:.05em;
+}
+.intro-tap{
+  margin-top:2rem;font-family:var(--display);font-size:.52rem;
+  letter-spacing:.6em;text-transform:uppercase;
+  color:var(--text4);opacity:0;
+  animation:zenFade .6s 3s ease forwards,zenPulse 2.5s 3.6s ease infinite;
+  text-align:center;
+}
+@keyframes zenPulse{0%,100%{opacity:.25;}50%{opacity:.7;}}
+
+#intro.out{animation:ensoClose .8s ease forwards;}
+@keyframes ensoClose{to{opacity:0;transform:scale(1.03);visibility:hidden;}}
+
+/* ══════════════════════════
+   FLOATING PARTICLES — pollen/mist
+══════════════════════════ */
+#zen-canvas{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.7;}
+
+/* ══════════════════════════
+   GLOBAL
+══════════════════════════ */
+main{position:relative;z-index:2;}
+section{padding:6rem 2rem;position:relative;}
+.s-eyebrow{
+  font-family:var(--display);font-size:.5rem;letter-spacing:.65em;
+  text-transform:uppercase;color:var(--forest3);opacity:.65;margin-bottom:1rem;
+}
+.s-title{
+  font-family:var(--serif);font-size:clamp(1.9rem,5vw,3rem);
+  font-weight:400;color:var(--text);margin-bottom:1.8rem;line-height:1.2;
+}
+.s-title em{color:var(--forest2);font-style:italic;}
+
+/* Forest rule divider */
+.zen-rule{
+  display:flex;align-items:center;gap:1.2rem;
+  margin:1.5rem auto 2rem;max-width:280px;
+}
+.zen-rule-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--moss),transparent);opacity:.4;}
+.zen-rule-mark{
+  font-family:var(--script);font-size:1.4rem;color:var(--forest3);opacity:.5;
+}
+
+/* ══════════════════════════
+   HERO — photo full, zen overlay
+══════════════════════════ */
+#hero{
+  height:100vh;min-height:600px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:0;
+}
+.hero-bg-silk{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#d8e4da,var(--silk) 40%,#e0d8c8);
+}
+/* Photo — clear, high opacity */
+.hero-photo{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center top;
+  opacity:.76;
+}
+/* Gentle mist at very top and bottom */
+.hero-mist-t{
+  position:absolute;top:0;left:0;right:0;height:25%;
+  background:linear-gradient(to bottom,rgba(244,240,234,.6),transparent);
+}
+.hero-mist-b{
+  position:absolute;bottom:0;left:0;right:0;height:40%;
+  background:linear-gradient(to top,rgba(30,46,34,.72) 0%,rgba(30,46,34,.25) 55%,transparent 100%);
+}
+/* Subtle color grade — forest tint */
+.hero-grade{
+  position:absolute;inset:0;
+  background:linear-gradient(195deg,rgba(44,74,53,.08),transparent 45%,rgba(44,74,53,.05));
+}
+
+.hero-content{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:2.5rem 2rem;z-index:3;
+}
+.hero-eyebrow{
+  font-family:var(--display);font-size:.5rem;letter-spacing:.65em;
+  text-transform:uppercase;color:rgba(255,255,255,.5);
+  margin-bottom:.8rem;display:block;
+  opacity:0;animation:zenFade .8s .3s ease forwards;
+}
+.hero-name-line{
+  opacity:0;animation:zenFade 1s .5s ease forwards;
+}
+.hero-groom{
+  font-family:var(--script);
+  font-size:clamp(2.5rem,12vw,5.5rem);
+  color:#fff;line-height:.95;display:block;
+  text-shadow:0 3px 24px rgba(30,46,34,.5);
+}
+.hero-amp{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(.9rem,3vw,1.6rem);
+  color:var(--gold3);display:inline-block;
+  margin:.3em .4em;letter-spacing:.1em;
+}
+.hero-bride{
+  font-family:var(--script);
+  font-size:clamp(2.5rem,12vw,5.5rem);
+  color:var(--gold4);line-height:.95;display:block;
+  text-shadow:0 3px 24px rgba(30,46,34,.5);
+}
+.hero-date{
+  margin-top:1.2rem;display:flex;align-items:center;gap:1rem;
+  opacity:0;animation:zenFade .7s 1s ease forwards;
+}
+.hd-line{width:24px;height:1px;background:rgba(255,255,255,.3);}
+.hd-text{
+  font-family:var(--display);font-size:.52rem;
+  letter-spacing:.45em;color:rgba(255,255,255,.5);
+}
+/* vertical scroll hint left side */
+.hero-hint{
+  position:absolute;left:1.5rem;top:50%;transform:translateY(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:.6rem;
+  opacity:0;animation:zenFade .6s 1.8s ease forwards;
+}
+.hint-line{
+  width:1px;height:40px;
+  background:linear-gradient(to bottom,transparent,rgba(255,255,255,.4));
+  animation:hintFlow 2s ease-in-out infinite;
+}
+@keyframes hintFlow{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}100%{transform:scaleY(0);transform-origin:bottom;}}
+.hint-txt{
+  font-family:var(--display);font-size:.42rem;letter-spacing:.35em;
+  color:rgba(255,255,255,.3);text-transform:uppercase;
+  writing-mode:vertical-rl;text-orientation:mixed;
+}
+
+/* ══════════════════════════
+   VERSE — sacred space
+══════════════════════════ */
+#verse{
+  background:linear-gradient(180deg,var(--mist-g) 0%,var(--silk) 50%,var(--mist-g) 100%);
+  text-align:center;padding:7rem 2rem;position:relative;overflow:hidden;
+}
+/* large enso bg */
+.verse-enso-bg{
+  position:absolute;top:50%;left:50%;
+  width:360px;height:360px;margin:-180px;
+  border-radius:50%;
+  border:1px solid rgba(44,74,53,.06);
+  pointer-events:none;
+}
+.verse-enso-bg::before{
+  content:'';position:absolute;inset:20px;border-radius:50%;
+  border:1px solid rgba(184,148,60,.05);
+}
+.verse-bismillah{
+  font-family:var(--serif);font-size:clamp(1.1rem,3.5vw,1.7rem);
+  color:var(--gold2);line-height:2.4;direction:rtl;
+  margin-bottom:2rem;
+  opacity:0;transform:translateY(16px);transition:all 1s ease;
+}
+.verse-bismillah.visible{opacity:1;transform:none;}
+.verse-text{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(.88rem,2.5vw,1.05rem);
+  color:var(--text2);max-width:420px;margin:0 auto 1.2rem;
+  line-height:2.1;
+  opacity:0;transform:translateY(14px);transition:all 1s .2s ease;
+}
+.verse-text.visible{opacity:1;transform:none;}
+.verse-src{
+  font-family:var(--display);font-size:.5rem;letter-spacing:.45em;
+  text-transform:uppercase;color:var(--forest3);
+  opacity:0;transition:all .8s .4s ease;
+}
+.verse-src.visible{opacity:.55;}
+.verse-tagline{
+  font-family:var(--script);font-size:clamp(1.3rem,4vw,1.9rem);
+  color:var(--forest2);margin-top:2.5rem;
+  opacity:0;transform:translateY(12px);transition:all .9s .6s ease;
+  display:block;
+}
+.verse-tagline.visible{opacity:.75;transform:none;}
+
+/* ══════════════════════════
+   COUPLE — minimal zen cards
+══════════════════════════ */
+#couple{
+  background:var(--silk);padding:6rem 1.5rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.couple-cards{width:100%;max-width:420px;display:flex;flex-direction:column;gap:1px;}
+.person-card{
+  padding:2.2rem 2rem;
+  background:rgba(255,255,255,.6);
+  border:1px solid rgba(44,74,53,.08);
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(22px);transition:all .9s ease;
+}
+.person-card.visible{opacity:1;transform:none;}
+/* very thin top accent */
+.person-card::before{
+  content:'';position:absolute;top:0;left:2rem;right:2rem;height:1px;
+  background:linear-gradient(to right,transparent,var(--forest3),transparent);
+  opacity:.3;
+}
+/* large bg character */
+.pc-bg{
+  position:absolute;right:.5rem;bottom:-.5rem;
+  font-family:var(--script);font-size:5rem;
+  color:rgba(44,74,53,.04);line-height:1;pointer-events:none;
+}
+.bride-card .pc-bg{color:rgba(184,148,60,.04);}
+.pc-role{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.55em;
+  text-transform:uppercase;color:var(--forest3);opacity:.6;margin-bottom:.9rem;
+}
+.bride-card .pc-role{color:var(--gold2);}
+.pc-name{
+  font-family:var(--serif);font-style:italic;font-size:2rem;
+  color:var(--text);margin-bottom:.35rem;line-height:1.2;
+}
+.pc-full{font-size:.8rem;color:var(--text2);margin-bottom:.6rem;font-weight:300;}
+.pc-parents{
+  font-size:.74rem;color:var(--text3);line-height:1.9;
+}
+.pc-parents-label{
+  font-family:var(--display);font-size:.45rem;letter-spacing:.4em;
+  text-transform:uppercase;color:var(--forest3);display:block;margin-bottom:.2rem;opacity:.6;
+}
+.bride-card .pc-parents-label{color:var(--gold2);}
+
+/* Bridge element between cards */
+.card-bridge{
+  width:100%;max-width:420px;
+  display:flex;align-items:center;justify-content:center;
+  padding:.8rem 0;background:rgba(255,255,255,.4);
+  border-left:1px solid rgba(44,74,53,.08);
+  border-right:1px solid rgba(44,74,53,.08);
+}
+.card-bridge-inner{
+  font-family:var(--script);font-size:1.6rem;color:var(--forest3);
+  opacity:.4;
+}
+
+/* ══════════════════════════
+   EVENT — Center Vertical Timeline
+══════════════════════════ */
+#event{
+  background:linear-gradient(180deg,var(--mist-g),var(--silk) 30%,var(--sage) 70%,var(--silk));
+  padding:6rem 0;display:flex;flex-direction:column;align-items:center;
+}
+#event .s-eyebrow,#event .s-title{padding:0 2rem;text-align:center;}
+
+.vtl-wrap{width:100%;max-width:480px;position:relative;padding:2rem 1.5rem;}
+.vtl-wrap::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--moss) 15%,var(--gold2) 50%,var(--moss) 85%,transparent);
+  transform:translateX(-50%);opacity:.35;
+}
+.vtl-item{
+  display:grid;grid-template-columns:1fr 32px 1fr;
+  align-items:start;margin-bottom:4rem;
+  opacity:0;transform:translateY(22px);transition:all .85s ease;
+}
+.vtl-item.visible{opacity:1;transform:none;}
+.vtl-item.v-left .vtl-content{grid-column:1;text-align:right;padding-right:2rem;}
+.vtl-item.v-left .vtl-dot-col{grid-column:2;}
+.vtl-item.v-left .vtl-empty{grid-column:3;}
+.vtl-item.v-right .vtl-empty{grid-column:1;}
+.vtl-item.v-right .vtl-dot-col{grid-column:2;}
+.vtl-item.v-right .vtl-content{grid-column:3;text-align:left;padding-left:2rem;}
+.vtl-dot-col{display:flex;justify-content:center;padding-top:.35rem;}
+.vtl-dot{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--silk);border:1.5px solid var(--moss);
+  box-shadow:0 0 0 4px rgba(110,143,114,.1);flex-shrink:0;
+}
+.vtl-item.v-right .vtl-dot{border-color:var(--gold2);box-shadow:0 0 0 4px rgba(184,148,60,.1);}
+.vtl-tag{
+  font-family:var(--display);font-size:.47rem;letter-spacing:.45em;
+  text-transform:uppercase;color:var(--moss);opacity:.7;margin-bottom:.5rem;
+}
+.vtl-item.v-right .vtl-tag{color:var(--gold2);}
+.vtl-event-name{
+  font-family:var(--serif);font-size:1.2rem;font-style:italic;
+  color:var(--text);margin-bottom:.8rem;line-height:1.3;
+}
+.vtl-info{font-family:var(--sans);font-size:.75rem;color:var(--text2);line-height:2.1;font-weight:300;}
+.vtl-row{display:flex;align-items:flex-start;gap:.4rem;justify-content:flex-end;}
+.vtl-item.v-right .vtl-row{justify-content:flex-start;}
+.vtl-link{
+  display:inline-block;margin-top:.7rem;
+  font-family:var(--display);font-size:.47rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--forest3);text-decoration:none;
+  border-bottom:1px solid rgba(61,99,72,.2);transition:all .3s;
+}
+.vtl-link:hover{color:var(--gold2);border-bottom-color:rgba(184,148,60,.4);}
+
+/* ══════════════════════════
+   SCHEDULE
+══════════════════════════ */
+#schedule{
+  background:var(--silk);padding:6rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.sch-wrap{width:100%;max-width:460px;position:relative;}
+.sch-wrap::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,transparent,rgba(44,74,53,.1),transparent);
+  transform:translateX(-50%);
+}
+.sch-item{
+  display:grid;grid-template-columns:1fr 24px 1fr;
+  gap:.5rem;margin-bottom:2.5rem;align-items:center;
+  opacity:0;transition:all .7s ease;
+}
+.sch-item.visible{opacity:1;}
+.sch-item.s-left .sch-content{grid-column:1;text-align:right;}
+.sch-item.s-left .sch-mid{grid-column:2;}
+.sch-item.s-left .sch-tcol{grid-column:3;}
+.sch-item.s-right .sch-tcol{grid-column:1;text-align:right;}
+.sch-item.s-right .sch-mid{grid-column:2;}
+.sch-item.s-right .sch-content{grid-column:3;}
+.sch-mid{display:flex;justify-content:center;}
+.sch-dot{width:7px;height:7px;border-radius:50%;background:rgba(110,143,114,.2);border:1px solid var(--moss);}
+.sch-time{
+  font-family:var(--serif);font-size:1.5rem;font-style:italic;
+  color:var(--forest2);line-height:1;
+}
+.sch-label{font-family:var(--display);font-size:.72rem;font-weight:400;color:var(--text);margin-bottom:.25rem;letter-spacing:.02em;}
+.sch-desc{font-size:.68rem;color:var(--text3);line-height:1.8;font-weight:300;}
+
+/* ══════════════════════════
+   GALLERY
+══════════════════════════ */
+#gallery{
+  background:linear-gradient(180deg,var(--mist-g),var(--silk) 30%);
+  padding:6rem 0;display:flex;flex-direction:column;align-items:center;
+}
+#gallery .s-eyebrow,#gallery .s-title{padding:0 2rem;text-align:center;}
+
+/* Hero photo — large, zen framed */
+.gallery-zen-hero{
+  width:100%;max-width:500px;padding:0 1.5rem;margin-bottom:.6rem;
+}
+.zen-frame{
+  position:relative;cursor:pointer;
+  box-shadow:0 12px 50px rgba(30,46,34,.1),0 2px 12px rgba(30,46,34,.06);
+}
+/* thin forest border */
+.zen-frame::before{
+  content:'';position:absolute;inset:8px;
+  border:1px solid rgba(44,74,53,.15);
+  pointer-events:none;z-index:2;
+  transition:border-color .3s;
+}
+.zen-frame:hover::before{border-color:rgba(44,74,53,.3);}
+/* corner marks */
+.zen-frame::after{
+  content:'';position:absolute;
+  top:3px;left:3px;
+  width:22px;height:22px;
+  border-top:1.5px solid rgba(184,148,60,.5);
+  border-left:1.5px solid rgba(184,148,60,.5);
+  pointer-events:none;z-index:2;
+}
+.zen-corner-br{
+  position:absolute;bottom:3px;right:3px;
+  width:22px;height:22px;
+  border-bottom:1.5px solid rgba(184,148,60,.5);
+  border-right:1.5px solid rgba(184,148,60,.5);
+  pointer-events:none;z-index:2;
+}
+.zen-hero-img{
+  width:100%;aspect-ratio:4/3;overflow:hidden;display:block;
+}
+.zen-hero-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .7s ease;
+  filter:contrast(1.03) saturate(.98);
+}
+.zen-frame:hover .zen-hero-img img{transform:scale(1.03);}
+
+/* Strip */
+.gallery-strip{
+  width:100%;overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:.6rem 1.5rem;display:flex;gap:.5rem;
+}
+.gallery-strip::-webkit-scrollbar{display:none;}
+.gs-zen{
+  flex-shrink:0;overflow:hidden;cursor:pointer;
+  position:relative;
+  box-shadow:0 3px 14px rgba(30,46,34,.08);
+}
+.gs-zen:nth-child(odd){width:148px;height:178px;margin-top:14px;}
+.gs-zen:nth-child(even){width:160px;height:192px;}
+.gs-zen::before{
+  content:'';position:absolute;inset:5px;
+  border:1px solid rgba(44,74,53,.1);
+  pointer-events:none;z-index:1;transition:border-color .3s;
+}
+.gs-zen:hover::before{border-color:rgba(44,74,53,.25);}
+.gs-zen img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease;
+  filter:contrast(1.02) saturate(.97);
+}
+.gs-zen:hover img{transform:scale(1.05);}
+
+/* grid fallback */
+.gallery-grid-sj{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:.5rem;width:100%;max-width:500px;padding:0 1.5rem;
+}
+.gallery-grid-sj .gsj-item{overflow:hidden;cursor:pointer;position:relative;}
+.gallery-grid-sj .gsj-item:first-child{grid-column:1/-1;aspect-ratio:16/7;}
+.gallery-grid-sj .gsj-item:not(:first-child){aspect-ratio:1;}
+.gallery-grid-sj .gsj-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;filter:contrast(1.02) saturate(.97);}
+.gallery-grid-sj .gsj-item:hover img{transform:scale(1.05);}
+
+/* ══════════════════════════
+   COUNTDOWN
+══════════════════════════ */
+#countdown{
+  background:var(--silk);padding:6rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cd-zen{
+  position:absolute;top:50%;left:50%;
+  width:320px;height:320px;margin:-160px;border-radius:50%;
+  border:1px solid rgba(44,74,53,.05);
+  pointer-events:none;
+}
+.cd-zen::before{content:'';position:absolute;inset:20px;border-radius:50%;border:1px solid rgba(184,148,60,.04);}
+.cd-row{
+  display:flex;margin-top:2.5rem;
+  position:relative;z-index:1;
+  opacity:0;transform:translateY(18px);transition:all .9s ease;
+}
+.cd-row.visible{opacity:1;transform:none;}
+/* dividers between blocks */
+.cd-block{
+  padding:2rem 1.8rem;
+  border-right:1px solid rgba(44,74,53,.08);
+  min-width:80px;
+}
+.cd-block:last-child{border-right:none;}
+.cd-num{
+  font-family:var(--serif);font-size:clamp(2.2rem,7vw,3rem);
+  font-style:italic;color:var(--forest2);line-height:1;font-weight:500;
+}
+.cd-label{
+  font-family:var(--display);font-size:.46rem;letter-spacing:.4em;
+  text-transform:uppercase;color:var(--text4);margin-top:.45rem;display:block;
+}
+
+/* ══════════════════════════
+   LOVE STORY
+══════════════════════════ */
+#story{
+  background:linear-gradient(180deg,var(--mist-g),var(--silk));
+  padding:6rem 1.8rem;display:flex;flex-direction:column;align-items:center;
+}
+.story-zen{
+  max-width:480px;width:100%;
+  padding:2.5rem 2rem;position:relative;
+  border-top:1px solid rgba(44,74,53,.1);
+  border-bottom:1px solid rgba(44,74,53,.1);
+}
+.story-zen::before{
+  content:'"';font-family:var(--serif);font-size:5rem;
+  color:rgba(44,74,53,.08);
+  position:absolute;top:.2rem;left:1rem;line-height:1;
+}
+.story-body{
+  font-family:var(--serif);font-style:italic;
+  font-size:1rem;color:var(--text2);line-height:2.2;position:relative;z-index:1;
+}
+
+/* ══════════════════════════
+   RSVP
+══════════════════════════ */
+#rsvp{
+  background:var(--mist-g);padding:6rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.rsvp-zen{width:100%;max-width:460px;}
+.sj-label{
+  display:block;font-family:var(--display);font-size:.48rem;
+  letter-spacing:.5em;text-transform:uppercase;
+  color:var(--forest3);opacity:.65;margin-bottom:.4rem;
+}
+.sj-input{
+  width:100%;padding:.9rem 0;background:transparent;
+  border:none;border-bottom:1px solid rgba(44,74,53,.18);
+  color:var(--text);font-family:var(--serif);font-style:italic;
+  font-size:.87rem;outline:none;transition:border-color .3s;margin-bottom:1.6rem;
+}
+.sj-input:focus{border-bottom-color:var(--forest2);}
+.sj-input::placeholder{color:var(--text4);font-style:italic;}
+.sj-input option{background:var(--silk);}
+.sj-btn{
+  width:100%;padding:1.1rem;
+  background:var(--forest);
+  border:none;color:rgba(244,240,234,.9);
+  font-family:var(--display);font-size:.5rem;
+  letter-spacing:.55em;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;margin-top:.5rem;
+}
+.sj-btn:hover{background:var(--forest2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(44,74,53,.25);}
+.sj-btn:disabled{opacity:.5;transform:none;}
+.sj-success{
+  display:none;text-align:center;padding:3rem 1rem;
+}
+.sj-success-mark{
+  width:50px;height:50px;border-radius:50%;
+  border:1px solid rgba(44,74,53,.2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;
+  font-family:var(--serif);font-size:1.5rem;font-style:italic;color:var(--forest3);
+}
+.sj-success-text{
+  font-family:var(--serif);font-style:italic;
+  color:var(--text2);font-size:1rem;line-height:2;
+}
+.sj-rsvp-list{margin-top:3rem;}
+.sj-rsvp-head{
+  font-family:var(--display);font-size:.48rem;letter-spacing:.45em;
+  text-transform:uppercase;color:var(--text4);
+  padding-bottom:1rem;border-bottom:1px solid rgba(44,74,53,.08);margin-bottom:1rem;
+}
+.sj-rsvp-item{
+  padding:.9rem 0;border-bottom:1px solid rgba(44,74,53,.05);
+  display:flex;gap:1rem;align-items:flex-start;
+}
+.sj-init{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(44,74,53,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;color:var(--forest3);font-size:.9rem;flex-shrink:0;
+}
+.sj-guest-name{font-size:.82rem;color:var(--text);margin-bottom:.2rem;}
+.sj-guest-msg{font-family:var(--serif);font-style:italic;font-size:.75rem;color:var(--text3);line-height:1.7;}
+.sj-badge{
+  font-family:var(--display);font-size:.44rem;letter-spacing:.1em;
+  padding:.1rem .4rem;margin-left:.3rem;
+}
+.sj-badge.hadir{color:var(--forest3);border:1px solid rgba(44,74,53,.2);}
+.sj-badge.tidak{color:var(--text4);border:1px solid rgba(160,180,164,.2);}
+
+/* ══════════════════════════
+   GIFT
+══════════════════════════ */
+#gift{
+  background:var(--silk);padding:6rem 1.8rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.gift-row{width:100%;max-width:460px;display:flex;flex-direction:column;gap:.8rem;}
+.gift-item{
+  padding:1.8rem;background:rgba(255,255,255,.6);
+  border:1px solid rgba(44,74,53,.08);position:relative;
+}
+.gift-item::before{
+  content:'';position:absolute;left:0;top:.8rem;bottom:.8rem;
+  width:2px;background:linear-gradient(to bottom,var(--forest3),var(--gold2));
+  opacity:.4;
+}
+.gi-type{font-family:var(--display);font-size:.47rem;letter-spacing:.45em;color:var(--forest3);opacity:.55;margin-bottom:.6rem;}
+.gi-bank{font-size:.9rem;color:var(--text);font-weight:400;margin-bottom:.3rem;}
+.gi-num{font-family:var(--serif);font-style:italic;font-size:1.5rem;color:var(--gold2);letter-spacing:.03em;margin-bottom:.25rem;}
+.gi-name{font-size:.73rem;color:var(--text3);}
+.gi-copy{
+  margin-top:.8rem;background:transparent;
+  border:1px solid rgba(44,74,53,.2);
+  color:var(--text3);padding:.4rem .9rem;
+  font-family:var(--display);font-size:.47rem;letter-spacing:.2em;
+  text-transform:uppercase;cursor:pointer;transition:all .3s;
+}
+.gi-copy:hover{border-color:var(--forest3);color:var(--forest3);}
+
+/* ══════════════════════════
+   CLOSING
+══════════════════════════ */
+#closing{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:5rem 2rem;text-align:center;
+  background:radial-gradient(ellipse at 50% 40%,#d8e4da 0%,var(--silk) 55%,#e8e0cc 100%);
+  position:relative;overflow:hidden;
+}
+/* Large enso behind */
+.closing-enso{
+  position:absolute;top:50%;left:50%;
+  width:min(90vw,420px);height:min(90vw,420px);
+  margin:calc(min(90vw,420px) / -2);
+  pointer-events:none;
+}
+.closing-enso-svg{width:100%;height:100%;}
+.closing-enso-path{
+  fill:none;stroke:var(--forest);stroke-width:1.5;stroke-linecap:round;
+  opacity:.06;
+  stroke-dasharray:1320;stroke-dashoffset:1320;
+  transition:stroke-dashoffset 3s ease;
+}
+.closing-enso-path.drawn{stroke-dashoffset:0;}
+
+.closing-monogram{
+  font-family:var(--script);font-size:5.5rem;
+  color:var(--forest3);opacity:.1;line-height:1;
+  margin-bottom:-2rem;position:relative;z-index:1;
+}
+.closing-names{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  color:var(--text);margin-bottom:.5rem;position:relative;z-index:1;
+}
+.closing-rule{
+  width:80px;height:1px;margin:.8rem auto 1.5rem;
+  background:linear-gradient(to right,transparent,var(--gold2),transparent);
+  opacity:.5;
+}
+.closing-doa{
+  font-family:var(--serif);font-style:italic;font-size:.97rem;
+  color:var(--text2);max-width:380px;line-height:2.1;margin-bottom:1.5rem;
+  position:relative;z-index:1;
+}
+.closing-thanks{
+  font-family:var(--sans);font-size:.76rem;color:var(--text3);
+  line-height:1.9;max-width:340px;margin:0 auto 2rem;
+  position:relative;z-index:1;font-weight:300;
+}
+.closing-ht{
+  font-family:var(--serif);font-style:italic;
+  color:var(--forest3);opacity:.6;font-size:1.1rem;position:relative;z-index:1;
+}
+.closing-mark{
+  font-family:var(--display);font-size:.5rem;letter-spacing:.6em;
+  color:var(--forest3);opacity:.2;margin-top:1.5rem;
+  text-transform:uppercase;position:relative;z-index:1;
+}
+
+/* ══════════════════════════
+   LIGHTBOX
+══════════════════════════ */
+#lightbox{
+  display:none;position:fixed;inset:0;z-index:3000;
+  background:rgba(20,30,22,.97);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(12px);
+}
+#lightbox.open{display:flex;}
+#lightbox img{
+  max-width:90vw;max-height:85vh;object-fit:contain;
+  box-shadow:0 20px 70px rgba(0,0,0,.5),0 0 0 1px rgba(44,74,53,.15);
+}
+#lb-close{
+  position:absolute;top:1.5rem;right:1.5rem;
+  font-family:var(--display);font-size:.7rem;letter-spacing:.2em;
+  color:rgba(255,255,255,.3);cursor:pointer;transition:color .2s;padding:.5rem;
+}
+#lb-close:hover{color:var(--fern);}
+#lb-prev,#lb-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(44,74,53,.1);border:1px solid rgba(44,74,53,.2);
+  color:rgba(255,255,255,.4);font-size:1.3rem;
+  padding:.5rem .8rem;cursor:pointer;transition:all .2s;
+}
+#lb-prev:hover,#lb-next:hover{background:rgba(44,74,53,.2);color:var(--fern);}
+#lb-prev{left:1rem;}#lb-next{right:1rem;}
+#lb-counter{
+  position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  font-family:var(--display);font-size:.5rem;letter-spacing:.3em;
+  color:rgba(255,255,255,.25);
+}
+
+/* MUSIC FAB */
+#music-fab{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  width:46px;height:46px;border-radius:50%;
+  border:1px solid rgba(44,74,53,.25);
+  background:rgba(250,247,242,.9);
+  backdrop-filter:blur(8px);
+  color:var(--forest3);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:100;transition:all .3s;
+  box-shadow:0 3px 16px rgba(30,46,34,.1);font-size:.95rem;
+}
+#music-fab:hover{background:var(--mist-g);color:var(--forest);}
+
+/* ══════════════════════════
+   REVEALS
+══════════════════════════ */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .85s ease,transform .85s ease;}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-l{opacity:0;transform:translateX(-24px);transition:opacity .85s ease,transform .85s ease;}
+.reveal-l.visible{opacity:1;transform:none;}
+.reveal-r{opacity:0;transform:translateX(24px);transition:opacity .85s ease,transform .85s ease;}
+.reveal-r.visible{opacity:1;transform:none;}
+.reveal-s{opacity:0;transform:scale(.95);transition:opacity .85s ease,transform .85s ease;}
+.reveal-s.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<canvas id="zen-canvas"></canvas>
+
+<!-- INTRO -->
+<div id="intro" onclick="openIntro()">
+  <div class="mist-orb" style="width:280px;height:280px;top:-60px;right:-60px;--dx:-20px;--dy:30px;animation-duration:8s;"></div>
+  <div class="mist-orb" style="width:200px;height:200px;bottom:-30px;left:-40px;--dx:25px;--dy:-15px;animation-duration:11s;animation-delay:2s;"></div>
+
+  <div class="enso-wrap">
+    <svg class="enso-svg" viewBox="0 0 200 200">
+      <circle class="enso-circle" cx="100" cy="100" r="88"/>
+    </svg>
+    <div class="enso-inner-text">
+      <div class="enso-kanji">Sejiwa</div>
+      <div class="enso-sub">Satu jiwa · Satu hati</div>
+    </div>
+  </div>
+
+  <div class="intro-title">Sejiwa</div>
+  <div class="intro-names">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <div class="intro-tap">Sentuh untuk membuka</div>
+</div>
+
+<main id="main-content" style="display:none">
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-silk"></div>
+  {% if photos %}
+  <div class="hero-photo" style="background-image:url('{{ photo_src(photos[0]) }}')"></div>
+  {% endif %}
+  <div class="hero-mist-t"></div>
+  <div class="hero-grade"></div>
+  <div class="hero-mist-b"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Undangan Pernikahan</span>
+    <div class="hero-name-line">
+      <span class="hero-groom">{{ inv.groom_name }}</span>
+      <span class="hero-amp">&amp;</span>
+      <span class="hero-bride">{{ inv.bride_name }}</span>
+    </div>
+    <div class="hero-date">
+      <div class="hd-line"></div>
+      <div class="hd-text">{{ inv.resepsi_date | format_date }}</div>
+    </div>
+  </div>
+  <div class="hero-hint">
+    <div class="hint-line"></div>
+    <div class="hint-txt">Gulir</div>
+  </div>
+</section>
+
+<!-- VERSE -->
+<section id="verse">
+  <div class="verse-enso-bg"></div>
+  <div class="s-eyebrow reveal" style="text-align:center;">Firman Allah</div>
+  <div class="verse-bismillah reveal">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+  <div class="verse-text reveal">
+    "Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
+  </div>
+  <div class="verse-src reveal">QS. Ar-Rum : 21</div>
+  <div class="zen-rule reveal"><div class="zen-rule-line"></div><div class="zen-rule-mark">✦</div><div class="zen-rule-line"></div></div>
+  <span class="verse-tagline reveal">dua jiwa yang menemukan rumahnya dalam satu sama lain</span>
+</section>
+
+<!-- COUPLE -->
+<section id="couple">
+  <div class="s-eyebrow reveal" style="text-align:center;">Kedua Mempelai</div>
+  <h2 class="s-title reveal" style="text-align:center;">Dua Jiwa <em>Sejiwa</em></h2>
+  <div class="zen-rule reveal"><div class="zen-rule-line"></div><div class="zen-rule-mark">✦</div><div class="zen-rule-line"></div></div>
+  <div class="couple-cards">
+    <div class="person-card reveal-l">
+      <div class="pc-bg">Pria</div>
+      <div class="pc-role">Mempelai Pria</div>
+      <div class="pc-name">{{ inv.groom_name }}</div>
+      {% if inv.groom_full %}<div class="pc-full">{{ inv.groom_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.groom_parents %}
+      <div class="pc-parents">
+        <span class="pc-parents-label">Putra dari</span>
+        {{ inv.groom_parents }}
+      </div>
+      {% endif %}
+    </div>
+    <div class="card-bridge reveal"><div class="card-bridge-inner">&amp;</div></div>
+    <div class="person-card bride-card reveal-r">
+      <div class="pc-bg">Wanita</div>
+      <div class="pc-role">Mempelai Wanita</div>
+      <div class="pc-name">{{ inv.bride_name }}</div>
+      {% if inv.bride_full %}<div class="pc-full">{{ inv.bride_full }}</div>{% endif %}
+      {% if inv.show_parents and inv.bride_parents %}
+      <div class="pc-parents">
+        <span class="pc-parents-label">Putri dari</span>
+        {{ inv.bride_parents }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- EVENT -->
+<section id="event">
+  <div class="s-eyebrow reveal" style="text-align:center;">Rangkaian Acara</div>
+  <h2 class="s-title reveal" style="text-align:center;">Hari yang <em>Ditunggu</em></h2>
+  <div class="zen-rule reveal"><div class="zen-rule-line"></div><div class="zen-rule-mark">✦</div><div class="zen-rule-line"></div></div>
+  <div class="vtl-wrap">
+    {% if inv.akad_date %}
+    <div class="vtl-item v-left">
+      <div class="vtl-content">
+        <div class="vtl-tag">Akad Nikah</div>
+        <div class="vtl-event-name">{{ inv.akad_venue }}</div>
+        <div class="vtl-info">
+          <div class="vtl-row">📅&nbsp;{{ inv.akad_date | format_date }}</div>
+          <div class="vtl-row">🕐&nbsp;{{ inv.akad_time }} WIB</div>
+          <div class="vtl-row">📍&nbsp;{{ inv.akad_address }}</div>
+        </div>
+        {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="vtl-link" style="float:right;">Lihat Maps →</a>{% endif %}
+      </div>
+      <div class="vtl-dot-col"><div class="vtl-dot"></div></div>
+      <div class="vtl-empty"></div>
+    </div>
+    {% endif %}
+    {% if inv.resepsi_date %}
+    <div class="vtl-item v-right">
+      <div class="vtl-empty"></div>
+      <div class="vtl-dot-col"><div class="vtl-dot"></div></div>
+      <div class="vtl-content">
+        <div class="vtl-tag">Resepsi</div>
+        <div class="vtl-event-name">{{ inv.resepsi_venue }}</div>
+        <div class="vtl-info">
+          <div class="vtl-row" style="justify-content:flex-start;">📅&nbsp;{{ inv.resepsi_date | format_date }}</div>
+          <div class="vtl-row" style="justify-content:flex-start;">🕐&nbsp;{{ inv.resepsi_time }} WIB</div>
+          <div class="vtl-row" style="justify-content:flex-start;">📍&nbsp;{{ inv.resepsi_address }}</div>
+        </div>
+        {% if inv.maps_url %}<a href="{{ inv.maps_url }}" target="_blank" class="vtl-link">Lihat Maps →</a>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- MAP -->
+{% if inv.maps_embed %}
+<div style="background:var(--mist-g);padding:0 1.8rem 5rem;display:flex;flex-direction:column;align-items:center;">
+  <div class="s-eyebrow reveal" style="text-align:center;padding-top:1rem;">Lokasi</div>
+  <div class="reveal" style="width:100%;max-width:480px;border:1px solid rgba(44,74,53,.1);box-shadow:0 4px 24px rgba(30,46,34,.06);overflow:hidden;">
+    <iframe src="{{ inv.maps_embed }}" width="100%" height="260" style="border:none;display:block;filter:saturate(.82) sepia(5%);" allowfullscreen loading="lazy"></iframe>
+  </div>
+</div>
+{% endif %}
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div class="s-eyebrow reveal" style="text-align:center;">Jadwal</div>
+  <h2 class="s-title reveal" style="text-align:center;">Susunan <em>Acara</em></h2>
+  <div class="zen-rule reveal"><div class="zen-rule-line"></div><div class="zen-rule-mark">✦</div><div class="zen-rule-line"></div></div>
+  <div class="sch-wrap">
+    <div class="sch-item s-left">
+      <div class="sch-content">
+        <div class="sch-label">Persiapan & Kedatangan</div>
+        <div class="sch-desc">Pengantin dan keluarga bersiap menyambut tamu dengan sepenuh hati</div>
+      </div>
+      <div class="sch-mid"><div class="sch-dot"></div></div>
+      <div class="sch-tcol"><div class="sch-time">08.00</div></div>
+    </div>
+    <div class="sch-item s-right">
+      <div class="sch-tcol" style="text-align:right;"><div class="sch-time">10.00</div></div>
+      <div class="sch-mid"><div class="sch-dot" style="border-color:var(--gold2);"></div></div>
+      <div class="sch-content">
+        <div class="sch-label">Akad Nikah</div>
+        <div class="sch-desc">Pembukaan · Ayat Suci Al-Qur'an · Khutbah Nikah · Ijab Kabul · Doa</div>
+      </div>
+    </div>
+    <div class="sch-item s-left">
+      <div class="sch-content">
+        <div class="sch-label">Resepsi Pernikahan</div>
+        <div class="sch-desc">Sambutan keluarga · Hiburan · Tarian tradisional · Makan bersama</div>
+      </div>
+      <div class="sch-mid"><div class="sch-dot"></div></div>
+      <div class="sch-tcol"><div class="sch-time">11.00</div></div>
+    </div>
+    <div class="sch-item s-right">
+      <div class="sch-tcol" style="text-align:right;"><div class="sch-time">14.00</div></div>
+      <div class="sch-mid"><div class="sch-dot" style="border-color:var(--gold2);"></div></div>
+      <div class="sch-content">
+        <div class="sch-label">Acara Puncak</div>
+        <div class="sch-desc">Hiburan · Makan siang · Kenangan indah bersama orang-orang terkasih</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown">
+  <div class="cd-zen"></div>
+  <div class="s-eyebrow reveal" style="text-align:center;">Menghitung Waktu</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Hitungan Mundur</em></h2>
+  <div class="cd-row reveal">
+    <div class="cd-block"><div class="cd-num" id="cd-days">--</div><span class="cd-label">Hari</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-hours">--</div><span class="cd-label">Jam</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-mins">--</div><span class="cd-label">Menit</span></div>
+    <div class="cd-block"><div class="cd-num" id="cd-secs">--</div><span class="cd-label">Detik</span></div>
+  </div>
+  <p class="reveal" style="margin-top:1.5rem;font-family:var(--serif);font-style:italic;font-size:.9rem;color:var(--text4);text-align:center;">
+    setiap detik yang berlalu membawa kami semakin dekat...
+  </p>
+</section>
+
+<!-- GALLERY -->
+{% if photos %}
+<section id="gallery">
+  <div class="s-eyebrow reveal" style="text-align:center;">Foto Prewed</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Momen Sejiwa</em></h2>
+  <div class="zen-rule reveal"><div class="zen-rule-line"></div><div class="zen-rule-mark">✦</div><div class="zen-rule-line"></div></div>
+  {% if photos|length >= 3 %}
+  <div class="gallery-zen-hero reveal-s">
+    <div class="zen-frame" onclick="openLightbox(0)">
+      <div class="zen-hero-img"><img src="{{ photo_src(photos[0]) }}" alt="Foto 1" loading="lazy"></div>
+      <div class="zen-corner-br"></div>
+    </div>
+  </div>
+  <div class="gallery-strip">
+    {% for p in photos[1:] %}
+    <div class="gs-zen" onclick="openLightbox({{ loop.index }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index+1 }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  <p style="text-align:center;font-family:var(--display);font-size:.46rem;color:var(--text4);letter-spacing:.4em;margin-top:.4rem;text-transform:uppercase;padding:0 1.5rem;">← Geser untuk lihat semua →</p>
+  {% else %}
+  <div class="gallery-grid-sj reveal">
+    {% for p in photos %}
+    <div class="gsj-item" onclick="openLightbox({{ loop.index0 }})">
+      <img src="{{ photo_src(p) }}" alt="Foto {{ loop.index }}" loading="lazy">
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- LOVE STORY -->
+{% if inv.love_story %}
+<section id="story">
+  <div class="s-eyebrow reveal">Kisah Kami</div>
+  <h2 class="s-title reveal"><em>Love Story</em></h2>
+  <div class="story-zen reveal">
+    <div class="story-body">{{ inv.love_story }}</div>
+  </div>
+</section>
+{% endif %}
+
+<!-- RSVP -->
+<section id="rsvp">
+  <div class="s-eyebrow reveal" style="text-align:center;">Konfirmasi Kehadiran</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>RSVP</em></h2>
+  <p class="reveal" style="font-family:var(--serif);font-style:italic;font-size:.9rem;color:var(--text3);text-align:center;margin-bottom:2.5rem;line-height:2;max-width:380px;">
+    Kehadiran dan doa tulusmu adalah hadiah<br>paling berharga yang bisa kami terima.
+  </p>
+  <div class="rsvp-zen">
+    <div id="sj-success" class="sj-success">
+      <div class="sj-success-mark">✦</div>
+      <div class="sj-success-text">Terima kasih atas doa dan konfirmasi kehadiranmu.<br>Kami menantikan momen berbagi kebahagiaan bersamamu.</div>
+    </div>
+    <div id="sj-form">
+      <div><label class="sj-label">Nama Lengkap</label><input class="sj-input" id="r-name" type="text" placeholder="Tulis nama Anda..."></div>
+      <div><label class="sj-label">Kehadiran</label>
+        <select class="sj-input" id="r-att"><option value="hadir">Insya Allah Hadir</option><option value="tidak">Tidak Dapat Hadir</option><option value="ragu">Masih Belum Pasti</option></select>
+      </div>
+      <div><label class="sj-label">Jumlah Tamu</label>
+        <select class="sj-input" id="r-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div><label class="sj-label">Ucapan & Doa</label><input class="sj-input" id="r-msg" type="text" placeholder="Sampaikan ucapan Anda..."></div>
+      <button class="sj-btn" onclick="submitRSVP('{{ inv.id }}')">Kirim Konfirmasi</button>
+    </div>
+    {% if rsvp_list %}
+    <div class="sj-rsvp-list">
+      <div class="sj-rsvp-head">{{ rsvp_list|length }} Tamu Mengonfirmasi</div>
+      {% for r in rsvp_list %}
+      <div class="sj-rsvp-item">
+        <div class="sj-init">{{ r.guest_name[0] }}</div>
+        <div>
+          <div class="sj-guest-name">{{ r.guest_name }}<span class="sj-badge {{ 'hadir' if r.attendance=='hadir' else 'tidak' }}">{{ 'Hadir' if r.attendance=='hadir' else ('Tidak' if r.attendance=='tidak' else 'Belum') }}</span></div>
+          {% if r.message %}<div class="sj-guest-msg">{{ r.message }}</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- GIFT -->
+{% if gifts %}
+<section id="gift">
+  <div class="s-eyebrow reveal" style="text-align:center;">Hadiah</div>
+  <h2 class="s-title reveal" style="text-align:center;"><em>Wedding Gift</em></h2>
+  <p class="reveal" style="font-family:var(--serif);font-style:italic;font-size:.87rem;color:var(--text3);text-align:center;margin-bottom:2rem;line-height:1.9;">
+    Doa dan kehadiranmu sudah lebih dari cukup bagi kami.
+  </p>
+  <div class="gift-row">
+    {% for g in gifts %}{% if g.bank_name %}
+    <div class="gift-item reveal">
+      <div class="gi-type">Transfer Bank</div>
+      <div class="gi-bank">{{ g.bank_name }}</div>
+      <div class="gi-num">{{ g.account_number }}</div>
+      <div class="gi-name">a.n. {{ g.account_name }}</div>
+      <button class="gi-copy" onclick="copyText('{{ g.account_number }}',this)">Salin Nomor</button>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- CLOSING -->
+<section id="closing">
+  <div class="closing-enso">
+    <svg class="closing-enso-svg" viewBox="0 0 420 420">
+      <circle class="closing-enso-path" id="closing-enso-path" cx="210" cy="210" r="200"/>
+    </svg>
+  </div>
+  <div class="closing-monogram reveal">{{ inv.groom_name[0] }}{{ inv.bride_name[0] }}</div>
+  <div class="closing-names reveal">{{ inv.groom_name }} &amp; {{ inv.bride_name }}</div>
+  <div class="closing-rule reveal"></div>
+  <p class="closing-doa reveal">
+    "Ya Allah, satukanlah kami dalam cinta-Mu, kuatkanlah ikatan kami dalam ridha-Mu, dan pertemukanlah kami kembali di surga-Mu dalam keadaan sejiwa."
+  </p>
+  <p class="closing-thanks reveal">
+    Dengan segenap kerendahan hati, kami memohon doa restu Bapak/Ibu/Saudara/i sekalian. Semoga Allah SWT melimpahkan rahmat dan keberkahan kepada kita semua.
+  </p>
+  <div class="closing-ht reveal">#{{ inv.groom_name }}dan{{ inv.bride_name }}</div>
+  <div class="closing-mark reveal">✦ &nbsp; Sejiwa &nbsp; ✦</div>
+</section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="lbOutside(event)">
+  <span id="lb-close" onclick="closeLb()">ESC</span>
+  <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-counter"></div>
+</div>
+
+{% if inv.music_url %}
+<div id="music-fab" onclick="toggleMusic()">♪</div>
+<audio id="bg-music" src="{{ inv.music_url }}" loop></audio>
+{% endif %}
+
+<script>
+/* ── ZEN CANVAS — slow rising pollen ── */
+(function(){
+  const c=document.getElementById('zen-canvas'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  const cols=[
+    'rgba(44,74,53,','rgba(110,143,114,','rgba(184,148,60,',
+    'rgba(154,184,158,','rgba(200,168,80,'
+  ];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  function init(){
+    resize();
+    pts=Array.from({length:22},()=>({
+      x:Math.random()*W,y:H+Math.random()*H,
+      vx:(Math.random()-.5)*.2,vy:-(Math.random()*.25+.06),
+      r:Math.random()*2.5+.8,
+      alpha:Math.random()*.18+.04,
+      col:cols[Math.floor(Math.random()*cols.length)]
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.y<-10){p.y=H+10;p.x=Math.random()*W;}
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.col+p.alpha+')';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);init();draw();
+})();
+
+/* ── OPEN INTRO ── */
+function openIntro(){
+  document.getElementById('intro').classList.add('out');
+  setTimeout(()=>{
+    document.getElementById('intro').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    document.getElementById('bg-music')?.play().catch(()=>{});
+    initReveal();startCountdown();animateSch();
+  },800);
+}
+
+/* ── REVEAL ── */
+function initReveal(){
+  const obs=new IntersectionObserver(e=>{
+    e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');});
+  },{threshold:.1});
+  document.querySelectorAll(
+    '.reveal,.reveal-l,.reveal-r,.reveal-s,.vtl-item,.person-card,.card-bridge,.verse-bismillah,.verse-text,.verse-src,.verse-tagline,.cd-row'
+  ).forEach(el=>obs.observe(el));
+
+  /* Closing enso draw */
+  const ensoObs=new IntersectionObserver(e=>{
+    e.forEach(x=>{if(x.isIntersecting){
+      document.getElementById('closing-enso-path').classList.add('drawn');
+      ensoObs.disconnect();
+    }});
+  },{threshold:.3});
+  const cs=document.getElementById('closing');
+  if(cs)ensoObs.observe(cs);
+}
+
+/* ── SCHEDULE ── */
+function animateSch(){
+  const obs=new IntersectionObserver(e=>{
+    e.forEach((x,i)=>{if(x.isIntersecting)setTimeout(()=>x.target.classList.add('visible'),i*120);});
+  },{threshold:.1});
+  document.querySelectorAll('.sch-item').forEach(el=>obs.observe(el));
+}
+
+/* ── COUNTDOWN ── */
+function startCountdown(){
+  const t=new Date('{{ inv.resepsi_date }}T{{ inv.resepsi_time }}:00');
+  function up(){
+    const d=t-new Date();if(d<=0)return;
+    document.getElementById('cd-days').textContent=Math.floor(d/86400000);
+    document.getElementById('cd-hours').textContent=String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-mins').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-secs').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  up();setInterval(up,1000);
+}
+
+/* ── LIGHTBOX ── */
+const lbPhotos=[{% for p in photos %}"{{ photo_src(p) }}"{% if not loop.last %},{% endif %}{% endfor %}];
+let lbIdx=0;
+function openLightbox(i){
+  lbIdx=i;document.getElementById('lb-img').src=lbPhotos[i];
+  document.getElementById('lb-counter').textContent=`${i+1} / ${lbPhotos.length}`;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+  ['lb-prev','lb-next'].forEach(id=>document.getElementById(id).style.display=lbPhotos.length>1?'':'none');
+}
+function closeLb(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function lbOutside(e){if(e.target===document.getElementById('lightbox'))closeLb();}
+function lbNav(d){lbIdx=(lbIdx+d+lbPhotos.length)%lbPhotos.length;openLightbox(lbIdx);}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lightbox').classList.contains('open'))return;
+  if(e.key==='Escape')closeLb();
+  if(e.key==='ArrowLeft')lbNav(-1);
+  if(e.key==='ArrowRight')lbNav(1);
+});
+
+/* ── RSVP ── */
+async function submitRSVP(id){
+  const name=document.getElementById('r-name').value.trim();
+  if(!name){alert('Masukkan nama Anda');return;}
+  const btn=document.querySelector('.sj-btn');
+  btn.disabled=true;btn.textContent='Mengirim...';
+  try{
+    const r=await fetch(`/rsvp/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,attendance:document.getElementById('r-att').value,count:parseInt(document.getElementById('r-count').value),message:document.getElementById('r-msg').value})});
+    if(r.ok){document.getElementById('sj-form').style.display='none';document.getElementById('sj-success').style.display='block';}
+  }catch(e){btn.disabled=false;btn.textContent='Kirim Konfirmasi';}
+}
+function copyText(t,btn){
+  navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='✓ Tersalin';setTimeout(()=>btn.textContent=o,2000);});
+}
+function toggleMusic(){
+  const m=document.getElementById('bg-music');if(!m)return;
+  if(m.paused){m.play();document.getElementById('music-fab').textContent='♫';}
+  else{m.pause();document.getElementById('music-fab').textContent='♪';}
+}
+</script>
+<script>document.querySelectorAll("img").forEach(img=>{img.addEventListener("contextmenu",e=>e.preventDefault());img.addEventListener("dragstart",e=>e.preventDefault());});</script>
+</body>
+</html>

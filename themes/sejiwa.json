@@ -1,0 +1,55 @@
+{
+  "id": "sejiwa",
+  "name": "Sejiwa",
+  "description": "Sunyi, sakral, dan menyentuh. Nuansa forest mist dengan silk gold dan cream sutra — seperti pagi tenang di hutan bambu. Dua jiwa, satu hati, satu nafas.",
+  "preview_color": "#2c4a35",
+  "accent_color": "#b8943c",
+  "skeleton": "sejiwa",
+  "tags": [
+    "zen",
+    "minimal",
+    "sacred",
+    "forest",
+    "elegant",
+    "serene"
+  ],
+  "demo_photos": [
+    "/static/themes/sejiwa/demo_cover.jpg"
+  ],
+  "price": 50000,
+  "price_label": "Rp. 50.000",
+  "price_original": 75000,
+  "price_note": "",
+  "palette": {
+    "silk": "#faf7f2",
+    "forest": "#2c4a35",
+    "forest2": "#3d6348",
+    "moss": "#6e8f72",
+    "gold": "#b8943c",
+    "gold2": "#c8a84e",
+    "mist_green": "#e4ede6"
+  },
+  "fonts": {
+    "display": "Marcellus",
+    "serif": "EB Garamond",
+    "script": "Sacramento",
+    "sans": "Jost"
+  },
+  "features": [
+    "enso_circle_intro",
+    "mist_orbs",
+    "zen_pollen_particles",
+    "bismillah_verse",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_clear_forest_grade",
+    "zen_framed_gallery",
+    "closing_enso_draw_animation",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music"
+  ]
+}
