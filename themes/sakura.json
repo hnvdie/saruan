@@ -5,5 +5,14 @@
   "preview_color": "#fff0f5",
   "accent_color": "#e8638c",
   "skeleton": "storybook",
-  "tags": ["light", "japanese", "floral", "animated", "soft"]
+  "tags": [
+    "light",
+    "japanese",
+    "floral",
+    "animated",
+    "soft"
+  ],
+  "demo_photos": [
+    "/static/themes/sakura/demo_2ea18edb.jpg"
+  ]
 }

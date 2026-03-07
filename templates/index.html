@@ -101,7 +101,7 @@ nav{
 
 
 
-.tc-label{
+ .tc-label{
   position:absolute;
   bottom:5px;
   left:8px;
@@ -110,11 +110,11 @@ nav{
   font-style:italic;
   font-size:.7rem;
   color:white;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.0);
   padding:2px 8px;
   border-radius:2px;
   backdrop-filter:blur(2px); /* efek kaca doff keren */
-}
+} 
 
 .tc-body{padding:.65rem .75rem;background:var(--white);}
 .tc-name{font-size:.78rem;font-weight:400;color:var(--ink);margin-bottom:.2rem;}
@@ -181,7 +181,11 @@ footer{padding:1.4rem 2rem;border-top:1px solid var(--border);display:flex;align
   </div>
 </nav>
 
+<img src="/static/themes/banner.jpg" style="width: 100%; height: auto; display: block; object-fit: contain;">
+
+
 <section id="hero">
+
   <div class="hero-eyebrow">Digital Wedding Invitation</div>
   <h1 class="hero-title no-select">Undangan Pernikahan yang<br><em>Selalu Dikenang</em></h1>
   <p class="hero-sub no-select">Ceritakan kisah cinta kalian dengan undangan digital elegan. Animasi unik, RSVP otomatis, galeri foto — siap dalam 24 jam.</p>
@@ -204,7 +208,7 @@ footer{padding:1.4rem 2rem;border-top:1px solid var(--border);display:flex;align
     <a href="/themes" class="sec-link">Lihat semua →</a>
   </div>
   <div class="themes-grid">
-    {% for theme in themes[:6]  %}
+    {% for theme in themes[:8]  %}
     {% set first_photo = theme.get('demo_photos', [None])[0] %}
     <div class="theme-card reveal">
       <div class="tc-preview" style="background:{{ theme.get('preview_color','#eee') }}">
