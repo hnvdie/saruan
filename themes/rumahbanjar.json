@@ -1,0 +1,132 @@
+{
+  "id": "rumahbanjar",
+  "name": "Rumah Banjar",
+  "description": "Megah, hangat, dan penuh kebanggaan budaya. Nuansa merah marun bersanding emas — terinspirasi ukiran Banjar, motif sasirangan, dan keanggunan rumah adat Kalimantan Selatan.",
+  "preview_color": "#6b1020",
+  "accent_color": "#c8a044",
+  "skeleton": "rumahbanjar",
+  "tags": [
+    "traditional",
+    "banjar",
+    "kalimantan",
+    "floral",
+    "royal",
+    "elegant",
+    "cultural",
+    "warm"
+  ],
+  "demo_photos": [
+    "/static/themes/rumahbanjar/demo_7e566063.jpg"
+  ],
+  "price": 65000,
+  "price_label": "Rp. 65.000",
+  "price_original": 90000,
+  "price_note": "Tema Eksklusif Budaya Banjar",
+  "palette": {
+    "maroon": "#6b1020",
+    "gold": "#c8a044",
+    "cream": "#f7f0e2",
+    "wood": "#8b5e3c",
+    "brown": "#3d2010"
+  },
+  "fonts": {
+    "display": "Cinzel",
+    "serif": "Playfair Display",
+    "sans": "Lato"
+  },
+  "assets": {
+    "folder": "static/themes/rumahbanjar/",
+    "required": [
+      {
+        "file": "floral-tl.png",
+        "desc": "Bunga sudut kiri atas — desain bunga khas Kalimantan, transparent background",
+        "usage": "Hero, closing, couple section — pojok kiri atas",
+        "recommended_size": "300x300px"
+      },
+      {
+        "file": "floral-tr.png",
+        "desc": "Bunga sudut kanan atas — mirror dari floral-tl atau variasi",
+        "usage": "Hero, closing — pojok kanan atas",
+        "recommended_size": "300x300px"
+      },
+      {
+        "file": "floral-bl.png",
+        "desc": "Bunga sudut kiri bawah",
+        "usage": "Closing, gallery section — pojok kiri bawah",
+        "recommended_size": "300x300px"
+      },
+      {
+        "file": "floral-br.png",
+        "desc": "Bunga sudut kanan bawah",
+        "usage": "Closing, hero, couple section — pojok kanan bawah",
+        "recommended_size": "300x300px"
+      },
+      {
+        "file": "rumah-banjar.png",
+        "desc": "Siluet/ilustrasi Rumah Banjar (Bubungan Tinggi), transparent background",
+        "usage": "Hero section background bawah + intro door frame inner",
+        "recommended_size": "600x400px, PNG transparent, warna putih/emas tipis"
+      },
+      {
+        "file": "ukiran-top.png",
+        "desc": "Ornamen ukiran kayu Banjar horizontal — untuk header/divider",
+        "usage": "Intro screen atas & bawah, section divider",
+        "recommended_size": "800x80px, PNG transparent, warna emas"
+      }
+    ],
+    "optional": [
+      {
+        "file": "bg-texture.png",
+        "desc": "Tekstur kain sasirangan atau kayu Banjar — untuk overlay background",
+        "usage": "Background texture subtle",
+        "recommended_size": "400x400px, tileable"
+      },
+      {
+        "file": "ukiran-divider.png",
+        "desc": "Ornamen divider kecil untuk pemisah antar section",
+        "usage": "Pengganti gold-divider CSS",
+        "recommended_size": "300x30px"
+      },
+      {
+        "file": "demo_preview.jpg",
+        "desc": "Screenshot/mockup tema untuk halaman pilih tema",
+        "recommended_size": "400x800px"
+      }
+    ]
+  },
+  "features": [
+    "door_intro",
+    "gold_particles",
+    "floating_petals",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_bg",
+    "asymmetric_gallery",
+    "lightbox_gallery",
+    "countdown",
+    "rsvp",
+    "gift_bank",
+    "gift_ewallet",
+    "love_story",
+    "maps_embed",
+    "music",
+    "scroll_reveal",
+    "image_protect"
+  ],
+  "cultural_notes": {
+    "region": "Kalimantan Selatan",
+    "ethnic": "Banjar",
+    "motifs": [
+      "Sasirangan",
+      "Ukiran Banjar",
+      "Bubungan Tinggi",
+      "Bunga Kamboja"
+    ],
+    "colors_meaning": {
+      "maroon": "Keberanian dan keagungan adat Banjar",
+      "gold": "Kemewahan, keberkahan, dan kemuliaan",
+      "cream": "Kesucian dan keanggunan"
+    }
+  }
+}

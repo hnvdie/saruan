@@ -1,0 +1,78 @@
+{
+  "id": "merakbanjar",
+  "name": "Merak Banjar",
+  "description": "Megah dan penuh pesona. Arch ukiran teal, mawar maroon, dan sepasang merak emas menyambut tamu — pernikahan yang terasa seperti masuk ke dalam lukisan.",
+  "preview_color": "#3d7d8c",
+  "accent_color": "#7a1428",
+  "skeleton": "merakbanjar",
+  "tags": [
+    "floral",
+    "banjar",
+    "kalimantan",
+    "romantic",
+    "vintage",
+    "teal",
+    "maroon",
+    "illustrated"
+  ],
+  "demo_photos": [
+    "/static/themes/merakbanjar/demo_preview.jpg"
+  ],
+  "price": 75000,
+  "price_label": "Rp. 75.000",
+  "price_original": 100000,
+  "price_note": "Tema Eksklusif — 1 Asset Cover",
+  "palette": {
+    "teal": "#3d7d8c",
+    "maroon": "#7a1428",
+    "cream": "#f4ece0",
+    "gold": "#c8a040",
+    "brown": "#2c1a10"
+  },
+  "fonts": {
+    "display": "Cinzel",
+    "serif": "Cormorant Garamond",
+    "sans": "Lato"
+  },
+  "assets": {
+    "folder": "static/themes/merakbanjar/",
+    "required": [
+      {
+        "file": "cover.jpg",
+        "desc": "Ilustrasi utama — arch teal + floral maroon + merak + rumah Banjar. Ini SATU-SATUNYA asset yang dibutuhkan tema ini.",
+        "usage": "Background penuh layar intro / cover undangan",
+        "recommended_size": "750x1334px (portrait mobile), JPG, kualitas tinggi",
+        "notes": "Foto yang diupload user (1000176751.jpg) sudah cocok langsung dipakai"
+      }
+    ],
+    "optional": [
+      {
+        "file": "demo_preview.jpg",
+        "desc": "Mockup tema untuk halaman pilih tema",
+        "recommended_size": "400x800px"
+      }
+    ]
+  },
+  "features": [
+    "fullscreen_cover_intro",
+    "buka_undangan_button",
+    "guest_name_display",
+    "ken_burns_bg",
+    "floating_petals",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_bg",
+    "asymmetric_gallery",
+    "lightbox_gallery",
+    "countdown",
+    "rsvp",
+    "gift_bank",
+    "gift_ewallet",
+    "love_story",
+    "maps_embed",
+    "music",
+    "scroll_reveal",
+    "image_protect"
+  ]
+}

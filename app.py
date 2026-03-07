@@ -309,10 +309,22 @@ def preview_theme(theme_id):
         maps_url='https://maps.google.com/?q=Hotel+Indonesia+Kempinski',
         maps_embed='https://maps.google.com/maps?q=Hotel+Indonesia+Kempinski+Jakarta&output=embed&z=15',
         love_story='Kami pertama bertemu di kampus pada tahun 2019. Berawal dari teman sekelas yang sering belajar bersama, lalu menjadi sahabat yang saling menguatkan. Kini dengan penuh rasa syukur, kami memutuskan untuk melangkah bersama menuju jenjang pernikahan yang penuh berkah dan cinta.',
-        cover_photo=None, music_url=None, expires_at=None, is_preview=True
+        cover_photo=None, music_url="/static/assets/moon.mp3", expires_at=None, is_preview=True
     )
+    dummy_gifts = [
+        {
+            'id': 1, 'invitation_id': 'preview',
+            'bank_name': 'BCA', 'account_number': '1234567890', 'account_name': 'Zaid bin Haritsah',
+            'ewallet_type': None, 'ewallet_number': None, 'ewallet_name': None,
+        },
+        {
+            'id': 2, 'invitation_id': 'preview',
+            'bank_name': None, 'account_number': None, 'account_name': None,
+            'ewallet_type': 'GoPay', 'ewallet_number': '081234567890', 'ewallet_name': 'Zainab binti Jahsy',
+        },
+    ]
     return render_template(f'themes/{theme_id}.html',
-                           inv=dummy, theme=theme, rsvp_list=[], gifts=[],
+                           inv=dummy, theme=theme, rsvp_list=[], gifts=dummy_gifts,
                            photos=photos, is_preview=True)
 
 @app.route('/i/<slug>')
