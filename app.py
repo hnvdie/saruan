@@ -209,23 +209,35 @@ def get_demo_photos():
     return photos
 
 def extract_maps_embed_src(url: str) -> str:
-    """Convert Google Maps URL to embed src, or return empty"""
+    """Convert Google Maps URL to full iframe embed HTML, or return empty"""
     if not url: return ''
-    # Already embed format
-    if 'maps/embed' in url: return url
-    # Extract query for place search embed
-    # https://www.google.com/maps?q=...  or  https://maps.google.com/...
     import urllib.parse
+
+    def make_iframe(src: str) -> str:
+        return (f'<iframe src="{src}" width="100%" height="200" style="border:0;" '
+                f'allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>')
+
+    # Already a full iframe tag
+    if url.strip().startswith('<iframe'): return url
+    # Already embed src URL
+    if 'maps/embed' in url: return make_iframe(url)
+    # Standard Google Maps share/search URL
     try:
         parsed = urllib.parse.urlparse(url)
         params = urllib.parse.parse_qs(parsed.query)
         q = params.get('q', [''])[0]
         if q:
-            return f'https://maps.google.com/maps?q={urllib.parse.quote(q)}&output=embed&z=15'
-        # Try to extract from path e.g. /place/...
+            src = f'https://maps.google.com/maps?q={urllib.parse.quote(q)}&output=embed&z=15'
+            return make_iframe(src)
+        # /place/Name/@lat,lng or /place/Name/
         if '/place/' in url:
             place = url.split('/place/')[1].split('/')[0]
-            return f'https://maps.google.com/maps?q={place}&output=embed&z=15'
+            src = f'https://maps.google.com/maps?q={place}&output=embed&z=15'
+            return make_iframe(src)
+        # any other google maps URL — append output=embed
+        if 'google.com/maps' in url or 'goo.gl/maps' in url:
+            sep = '&' if '?' in url else '?'
+            return make_iframe(url + sep + 'output=embed')
     except: pass
     return ''
 
@@ -307,7 +319,7 @@ def preview_theme(theme_id):
         resepsi_venue='Grand Ballroom Hotel Bintang Lima',
         resepsi_address='Jl. Jend. Sudirman No. 88, Jakarta',
         maps_url='https://maps.google.com/?q=Hotel+Indonesia+Kempinski',
-        maps_embed='https://maps.google.com/maps?q=Hotel+Indonesia+Kempinski+Jakarta&output=embed&z=15',
+        maps_embed=extract_maps_embed_src('https://maps.google.com/?q=Hotel+Indonesia+Kempinski'),
         love_story='Kami pertama bertemu di kampus pada tahun 2019. Berawal dari teman sekelas yang sering belajar bersama, lalu menjadi sahabat yang saling menguatkan. Kini dengan penuh rasa syukur, kami memutuskan untuk melangkah bersama menuju jenjang pernikahan yang penuh berkah dan cinta.',
         cover_photo=None, music_url="/static/assets/moon.mp3", expires_at=None, is_preview=True
     )
