@@ -1,0 +1,31 @@
+{
+  "id": "gerbangzen",
+  "name": "Gerbang Zen",
+  "description": "Nuansa taman zen Jepang — putih washi bersih, sakura, torii gate, tipografi Zen Old Mincho. Minimal tapi elegan, dengan animasi scroll yang berbeda di setiap section.",
+  "preview_image": "/static/themes/gerbangzen/cover.jpg",
+  "colors": {
+    "primary": "#1a1614",
+    "secondary": "#d4849a",
+    "accent": "#b83228",
+    "background": "#f7f3ee"
+  },
+  "fonts": {
+    "display": "Zen Old Mincho",
+    "body": "Shippori Mincho",
+    "label": "Zen Kaku Gothic New"
+  },
+  "features": [
+    "Intro cover full-screen dengan foto ilustrasi",
+    "Animasi clip-path, blur-fade, scale, slide — berbeda per section",
+    "Petals: sakura 5 kelopak, wisteria oval, daun hijau",
+    "Lightbox galeri foto",
+    "Countdown real-time",
+    "RSVP form + daftar tamu",
+    "Wedding gift / transfer",
+    "Background musik",
+    "Closing: iris circle reveal"
+  ],
+  "assets_required": [
+    "cover.jpg"
+  ]
+}
