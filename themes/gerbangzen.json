@@ -27,5 +27,8 @@
   ],
   "assets_required": [
     "cover.jpg"
+  ],
+  "demo_photos": [
+    "/static/themes/gerbangzen/demo_d23ddb91.jpg"
   ]
 }
