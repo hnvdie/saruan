@@ -1,0 +1,28 @@
+# ─── SECRETS — JANGAN PERNAH DI-COMMIT ───────────────────────
+.env
+*.env
+.env.*
+!.env.example
+
+# Database
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Upload user
+static/uploads/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -160,7 +160,7 @@ tr:hover td{background:var(--bg);}
     <form action="/admin" method="get" class="search-form">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-input" name="q" type="text" placeholder="Cari nama / slug / tema..." value="{{ search_q or '' }}">
+        <input class="search-input" name="q" type="text" placeholder="Cari nama / slug..." value="{{ search_q or '' }}">
       </div>
       <button type="submit" class="search-btn">Cari</button>
       {% if search_q %}<a href="/admin" class="search-clear">✕</a>{% endif %}
@@ -251,23 +251,9 @@ tr:hover td{background:var(--bg);}
           <div class="card-title">Manajemen Tema</div>
           <div class="card-sub">Atur harga &amp; foto katalog per tema</div>
         </div>
-        <form action="/admin" method="get" class="search-form" style="margin:0">
-          <div class="search-wrap">
-            <span class="search-icon">⌕</span>
-            <input class="search-input" name="qt" type="text" placeholder="Cari nama tema..." value="{{ search_qt or '' }}" style="width:175px">
-          </div>
-          <button type="submit" class="search-btn">Cari</button>
-          {% if search_qt %}<a href="/admin" class="search-clear">✕</a>{% endif %}
-        </form>
       </div>
-      {% if search_qt %}
-      <div style="padding:.45rem 1.1rem .1rem;font-size:.7rem;color:var(--muted)">
-        🔍 {{ filtered_themes|length }} tema untuk "<strong>{{ search_qt }}</strong>"
-        {% if not filtered_themes %} — <a href="/admin" style="color:var(--gold)">Reset</a>{% endif %}
-      </div>
-      {% endif %}
       <div class="themes-grid">
-        {% for theme in filtered_themes %}
+        {% for theme in themes %}
         {% set fp = theme.get('demo_photos',[None])[0] %}
         <div class="tc" id="tc-{{ theme.id }}">
           <div class="tc-prev" style="background:{{ theme.preview_color }}">
@@ -436,4 +422,3 @@ async function delThemePhoto(themeId, photoUrl, el){
 </script>
 </body>
 </html>
-

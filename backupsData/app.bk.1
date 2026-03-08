@@ -33,12 +33,6 @@ RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
 RATE_MAX_ATTEMPTS = 30        # 30 percobaan per window
 RATE_STORE: dict  = {}
 
-# RSVP-specific rate limit (anti-spam bot)
-RSVP_WINDOW_SEC      = 60 * 60   # 1 jam window per IP per undangan
-RSVP_MAX_PER_IP      = 3         # maks 3 RSVP per IP per undangan per jam
-RSVP_MAX_PER_INV     = 2000      # maks total RSVP per undangan (hard cap)
-RSVP_RATE_STORE: dict = {}       # key: (ip, inv_id)
-
 # Admin credentials — set via env vars
 ADMIN_USERNAME  = os.environ.get('ADMIN_USER', 'admin')
 _SALT           = 'undangankita_v3'
@@ -85,22 +79,6 @@ def record_attempt(ip: str):
 def attempts_left(ip: str) -> int:
     _clean_rate(ip)
     return max(0, RATE_MAX_ATTEMPTS - len(RATE_STORE.get(ip, [])))
-
-# ─── RSVP RATE LIMITING ──────────────────────────────────────────────────────
-def _clean_rsvp_rate(key: tuple):
-    now = time.time()
-    RSVP_RATE_STORE[key] = [t for t in RSVP_RATE_STORE.get(key, [])
-                             if now - t < RSVP_WINDOW_SEC]
-
-def is_rsvp_rate_limited(ip: str, inv_id: str) -> bool:
-    key = (ip, inv_id)
-    _clean_rsvp_rate(key)
-    return len(RSVP_RATE_STORE.get(key, [])) >= RSVP_MAX_PER_IP
-
-def record_rsvp_attempt(ip: str, inv_id: str):
-    key = (ip, inv_id)
-    _clean_rsvp_rate(key)
-    RSVP_RATE_STORE.setdefault(key, []).append(time.time())
 
 # ─── AUTH ────────────────────────────────────────────────────────────────────
 def login_required(f):
@@ -394,12 +372,6 @@ def submit_rsvp(inv_id):
     if is_rate_limited(ip):
         return jsonify({'error': 'Too many requests'}), 429
     record_attempt(ip)
-
-    # RSVP-specific rate limit: maks 3x per IP per undangan per jam
-    if is_rsvp_rate_limited(ip, inv_id):
-        return jsonify({'error': 'Terlalu banyak RSVP dari alamat ini. Coba lagi nanti.'}), 429
-    record_rsvp_attempt(ip, inv_id)
-
     data = request.get_json()
     if not data or not data.get('name','').strip():
         return jsonify({'error':'Nama wajib diisi'}), 400
@@ -407,12 +379,6 @@ def submit_rsvp(inv_id):
     inv  = conn.execute('SELECT * FROM invitations WHERE id=? AND is_active=1',(inv_id,)).fetchone()
     if not inv or is_expired(dict(inv)):
         conn.close(); return jsonify({'error':'Undangan tidak tersedia'}), 404
-
-    # Hard cap: cegah spam database
-    total_existing = conn.execute('SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?',(inv_id,)).fetchone()['c']
-    if total_existing >= RSVP_MAX_PER_INV:
-        conn.close(); return jsonify({'error': 'Batas maksimal RSVP untuk undangan ini telah tercapai.'}), 429
-
     conn.execute(
         'INSERT INTO rsvp(invitation_id,guest_name,attendance,guest_count,message) VALUES(?,?,?,?,?)',
         (inv_id, data['name'].strip()[:100], data.get('attendance','hadir'),
@@ -477,13 +443,12 @@ def admin_logout():
 def admin_dashboard():
     conn   = get_db()
     q      = request.args.get('q','').strip()
-    qt     = request.args.get('qt','').strip()  # query for themes
     if q:
         rows = conn.execute(
             "SELECT * FROM invitations WHERE is_active=1 AND "
-            "(groom_name LIKE ? OR bride_name LIKE ? OR slug LIKE ? OR theme_id LIKE ?) "
+            "(groom_name LIKE ? OR bride_name LIKE ? OR slug LIKE ?) "
             "ORDER BY created_at DESC",
-            (f'%{q}%', f'%{q}%', f'%{q}%', f'%{q}%')
+            (f'%{q}%', f'%{q}%', f'%{q}%')
         ).fetchall()
     else:
         rows = conn.execute('SELECT * FROM invitations WHERE is_active=1 ORDER BY created_at DESC').fetchall()
@@ -495,15 +460,9 @@ def admin_dashboard():
         invs.append(d)
     total_rsvp = conn.execute('SELECT COUNT(*) as c FROM rsvp').fetchone()['c']
     conn.close()
-    all_themes = get_all_themes()
-    if qt:
-        filtered_themes = [t for t in all_themes if qt.lower() in t.get('name','').lower() or qt.lower() in t.get('id','').lower()]
-    else:
-        filtered_themes = all_themes
     return render_template('admin/dashboard.html',
-                           invitations=invs, themes=all_themes,
-                           filtered_themes=filtered_themes,
-                           total_rsvp=total_rsvp, search_q=q, search_qt=qt)
+                           invitations=invs, themes=get_all_themes(),
+                           total_rsvp=total_rsvp, search_q=q)
 
 # ─── ADMIN CREATE ────────────────────────────────────────────────────────────
 @app.route('/admin/create', methods=['GET','POST'])
@@ -634,10 +593,6 @@ def admin_delete(inv_id):
     conn = get_db()
     for p in conn.execute('SELECT * FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchall():
         delete_photo_file(dict(p))
-    # Cascade delete semua data terkait undangan ini
-    conn.execute('DELETE FROM rsvp WHERE invitation_id=?',(inv_id,))
-    conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
-    conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
     conn.execute('UPDATE invitations SET is_active=0 WHERE id=?',(inv_id,))
     conn.commit(); conn.close()
     flash('Undangan dihapus.','info')
