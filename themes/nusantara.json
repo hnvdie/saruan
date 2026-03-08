@@ -1,0 +1,53 @@
+{
+  "id": "nusantara",
+  "name": "Nusantara",
+  "description": "Tema pernikahan Islami-Nusantara yang elegan — memadukan ornamen ukir Jawa-Bali dengan nuansa warm botanical yang dramatis. Setiap section terasa seperti lukisan batik yang bergerak.",
+  "preview_color": "#B8860B",
+  "accent_color": "#6B3A2A",
+  "skeleton": "nusantara",
+  "tags": ["islami", "jawa", "bali", "nusantara", "botanik", "warm", "elegan", "tradisional", "gold"],
+  "demo_photos": ["/static/themes/nusantara/cover.jpg"],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 120000,
+  "price_note": "Harga termasuk domain 1 tahun & unlimited tamu RSVP",
+  "palette": {
+    "cream":       "#F5F0E8",
+    "warm_white":  "#FAF7F2",
+    "gold":        "#B8860B",
+    "gold_light":  "#D4A017",
+    "gold_pale":   "#F0D080",
+    "brown":       "#6B3A2A",
+    "brown_dark":  "#3D1F14",
+    "green":       "#2D5016",
+    "green_mid":   "#4A7A25",
+    "maroon":      "#7B1C2E",
+    "text_dark":   "#2C1810",
+    "text_mid":    "#5C3D2E",
+    "text_light":  "#8B6B5A"
+  },
+  "fonts": {
+    "display": "IM Fell English",
+    "serif":   "Cormorant Garamond",
+    "sans":    "Lato",
+    "arabic":  "Amiri"
+  },
+  "features": [
+    "Cover fullscreen dengan efek curtain reveal dramatis",
+    "Ayat Al-Quran QS. Ar-Rum: 21 (Arab + terjemahan)",
+    "Profil mempelai dengan foto half-panel cinematic",
+    "Love story dengan drop cap estetis",
+    "Detail akad & resepsi dengan Google Maps embed",
+    "Countdown timer real-time",
+    "Galeri film strip horizontal scroll",
+    "RSVP form dengan append real-time ke guestbook",
+    "Buku tamu (guestbook) dinamis",
+    "Gift section dengan copy-to-clipboard (bank & e-wallet)",
+    "Floating music player dengan autoplay",
+    "Partikel gold dust ambient canvas",
+    "Scroll animations IntersectionObserver (clip, fade, scale, stagger)",
+    "Pure CSS + Vanilla JS — zero library dependency",
+    "Mobile-first max-width 480px, responsive desktop"
+  ]
+}
+
