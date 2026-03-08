@@ -17,10 +17,10 @@
   "demo_photos": [
     "/static/themes/sekarjagad/demo_bd90b12d.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga promo terbatas",
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "terracotta": "#B5522A",
     "parchment": "#F0E8D5",

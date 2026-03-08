@@ -42,7 +42,7 @@ ADMIN_PW_HASH   = os.environ.get('ADMIN_PW_HASH', _DEFAULT_HASH)
 
 # All config via env — no web UI for sensitive settings
 WA_NUMBER        = os.environ.get('WA_NUMBER', '6281234567890')
-SITE_NAME        = os.environ.get('SITE_NAME', 'UndanganKita')
+SITE_NAME        = os.environ.get('SITE_NAME', 'habarkita.com')
 RECAPTCHA_KEY    = os.environ.get('RECAPTCHA_SITE_KEY', '')   # empty = disabled
 RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET', '')
 

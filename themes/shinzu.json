@@ -17,9 +17,9 @@
   "demo_photos": [
     "/static/themes/shinzu/demo_3dbb12ac.jpg"
   ],
-  "price": 75000,
-  "price_label": "Rp. 75.000",
-  "price_original": 100000,
+  "price": 25000,
+  "price_label": "Rp. 25000",
+  "price_original": 50000,
   "price_note": "",
   "palette": {
     "ivory": "#fdf8f2",

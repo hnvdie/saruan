@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>{{ site_name }} — Undangan Digital Pernikahan</title>
+<meta name="description" content="Undangan digital pernikahan elegan. Berbagai tema eksklusif, RSVP otomatis, galeri foto.">
+<meta property="og:title" content="{{ site_name }} — Undangan Digital Pernikahan">
+<meta property="og:description" content="Undangan digital pernikahan elegan dengan animasi unik dan RSVP otomatis.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ANTI-ZOOM, ANTI-HIGHLIGHT, ANTI-SELECT */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+.no-select{-webkit-user-select:none;user-select:none;}
+
+:root{
+  --white:#ffffff;--off:#fafaf8;--cream:#f5f0e8;
+  --border:#e8e4dc;--border2:#f0ece4;
+  --ink:#1a1a1a;--muted:#888;--faint:#ccc;
+  --gold:#c9a84c;--green:#25d366;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent;}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(255,255,255,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:.85rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--gold);}
+.nav-right{display:flex;gap:1rem;align-items:center;}
+.nav-link{font-size:.7rem;color:var(--muted);transition:color .2s;letter-spacing:.03em;}
+.nav-link:hover{color:var(--ink);}
+.nav-cta{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:2px;border:1px solid var(--border);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.nav-cta:hover{border-color:var(--gold);color:var(--gold);}
+
+/* HERO */
+#hero{
+  padding:6.5rem 2rem 4.5rem;text-align:center;
+  border-bottom:1px solid var(--border2);
+  background:linear-gradient(to bottom,var(--white),var(--off));
+}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.7rem;font-size:.58rem;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:1.8rem;opacity:0;animation:fadeUp .7s .1s ease both;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:28px;height:1px;background:currentColor;opacity:.4;}
+.hero-title{font-family:var(--serif);font-size:clamp(2.6rem,7vw,5rem);font-weight:300;line-height:1.06;color:var(--ink);margin-bottom:1.1rem;opacity:0;animation:fadeUp .7s .2s ease both;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:.82rem;color:var(--muted);max-width:400px;margin:0 auto 2.75rem;line-height:1.9;opacity:0;animation:fadeUp .7s .35s ease both;}
+.hero-actions{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .7s .5s ease both;}
+.btn-primary{display:inline-flex;align-items:center;gap:.45rem;padding:.8rem 1.9rem;background:var(--green);color:#fff;border-radius:2px;font-size:.73rem;letter-spacing:.08em;text-transform:uppercase;transition:opacity .2s;}
+.btn-primary:hover{opacity:.9;}
+.btn-secondary{display:inline-flex;align-items:center;gap:.45rem;padding:.8rem 1.9rem;border:1px solid var(--border);color:var(--muted);border-radius:2px;font-size:.73rem;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink);}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.stat{padding:1.75rem 1.5rem;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:var(--serif);font-size:2rem;color:var(--ink);line-height:1;}
+.stat-lbl{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.25rem;}
+
+/* THEMES */
+#themes{padding:4rem 2rem;border-bottom:1px solid var(--border);}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.75rem;}
+.sec-title{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:300;}
+.sec-title em{font-style:italic;color:var(--gold);}
+.sec-link{font-size:.7rem;color:var(--muted);transition:color .2s;}
+.sec-link:hover{color:var(--ink);}
+.themes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;}
+.theme-card{border:1px solid var(--border);border-radius:3px;overflow:hidden;transition:border-color .2s,transform .25s;display:block;}
+.theme-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-3px);}
+
+
+.tc-preview{
+  height:auto;  /* biar tinggi menyesuaikan gambar */
+  min-height:85px;  /* minimal 85px */
+  max-height:150px; /* batasi maksimal biar gak terlalu besar */
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f5f5f5; /* background kalau gambar kosong */
+}
+
+.tc-preview img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* contain = gambar utuh, cover = crop */
+  opacity:.8;
+  position:relative; /* hapus absolute */
+  inset:auto; /* reset inset */
+}
+
+
+
+ .tc-label{
+  position:absolute;
+  bottom:5px;
+  left:8px;
+  z-index:2;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:.7rem;
+  color:white;
+  background:rgba(0,0,0,0.0);
+  padding:2px 8px;
+  border-radius:2px;
+  backdrop-filter:blur(2px); /* efek kaca doff keren */
+} 
+
+.tc-body{padding:.65rem .75rem;background:var(--white);}
+.tc-name{font-size:.78rem;font-weight:400;color:var(--ink);margin-bottom:.2rem;}
+.tc-price{font-size:.7rem;color:var(--gold);margin-bottom:.28rem;min-height:.9rem;}
+.tc-tags{display:flex;gap:.18rem;flex-wrap:wrap;margin-bottom:.45rem;}
+.tc-tag{font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:.08rem .28rem;border:1px solid var(--border2);border-radius:1px;}
+.tc-btns{display:flex;gap:.25rem;}
+.tc-btn-demo{flex:1;padding:.38rem;text-align:center;border:1px solid var(--border);color:var(--muted);font-size:.58rem;letter-spacing:.05em;text-transform:uppercase;border-radius:1px;transition:all .18s;}
+.tc-btn-demo:hover{border-color:var(--ink);color:var(--ink);}
+.tc-btn-wa{flex:1;padding:.38rem;text-align:center;background:var(--green);color:#fff;font-size:.58rem;letter-spacing:.05em;text-transform:uppercase;border-radius:1px;transition:opacity .2s;display:block;}
+.tc-btn-wa:hover{opacity:.88;}
+
+/* FEATURES */
+#features{padding:4rem 2rem;border-bottom:1px solid var(--border);background:var(--off);}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem;}
+.feat{padding:1.35rem;background:var(--white);border:1px solid var(--border);border-radius:3px;}
+.feat-icon{font-size:1.3rem;margin-bottom:.7rem;}
+.feat-title{font-size:.8rem;font-weight:400;margin-bottom:.3rem;}
+.feat-desc{font-size:.71rem;color:var(--muted);line-height:1.8;}
+
+/* HOW */
+#how{padding:4rem 2rem;border-bottom:1px solid var(--border);}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1.75rem;margin-top:2rem;}
+.step-num{font-family:var(--serif);font-size:2.2rem;color:var(--border);line-height:1;margin-bottom:.5rem;}
+.step h4{font-size:.8rem;font-weight:400;margin-bottom:.3rem;}
+.step p{font-size:.7rem;color:var(--muted);line-height:1.8;}
+
+/* CTA */
+#cta{padding:4.5rem 2rem;text-align:center;background:var(--off);border-bottom:1px solid var(--border);}
+#cta h2{font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.8rem);font-weight:300;margin-bottom:.65rem;}
+#cta h2 em{font-style:italic;color:var(--gold);}
+#cta p{font-size:.8rem;color:var(--muted);max-width:340px;margin:0 auto 1.75rem;line-height:1.9;}
+
+/* FOOTER */
+footer{padding:1.4rem 2rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:.95rem;}
+.footer-logo span{color:var(--gold);}
+.footer-copy{font-size:.63rem;color:var(--faint);letter-spacing:.04em;}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* RESPONSIVE */
+@media(max-width:900px){.features-grid{grid-template-columns:repeat(2,1fr);}.steps{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){
+  .themes-grid{grid-template-columns:repeat(2,1fr);}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .stat{border-bottom:1px solid var(--border);}
+  .features-grid{grid-template-columns:1fr;}
+  nav{padding:.75rem 1.2rem;}
+  .nav-link{display:none;}
+}
+</style>
+</head>
+<body class="no-select">
+
+<nav>
+  <div class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></div>
+  <div class="nav-right">
+    <a href="/themes" class="nav-link">Katalog Tema</a>
+    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo, saya mau tanya tentang undangan digital 😊' | urlencode }}" target="_blank" class="nav-cta">💬 Hubungi Kami</a>
+  </div>
+</nav>
+
+<img src="/static/themes/banner.jpg" style="width: 100%; height: auto; display: block; object-fit: contain;">
+
+
+<section id="hero">
+
+  <div class="hero-eyebrow">Digital Wedding Invitation</div>
+  <h1 class="hero-title no-select">Undangan Pernikahan yang<br><em>Selalu Dikenang</em></h1>
+  <p class="hero-sub no-select">Ceritakan kisah cinta kalian dengan undangan digital elegan. Animasi unik, RSVP otomatis, galeri foto — siap dalam 24 jam.</p>
+  <div class="hero-actions">
+    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo! Saya mau pesan undangan digital. Boleh tanya-tanya dulu?' | urlencode }}" target="_blank" class="btn-primary">💬 Buat Undangan Sekarang</a>
+    <a href="/themes" class="btn-secondary">Lihat Semua Tema →</a>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat no-select"><div class="stat-num">{{ themes|length }}+</div><div class="stat-lbl">Tema Eksklusif</div></div>
+  <div class="stat no-select"><div class="stat-num">24h</div><div class="stat-lbl">Waktu Pengerjaan</div></div>
+  <div class="stat no-select"><div class="stat-num">1 Thn</div><div class="stat-lbl">Masa Aktif</div></div>
+  <div class="stat no-select"><div class="stat-num">∞</div><div class="stat-lbl">Tamu Undangan</div></div>
+</div>
+
+<section id="themes">
+  <div class="sec-head reveal">
+    <div class="sec-title no-select">Pilihan <em>Tema</em></div>
+    <a href="/themes" class="sec-link">Lihat semua →</a>
+  </div>
+  <div class="themes-grid">
+    {% for theme in themes[:8]  %}
+    {% set first_photo = theme.get('demo_photos', [None])[0] %}
+    <div class="theme-card reveal">
+      <div class="tc-preview" style="background:{{ theme.get('preview_color','#eee') }}">
+        {% if first_photo %}<img src="{{ first_photo }}" alt="{{ theme.get('name','') }}">{% endif %}
+        <span class="tc-label no-select" style="color:{{ theme.get('accent_color','#333') }}">{{ theme.get('name','') }}</span>
+      </div>
+      <div class="tc-body">
+        <div class="tc-name no-select">{{ theme.get('name','') }}</div>
+        <div class="tc-price no-select">
+          {% if theme.get('price_label') %}{{ theme.price_label }}
+          {% elif theme.get('price') %}Rp {{ '{:,}'.format(theme.price).replace(',','.') }}
+          {% endif %}
+        </div>
+        <div class="tc-tags">{% for t in theme.get('tags',['tema'])[:3] %}<span class="tc-tag">{{ t }}</span>{% endfor %}</div>
+        <div class="tc-btns">
+          <a href="/preview/{{ theme.get('id','') }}" target="_blank" class="tc-btn-demo">Demo</a>
+          <a href="https://wa.me/{{ wa_number }}?text={{ ('Halo! Saya tertarik tema *' + theme.get('name','') + '*. Info harga & cara pesan?') | urlencode }}" target="_blank" class="tc-btn-wa">Pesan</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="features">
+  <div class="sec-head reveal"><div class="sec-title no-select">Fitur <em>Lengkap</em></div></div>
+  <div class="features-grid">
+    <div class="feat reveal"><div class="feat-icon">🎨</div><div class="feat-title">Animasi Unik per Tema</div><div class="feat-desc">Kunang-kunang, sakura, partikel emas, ornamen SVG — setiap tema beda total.</div></div>
+    <div class="feat reveal"><div class="feat-icon">📸</div><div class="feat-title">Galeri Foto Prewed</div><div class="feat-desc">Upload hingga 10 foto. Tampil elegan dengan lightbox fullscreen.</div></div>
+    <div class="feat reveal"><div class="feat-icon">✅</div><div class="feat-title">RSVP Otomatis</div><div class="feat-desc">Tamu konfirmasi langsung di undangan. Pantau real-time dari dashboard admin.</div></div>
+    <div class="feat reveal"><div class="feat-icon">🗺️</div><div class="feat-title">Maps Embed</div><div class="feat-desc">Peta tampil langsung di halaman — tamu tak perlu buka app terpisah.</div></div>
+    <div class="feat reveal"><div class="feat-icon">⏳</div><div class="feat-title">Countdown Timer</div><div class="feat-desc">Hitung mundur live per detik menuju hari pernikahan.</div></div>
+    <div class="feat reveal"><div class="feat-icon">🎵</div><div class="feat-title">Musik Latar</div><div class="feat-desc">Tambahkan lagu favorit sebagai musik latar undangan digital.</div></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="sec-head reveal"><div class="sec-title no-select">Cara <em>Pesan</em></div></div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num no-select">01</div><h4>Pilih Tema</h4><p>Browse katalog, lihat demo langsung, pilih yang paling pas.</p></div>
+    <div class="step reveal"><div class="step-num no-select">02</div><h4>Kirim Data</h4><p>Kirim data pernikahan dan foto prewed via WhatsApp.</p></div>
+    <div class="step reveal"><div class="step-num no-select">03</div><h4>Selesai 24 Jam</h4><p>Undangan digital siap. Link langsung bisa disebar ke semua tamu.</p></div>
+    <div class="step reveal"><div class="step-num no-select">04</div><h4>Pantau RSVP</h4><p>Tamu isi konfirmasi kehadiran — bisa dipantau real-time.</p></div>
+  </div>
+</section>
+
+<section id="cta">
+  <h2 class="reveal no-select">Siap Bikin Undangan<br><em>Impianmu?</em></h2>
+  <p class="reveal">Konsultasi gratis — kami bantu pilih tema yang paling cocok.</p>
+  <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo! Saya mau konsultasi dan pesan undangan digital 😊' | urlencode }}" target="_blank" class="btn-primary reveal">💬 Chat WhatsApp Sekarang</a>
+</section>
+
+<footer>
+  <div class="footer-logo no-select">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></div>
+  <div class="footer-copy no-select">© {{ now.year }} {{ site_name }}</div>
+</footer>
+
+<script>
+// Prevent right-click context menu on images
+document.querySelectorAll('img').forEach(img=>{
+  img.addEventListener('contextmenu',e=>e.preventDefault());
+  img.addEventListener('dragstart',e=>e.preventDefault());
+});
+// Scroll reveal
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

@@ -16,9 +16,9 @@
   "demo_photos": [
     "/static/themes/bluesky/demo_98637b5b.jpg"
   ],
-  "price": 50000,
-  "price_label": "Rp. 50.000",
-  "price_original": 75000,
+  "price": 30000,
+  "price_label": "Rp. 30000",
+  "price_original": 50000,
   "price_note": "",
   "palette": {
     "ivory": "#f9f5ee",

@@ -24,10 +24,10 @@
   "demo_photos": [
     "/static/themes/surga_alam/demo_3b57014a.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga sudah termasuk desain premium, hosting 3 bulan, dan unlimited RSVP",
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "forest_deep": "#2D4A2F",
     "forest_mid": "#3D6140",

@@ -18,10 +18,10 @@
   "demo_photos": [
     "/static/themes/rumahbanjar/demo_7e566063.jpg"
   ],
-  "price": 65000,
-  "price_label": "Rp. 65.000",
-  "price_original": 90000,
-  "price_note": "Tema Eksklusif Budaya Banjar",
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "maroon": "#6b1020",
     "gold": "#c8a044",

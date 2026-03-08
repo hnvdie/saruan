@@ -19,10 +19,10 @@
   "demo_photos": [
     "/static/themes/abyssaltide/demo_a07b2b3e.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga peluncuran perdana — berlaku terbatas",
+  "price": 25,
+  "price_label": "Rp. 25.000",
+  "price_original": 30000,
+  "price_note": "",
   "palette": {
     "abyss": "#040d1a",
     "deep": "#071428",

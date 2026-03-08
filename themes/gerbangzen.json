@@ -30,5 +30,9 @@
   ],
   "demo_photos": [
     "/static/themes/gerbangzen/demo_d23ddb91.jpg"
-  ]
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": ""
 }

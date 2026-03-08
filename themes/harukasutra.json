@@ -19,10 +19,10 @@
   "demo_photos": [
     "/static/themes/harukasutra/demo_daf8c156.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Termasuk setup + revisi 1x",
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "cream": "#F7F1E8",
     "cream_deep": "#EDE5D4",

@@ -18,10 +18,10 @@
   "demo_photos": [
     "/static/themes/memory/demo_ee3dfb7f.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp 85.000",
-  "price_original": 120000,
-  "price_note": "Termasuk setup, domain undangan, dan musik background",
+  "price": 35000,
+  "price_label": "Rp 35.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "cream": "#f7f3ee",
     "parchment": "#ede6da",

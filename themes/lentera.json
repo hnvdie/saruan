@@ -12,11 +12,11 @@
     "animated",
     "soft"
   ],
-  "price": 65000,
-  "price_label": "Rp. 65.000",
+  "price": 25000,
+  "price_label": "Rp. 25.000",
   "demo_photos": [
     "/static/themes/lentera/demo_1b077984.jpg"
   ],
-  "price_original": 85000,
+  "price_original": 50000,
   "price_note": ""
 }

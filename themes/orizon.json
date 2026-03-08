@@ -15,10 +15,10 @@
   "demo_photos": [
     "/static/themes/orizon/demo_7981acb5.jpg"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Premium Kinetic Theme",
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "background": "#F8F9FA",
     "text": "#1A1A1B",

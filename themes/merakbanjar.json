@@ -18,10 +18,10 @@
   "demo_photos": [
     "/static/themes/merakbanjar/demo_ecc12f43.jpg"
   ],
-  "price": 75000,
-  "price_label": "Rp. 75.000",
-  "price_original": 100000,
-  "price_note": "Tema Eksklusif — 1 Asset Cover",
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "teal": "#3d7d8c",
     "maroon": "#7a1428",

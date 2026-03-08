@@ -14,5 +14,9 @@
   ],
   "demo_photos": [
     "/static/themes/sakura/demo_2ea18edb.jpg"
-  ]
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": ""
 }

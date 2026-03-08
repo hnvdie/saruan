@@ -14,8 +14,8 @@
   "demo_photos": [
     "/static/themes/cinematic/demo_f705d6a1.jpg"
   ],
-  "price": 50000,
-  "price_label": "Rp. 50.000",
-  "price_original": 75000,
+  "price": 25000,
+  "price_label": "Rp. 25000",
+  "price_original": 50000,
   "price_note": ""
 }

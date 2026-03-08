@@ -16,9 +16,9 @@
   "demo_photos": [
     "/static/themes/abadi/demo_f383ecfe.jpg"
   ],
-  "price": 50000,
-  "price_label": "Rp. 50.000",
-  "price_original": 75000,
+  "price": 25,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
   "price_note": "",
   "palette": {
     "void": "#04060f",

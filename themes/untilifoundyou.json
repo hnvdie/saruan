@@ -16,9 +16,9 @@
   "demo_photos": [
     "/static/themes/untilifoundyou/demo_0b49ce6e.jpg"
   ],
-  "price": 50000,
-  "price_label": "Rp. 50.000",
-  "price_original": 75000,
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
   "price_note": "",
   "palette": {
     "espresso": "#1a0e08",
