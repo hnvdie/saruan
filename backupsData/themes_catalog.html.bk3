@@ -222,13 +222,29 @@ footer{
 </div>
 
 <div class="filter-bar">
-  <div style="position:relative">
-    <span style="position:absolute;left:.5rem;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--faint);pointer-events:none">⌕</span>
-    <input id="searchInput" type="text" placeholder="Cari tema..." autocomplete="off"
-      style="padding:.22rem .6rem .22rem 1.5rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.62rem;color:var(--ink);background:transparent;outline:none;width:160px;transition:border-color .15s"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+<!--
+  <div class="filter-tags" id="filterTags">
+    <button class="ftag active no-select" data-tag="all">Semua</button>
+    {% set all_tags = [] %}
+    {% for theme in themes %}
+      {% for tag in theme.get('tags', []) %}
+        {% if tag and tag not in all_tags %}{% set _ = all_tags.append(tag) %}{% endif %}
+      {% endfor %}
+    {% endfor %}
+    {% for tag in all_tags|sort %}
+    <button class="ftag no-select" data-tag="{{ tag }}">{{ tag|capitalize }}</button>
+    {% endfor %}
   </div>
-  <span class="grid-meta no-select" id="gridMeta">{{ themes|length }} tema</span>
+-->
+  <div style="display:flex;align-items:center;gap:.5rem;margin-left:auto">
+    <div style="position:relative">
+      <span style="position:absolute;left:.5rem;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--faint);pointer-events:none">⌕</span>
+      <input id="searchInput" type="text" placeholder="Cari tema..." autocomplete="off"
+        style="padding:.22rem .6rem .22rem 1.5rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.62rem;color:var(--ink);background:transparent;outline:none;width:130px;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+    <span class="grid-meta no-select" id="gridMeta">{{ themes|length }} tema</span>
+  </div>
 </div>
 
 <div class="catalog">
@@ -334,6 +350,7 @@ setInterval(()=>{
 // ── PAGINATION + FILTER ───────────────────────────
 const PER_PAGE = 16;
 let currentPage = 1;
+let activeTag = 'all';
 let visibleCards = [];
 
 const allCards = Array.from(document.querySelectorAll('.theme-card'));
@@ -345,7 +362,11 @@ const pgInfo    = document.getElementById('pgInfo');
 
 function applyFilter(){
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-  visibleCards = allCards.filter(c => !q || (c.dataset.name||'').includes(q));
+  visibleCards = allCards.filter(c=>{
+    const tagMatch = activeTag==='all' || (c.dataset.tags||'').split(',').includes(activeTag);
+    const nameMatch = !q || (c.dataset.name||'').includes(q);
+    return tagMatch && nameMatch;
+  });
   currentPage = 1;
   render();
 }
@@ -431,8 +452,17 @@ function goPage(p){
   document.querySelector('.filter-bar').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// ── FILTER BUTTONS ────────────────────────────────
+document.querySelectorAll('.ftag').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.ftag').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTag=btn.dataset.tag;
+  applyFilter();
+}));
+
 // ── SEARCH ────────────────────────────────────────
-document.getElementById('searchInput').addEventListener('input', () => applyFilter());
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => { applyFilter(); });
 
 // Init
 applyFilter();

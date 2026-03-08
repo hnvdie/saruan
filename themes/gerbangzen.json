@@ -1,8 +1,19 @@
 {
   "id": "gerbangzen",
   "name": "Gerbang Zen",
-  "description": "Nuansa taman zen Jepang — putih washi bersih, sakura, torii gate, tipografi Zen Old Mincho. Minimal tapi elegan, dengan animasi scroll yang berbeda di setiap section.",
+  "description": "Nuansa taman zen Jepang. putih washi bersih, sakura, torii gate, tipografi Zen Old Mincho. Minimal tapi elegan.",
   "preview_image": "/static/themes/gerbangzen/cover.jpg",
+  "tags": [
+    "japanese",
+    "minimalist",
+    "elegant",
+    "zen",
+    "animation-rich",
+    "culture",
+    "sakura",
+    "luxury"
+  ],
+
   "colors": {
     "primary": "#1a1614",
     "secondary": "#d4849a",
