@@ -9,6 +9,7 @@ import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
+from flask import send_from_directory
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -723,6 +724,12 @@ def _save_photos(conn, inv_id, files, form):
         conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,1,?)',
                      (inv_id, url, existing+saved))
         saved += 1
+
+#other
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico')
+
 
 # ─── MAIN ────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
