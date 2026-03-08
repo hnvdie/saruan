@@ -1691,7 +1691,7 @@ body {
     <!-- Maps Embed -->
     {% if inv.maps_embed %}
     <div class="maps-embed-wrap reveal-up delay-3">
-      {{ inv.maps_embed | safe }}
+      {{ inv.maps_embed_html | safe }}
     </div>
     {% endif %}
   </section>
