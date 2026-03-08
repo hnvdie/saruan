@@ -1,0 +1,63 @@
+{
+  "id": "memory",
+  "name": "Memory",
+  "description": "Tema botanical vintage yang hangat dan puitis. Terinspirasi dari bunga-bunga kering di buku tua, surat-surat cinta yang terlipat, dan kenangan yang terjaga dengan lembut. Palet krem, blush rose, dan sage hijau menciptakan suasana nostalgia elegan nan romantis. Dilengkapi efek kelopak bunga jatuh, animasi scroll dramatis, dan cover fullscreen dari foto asli undangan.",
+  "preview_color": "#e8cfc4",
+  "accent_color": "#c9847a",
+  "skeleton": "memory",
+  "tags": [
+    "botanical",
+    "vintage",
+    "romantic",
+    "floral",
+    "soft",
+    "elegant",
+    "warm",
+    "classic"
+  ],
+  "demo_photos": [
+    "/static/themes/memory/demo_ee3dfb7f.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp 85.000",
+  "price_original": 120000,
+  "price_note": "Termasuk setup, domain undangan, dan musik background",
+  "palette": {
+    "cream": "#f7f3ee",
+    "parchment": "#ede6da",
+    "blush": "#e8cfc4",
+    "rose": "#c9847a",
+    "dusty_rose": "#b07070",
+    "sage": "#8a9e82",
+    "deep_sage": "#5a7255",
+    "brown": "#6b4c3b",
+    "ink": "#2e2018",
+    "gold": "#c9a96e",
+    "gold_light": "#e8d5b0",
+    "white": "#fffdf9"
+  },
+  "fonts": {
+    "display": "Great Vibes",
+    "serif": "Cormorant Garamond",
+    "sans": "Jost"
+  },
+  "features": [
+    "Envelope cover fullscreen dengan foto asli",
+    "Efek buka undangan split-curtain dramatis",
+    "Animasi kelopak bunga jatuh (canvas particle)",
+    "Ayat Al-Quran 3 bagian (Bismillah + Arab + Terjemahan)",
+    "Profil mempelai dengan foto bulat",
+    "Love story section puitis",
+    "Galeri foto hero + strip 3 kolom",
+    "Detail akad dan resepsi dengan ikon",
+    "Countdown timer real-time",
+    "Google Maps embed + link",
+    "RSVP form interaktif",
+    "Guestbook dengan tambah real-time",
+    "Gift section bank + e-wallet dengan tombol salin",
+    "Floating music player",
+    "IntersectionObserver scroll animations",
+    "Mobile-first 480px max-width",
+    "Responsive desktop dengan shadow card"
+  ]
+}

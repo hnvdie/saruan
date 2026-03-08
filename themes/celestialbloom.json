@@ -18,14 +18,7 @@
     "dark-theme"
   ],
   "demo_photos": [
-    "/static/themes/celestialbloom/cover.jpg",
-    "/static/themes/celestialbloom/couple.jpg",
-    "/static/themes/celestialbloom/groom.jpg",
-    "/static/themes/celestialbloom/bride.jpg",
-    "/static/themes/celestialbloom/gallery1.jpg",
-    "/static/themes/celestialbloom/gallery2.jpg",
-    "/static/themes/celestialbloom/gallery3.jpg",
-    "/static/themes/celestialbloom/gallery4.jpg"
+    "/static/themes/celestialbloom/demo_99a37b5f.jpg"
   ],
   "price": 85000,
   "price_label": "Rp. 85.000",

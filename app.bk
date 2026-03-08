@@ -209,39 +209,37 @@ def get_demo_photos():
     return photos
 
 def extract_maps_embed_src(url: str) -> str:
-    """Convert Google Maps URL to embed src URL only (not full iframe), or return empty"""
+    """Convert Google Maps URL to full iframe embed HTML, or return empty"""
     if not url: return ''
     import urllib.parse
 
-    # Already a full iframe tag — extract the src URL from it
-    if url.strip().startswith('<iframe'):
-        m = re.search(r'src=["\']([^"\']+)["\']', url)
-        return m.group(1) if m else ''
+    def make_iframe(src: str) -> str:
+        return (f'<iframe src="{src}" width="100%" height="200" style="border:0;" '
+                f'allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>')
+
+    # Already a full iframe tag
+    if url.strip().startswith('<iframe'): return url
     # Already embed src URL
-    if 'maps/embed' in url: return url
+    if 'maps/embed' in url: return make_iframe(url)
     # Standard Google Maps share/search URL
     try:
         parsed = urllib.parse.urlparse(url)
         params = urllib.parse.parse_qs(parsed.query)
         q = params.get('q', [''])[0]
         if q:
-            return f'https://maps.google.com/maps?q={urllib.parse.quote(q)}&output=embed&z=15'
+            src = f'https://maps.google.com/maps?q={urllib.parse.quote(q)}&output=embed&z=15'
+            return make_iframe(src)
         # /place/Name/@lat,lng or /place/Name/
         if '/place/' in url:
             place = url.split('/place/')[1].split('/')[0]
-            return f'https://maps.google.com/maps?q={place}&output=embed&z=15'
+            src = f'https://maps.google.com/maps?q={place}&output=embed&z=15'
+            return make_iframe(src)
         # any other google maps URL — append output=embed
         if 'google.com/maps' in url or 'goo.gl/maps' in url:
             sep = '&' if '?' in url else '?'
-            return url + sep + 'output=embed'
+            return make_iframe(url + sep + 'output=embed')
     except: pass
     return ''
-
-def make_maps_iframe(src: str) -> str:
-    """Wrap embed src URL into full iframe HTML"""
-    if not src: return ''
-    return (f'<iframe src="{src}" width="100%" height="260" style="border:0;display:block;" '
-            f'allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>')
 
 @app.template_filter('format_date')
 def format_date(v):
@@ -322,7 +320,6 @@ def preview_theme(theme_id):
         resepsi_address='Jl. Jend. Sudirman No. 88, Jakarta',
         maps_url='https://maps.google.com/?q=Hotel+Indonesia+Kempinski',
         maps_embed=extract_maps_embed_src('https://maps.google.com/?q=Hotel+Indonesia+Kempinski'),
-        maps_embed_html=make_maps_iframe(extract_maps_embed_src('https://maps.google.com/?q=Hotel+Indonesia+Kempinski')),
         love_story='Kami pertama bertemu di kampus pada tahun 2019. Berawal dari teman sekelas yang sering belajar bersama, lalu menjadi sahabat yang saling menguatkan. Kini dengan penuh rasa syukur, kami memutuskan untuk melangkah bersama menuju jenjang pernikahan yang penuh berkah dan cinta.',
         cover_photo=None, music_url="/static/assets/moon.mp3", expires_at=None, is_preview=True
     )
@@ -353,14 +350,9 @@ def view_invitation(slug):
     rsvps   = conn.execute('SELECT * FROM rsvp WHERE invitation_id=? ORDER BY created_at DESC LIMIT 50',(inv['id'],)).fetchall()
     gifts   = conn.execute('SELECT * FROM gifts WHERE invitation_id=?',(inv['id'],)).fetchall()
     photos  = get_inv_photos(conn, inv['id'])
-    # Auto-generate embed URL jika belum ada
+    # Auto-generate embed if maps_url exists but maps_embed is empty
     if inv.get('maps_url') and not inv.get('maps_embed'):
         inv['maps_embed'] = extract_maps_embed_src(inv['maps_url'])
-    # Normalize data lama di DB yang tersimpan sebagai full iframe tag
-    elif inv.get('maps_embed') and inv['maps_embed'].strip().startswith('<iframe'):
-        inv['maps_embed'] = extract_maps_embed_src(inv['maps_embed'])
-    # Inject maps_embed_html = full iframe HTML (untuk tema yang pakai | safe)
-    inv['maps_embed_html'] = make_maps_iframe(inv.get('maps_embed', ''))
     conn.close()
     return render_template(f'themes/{inv["theme_id"]}.html',
                            inv=inv, theme=theme, rsvp_list=rsvps,
@@ -692,4 +684,3 @@ if __name__ == '__main__':
     print('  lalu set env: ADMIN_PW_HASH=<hash>')
     print('─' * 50)
     app.run(debug=False, port=5000)
-
