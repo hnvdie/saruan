@@ -1,0 +1,40 @@
+{
+  "id": "silverseal",
+  "name": "Silver Seal",
+  "description": "Estetika surat tersegel perak bertemu sinema noir romantis Eropa tahun 1950-an. Monokrom penuh karakter dengan bingkai darkroom, strip film, dan tipografi editorial — hangat namun tegas, seperti foto hitam-putih yang menyimpan sejuta cerita.",
+  "preview_color": "#0d0d0d",
+  "accent_color": "#8a8a8a",
+  "skeleton": "silverseal",
+  "tags": ["monochrome", "noir", "film", "editorial", "darkroom", "cinematic"],
+  "demo_photos": [
+    "/static/themes/silverseal/photos/couple.jpg",
+    "/static/themes/silverseal/photos/groom.jpg",
+    "/static/themes/silverseal/photos/bride.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 120000,
+  "price_note": "Harga promo terbatas",
+  "palette": {
+    "ink":      "#0d0d0d",
+    "charcoal": "#1a1a1a",
+    "graphite": "#2e2e2e",
+    "silver":   "#8a8a8a",
+    "ash":      "#b8b8b8",
+    "fog":      "#d6d6d6",
+    "pearl":    "#efefef",
+    "paper":    "#f8f7f5"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "serif":   "IM Fell English",
+    "sans":    "Montserrat"
+  },
+  "features": [
+    "Foto berbingkai darkroom dengan ornamen sudut dekoratif",
+    "Sistem polaroid + film strip untuk galeri kreatif",
+    "Tiket pernikahan bergaya sinema hitam-putih",
+    "Efek grain + ambient dust particle fullscreen",
+    "Envelope intro dengan monogram berputar & curtain reveal"
+  ]
+}

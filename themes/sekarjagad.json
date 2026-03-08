@@ -1,0 +1,44 @@
+{
+  "id": "sekarjagad",
+  "name": "Sekarjagad",
+  "description": "Tema pernikahan yang terinspirasi dari Wayang Beber × suasana pagi di Jogja — hangat, dalam, dan penuh tradisi yang hidup. Memadukan estetika gulungan lukisan wayang dengan ornamen emas terracotta, menghadirkan undangan yang terasa seperti karya seni yang menyentuh hati.",
+  "preview_color": "#B5522A",
+  "accent_color": "#C9982A",
+  "skeleton": "sekarjagad",
+  "tags": [
+    "tradisional",
+    "wayang",
+    "jogja",
+    "terracotta",
+    "romantis",
+    "budaya",
+    "hangat"
+  ],
+  "demo_photos": [
+    "/static/themes/sekarjagad/demo_bd90b12d.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 120000,
+  "price_note": "Harga promo terbatas",
+  "palette": {
+    "terracotta": "#B5522A",
+    "parchment": "#F0E8D5",
+    "sage": "#7A8C6E",
+    "mauve": "#9B7B8A",
+    "charcoal": "#2D2520",
+    "gold": "#C9982A"
+  },
+  "fonts": {
+    "display": "Cinzel Decorative",
+    "serif": "Cormorant Garamond",
+    "sans": "Nunito"
+  },
+  "features": [
+    "Iris/pinhole reveal yang dramatis saat membuka undangan",
+    "Sistem partikel kelopak melati melayang (pure canvas JS)",
+    "Galeri foto dalam format strip film yang bisa digeser",
+    "Animasi scroll berbeda-beda tiap section (clip-path, blur, skew, stagger)",
+    "Ornamen frame Wayang Beber SVG animasi pada cover"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "harukasutra",
+  "name": "Haruka Sutra",
+  "description": "Tema washi paper Jepang bertemu Art Nouveau botanical — palet putih susu, krem mentah, blush mauve, dan dusty rose yang menyatu lembut seperti kertas vintage terkena cahaya pagi. Elegan tanpa berteriak.",
+  "preview_color": "#F7F1E8",
+  "accent_color": "#B5624F",
+  "skeleton": "harukasutra",
+  "tags": [
+    "japanese",
+    "washi",
+    "art-nouveau",
+    "botanical",
+    "cream",
+    "soft",
+    "elegant",
+    "romantic",
+    "warm"
+  ],
+  "demo_photos": [
+    "/static/themes/harukasutra/demo_daf8c156.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 120000,
+  "price_note": "Termasuk setup + revisi 1x",
+  "palette": {
+    "cream": "#F7F1E8",
+    "cream_deep": "#EDE5D4",
+    "cream_mid": "#F2EAD9",
+    "blush": "#C9897A",
+    "blush_light": "#E8C4BC",
+    "rose": "#B5624F",
+    "mauve": "#9A7B74",
+    "sage": "#8A9A7A",
+    "sage_light": "#B8C4AA",
+    "ink": "#3A2E28",
+    "ink_mid": "#6B5248",
+    "gold": "#C4A96A",
+    "gold_pale": "#E8D9B5",
+    "white": "#FDFAF5"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "serif": "Cormorant Garamond",
+    "sans": "Zen Kaku Gothic Antique"
+  },
+  "features": [
+    "Envelope reveal — split-screen dramatic open",
+    "Ambient falling petal canvas (pure JS)",
+    "Washi paper texture overlay",
+    "Polaroid collage gallery dengan rotasi acak",
+    "Profil mempelai dua kolom dengan rotating dashed ring",
+    "Countdown timer real-time",
+    "RSVP form + append real-time ke guestbook",
+    "Gift section dengan copy button",
+    "Google Maps embed responsif dengan sepia filter",
+    "Floating music player autoplay",
+    "IntersectionObserver scroll reveal — 4 varian animasi berbeda",
+    "Mobile-first max-width 480px",
+    "Pure CSS + JS tanpa library eksternal"
+  ]
+}

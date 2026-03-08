@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F4EDE3;
+            --accent: #D27D46;
+            --text: #4A3728;
+            --soft: #A67B7D;
+            --clay: #8C6A56;
+            --bezier: cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Crimson Text', serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- UTILS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s var(--bezier); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- AMBIENT --- */
+        #dust-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10; opacity: 0.6;
+        }
+
+        /* --- ENVELOPE / COVER --- */
+        #envelope {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            background: url('/static/themes/kalajingga/cover.jpg') center/cover no-repeat;
+            transition: transform 1.2s var(--bezier), clip-path 1.2s var(--bezier);
+        }
+        #envelope.opened {
+            clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            transform: scale(1.1);
+        }
+        .env-content {
+            text-align: center; color: white;
+            background: rgba(74, 55, 40, 0.4);
+            backdrop-filter: blur(8px); padding: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            width: 85%; max-width: 400px;
+        }
+        .open-btn {
+            margin-top: 20px; padding: 12px 30px;
+            background: var(--accent); color: white;
+            border: none; cursor: pointer; font-family: 'Montserrat';
+            text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        /* --- MAIN LAYOUT --- */
+        main { width: 100%; max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* HERO SECTION */
+        .hero { 
+            height: 100vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px;
+        }
+        .hero h1 { font-family: 'DM Serif Display'; font-size: 3.5rem; line-height: 1; margin-bottom: 10px; }
+        .hero-date { font-family: 'Montserrat'; letter-spacing: 4px; text-transform: uppercase; border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 5px 0; }
+
+        /* QURAN SECTION */
+        .quran-section { padding: 60px 30px; text-align: center; font-style: italic; background: #E9E1D5; margin: 40px 0; }
+        .arabic { font-size: 1.8rem; margin-bottom: 20px; display: block; color: var(--clay); }
+
+        /* PROFIL SECTION (Asymmetric) */
+        .profile-container { padding: 40px 20px; position: relative; }
+        .profile-card { margin-bottom: 80px; position: relative; }
+        .photo-frame {
+            width: 250px; height: 350px; overflow: hidden;
+            border-radius: 150px 150px 0 0; border: 8px solid white;
+            box-shadow: 20px 20px 0 var(--soft);
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info { margin-top: -40px; background: var(--bg); padding: 20px; width: 80%; margin-left: auto; border: 1px solid var(--clay); }
+        .profile-info h2 { font-family: 'DM Serif Display'; font-size: 2rem; }
+
+        /* STORY SECTION (Vertical Line) */
+        .story-section { padding: 40px 30px; border-left: 2px dashed var(--clay); margin-left: 30px; }
+        .story-item { margin-bottom: 30px; position: relative; }
+        .story-item::before { content: ''; position: absolute; left: -37px; top: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
+
+        /* EVENT SECTION */
+        .event-card { 
+            background: white; margin: 20px; padding: 40px 20px; 
+            border-radius: 0; position: relative; border: 1px solid #ddd;
+            background-image: radial-gradient(var(--clay) 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+        }
+        .event-card-inner { background: white; padding: 20px; }
+        .maps-btn { 
+            display: inline-block; margin-top: 20px; padding: 10px 20px;
+            background: var(--text); color: white; text-decoration: none; font-size: 0.8rem;
+        }
+
+        /* COUNTDOWN */
+        .timer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 40px 20px; }
+        .time-box { background: var(--text); color: var(--bg); padding: 15px 5px; text-align: center; }
+        .time-box span { display: block; font-size: 1.5rem; font-weight: bold; }
+        .time-box label { font-size: 0.6rem; text-transform: uppercase; }
+
+        /* GIFT & RSVP */
+        .form-group { margin-bottom: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--clay); background: transparent; font-family: inherit; }
+        .btn-submit { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; font-weight: bold; }
+
+        .gift-card { background: #efe4d6; padding: 20px; margin-bottom: 15px; border-left: 5px solid var(--accent); }
+        .copy-btn { font-size: 0.7rem; background: var(--clay); color: white; border: none; padding: 4px 8px; cursor: pointer; }
+
+        /* GUESTBOOK */
+        .guestbook { max-height: 400px; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.5); }
+        .guest-entry { border-bottom: 1px solid var(--clay); padding: 15px 0; }
+
+        /* MUSIC */
+        .music-player {
+            position: fixed; bottom: 20px; left: 20px; z-index: 90;
+            width: 50px; height: 50px; background: var(--accent);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: rotate 5s linear infinite; animation-play-state: paused;
+        }
+        .music-player.playing { animation-play-state: running; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* DECORATION */
+        .flower-svg { position: absolute; width: 150px; opacity: 0.1; z-index: -1; }
+    </style>
+</head>
+<body>
+
+    <canvas id="dust-canvas"></canvas>
+
+    <div id="envelope">
+        <div class="env-content">
+            <p style="font-family: 'Montserrat'; letter-spacing: 3px; font-size: 0.7rem;">THE WEDDING OF</p>
+            <h1 style="font-family: 'DM Serif Display'; font-size: 2.5rem; margin: 15px 0;">{{ inv.groom_name }} & {{ inv.bride_name }}</h1>
+            <button class="open-btn" onclick="openInvitation()">Buka Undangan</button>
+        </div>
+    </div>
+
+    <div class="music-player" id="musicToggle" onclick="toggleMusic()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="{{ inv.music_url }}" type="audio/mpeg">
+    </audio>
+
+    <main>
+        <section class="hero reveal">
+            <p>Save the Date</p>
+            <h1>{{ inv.groom_name }}<br>&<br>{{ inv.bride_name }}</h1>
+            <div class="hero-date">{{ inv.akad_date | format_date }}</div>
+            <div style="margin-top: 40px; width: 1px; height: 100px; background: var(--text);"></div>
+        </section>
+
+        <section class="quran-section reveal">
+            <span class="arabic">وَمِنْ اٰيٰتِهٖٓ اَنْ خَلَقَ لَكُمْ مِّنْ اَنْفُسِكُمْ اَزْوَاجًا لِّتَسْكُنُوْٓا اِلَيْهَا</span>
+            <p>"Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya..."</p>
+            <small>(QS. Ar-Rum: 21)</small>
+        </section>
+
+        <section class="profile-container">
+            <div class="profile-card reveal" style="margin-right: 40px;">
+                <div class="photo-frame">
+                    <img src="{% if photos %}{{ photo_src(photos[1]) }}{% endif %}" alt="Groom">
+                </div>
+                <div class="profile-info">
+                    <h2>{{ inv.groom_full }}</h2>
+                    <p>Putra dari {{ inv.groom_parents }}</p>
+                </div>
+            </div>
+
+            <div class="profile-card reveal" style="margin-left: 40px;">
+                <div class="photo-frame" style="border-radius: 0 0 150px 150px; box-shadow: -20px -20px 0 var(--clay);">
+                    <img src="{% if photos %}{{ photo_src(photos[2]) }}{% endif %}" alt="Bride">
+                </div>
+                <div class="profile-info" style="margin-top: 20px; margin-left: 0; margin-right: auto;">
+                    <h2>{{ inv.bride_full }}</h2>
+                    <p>Putri dari {{ inv.bride_parents }}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="reveal" style="padding: 20px;">
+            <h2 style="font-family: 'DM Serif Display'; text-align: center; margin-bottom: 30px;">Our Journey</h2>
+            <div class="story-section">
+                {{ inv.love_story | safe }}
+            </div>
+        </section>
+
+        <section class="reveal">
+            <div class="event-card">
+                <div class="event-card-inner">
+                    <h3 style="font-family: 'DM Serif Display'; font-size: 2rem;">Akad Nikah</h3>
+                    <p>{{ inv.akad_date | format_date }}</p>
+                    <p>{{ inv.akad_time }}</p>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid var(--clay);">
+                    <p><strong>{{ inv.akad_venue }}</strong></p>
+                    <p>{{ inv.akad_address }}</p>
+                    <a href="{{ inv.maps_url }}" class="maps-btn">LIHAT LOKASI</a>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-card-inner">
+                    <h3 style="font-family: 'DM Serif Display'; font-size: 2rem;">Resepsi</h3>
+                    <p>{{ inv.resepsi_date | format_date }}</p>
+                    <p>{{ inv.resepsi_time }}</p>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid var(--clay);">
+                    <p><strong>{{ inv.resepsi_venue }}</strong></p>
+                    <p>{{ inv.resepsi_address }}</p>
+                    {{ inv.maps_embed_html | safe }}
+                </div>
+            </div>
+        </section>
+
+        <div class="timer reveal" id="countdown" data-date="{{ inv.akad_date }}">
+            <div class="time-box"><span id="days">00</span><label>Hari</label></div>
+            <div class="time-box"><span id="hours">00</span><label>Jam</label></div>
+            <div class="time-box"><span id="mins">00</span><label>Menit</label></div>
+            <div class="time-box"><span id="secs">00</span><label>Detik</label></div>
+        </div>
+
+        <section class="reveal" style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            {% if photos %}
+                {% for p in photos[3:] %}
+                <div class="gallery-img" style="height: {{ [200, 250, 300] | random }}px; background: url('{{ photo_src(p) }}') center/cover; border: 5px solid white;"></div>
+                {% endfor %}
+            {% endif %}
+        </section>
+
+        <section class="reveal" style="padding: 40px 20px; background: #E9E1D5;">
+            <h2 style="font-family: 'DM Serif Display'; text-align: center;">Konfirmasi Kehadiran</h2>
+            <form id="rsvpForm" style="margin-top: 20px;">
+                <div class="form-group"><input type="text" name="name" placeholder="Nama Lengkap" required></div>
+                <div class="form-group">
+                    <select name="attendance">
+                        <option value="Hadir">Hadir</option>
+                        <option value="Tidak Hadir">Tidak Hadir</option>
+                    </select>
+                </div>
+                <div class="form-group"><input type="number" name="count" placeholder="Jumlah Tamu"></div>
+                <div class="form-group"><textarea name="message" placeholder="Ucapan & Doa"></textarea></div>
+                <button type="submit" class="btn-submit">KIRIM KONFIRMASI</button>
+            </form>
+        </section>
+
+        <section class="reveal" style="padding: 40px 20px;">
+            <h2 style="font-family: 'DM Serif Display'; text-align: center; margin-bottom: 20px;">Wedding Gift</h2>
+            <p style="text-align: center; margin-bottom: 30px;">Doa restu Anda adalah karunia terindah. Namun jika ingin memberi lebih, kami sediakan sarana berikut:</p>
+            {% for gift in gifts %}
+            <div class="gift-card">
+                <p><strong>{{ gift.bank_name or gift.ewallet_type }}</strong></p>
+                <p id="acc-{{ loop.index }}">{{ gift.account_number or gift.ewallet_number }}</p>
+                <p>a.n {{ gift.account_name or gift.ewallet_name }}</p>
+                <button class="copy-btn" onclick="copyText('acc-{{ loop.index }}')">SALIN NOMOR</button>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="reveal" style="padding: 40px 20px;">
+            <h2 style="font-family: 'DM Serif Display'; margin-bottom: 20px;">Guestbook</h2>
+            <div class="guestbook" id="guestbook">
+                {% for r in rsvp_list %}
+                <div class="guest-entry">
+                    <strong>{{ r.guest_name }}</strong>
+                    <p>{{ r.message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer style="padding: 60px 20px; text-align: center; background: var(--text); color: var(--bg);">
+            <p>Sampai Jumpa di Hari Bahagia Kami</p>
+            <h2 style="font-family: 'DM Serif Display'; font-size: 2rem; margin-top: 10px;">{{ inv.groom_name }} & {{ inv.bride_name }}</h2>
+        </footer>
+    </main>
+
+    <script>
+        // --- ENVELOPE ---
+        function openInvitation() {
+            document.getElementById('envelope').classList.add('opened');
+            document.body.style.overflow = 'auto';
+            toggleMusic();
+            initAnimations();
+        }
+
+        // --- MUSIC ---
+        const audio = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicToggle');
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                musicBtn.classList.add('playing');
+            } else {
+                audio.pause();
+                musicBtn.classList.remove('playing');
+            }
+        }
+
+        // --- AMBIENT DUST ---
+        const canvas = document.getElementById('dust-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 + 0.1;
+                this.opacity = Math.random() * 0.5;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y > canvas.height) this.y = -10;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(210, 125, 70, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for(let i=0; i<50; i++) particles.push(new Particle());
+        function animateDust() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateDust);
+        }
+        animateDust();
+
+        // --- SCROLL REVEAL ---
+        function initAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // --- COUNTDOWN ---
+        const target = new Date(document.getElementById('countdown').dataset.date).getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = target - now;
+            if(diff < 0) return;
+            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById('mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('secs').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+        }, 1000);
+
+        // --- AJAX RSVP ---
+        document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const res = await fetch('/rsvp/{{ inv.id }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if(res.ok) {
+                    alert('Terima kasih atas konfirmasinya!');
+                    const gb = document.getElementById('guestbook');
+                    gb.innerHTML = `<div class="guest-entry"><strong>${data.name}</strong><p>${data.message}</p></div>` + gb.innerHTML;
+                    e.target.reset();
+                }
+            } catch(err) { console.error(err); }
+        });
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            alert('Nomor rekening disalin!');
+        }
+        
+        document.body.style.overflow = 'hidden';
+    </script>
+</body>
+</html>

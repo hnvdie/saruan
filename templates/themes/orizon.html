@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wedding Invitation - {{ inv.groom_name }} & {{ inv.bride_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Montserrat:wght@200;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F8F9FA; --text: #1A1A1B; --accent: #C5A36D; --shadow: rgba(0,0,0,0.05);
+            --curve: cubic-bezier(0.87, 0, 0.13, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); 
+            overflow-x: hidden; width: 100%; max-width: 480px; margin: 0 auto;
+        }
+        h1, h2, .font-serif { font-family: 'Cormorant Garamond', serif; }
+
+        /* --- BACKGROUND KINETIC SYSTEM --- */
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.4; }
+
+        /* --- ENVELOPE / COVER --- */
+        #envelope {
+            position: fixed; inset: 0; z-index: 9999; background: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 1.2s var(--curve), clip-path 1.2s var(--curve);
+            background: url('/static/themes/orizon/cover.jpg') center/cover no-repeat;
+        }
+        #envelope.open { transform: translateY(-100%); clip-path: inset(0 0 100% 0); }
+        .env-content { text-align: center; color: white; background: rgba(0,0,0,0.3); padding: 2rem; backdrop-filter: blur(5px); width: 80%; }
+        .btn-open { 
+            margin-top: 2rem; padding: 12px 30px; border: 1px solid white; background: transparent; 
+            color: white; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: 0.3s;
+        }
+
+        /* --- MUSIC PLAYER --- */
+        #music-control {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
+            width: 45px; height: 45px; border-radius: 50%; background: var(--accent);
+            display: none; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        /* --- SECTION GENERIC --- */
+        section { position: relative; padding: 60px 25px; overflow: hidden; opacity: 0; transform: translateY(30px); transition: 1s var(--curve); }
+        section.is-visible { opacity: 1; transform: translateY(0); }
+
+        /* --- HERO SECTION (FRAGMENTED) --- */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; }
+        .hero-title { font-size: 3.5rem; line-height: 0.9; margin-bottom: 1rem; position: relative; }
+        .hero-img { 
+            position: absolute; top: 10%; right: -10%; width: 70%; height: 50%; 
+            object-fit: cover; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            z-index: -1; filter: grayscale(100%);
+        }
+
+        /* --- AR-RUM SECTION --- */
+        .verse-box { border-left: 1px solid var(--accent); padding-left: 20px; margin: 40px 0; }
+        .arabic { font-size: 1.5rem; text-align: right; margin-bottom: 15px; color: var(--accent); }
+
+        /* --- COUPLE SECTION (KINETIC SLIDE) --- */
+        .couple-card { margin-bottom: 80px; position: relative; }
+        .couple-img { width: 100%; height: 400px; object-fit: cover; border-radius: 200px 200px 0 0; margin-bottom: 20px; }
+        .couple-name { font-size: 2.5rem; border-bottom: 1px solid #ddd; display: inline-block; margin-bottom: 10px; }
+
+        /* --- EVENT SECTION (ARCH DESIGN) --- */
+        .event-arch { 
+            background: white; border: 1px solid #eee; border-radius: 200px 200px 0 0;
+            padding: 60px 30px; text-align: center; margin-bottom: 30px; box-shadow: 0 20px 40px var(--shadow);
+        }
+        .countdown { display: flex; justify-content: center; gap: 15px; margin: 30px 0; }
+        .count-item { display: flex; flex-direction: column; align-items: center; }
+        .count-val { font-weight: 700; font-size: 1.5rem; color: var(--accent); }
+
+        /* --- MAPS --- */
+        .map-wrapper { filter: grayscale(1); border-radius: 15px; overflow: hidden; margin: 20px 0; border: 5px solid white; }
+
+        /* --- STORY (HORIZONTAL TICKER STYLE) --- */
+        .story-text { font-size: 1.1rem; line-height: 1.8; color: #555; text-align: justify; }
+
+        /* --- GIFT & RSVP --- */
+        .input-group { margin-bottom: 15px; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border: none; border-bottom: 1px solid #ccc; 
+            background: transparent; font-family: inherit; transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); outline: none; }
+        .btn-submit { background: var(--text); color: white; width: 100%; padding: 15px; border: none; margin-top: 10px; font-weight: 700; letter-spacing: 2px; cursor: pointer; }
+        
+        .bank-card { 
+            background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 15px;
+            border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;
+        }
+        .copy-btn { font-size: 0.8rem; background: #eee; padding: 5px 10px; cursor: pointer; }
+
+        /* --- GUESTBOOK --- */
+        .guest-item { background: white; padding: 20px; margin-bottom: 15px; border-radius: 0 20px 20px 20px; box-shadow: 5px 5px 15px var(--shadow); }
+        .guest-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; display: block; }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <div id="envelope">
+        <div class="env-content">
+            <p style="letter-spacing: 5px; font-size: 0.8rem; margin-bottom: 1rem;">UNDANGAN PERNIKAHAN</p>
+            <h1 style="font-size: 3rem;">{{ inv.groom_name }} & {{ inv.bride_name }}</h1>
+            <p style="margin-top: 1rem;">{{ inv.akad_date | format_date }}</p>
+            <button class="btn-open" onclick="openInvitation()">Buka Undangan</button>
+        </div>
+    </div>
+
+    <div id="music-control" onclick="toggleMusic()">
+        <span id="music-icon">♪</span>
+    </div>
+    <audio id="bg-music" src="{{ inv.music_url }}" loop></audio>
+
+    <main id="main-content">
+        <section class="hero">
+            {% if photos[0] %}<img src="{{ photo_src(photos[0]) }}" class="hero-img" alt="Hero">{% endif %}
+            <div class="hero-title">
+                <span style="display: block; font-size: 1.5rem; font-weight: 200;">The Union of</span>
+                {{ inv.groom_name }}<br>& {{ inv.bride_name }}
+            </div>
+            <p style="letter-spacing: 3px;">{{ inv.akad_date | format_date }}</p>
+        </section>
+
+        <section>
+            <div class="verse-box">
+                <div class="arabic">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا لِتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنEncكُمْ مَوَدَّةً وَرَحْمَةً...</div>
+                <p style="font-style: italic; font-size: 0.9rem;">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya..." (QS. Ar-Rum: 21)</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="couple-card">
+                {% if photos[1] %}<img src="{{ photo_src(photos[1]) }}" class="couple-img" style="border-radius: 200px 0 200px 0;">{% endif %}
+                <h2 class="couple-name">{{ inv.groom_full }}</h2>
+                <p>Putra dari {{ inv.groom_parents }}</p>
+            </div>
+            <div class="couple-card" style="text-align: right;">
+                {% if photos[2] %}<img src="{{ photo_src(photos[2]) }}" class="couple-img" style="border-radius: 0 200px 0 200px;">{% endif %}
+                <h2 class="couple-name">{{ inv.bride_full }}</h2>
+                <p>Putri dari {{ inv.bride_parents }}</p>
+            </div>
+        </section>
+
+        <section style="background: var(--text); color: white; margin: 0 -25px; padding: 80px 50px;">
+            <h2 style="font-size: 3rem; margin-bottom: 30px; color: var(--accent);">Our Journey</h2>
+            <div class="story-text">{{ inv.love_story | safe }}</div>
+        </section>
+
+        <section>
+            <div class="event-arch">
+                <h3 style="letter-spacing: 4px; margin-bottom: 20px;">AKAD NIKAH</h3>
+                <p><strong>{{ inv.akad_date | format_date }}</strong></p>
+                <p>{{ inv.akad_time }}</p>
+                <hr style="margin: 20px auto; width: 30px; border: 1px solid var(--accent);">
+                <p>{{ inv.akad_venue }}</p>
+                <p style="font-size: 0.8rem; margin-top: 10px;">{{ inv.akad_address }}</p>
+            </div>
+
+            <div class="countdown" id="timer">
+                <div class="count-item"><span class="count-val" id="days">00</span><span>Hari</span></div>
+                <div class="count-item"><span class="count-val" id="hours">00</span><span>Jam</span></div>
+                <div class="count-item"><span class="count-val" id="mins">00</span><span>Menit</span></div>
+                <div class="count-item"><span class="count-val" id="secs">00</span><span>Detik</span></div>
+            </div>
+
+            <div class="event-arch">
+                <h3 style="letter-spacing: 4px; margin-bottom: 20px;">RESEPSI</h3>
+                <p><strong>{{ inv.resepsi_date | format_date }}</strong></p>
+                <p>{{ inv.resepsi_time }}</p>
+                <hr style="margin: 20px auto; width: 30px; border: 1px solid var(--accent);">
+                <p>{{ inv.resepsi_venue }}</p>
+                <p style="font-size: 0.8rem; margin-top: 10px;">{{ inv.resepsi_address }}</p>
+            </div>
+
+            <div class="map-wrapper">
+                {{ inv.maps_embed_html | safe }}
+            </div>
+            <a href="{{ inv.maps_url }}" style="display: block; text-align: center; color: var(--text); font-weight: 700; text-decoration: none; margin-top: 10px;">BUKA GOOGLE MAPS →</a>
+        </section>
+
+        <section>
+            <h2 style="text-align: center; margin-bottom: 40px;">Wedding Gift</h2>
+            <p style="text-align: center; margin-bottom: 30px; font-size: 0.9rem;">Doa restu Anda adalah karunia terindah, namun jika ingin memberi lebih, kami sediakan saluran berikut:</p>
+            
+            {% for gift in gifts %}
+            <div class="bank-card">
+                <div>
+                    <strong style="display: block;">{{ gift.bank_name or gift.ewallet_type }}</strong>
+                    <span>{{ gift.account_number or gift.ewallet_number }}</span><br>
+                    <small>a/n {{ gift.account_name or gift.ewallet_name }}</small>
+                </div>
+                <div class="copy-btn" onclick="copyText('{{ gift.account_number or gift.ewallet_number }}')">SALIN</div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section id="rsvp-section">
+            <div style="background: #fff; padding: 40px 20px; border: 1px solid #eee;">
+                <h2 style="margin-bottom: 20px;">RSVP</h2>
+                <form id="rsvpForm">
+                    <div class="input-group"><input type="text" name="name" placeholder="Nama Lengkap" required></div>
+                    <div class="input-group">
+                        <select name="attendance" required>
+                            <option value="">Konfirmasi Kehadiran</option>
+                            <option value="Hadir">Hadir</option>
+                            <option value="Tidak Hadir">Tidak Hadir</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><input type="number" name="count" placeholder="Jumlah Tamu" min="1" max="5"></div>
+                    <div class="input-group"><textarea name="message" placeholder="Ucapan & Doa Restu" rows="4" required></textarea></div>
+                    <button type="submit" class="btn-submit">KIRIM KONFIRMASI</button>
+                </form>
+            </div>
+        </section>
+
+        <section>
+            <h2 style="margin-bottom: 30px;">Guestbook</h2>
+            <div id="rsvp-list">
+                {% for r in rsvp_list %}
+                <div class="guest-item">
+                    <span class="guest-name">{{ r.guest_name }}</span>
+                    <p style="font-size: 0.85rem; color: #666;">{{ r.message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section style="text-align: center; padding: 100px 25px;">
+            <p style="letter-spacing: 3px; margin-bottom: 20px;">TERIMA KASIH</p>
+            <h2 style="font-size: 2.5rem;">{{ inv.groom_name }} & {{ inv.bride_name }}</h2>
+        </section>
+    </main>
+
+    <script>
+        // --- OPEN LOGIC ---
+        function openInvitation() {
+            document.getElementById('envelope').classList.add('open');
+            document.getElementById('music-control').style.display = 'flex';
+            document.getElementById('bg-music').play();
+            initAnimations();
+        }
+
+        function toggleMusic() {
+            const m = document.getElementById('bg-music');
+            const icon = document.getElementById('music-icon');
+            if (m.paused) { m.play(); icon.innerText = '♪'; }
+            else { m.pause(); icon.innerText = 'II'; }
+        }
+
+        // --- ANIMATION SYSTEM ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('is-visible');
+            });
+        }, { threshold: 0.1 });
+
+        function initAnimations() {
+            document.querySelectorAll('section').forEach(s => observer.observe(s));
+        }
+
+        // --- CANVAS BACKGROUND (KINETIC LINES) ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let lines = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Line {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.len = Math.random() * 100 + 50;
+                this.speed = Math.random() * 0.5 + 0.1;
+                this.opacity = Math.random() * 0.5;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(197, 163, 109, ${this.opacity})`;
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.len, this.y - this.len/2);
+                ctx.stroke();
+                this.x += this.speed;
+                this.y -= this.speed/2;
+                if (this.x > canvas.width || this.y < 0) this.reset();
+            }
+        }
+
+        for(let i=0; i<15; i++) lines.push(new Line());
+        function animate() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            lines.forEach(l => l.draw());
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- COUNTDOWN ---
+        const targetDate = new Date("{{ inv.akad_date }} {{ inv.akad_time }}").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+            if (diff < 0) return;
+            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById('mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('secs').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+        }, 1000);
+
+        // --- RSVP HANDLER ---
+        document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'MENGIRIM...';
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('/rsvp/{{ inv.id }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('Terima kasih atas konfirmasinya!');
+                    location.reload();
+                }
+            } catch (err) { alert('Terjadi kesalahan.'); }
+            btn.innerText = 'KIRIM KONFIRMASI';
+        });
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt);
+            alert('Nomor rekening disalin!');
+        }
+    </script>
+</body>
+</html>
