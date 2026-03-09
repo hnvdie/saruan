@@ -48,12 +48,14 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
 
 #envelope-cover {
   position: absolute; inset: 0;
-  background: var(--oud);
+  background: transparent;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: clamp(12px, 3vw, 28px);
-  z-index: 2;
+  z-index: 4;
   transition: none;
+  padding: clamp(20px, 5vw, 60px);
+  text-align: center;
 }
 
 .env-bismillah {
@@ -151,20 +153,59 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
   50%       { opacity: 0.9; }
 }
 
+.env-open-label {
+  font-family: var(--display);
+  font-size: clamp(15px, 3.5vw, 26px);
+  color: var(--sand);
+  letter-spacing: 0.15em;
+  font-weight: 300;
+  margin-top: 4px;
+}
+
+.env-open-btn {
+  margin-top: clamp(8px, 2vw, 16px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: clamp(10px, 2.5vw, 16px) clamp(24px, 6vw, 48px);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: clamp(10px, 2.2vw, 14px);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  background: rgba(184,148,83,0.08);
+  cursor: pointer;
+  animation: tapBlink 2.5s ease-in-out infinite;
+  transition: background 0.3s, color 0.3s;
+}
+.env-open-btn:hover {
+  background: var(--gold);
+  color: var(--oud);
+  opacity: 1 !important;
+  animation: none;
+}
+.env-open-btn .btn-arrow {
+  font-size: 1.2em;
+  transition: transform 0.3s;
+}
+.env-open-btn:hover .btn-arrow { transform: translateX(4px); }
+
 /* CURTAIN OPEN ANIMATION */
 #curtain-left, #curtain-right {
   position: absolute;
   top: 0;
   width: 50%;
   height: 100%;
-  background: var(--oud);
-  z-index: 3;
+  background: #2A1608;
+  z-index: 1;
   transition: transform 1.2s cubic-bezier(.77,0,.175,1);
+  pointer-events: none;
 }
-#curtain-left  { left: 0;   transform: translateX(0); }
-#curtain-right { right: 0;  transform: translateX(0); }
+#curtain-left  { left: 0;  transform: translateX(0); }
+#curtain-right { right: 0; transform: translateX(0); }
 
-/* Decorative edge on curtains */
+/* Decorative gold edge */
 #curtain-left::after, #curtain-right::before {
   content: '';
   position: absolute;
@@ -176,9 +217,12 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
 #curtain-left::after  { right: 0; }
 #curtain-right::before{ left: 0; }
 
+/* envelope-cover sits ABOVE curtains */
+#envelope-cover { z-index: 4 !important; }
+
 .envelope-opening #curtain-left  { transform: translateX(-100%); }
 .envelope-opening #curtain-right { transform: translateX(100%); }
-.envelope-opening #envelope-cover { opacity: 0; transition: opacity 0.3s; }
+.envelope-opening #envelope-cover { opacity: 0 !important; transition: opacity 0.4s 0.5s; pointer-events: none; }
 .envelope-done { opacity: 0 !important; pointer-events: none !important; transition: opacity 0.5s 0.8s !important; }
 
 /* ─── PARTICLE CANVAS ─── */
@@ -1444,10 +1488,12 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
     </div>
     <div class="env-date">{{ inv.akad_date | format_date }}</div>
     <div class="env-cta">
-      <div class="env-seal">
-        <span class="env-seal-inner">✦</span>
+      <div class="env-open-label">Anda Diundang</div>
+      <div class="env-open-btn">
+        <span>Buka Undangan</span>
+        <span class="btn-arrow">→</span>
       </div>
-      <span class="env-tap">Ketuk untuk membuka</span>
+      <span class="env-tap">Ketuk di mana saja untuk membuka</span>
     </div>
   </div>
 </div>
