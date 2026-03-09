@@ -5,24 +5,14 @@ Config via environment variables (see README).
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory)
-import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, imghdr
+import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
-from werkzeug.middleware.proxy_fix import ProxyFix
-from dotenv import load_dotenv
-load_dotenv()
+from flask import send_from_directory
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-
-# SECRET_KEY wajib di-set via env var — jangan pakai fallback random di produksi
-_sk = os.environ.get('SECRET_KEY')
-if not _sk:
-    import sys
-    print('[WARNING] SECRET_KEY env var tidak di-set! Session tidak persisten antar restart.', file=sys.stderr)
-    _sk = secrets.token_hex(32)
-app.secret_key = _sk
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
@@ -193,19 +183,7 @@ def init_db():
     c.commit(); c.close()
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
-# Magic bytes untuk validasi konten file — bukan hanya ekstensi
 def allowed_file(fn): return '.' in fn and fn.rsplit('.',1)[1].lower() in ALLOWED_EXT
-
-def validate_image_bytes(stream) -> bool:
-    """Validasi magic bytes — cegah file non-gambar yang diganti ekstensi."""
-    stream.seek(0)
-    header = stream.read(12)
-    stream.seek(0)
-    if header[:3] == b'\xff\xd8\xff': return True   # JPEG
-    if header[:4] == b'\x89PNG': return True           # PNG
-    if header[:4] == b'RIFF' and header[8:12] == b'WEBP': return True  # WebP
-    return False
-
 def secure_name(fn):
     ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'jpg'
     return f'{uuid.uuid4().hex}.{ext}'
@@ -339,31 +317,7 @@ def inject_globals():
         'site_name': SITE_NAME,
         'photo_src': photo_src,
         'recaptcha_key': RECAPTCHA_KEY,
-        'csrf_token': generate_csrf_token(),
     }
-
-# ─── CSRF PROTECTION ────────────────────────────────────────────────────────
-def generate_csrf_token() -> str:
-    if 'csrf_token' not in session:
-        session['csrf_token'] = secrets.token_hex(32)
-    return session['csrf_token']
-
-def csrf_protect(f):
-    """Decorator: validasi CSRF token di semua admin POST request."""
-    @wraps(f)
-    def dec(*a, **kw):
-        if request.method == 'POST':
-            token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken', '')
-            if isinstance(token, str) and token:
-                pass
-            else:
-                # coba dari JSON body
-                body = request.get_json(silent=True, force=True) or {}
-                token = body.get('csrf_token', '')
-            if not token or not hmac.compare_digest(token, session.get('csrf_token', '')):
-                abort(403)
-        return f(*a, **kw)
-    return dec
 
 # ─── ERROR HANDLERS ──────────────────────────────────────────────────────────
 @app.errorhandler(404)
@@ -509,9 +463,8 @@ def submit_rsvp(inv_id):
 
     conn.execute(
         'INSERT INTO rsvp(invitation_id,guest_name,attendance,guest_count,message) VALUES(?,?,?,?,?)',
-        (inv_id, data['name'].strip()[:100],
-         data.get('attendance','hadir') if data.get('attendance') in ('hadir','tidak_hadir') else 'hadir',
-         min(max(int(data.get('count',1)),1),20), data.get('message','')[:500]))
+        (inv_id, data['name'].strip()[:100], data.get('attendance','hadir'),
+         min(int(data.get('count',1)),20), data.get('message','')[:500]))
     conn.commit()
     total = conn.execute('SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?',(inv_id,)).fetchone()['c']
     conn.close()
@@ -603,7 +556,6 @@ def admin_dashboard():
 # ─── ADMIN CREATE ────────────────────────────────────────────────────────────
 @app.route('/admin/create', methods=['GET','POST'])
 @login_required
-@csrf_protect
 def admin_create():
     themes = get_all_themes()
     if request.method == 'POST':
@@ -653,7 +605,6 @@ def admin_create():
 # ─── ADMIN EDIT ──────────────────────────────────────────────────────────────
 @app.route('/admin/edit/<inv_id>', methods=['GET','POST'])
 @login_required
-@csrf_protect
 def admin_edit(inv_id):
     conn = get_db()
     inv  = conn.execute('SELECT * FROM invitations WHERE id=?',(inv_id,)).fetchone()
@@ -686,9 +637,9 @@ def admin_edit(inv_id):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
-            # Handle clear portrait checkboxes — col dari whitelist hardcoded, bukan user input
-            for form_key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
-                if f.get(form_key):
+            # Handle clear portrait checkboxes
+            for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
+                if f.get(key):
                     row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?',(inv_id,)).fetchone()
                     if row and row[col]:
                         try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
@@ -710,7 +661,6 @@ def admin_edit(inv_id):
 
 @app.route('/admin/photo/delete/<int:pid>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_delete_photo(pid):
     conn = get_db()
     row  = conn.execute('SELECT * FROM invitation_photos WHERE id=?',(pid,)).fetchone()
@@ -723,7 +673,6 @@ def admin_delete_photo(pid):
 
 @app.route('/admin/extend/<inv_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_extend(inv_id):
     conn = get_db()
     inv  = conn.execute('SELECT expires_at FROM invitations WHERE id=?',(inv_id,)).fetchone()
@@ -738,7 +687,6 @@ def admin_extend(inv_id):
 
 @app.route('/admin/delete/<inv_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_delete(inv_id):
     conn = get_db()
     # Hapus file gallery
@@ -763,7 +711,6 @@ def admin_delete(inv_id):
 # Theme demo photo management
 @app.route('/admin/theme-demo/<theme_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def upload_theme_demo(theme_id):
     theme = get_theme(theme_id)
     if not theme: abort(404)
@@ -788,7 +735,6 @@ def upload_theme_demo(theme_id):
 
 @app.route('/admin/theme-demo/<theme_id>/delete', methods=['POST'])
 @login_required
-@csrf_protect
 def delete_theme_demo(theme_id):
     data  = request.get_json()
     photo = data.get('photo','')
@@ -804,7 +750,6 @@ def delete_theme_demo(theme_id):
 # Theme pricing
 @app.route('/admin/theme-price/<theme_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def update_theme_price(theme_id):
     theme = get_theme(theme_id)
     if not theme: abort(404)
@@ -825,9 +770,6 @@ def update_theme_price(theme_id):
 # Keys reserved for portrait uploads — disimpan ke kolom invitations, BUKAN gallery table
 _PORTRAIT_KEYS = {'groom_photo', 'bride_photo'}
 
-# Whitelist kolom portrait — aman dari f-string injection
-_PORTRAIT_COL_MAP = {'groom_photo': 'groom_photo', 'bride_photo': 'bride_photo'}
-
 def _save_portrait(conn, inv_id, key: str, f) -> bool:
     """Simpan satu file portrait ke UPLOAD_DIR dan update kolom DB.
     Return True jika berhasil."""
@@ -836,11 +778,8 @@ def _save_portrait(conn, inv_id, key: str, f) -> bool:
     f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
     if size > MAX_UPLOAD_MB * 1024 * 1024:
         return False
-    if not validate_image_bytes(f.stream):
-        return False
-    # Whitelist col — aman dari injection
-    col = _PORTRAIT_COL_MAP.get(key)
-    if not col: return False
+    # Hapus file lama jika ada
+    col = 'groom_photo' if key == 'groom_photo' else 'bride_photo'
     row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?', (inv_id,)).fetchone()
     if row and row[col]:
         try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
@@ -864,7 +803,6 @@ def _save_photos(conn, inv_id, files, form):
             if not f or not f.filename or not allowed_file(f.filename): continue
             f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
             if size > MAX_UPLOAD_MB * 1024 * 1024: continue
-            if not validate_image_bytes(f.stream): continue
             fname = secure_name(f.filename)
             f.save(str(UPLOAD_DIR / fname))
             conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,0,?)',

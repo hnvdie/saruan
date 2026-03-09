@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="csrf-token" content="{{ csrf_token }}"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Edit Undangan — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -96,6 +97,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
   {% if error %}<div class="error">⚠️ {{ error }}</div>{% endif %}
 
   <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
     <!-- TEMA -->
     <div class="card">
@@ -432,9 +434,10 @@ function addUrlField() {
 // ── DELETE PHOTO ──
 async function deletePhoto(id) {
   if (!confirm('Hapus foto ini?')) return;
-  const r = await fetch(`/admin/photo/delete/${id}`, {method:'POST'});
+  const r = await fetch(`/admin/photo/delete/${id}`, {method:'POST',headers:{'X-CSRFToken':document.querySelector('meta[name=csrf-token]').content}});
   if ((await r.json()).success) document.getElementById(`ep-${id}`).remove();
 }
 </script>
 </body>
 </html>
+

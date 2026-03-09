@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="csrf-token" content="{{ csrf_token }}"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dashboard — {{ site_name }} Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -225,7 +224,6 @@ tr:hover td{background:var(--bg);}
                 <a href="/i/{{ inv.slug }}" target="_blank" class="btn">Lihat</a>
                 {% if inv.is_expired %}
                 <form method="post" action="/admin/extend/{{ inv.id }}" style="display:inline">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                   <button type="submit" class="btn success">+1Thn</button>
                 </form>
                 {% endif %}
@@ -329,7 +327,6 @@ tr:hover td{background:var(--bg);}
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('delModal')">Batal</button>
       <form id="delForm" method="post" style="display:inline">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="btn danger" style="border-color:var(--red);color:var(--red)">Ya, Hapus</button>
       </form>
     </div>
@@ -380,7 +377,6 @@ async function savePrice(){
     price_label: document.getElementById('priceLbl').value.trim(),
     price_original: parseInt(document.getElementById('priceOrig').value)||0,
   };
-  body.csrf_token = document.querySelector('meta[name=csrf-token]').content;
   const r = await fetch(`/admin/theme-price/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(r.ok){
     closeModal('priceModal');
@@ -407,7 +403,6 @@ async function uploadThemePhotos(themeId, input){
   if(!input.files.length) return;
   const form = new FormData();
   Array.from(input.files).forEach((f,i) => form.append(`photo${i}`, f));
-  form.append('csrf_token', document.querySelector('meta[name=csrf-token]').content);
   const r = await fetch(`/admin/theme-demo/${themeId}`, {method:'POST', body:form});
   const data = await r.json();
   if(data.success && data.urls){
@@ -435,7 +430,7 @@ async function uploadThemePhotos(themeId, input){
 // DELETE theme photo
 async function delThemePhoto(themeId, photoUrl, el){
   if(!confirm('Hapus foto ini?')) return;
-  const r = await fetch(`/admin/theme-demo/${themeId}/delete`,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':document.querySelector('meta[name=csrf-token]').content},body:JSON.stringify({photo:photoUrl})});
+  const r = await fetch(`/admin/theme-demo/${themeId}/delete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({photo:photoUrl})});
   if((await r.json()).success){ el.remove(); }
 }
 </script>

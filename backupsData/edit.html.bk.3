@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Buat Undangan — Admin</title>
+<title>Edit Undangan — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -14,7 +14,7 @@ body{font-family:'DM Sans',sans-serif;font-weight:300;background:var(--bg);color
 .back{font-size:.78rem;color:#888;text-decoration:none;}
 .back:hover{color:#1a1a1a;}
 .container{max-width:680px;margin:0 auto;padding:1.5rem;}
-.page-title{font-size:1.3rem;font-weight:400;margin-bottom:.3rem;}
+.page-title{font-size:1.3rem;font-weight:400;margin-bottom:.2rem;}
 .page-sub{font-size:.78rem;color:#888;margin-bottom:1.75rem;}
 .card{background:#fff;border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin-bottom:1.25rem;}
 .card-title{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#888;font-weight:400;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
@@ -52,33 +52,33 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .ts-clear:hover{color:var(--red);}
 .no-results{padding:1rem;text-align:center;font-size:.78rem;color:#aaa;}
 
-/* ── PHOTO UPLOAD ── */
-.photo-upload-zone{border:2px dashed #ddd;border-radius:6px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+/* Photos */
+.existing-photos{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
+.ep-item{position:relative;}
+.ep-img{width:70px;height:70px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
+.ep-del{position:absolute;top:-5px;right:-5px;width:18px;height:18px;background:var(--red);color:#fff;border:none;border-radius:50%;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.photo-upload-zone{border:2px dashed #ddd;border-radius:6px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .photo-upload-zone:hover,.photo-upload-zone.dragover{border-color:var(--gold);background:#fffdf5;}
 .photo-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.puz-icon{font-size:1.5rem;margin-bottom:.3rem;}
 .puz-text{font-size:.78rem;color:#888;}
-.puz-sub{font-size:.68rem;color:#bbb;margin-top:.2rem;}
-.photo-preview-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;}
-.photo-thumb{width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
 .portrait-zone{border:2px dashed #ddd;border-radius:6px;padding:.9rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .portrait-zone:hover{border-color:var(--gold);background:#fffdf5;}
 .portrait-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.portrait-preview{display:none;width:60px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border);margin-top:.5rem;}
-
-/* URL PHOTOS */
+.puz-text{font-size:.78rem;color:#888;}
 .url-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;}
 .url-row input{flex:1;}
-.add-url-btn{padding:.5rem .85rem;background:transparent;border:1px solid #ddd;border-radius:4px;font-size:.75rem;cursor:pointer;color:#666;white-space:nowrap;}
+.add-url-btn{padding:.45rem .8rem;background:transparent;border:1px solid #ddd;border-radius:4px;font-size:.72rem;cursor:pointer;color:#666;white-space:nowrap;}
 .add-url-btn:hover{border-color:var(--gold);color:var(--gold);}
+.photo-preview-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+.photo-thumb{width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
 
-/* SUBMIT */
 .submit-area{display:flex;gap:.75rem;justify-content:flex-end;padding-top:.5rem;}
 .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.65rem 1.4rem;border-radius:4px;font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid transparent;transition:all .15s;text-decoration:none;}
 .btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
 .btn-primary:hover{background:#333;}
 .btn-ghost{background:transparent;border-color:#ddd;color:#666;}
 .btn-ghost:hover{border-color:#aaa;}
+.live-link{display:inline-flex;align-items:center;gap:.4rem;background:#f5f5f5;padding:.4rem .85rem;border-radius:4px;font-size:.75rem;color:var(--gold);text-decoration:none;margin-bottom:1.25rem;}
 @media(max-width:480px){.form-row{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -87,27 +87,27 @@ textarea.form-input{resize:vertical;min-height:80px;}
   <a href="/admin" class="logo">Undangan<span>Kita</span></a>
   <a href="/admin" class="back">← Dashboard</a>
 </div>
-
 <div class="container">
-  <div class="page-title">Buat Undangan Baru</div>
-  <p class="page-sub">Isi semua informasi pernikahan di bawah ini</p>
+  <div class="page-title">Edit: {{ inv.groom_name }} & {{ inv.bride_name }}</div>
+  <p class="page-sub">ID: {{ inv.id }} • Dibuat {{ inv.created_at[:10] }}</p>
+
+  <a href="/i/{{ inv.slug }}" target="_blank" class="live-link">🔗 Lihat undangan live: /i/{{ inv.slug }}</a>
 
   {% if error %}<div class="error">⚠️ {{ error }}</div>{% endif %}
 
-  <form method="post" enctype="multipart/form-data" id="mainForm">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <form method="post" enctype="multipart/form-data">
 
     <!-- TEMA -->
     <div class="card">
-      <div class="card-title">Pilih Tema</div>
-      <input type="hidden" name="theme_id" id="theme_id_input" value="{{ form.get('theme_id', themes[0].id if themes else '') }}">
+      <div class="card-title">Tema</div>
+      <input type="hidden" name="theme_id" id="theme_id_input" value="{{ inv.theme_id }}">
       <div class="theme-search-wrap">
         <span class="theme-search-icon">⌕</span>
         <input type="text" class="theme-search-input" id="themeSearch"
-               placeholder="Cari nama atau tag tema... (mis: romantic, floral, modern)" autocomplete="off">
+               placeholder="Cari nama atau tag tema..." autocomplete="off">
         <div class="theme-results" id="themeResults"></div>
       </div>
-      <div class="theme-selected" id="themeSelected">
+      <div class="theme-selected show" id="themeSelected">
         <div class="ts-swatch" id="tsSwatchEl"></div>
         <div class="ts-info">
           <div class="ts-name" id="tsNameEl">—</div>
@@ -115,76 +115,78 @@ textarea.form-input{resize:vertical;min-height:80px;}
         </div>
         <span class="ts-clear" onclick="clearTheme()">✕ Ganti tema</span>
       </div>
-      <p style="margin-top:.6rem"><a href="/themes" target="_blank" style="font-size:.73rem;color:var(--gold);">Lihat semua tema →</a></p>
     </div>
 
     <!-- IDENTITAS -->
     <div class="card">
-      <div class="card-title">Identitas Pasangan & URL</div>
+      <div class="card-title">Identitas Pasangan</div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Nama Panggilan Pria *</label>
-          <input class="form-input" type="text" name="groom_name" value="{{ form.get('groom_name','') }}" required placeholder="Rizky">
-        </div>
-        <div class="form-group">
-          <label>Nama Panggilan Wanita *</label>
-          <input class="form-input" type="text" name="bride_name" value="{{ form.get('bride_name','') }}" required placeholder="Amara">
-        </div>
+        <div class="form-group"><label>Nama Pria *</label><input class="form-input" type="text" name="groom_name" value="{{ inv.groom_name }}" required></div>
+        <div class="form-group"><label>Nama Wanita *</label><input class="form-input" type="text" name="bride_name" value="{{ inv.bride_name }}" required></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Nama Lengkap Pria</label>
-          <input class="form-input" type="text" name="groom_full" value="{{ form.get('groom_full','') }}" placeholder="Beserta gelar">
-        </div>
-        <div class="form-group">
-          <label>Nama Lengkap Wanita</label>
-          <input class="form-input" type="text" name="bride_full" value="{{ form.get('bride_full','') }}" placeholder="Beserta gelar">
-        </div>
+        <div class="form-group"><label>Nama Lengkap Pria</label><input class="form-input" type="text" name="groom_full" value="{{ inv.groom_full or '' }}"></div>
+        <div class="form-group"><label>Nama Lengkap Wanita</label><input class="form-input" type="text" name="bride_full" value="{{ inv.bride_full or '' }}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Orang Tua Pria</label>
-          <input class="form-input" type="text" name="groom_parents" value="{{ form.get('groom_parents','') }}" placeholder="Bapak ... & Ibu ...">
-        </div>
-        <div class="form-group">
-          <label>Orang Tua Wanita</label>
-          <input class="form-input" type="text" name="bride_parents" value="{{ form.get('bride_parents','') }}" placeholder="Bapak ... & Ibu ...">
-        </div>
+        <div class="form-group"><label>Orang Tua Pria</label><input class="form-input" type="text" name="groom_parents" value="{{ inv.groom_parents or '' }}"></div>
+        <div class="form-group"><label>Orang Tua Wanita</label><input class="form-input" type="text" name="bride_parents" value="{{ inv.bride_parents or '' }}"></div>
       </div>
       <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
-        <input type="checkbox" name="show_parents" id="show_parents" value="1" checked style="width:16px;height:16px;accent-color:var(--gold)">
+        <input type="checkbox" name="show_parents" id="show_parents" value="1" {{ 'checked' if inv.show_parents != 0 else '' }} style="width:16px;height:16px;accent-color:var(--gold)">
         <label for="show_parents" style="font-size:.78rem;color:#555;text-transform:none;letter-spacing:0;cursor:pointer">Tampilkan nama orang tua di undangan</label>
-      </div>
-      <div class="form-group">
-        <label>Slug URL *</label>
-        <input class="form-input" type="text" name="slug" value="{{ form.get('slug','') }}" required placeholder="rizky-amara-2025">
-        <div class="helper">Link undangan: undangankita.com/i/<strong>[slug]</strong> — huruf kecil, angka, tanda strip saja</div>
       </div>
     </div>
 
     <!-- FOTO PROFIL MEMPELAI -->
     <div class="card">
-      <div class="card-title">Foto Profil Mempelai <span style="font-weight:300;color:#bbb;text-transform:none;letter-spacing:0">(opsional — untuk kartu profil di tema)</span></div>
+      <div class="card-title">Foto Profil Mempelai <span style="font-weight:300;color:#bbb;text-transform:none;letter-spacing:0">(opsional — untuk tampil di kartu profil tema)</span></div>
       <div class="form-row">
+        <!-- Groom portrait -->
         <div class="form-group">
           <label>Foto Mempelai Pria</label>
+          {% if inv.groom_photo %}
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem">
+            <img src="/uploads/{{ inv.groom_photo }}" style="width:60px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" alt="Groom">
+            <div>
+              <div style="font-size:.72rem;color:#555;margin-bottom:.3rem">Sudah ada foto</div>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;cursor:pointer;color:#888">
+                <input type="checkbox" name="clear_groom_photo" value="1" style="accent-color:var(--red);width:13px;height:13px">
+                Hapus foto ini
+              </label>
+            </div>
+          </div>
+          {% endif %}
           <div class="portrait-zone">
             <input type="file" name="groom_photo" accept=".jpg,.jpeg,.png,.webp" onchange="previewPortrait(this,'prev-groom')">
-            <div class="puz-text" style="font-size:.72rem">📷 Upload foto pria</div>
-            <div class="puz-sub">JPG/PNG/WebP · maks 5MB</div>
+            <div class="puz-text" style="font-size:.72rem">📷 {{ 'Ganti' if inv.groom_photo else 'Upload' }} foto pria</div>
+            <div style="font-size:.63rem;color:#bbb;margin-top:.15rem">JPG/PNG/WebP · maks 5MB</div>
           </div>
-          <img id="prev-groom" class="portrait-preview" src="#" alt="">
-          <div class="helper">Jika tidak diupload, tema pakai foto gallery sebagai fallback.</div>
+          <img id="prev-groom" src="#" alt="" style="display:none;width:60px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border);margin-top:.5rem">
+          <div class="helper">Jika tidak diupload, tema akan pakai foto gallery sebagai fallback.</div>
         </div>
+        <!-- Bride portrait -->
         <div class="form-group">
           <label>Foto Mempelai Wanita</label>
+          {% if inv.bride_photo %}
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem">
+            <img src="/uploads/{{ inv.bride_photo }}" style="width:60px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" alt="Bride">
+            <div>
+              <div style="font-size:.72rem;color:#555;margin-bottom:.3rem">Sudah ada foto</div>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;cursor:pointer;color:#888">
+                <input type="checkbox" name="clear_bride_photo" value="1" style="accent-color:var(--red);width:13px;height:13px">
+                Hapus foto ini
+              </label>
+            </div>
+          </div>
+          {% endif %}
           <div class="portrait-zone">
             <input type="file" name="bride_photo" accept=".jpg,.jpeg,.png,.webp" onchange="previewPortrait(this,'prev-bride')">
-            <div class="puz-text" style="font-size:.72rem">📷 Upload foto wanita</div>
-            <div class="puz-sub">JPG/PNG/WebP · maks 5MB</div>
+            <div class="puz-text" style="font-size:.72rem">📷 {{ 'Ganti' if inv.bride_photo else 'Upload' }} foto wanita</div>
+            <div style="font-size:.63rem;color:#bbb;margin-top:.15rem">JPG/PNG/WebP · maks 5MB</div>
           </div>
-          <img id="prev-bride" class="portrait-preview" src="#" alt="">
-          <div class="helper">Jika tidak diupload, tema pakai foto gallery sebagai fallback.</div>
+          <img id="prev-bride" src="#" alt="" style="display:none;width:60px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border);margin-top:.5rem">
+          <div class="helper">Jika tidak diupload, tema akan pakai foto gallery sebagai fallback.</div>
         </div>
       </div>
     </div>
@@ -193,93 +195,102 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <div class="card">
       <div class="card-title">Akad Nikah</div>
       <div class="form-row">
-        <div class="form-group"><label>Tanggal</label><input class="form-input" type="date" name="akad_date" value="{{ form.get('akad_date','') }}"></div>
-        <div class="form-group"><label>Waktu</label><input class="form-input" type="time" name="akad_time" value="{{ form.get('akad_time','') }}"></div>
+        <div class="form-group"><label>Tanggal</label><input class="form-input" type="date" name="akad_date" value="{{ inv.akad_date or '' }}"></div>
+        <div class="form-group"><label>Waktu</label><input class="form-input" type="time" name="akad_time" value="{{ inv.akad_time or '' }}"></div>
       </div>
-      <div class="form-group"><label>Nama Venue</label><input class="form-input" type="text" name="akad_venue" value="{{ form.get('akad_venue','') }}" placeholder="Masjid Al-Ikhlas"></div>
-      <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="akad_address" value="{{ form.get('akad_address','') }}" placeholder="Jl. ..."></div>
+      <div class="form-group"><label>Venue</label><input class="form-input" type="text" name="akad_venue" value="{{ inv.akad_venue or '' }}"></div>
+      <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="akad_address" value="{{ inv.akad_address or '' }}"></div>
     </div>
 
     <!-- RESEPSI -->
     <div class="card">
       <div class="card-title">Resepsi Pernikahan</div>
       <div class="form-row">
-        <div class="form-group"><label>Tanggal</label><input class="form-input" type="date" name="resepsi_date" value="{{ form.get('resepsi_date','') }}"></div>
-        <div class="form-group"><label>Waktu</label><input class="form-input" type="time" name="resepsi_time" value="{{ form.get('resepsi_time','') }}"></div>
+        <div class="form-group"><label>Tanggal</label><input class="form-input" type="date" name="resepsi_date" value="{{ inv.resepsi_date or '' }}"></div>
+        <div class="form-group"><label>Waktu</label><input class="form-input" type="time" name="resepsi_time" value="{{ inv.resepsi_time or '' }}"></div>
       </div>
-      <div class="form-group"><label>Nama Venue</label><input class="form-input" type="text" name="resepsi_venue" value="{{ form.get('resepsi_venue','') }}" placeholder="Grand Ballroom Hotel ..."></div>
-      <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="resepsi_address" value="{{ form.get('resepsi_address','') }}" placeholder="Jl. ..."></div>
-      <div class="form-group"><label>Link Google Maps</label><input class="form-input" type="url" name="maps_url" value="{{ form.get('maps_url','') }}" placeholder="https://maps.google.com/..."></div>
-      <div class="form-group">
-        <label>Maps Embed URL <span style="color:#bbb;font-weight:300">(opsional — auto-generate dari link di atas)</span></label>
-        <input class="form-input" type="text" name="maps_embed" value="{{ form.get('maps_embed','') }}" placeholder="Kosongkan untuk auto-generate">
-        <div class="helper">Jika diisi, peta tampil langsung di halaman undangan.</div>
-      </div>
+      <div class="form-group"><label>Venue</label><input class="form-input" type="text" name="resepsi_venue" value="{{ inv.resepsi_venue or '' }}"></div>
+      <div class="form-group"><label>Alamat</label><input class="form-input" type="text" name="resepsi_address" value="{{ inv.resepsi_address or '' }}"></div>
+      <div class="form-group"><label>Link Google Maps</label><input class="form-input" type="url" name="maps_url" value="{{ inv.maps_url or '' }}"></div>
+      <div class="form-group"><label>Maps Embed URL <span style="color:#bbb;font-weight:300">(auto-generate dari link di atas jika kosong)</span></label><input class="form-input" type="text" name="maps_embed" value="{{ inv.maps_embed or '' }}" placeholder="Kosongkan untuk auto-generate"><div class="helper">Peta tampil langsung di halaman undangan jika diisi.</div></div>
     </div>
 
-    <!-- FOTO PREWED / GALLERY -->
+    <!-- FOTO -->
     <div class="card">
-      <div class="card-title">Foto Prewed — Gallery (maks 10 foto, 5MB/foto)</div>
-      <div class="photo-upload-zone" id="galleryZone">
-        <input type="file" name="photos" accept=".jpg,.jpeg,.png,.webp" multiple id="galleryFiles" onchange="previewGallery(this)">
-        <div class="puz-icon">📸</div>
-        <div class="puz-text">Klik atau seret beberapa foto sekaligus</div>
-        <div class="puz-sub">JPG, PNG, WebP — maks 5MB per foto • bisa pilih banyak sekaligus</div>
-      </div>
-      <div class="photo-preview-row" id="galleryPreview"></div>
-      <div style="margin-top:1.25rem">
-        <div class="card-title" style="margin-top:0">Atau Masukkan URL Foto (Google Drive, dll)</div>
-        <div class="helper" style="margin-bottom:.75rem">Untuk Google Drive: ubah link ke format <code>https://drive.google.com/uc?id=FILE_ID</code></div>
-        <div id="url-fields">
-          <div class="url-row"><input class="form-input" type="url" name="photo_url_0" placeholder="https://..."></div>
+      <div class="card-title">Foto Prewed — Gallery</div>
+      {% if photos %}
+      <div class="existing-photos">
+        {% for p in photos %}
+        <div class="ep-item" id="ep-{{ p.id }}">
+          <img class="ep-img" src="{{ photo_src(p) }}" alt="">
+          <button type="button" class="ep-del" onclick="deletePhoto({{ p.id }})">×</button>
         </div>
-        <button type="button" class="add-url-btn" onclick="addUrlField()">+ Tambah URL foto</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="photo-upload-zone" id="galleryZone">
+        <input type="file" name="photos" accept=".jpg,.jpeg,.png,.webp" multiple onchange="previewPhotos(this)">
+        <div class="puz-text">📸 Klik atau seret foto baru — bisa pilih banyak sekaligus</div>
+        <div style="font-size:.68rem;color:#bbb;margin-top:.2rem">Maks 5MB per foto • JPG/PNG/WebP</div>
+      </div>
+      <div class="photo-preview-row" id="photoPreview"></div>
+
+      <div style="margin-top:1.25rem">
+        <div class="card-title" style="margin-top:0">Tambah via URL</div>
+        <div id="url-fields">
+          <div class="url-row"><input class="form-input" type="url" name="photo_url_0" placeholder="https://drive.google.com/uc?id=..."></div>
+        </div>
+        <button type="button" class="add-url-btn" onclick="addUrlField()">+ Tambah URL</button>
       </div>
     </div>
 
     <!-- KONTEN -->
     <div class="card">
-      <div class="card-title">Konten Undangan</div>
+      <div class="card-title">Konten</div>
       <div class="form-group">
-        <label>Kisah Cinta (Love Story)</label>
-        <textarea class="form-input" name="love_story" placeholder="Ceritakan bagaimana kalian bertemu...">{{ form.get('love_story','') }}</textarea>
+        <label>Kisah Cinta</label>
+        <textarea class="form-input" name="love_story">{{ inv.love_story or '' }}</textarea>
       </div>
       <div class="form-group">
-        <label>URL Musik Latar (MP3)</label>
-        <input class="form-input" type="url" name="music_url" value="{{ form.get('music_url','') }}" placeholder="https://... (opsional)">
-        <div class="helper">Link langsung ke file MP3. Google Drive: ubah ke format uc?id=...</div>
+        <label>URL Musik (MP3)</label>
+        <input class="form-input" type="url" name="music_url" value="{{ inv.music_url or '' }}">
       </div>
     </div>
 
-    <!-- MASA AKTIF -->
+    <!-- EXPIRED -->
     <div class="card">
-      <div class="card-title">Masa Aktif Undangan</div>
+      <div class="card-title">Masa Aktif</div>
       <div class="form-group">
         <label>Tanggal Kadaluarsa</label>
-        <input class="form-input" type="date" name="expires_at" value="{{ form.get('expires_at','') }}">
-        <div class="helper">Kosongkan = otomatis +1 tahun dari tanggal resepsi.</div>
+        <input class="form-input" type="date" name="expires_at" value="{{ inv.expires_at or '' }}">
+        <div class="helper">
+          {% if inv.expires_at %}
+            Saat ini expired: {{ inv.expires_at | format_date }}
+            ({{ inv.expires_at | days_left }} hari lagi)
+          {% endif %}
+        </div>
       </div>
     </div>
 
     <!-- REKENING -->
     <div class="card">
-      <div class="card-title">Rekening Hadiah (Opsional)</div>
+      <div class="card-title">Rekening Hadiah</div>
       <div class="form-row">
-        <div class="form-group"><label>Nama Bank</label><input class="form-input" type="text" name="bank_name" value="{{ form.get('bank_name','') }}" placeholder="BCA / BNI / Mandiri"></div>
-        <div class="form-group"><label>Nomor Rekening</label><input class="form-input" type="text" name="account_number" value="{{ form.get('account_number','') }}"></div>
+        <div class="form-group"><label>Nama Bank</label><input class="form-input" type="text" name="bank_name" value="{{ gift.get('bank_name','') }}"></div>
+        <div class="form-group"><label>Nomor Rekening</label><input class="form-input" type="text" name="account_number" value="{{ gift.get('account_number','') }}"></div>
       </div>
-      <div class="form-group"><label>Nama Pemilik Rekening</label><input class="form-input" type="text" name="account_name" value="{{ form.get('account_name','') }}"></div>
+      <div class="form-group"><label>Nama Pemilik</label><input class="form-input" type="text" name="account_name" value="{{ gift.get('account_name','') }}"></div>
     </div>
 
     <div class="submit-area">
       <a href="/admin" class="btn btn-ghost">Batal</a>
-      <button type="submit" class="btn btn-primary">Simpan & Buat Undangan →</button>
+      <button type="submit" class="btn btn-primary">Simpan Perubahan ✓</button>
     </div>
   </form>
 </div>
 
 <script>
-// ── THEME DATA dari Jinja ──
+// ── THEME DATA ──
 const THEMES = [
   {% for t in themes %}
   {id:{{ t.id|tojson }},name:{{ t.name|tojson }},preview_color:{{ t.preview_color|tojson }},accent_color:{{ t.accent_color|tojson }},tags:{{ (t.tags or [])|tojson }},price_label:{{ (t.price_label or '')|tojson }},demo_photo:{{ ((t.demo_photos or [None])[0])|tojson }}}{% if not loop.last %},{% endif %}
@@ -297,7 +308,7 @@ const tsIdEl      = document.getElementById('tsIdEl');
 let focusedIdx = -1;
 let filteredList = [];
 
-// Pre-select if value already set (form repopulation on error)
+// Pre-select current theme on page load
 const initId = hiddenInput.value;
 if (initId) { const t = THEMES.find(x => x.id === initId); if (t) applyTheme(t); }
 
@@ -390,19 +401,19 @@ function previewPortrait(inp, previewId) {
   img.style.display = 'block';
 }
 
-// ── GALLERY PREVIEW (multiple files) ──
-function previewGallery(input) {
-  const preview = document.getElementById('galleryPreview');
-  preview.innerHTML = '';
-  Array.from(input.files).slice(0, 10).forEach(f => {
+// ── GALLERY PREVIEW ──
+function previewPhotos(inp) {
+  const pr = document.getElementById('photoPreview');
+  pr.innerHTML = '';
+  Array.from(inp.files).slice(0,10).forEach(f => {
     const img = document.createElement('img');
     img.className = 'photo-thumb';
     img.src = URL.createObjectURL(f);
-    preview.appendChild(img);
+    pr.appendChild(img);
   });
 }
 
-// Drag & drop visual feedback on gallery zone
+// Drag & drop feedback
 const galleryZone = document.getElementById('galleryZone');
 galleryZone.addEventListener('dragover', e => { e.preventDefault(); galleryZone.classList.add('dragover'); });
 ['dragleave','drop'].forEach(ev => galleryZone.addEventListener(ev, () => galleryZone.classList.remove('dragover')));
@@ -411,24 +422,19 @@ galleryZone.addEventListener('dragover', e => { e.preventDefault(); galleryZone.
 let urlCount = 1;
 function addUrlField() {
   if (urlCount >= 9) return;
-  const div = document.createElement('div');
-  div.className = 'url-row';
-  div.innerHTML = `<input class="form-input" type="url" name="photo_url_${urlCount}" placeholder="https://...">`;
-  document.getElementById('url-fields').appendChild(div);
+  const d = document.createElement('div');
+  d.className = 'url-row';
+  d.innerHTML = `<input class="form-input" type="url" name="photo_url_${urlCount}" placeholder="https://...">`;
+  document.getElementById('url-fields').appendChild(d);
   urlCount++;
 }
 
-// ── SUBMIT VALIDATION ──
-document.getElementById('mainForm').addEventListener('submit', e => {
-  if (!hiddenInput.value) {
-    e.preventDefault();
-    searchInput.style.borderColor = '#e53935';
-    searchInput.focus();
-    setTimeout(() => searchInput.style.borderColor = '', 2500);
-    alert('Pilih tema terlebih dahulu sebelum menyimpan.');
-  }
-});
+// ── DELETE PHOTO ──
+async function deletePhoto(id) {
+  if (!confirm('Hapus foto ini?')) return;
+  const r = await fetch(`/admin/photo/delete/${id}`, {method:'POST'});
+  if ((await r.json()).success) document.getElementById(`ep-${id}`).remove();
+}
 </script>
 </body>
 </html>
-

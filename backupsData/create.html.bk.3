@@ -95,7 +95,6 @@ textarea.form-input{resize:vertical;min-height:80px;}
   {% if error %}<div class="error">⚠️ {{ error }}</div>{% endif %}
 
   <form method="post" enctype="multipart/form-data" id="mainForm">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
     <!-- TEMA -->
     <div class="card">
@@ -431,4 +430,3 @@ document.getElementById('mainForm').addEventListener('submit', e => {
 </script>
 </body>
 </html>
-
