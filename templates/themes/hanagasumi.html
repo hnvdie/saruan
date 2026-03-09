@@ -2,2498 +2,998 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>{{ inv.groom_name }} & {{ inv.bride_name }} — Hanagasumi</title>
-
-<!-- Google Fonts -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;500;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   HANAGASUMI — 花霞
-   Japanese Poster × Intimate Paper Letter
-   Wedding Invitation Theme
-   ============================================================ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --washi:     #F5EFE0;
-  --sumi:      #1C1410;
-  --beni:      #9B2335;
-  --kurenai:   #C8374A;
-  --kincha:    #C49A3C;
-  --misty:     #D4C5A9;
-  --ink:       #2D2218;
-  --paper:     #EDE4CF;
-  --rouge:     #7A1B28;
-  --fog:       rgba(245,239,224,0.85);
+  --washi:  #F5EFE0;
+  --sumi:   #1C1410;
+  --beni:   #9B2335;
+  --kincha: #C49A3C;
+  --misty:  #D4C5A9;
+  --paper:  #EDE4CF;
+  --rouge:  #7A1B28;
 }
 
 html, body {
-  width: 100%; height: 100%;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background: var(--sumi);
   font-family: 'Cormorant Garamond', serif;
-  color: var(--sumi);
   -webkit-font-smoothing: antialiased;
-  touch-action: none;
 }
 
-/* ============================================================
-   ENVELOPE INTRO
-   ============================================================ */
-#envelope-screen {
-  position: fixed; inset: 0;
-  z-index: 1000;
-  display: flex; align-items: center; justify-content: center;
+/* ── ENVELOPE ── */
+#envelope {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 999;
   background: var(--sumi);
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.env-bg {
-  position: absolute; inset: 0;
-  background-image: url('/static/themes/hanagasumi/cover.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.35;
-  filter: sepia(0.4);
-  transition: opacity 0.6s;
-}
-
-/* Washi texture overlay */
-.env-bg::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.015) 3px,
-    rgba(0,0,0,0.015) 4px
-  );
-}
-
-.env-seal {
-  position: relative; z-index: 2;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 24px;
-  animation: sealFloat 3s ease-in-out infinite;
-}
-
-@keyframes sealFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.seal-circle {
-  width: 120px; height: 120px;
-  border: 2px solid var(--beni);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-  background: rgba(28,20,16,0.7);
-  backdrop-filter: blur(4px);
-}
-
-.seal-circle::before {
-  content: '';
-  position: absolute; inset: 6px;
-  border: 1px solid rgba(155,35,53,0.5);
-  border-radius: 50%;
-}
-
-.seal-koi {
-  width: 60px; height: 60px;
-}
-
-.seal-text {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 11px;
-  letter-spacing: 0.4em;
-  color: var(--misty);
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.seal-names {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--washi);
-  letter-spacing: 0.05em;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.seal-names span {
-  color: var(--beni);
-  font-style: italic;
-}
-
-.seal-hint {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: var(--misty);
-  opacity: 0.7;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.9; }
-}
-
-/* Envelope open animation */
-.env-curtain-left, .env-curtain-right {
-  position: absolute; top: 0; bottom: 0; z-index: 3;
-  width: 50%;
-  background: var(--sumi);
-  transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
-}
-.env-curtain-left  { left: 0;  transform: translateX(0); }
-.env-curtain-right { right: 0; transform: translateX(0); }
-
-/* Red stripe on curtains */
-.env-curtain-left::after, .env-curtain-right::after {
-  content: '';
-  position: absolute; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--beni);
-}
-.env-curtain-left::after  { right: 0; }
-.env-curtain-right::after { left: 0; }
-
-.envelope-screen.open .env-curtain-left  { transform: translateX(-105%); }
-.envelope-screen.open .env-curtain-right { transform: translateX(105%); }
-
-/* Japanese vertical text decorations */
-.env-jp-left, .env-jp-right {
-  position: absolute; top: 50%; z-index: 1;
-  transform: translateY(-50%);
-  font-family: 'Noto Serif JP', serif;
-  font-size: 11px;
-  color: rgba(196,154,60,0.3);
-  writing-mode: vertical-rl;
-  letter-spacing: 0.3em;
-}
-.env-jp-left  { left: 20px; }
-.env-jp-right { right: 20px; text-orientation: mixed; }
-
-/* ============================================================
-   MAIN INVITATION — CARD SLIDER
-   ============================================================ */
-#invitation {
-  position: fixed; inset: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.8s ease 0.4s;
-}
-
-#invitation.visible { opacity: 1; }
-
-/* Ambient Koi particles canvas */
-#ambient-canvas {
-  position: fixed; inset: 0;
-  pointer-events: none; z-index: 0;
-}
-
-/* ============================================================
-   CARD SLIDER SYSTEM
-   ============================================================ */
-.slider-wrapper {
-  position: fixed; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-}
-
-.cards-track {
-  position: relative;
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* Each card */
-.card {
-  position: absolute;
-  width: min(100vw, 480px);
-  height: 100dvh;
-  display: flex; flex-direction: column;
-  overflow: hidden;
-  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1),
-              opacity 0.5s ease,
-              scale 0.7s cubic-bezier(0.77, 0, 0.175, 1);
-  will-change: transform, opacity;
-  user-select: none;
-}
-
-.card[data-state="current"] {
-  transform: translateX(0); opacity: 1; scale: 1;
-  z-index: 10;
-}
-.card[data-state="prev"] {
-  transform: translateX(-110%); opacity: 0; scale: 0.92;
-  z-index: 5;
-}
-.card[data-state="next"] {
-  transform: translateX(110%); opacity: 0; scale: 0.92;
-  z-index: 5;
-}
-.card[data-state="far"] {
-  transform: translateX(200%); opacity: 0; scale: 0.85;
-  z-index: 1;
-}
-
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
-.nav-dots {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  z-index: 100;
-  display: flex; gap: 8px; align-items: center;
-}
-
-.nav-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(245,239,224,0.3);
-  border: 1px solid rgba(245,239,224,0.4);
-  cursor: pointer;
-  transition: all 0.4s ease;
-}
-
-.nav-dot.active {
-  background: var(--beni);
-  border-color: var(--beni);
-  width: 18px;
-  border-radius: 3px;
-}
-
-.nav-arrows {
-  position: fixed; top: 50%; z-index: 100;
-  width: min(100vw, 480px);
-  left: 50%; transform: translate(-50%, -50%);
-  display: flex; justify-content: space-between;
-  padding: 0 12px;
-  pointer-events: none;
-}
-
-.nav-arrow {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: rgba(28,20,16,0.5);
-  border: 1px solid rgba(155,35,53,0.5);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  pointer-events: all;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-
-.nav-arrow:hover {
-  background: var(--beni);
-  border-color: var(--beni);
-}
-
-.nav-arrow svg { width: 16px; height: 16px; fill: var(--washi); }
-
-/* Progress bar top */
-.progress-bar {
-  position: fixed; top: 0; left: 0;
-  height: 2px; background: var(--beni);
-  z-index: 200;
-  transition: width 0.5s ease;
-}
-
-/* Swipe hint */
-.swipe-hint {
-  position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-  z-index: 100;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.4em;
-  color: rgba(245,239,224,0.4);
-  text-transform: uppercase;
-  animation: hintFade 3s ease-in-out 2s both;
-}
-
-@keyframes hintFade {
-  0%, 100% { opacity: 0; }
-  30%, 70% { opacity: 1; }
-}
-
-/* ============================================================
-   MUSIC PLAYER
-   ============================================================ */
-.music-player {
-  position: fixed; top: 16px; right: 16px; z-index: 200;
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: rgba(28,20,16,0.8);
-  border: 1px solid var(--beni);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
-}
-
-.music-player:hover { background: var(--beni); }
-
-.music-player svg { width: 16px; height: 16px; fill: var(--washi); }
-
-.music-eq {
-  display: flex; gap: 2px; align-items: flex-end;
-}
-.music-eq span {
-  width: 2px; background: var(--washi); border-radius: 1px;
-  animation: eq 0.8s ease-in-out infinite;
-}
-.music-eq span:nth-child(1) { height: 8px; animation-delay: 0s; }
-.music-eq span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
-.music-eq span:nth-child(3) { height: 10px; animation-delay: 0.3s; }
-
-@keyframes eq {
-  0%, 100% { transform: scaleY(0.4); }
-  50% { transform: scaleY(1); }
-}
-
-.music-player.paused .music-eq span { animation-play-state: paused; }
-
-/* ============================================================
-   CARD 1: COVER / HERO
-   ============================================================ */
-.card-cover {
-  background: var(--sumi);
-  position: relative;
-}
-
-.card-cover .cover-photo {
-  position: absolute; inset: 0;
-  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
-  background-size: cover; background-position: center top;
-  opacity: 0.5; filter: sepia(0.3) contrast(1.1);
-}
-
-/* Diagonal ink wash overlay */
-.card-cover .cover-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(
-    170deg,
-    rgba(28,20,16,0.3) 0%,
-    rgba(28,20,16,0.0) 40%,
-    rgba(28,20,16,0.7) 70%,
-    rgba(28,20,16,0.95) 100%
-  );
-}
-
-/* Red sun circle — like the poster */
-.cover-sun {
-  position: absolute; top: -60px; right: -60px;
-  width: 220px; height: 220px;
-  border-radius: 50%;
-  background: var(--beni);
-  opacity: 0.75;
-  mix-blend-mode: multiply;
-}
-
-/* Vertical JP text */
-.cover-jp-vertical {
-  position: absolute; top: 40px; left: 24px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 12px;
-  color: rgba(245,239,224,0.6);
-  writing-mode: vertical-rl;
-  letter-spacing: 0.5em;
-  line-height: 1;
-}
-
-/* Corner ornament */
-.cover-corner {
-  position: absolute; top: 24px; right: 24px;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
-}
-.cover-corner-line {
-  height: 1px; background: var(--beni);
-  animation: lineGrow 1s ease 0.5s both;
-}
-@keyframes lineGrow { from { width: 0; } to { width: 100%; } }
-
-/* Main content at bottom */
-.cover-content {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 32px 32px 80px;
-}
-
-.cover-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 12px;
-}
-.cover-label::before {
-  content: '';
-  flex: 1; height: 1px; background: var(--beni);
-}
-
-.cover-names {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 42px;
-  font-weight: 700;
-  color: var(--washi);
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-}
-
-.cover-names .ampersand {
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  color: var(--beni);
-  font-size: 36px;
-  display: block;
-  margin: 4px 0;
-}
-
-.cover-date {
-  margin-top: 16px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  font-weight: 300;
-  color: var(--misty);
-  letter-spacing: 0.3em;
-}
-
-/* Koi silhouette decorative lines */
-.cover-koi-deco {
-  position: absolute; right: 32px; bottom: 120px;
-  opacity: 0.15;
-}
-
-/* ============================================================
-   CARD 2: AYAT AL-QURAN
-   ============================================================ */
-.card-quran {
-  background: var(--beni);
-  position: relative; overflow: hidden;
-}
-
-.quran-pattern {
-  position: absolute; inset: 0;
-  opacity: 0.06;
-  background-image: 
-    radial-gradient(circle at 30% 30%, var(--kincha) 0%, transparent 50%),
-    radial-gradient(circle at 70% 70%, var(--washi) 0%, transparent 50%);
-}
-
-/* Seigaiha pattern */
-.quran-pattern::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='18' fill='none' stroke='%23F5EFE0' stroke-width='0.5'/%3E%3C/svg%3E");
-  background-size: 40px 40px;
-  opacity: 0.12;
-}
-
-.quran-content {
-  position: relative; z-index: 1;
-  height: 100%; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 32px 80px;
-  text-align: center;
-}
-
-.quran-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: rgba(245,239,224,0.6);
-  text-transform: uppercase;
-  margin-bottom: 32px;
-}
-
-.quran-arabic {
-  font-size: 22px;
-  line-height: 2;
-  color: var(--washi);
-  direction: rtl;
-  font-family: 'Noto Serif JP', serif;
-  margin-bottom: 24px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
-}
-
-.quran-divider {
-  width: 60px; height: 1px;
-  background: rgba(245,239,224,0.4);
-  margin: 0 auto 24px;
-}
-
-.quran-translation {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
-  font-style: italic;
-  font-weight: 300;
-  color: rgba(245,239,224,0.85);
-  line-height: 1.8;
-  max-width: 320px;
-}
-
-.quran-source {
-  margin-top: 20px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  color: rgba(245,239,224,0.5);
-}
-
-/* Decorative vertical lines */
-.quran-vline {
-  position: absolute;
-  width: 1px; background: rgba(245,239,224,0.2);
-  top: 40px; bottom: 40px;
-}
-.quran-vline.left  { left: 20px; }
-.quran-vline.right { right: 20px; }
-
-/* ============================================================
-   CARD 3: COUPLE PROFILE
-   ============================================================ */
-.card-couple {
-  background: var(--washi);
-  position: relative; overflow: hidden;
-}
-
-/* Paper texture */
-.card-couple::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 1;
-}
-
-.couple-header {
-  padding: 40px 28px 0;
-  position: relative; z-index: 2;
-}
-
-.couple-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.couple-header-title {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--sumi);
-  line-height: 1.3;
-}
-
-/* Couple photos — Japanese split style */
-.couple-photos {
-  display: flex; gap: 0;
-  height: 240px;
-  margin: 20px 0 0;
-  position: relative; z-index: 2;
-}
-
-.couple-photo-wrap {
-  flex: 1; overflow: hidden; position: relative;
-}
-
-.couple-photo-wrap img, .couple-photo-wrap .photo-placeholder {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: top;
-  filter: sepia(0.15) contrast(1.05);
-  display: block;
-}
-
-.photo-placeholder {
-  background: var(--misty);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: rgba(28,20,16,0.3);
-  letter-spacing: 0.2em; font-family: 'Noto Serif JP', serif;
-}
-
-/* Diagonal cut between photos */
-.couple-photo-wrap:first-child {
-  clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
-}
-.couple-photo-wrap:last-child {
-  clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
-  margin-left: -12px;
-}
-
-/* Name tag overlays */
-.photo-name-tag {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 32px 16px 12px;
-  background: linear-gradient(to top, rgba(28,20,16,0.8), transparent);
-  font-family: 'Shippori Mincho', serif;
-  color: var(--washi);
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* Profile details */
-.couple-details {
-  padding: 0 28px; z-index: 2; position: relative;
-  display: flex; gap: 12px;
-  margin-top: 16px;
-}
-
-.profile-card {
-  flex: 1;
-  padding: 16px 14px;
-  background: var(--paper);
-  border-radius: 4px;
-  border-left: 3px solid var(--beni);
-  position: relative;
-}
-
-.profile-role {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 8px;
-  letter-spacing: 0.4em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.profile-fullname {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--sumi);
-  line-height: 1.3;
-  margin-bottom: 8px;
-}
-
-.profile-parents-label {
-  font-size: 9px;
-  color: rgba(28,20,16,0.5);
-  font-family: 'Cormorant Garamond', serif;
-  letter-spacing: 0.1em;
-  margin-bottom: 2px;
-}
-
-.profile-parents {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 11px;
-  color: var(--ink);
-  line-height: 1.5;
-  font-style: italic;
-}
-
-/* Red brush stroke decorations */
-.couple-brush {
-  position: absolute; bottom: 0; right: 0;
-  width: 80px; height: 80px;
-  opacity: 0.06; pointer-events: none; z-index: 1;
-}
-
-/* ============================================================
-   CARD 4: LOVE STORY
-   ============================================================ */
-.card-story {
-  background: var(--sumi);
-  position: relative; overflow: hidden;
-}
-
-/* Ink wash background */
-.story-ink {
-  position: absolute; top: -20%; left: -20%;
-  width: 140%; height: 140%;
-  background: radial-gradient(ellipse at 30% 40%, rgba(155,35,53,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 70% 60%, rgba(196,154,60,0.08) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.story-content {
-  position: relative; z-index: 2;
-  height: 100%; display: flex; flex-direction: column;
-  padding: 40px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-}
-
-.story-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex; align-items: center; gap: 12px;
-}
-.story-label::after {
-  content: ''; flex: 1; height: 1px; background: rgba(155,35,53,0.4);
-}
-
-.story-title {
-  font-family: 'IM Fell English', serif;
-  font-size: 36px;
-  font-style: italic;
-  color: var(--washi);
-  line-height: 1.2;
-  margin-bottom: 24px;
-}
-
-.story-title .red { color: var(--beni); }
-
-.story-divider {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 20px;
-}
-.story-divider-line {
-  flex: 1; height: 1px; background: rgba(245,239,224,0.15);
-}
-.story-divider-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--beni);
-}
-
-.story-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 300;
-  color: rgba(245,239,224,0.8);
-  line-height: 1.9;
-  max-height: 240px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  padding-right: 4px;
-}
-.story-text::-webkit-scrollbar { display: none; }
-
-/* Vertical photo strip on right */
-.story-photo {
-  position: absolute; right: 0; top: 80px; bottom: 80px;
-  width: 100px;
-  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
-  background-size: cover; background-position: center;
-  opacity: 0.2;
-  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
-}
-
-/* ============================================================
-   CARD 5: AKAD NIKAH
-   ============================================================ */
-.card-akad {
-  background: var(--paper);
-  position: relative; overflow: hidden;
-}
-
-/* Washi paper lines */
-.akad-lines {
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 31px,
-    rgba(155,35,53,0.06) 31px, rgba(155,35,53,0.06) 32px
-  );
-}
-
-.akad-content {
-  position: relative; z-index: 2;
-  height: 100%; display: flex; flex-direction: column;
-  padding: 50px 32px 80px;
-}
-
-/* Stamp-style header */
-.event-stamp {
-  display: inline-flex;
-  border: 2px solid var(--beni);
-  padding: 6px 16px;
-  margin-bottom: 24px;
-  position: relative;
-  align-self: flex-start;
-}
-.event-stamp::before {
-  content: '';
-  position: absolute; inset: 3px;
-  border: 1px solid rgba(155,35,53,0.3);
-}
-
-.event-stamp-text {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 10px;
-  letter-spacing: 0.4em;
-  color: var(--beni);
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.event-type {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 44px;
-  font-weight: 800;
-  color: var(--sumi);
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.event-type-jp {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 14px;
-  color: var(--beni);
-  letter-spacing: 0.3em;
-  margin-bottom: 32px;
-}
-
-/* Event info blocks */
-.event-info-grid {
-  display: flex; flex-direction: column; gap: 16px;
-}
-
-.event-info-row {
-  display: flex; align-items: flex-start; gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(155,35,53,0.15);
-}
-
-.event-info-icon {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--beni);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.event-info-icon svg { width: 14px; height: 14px; fill: var(--washi); }
-
-.event-info-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 8px;
-  letter-spacing: 0.3em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 3px;
-}
-
-.event-info-value {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--sumi);
-  line-height: 1.4;
-}
-
-.event-info-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 12px;
-  color: rgba(28,20,16,0.55);
-  font-style: italic;
-}
-
-/* Decorative koi outline */
-.akad-koi-deco {
-  position: absolute; bottom: 60px; right: 20px;
-  opacity: 0.06; pointer-events: none;
-}
-
-/* ============================================================
-   CARD 6: RESEPSI
-   ============================================================ */
-.card-resepsi {
-  background: var(--rouge);
-  position: relative; overflow: hidden;
-}
-
-/* Pattern overlay */
-.resepsi-pattern {
-  position: absolute; inset: 0;
-  opacity: 0.08;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30 Z' fill='none' stroke='%23F5EFE0' stroke-width='0.5'/%3E%3C/svg%3E");
-  background-size: 60px 60px;
-}
-
-.resepsi-content {
-  position: relative; z-index: 2;
-  height: 100%; display: flex; flex-direction: column;
-  padding: 50px 32px 80px;
-}
-
-.resepsi-content .event-type { color: var(--washi); }
-.resepsi-content .event-type-jp { color: var(--kincha); }
-.resepsi-content .event-stamp { border-color: var(--kincha); }
-.resepsi-content .event-stamp-text { color: var(--kincha); }
-.resepsi-content .event-stamp::before { border-color: rgba(196,154,60,0.3); }
-.resepsi-content .event-info-label { color: var(--kincha); }
-.resepsi-content .event-info-value { color: var(--washi); }
-.resepsi-content .event-info-sub { color: rgba(245,239,224,0.55); }
-.resepsi-content .event-info-row { border-color: rgba(245,239,224,0.1); }
-.resepsi-content .event-info-icon { background: var(--kincha); }
-.resepsi-content .event-info-icon svg { fill: var(--rouge); }
-
-.maps-btn {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 24px;
-  padding: 14px 20px;
-  background: rgba(245,239,224,0.1);
-  border: 1px solid rgba(196,154,60,0.4);
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.maps-btn:hover {
-  background: rgba(245,239,224,0.2);
-}
-
-.maps-btn-icon { width: 20px; height: 20px; fill: var(--kincha); flex-shrink: 0; }
-
-.maps-btn-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  color: var(--washi);
-  letter-spacing: 0.1em;
-}
-
-/* Maps embed */
-.maps-embed-wrap {
-  margin-top: 12px;
-  border-radius: 4px;
+  gap: 18px;
   overflow: hidden;
-  height: 120px;
-  border: 1px solid rgba(196,154,60,0.3);
-  opacity: 0.85;
 }
-.maps-embed-wrap iframe { width: 100%; height: 100%; }
-
-/* ============================================================
-   CARD 7: COUNTDOWN
-   ============================================================ */
-.card-countdown {
-  background: var(--sumi);
-  position: relative; overflow: hidden;
-}
-
-.countdown-bg {
-  position: absolute; inset: 0;
-  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
-  background-size: cover; background-position: center;
-  opacity: 0.12; filter: sepia(0.5);
-}
-
-.countdown-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to bottom, rgba(28,20,16,0.6), rgba(28,20,16,0.9));
-}
-
-.countdown-content {
-  position: relative; z-index: 2;
-  height: 100%; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 32px 80px;
-  text-align: center;
-}
-
-.countdown-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-
-.countdown-title {
-  font-family: 'IM Fell English', serif;
-  font-size: 28px;
-  font-style: italic;
-  color: var(--washi);
-  margin-bottom: 8px;
-}
-
-.countdown-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  color: rgba(245,239,224,0.5);
-  letter-spacing: 0.2em;
-  margin-bottom: 40px;
-}
-
-.countdown-grid {
-  display: flex; gap: 16px; justify-content: center;
-  margin-bottom: 32px;
-}
-
-.countdown-unit {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-
-.countdown-number {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 52px;
-  font-weight: 800;
-  color: var(--washi);
-  line-height: 1;
-  min-width: 68px; text-align: center;
-  position: relative;
-}
-
-.countdown-number::after {
-  content: '';
-  position: absolute; bottom: 0; left: 10%; right: 10%;
-  height: 2px; background: var(--beni);
-}
-
-.countdown-unit-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 8px;
-  letter-spacing: 0.3em;
-  color: var(--misty);
-  text-transform: uppercase;
-}
-
-.countdown-sep {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 40px;
-  color: var(--beni);
-  line-height: 1;
-  padding-top: 4px;
-  opacity: 0.6;
-}
-
-/* Date reminder */
-.countdown-date {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 14px;
-  font-style: italic;
-  color: rgba(245,239,224,0.6);
-  letter-spacing: 0.15em;
-}
-
-/* ============================================================
-   CARD 8: GALLERY
-   ============================================================ */
-.card-gallery {
-  background: var(--washi);
-  position: relative; overflow: hidden;
-}
-
-.gallery-header {
-  padding: 40px 28px 20px;
-  position: relative; z-index: 2;
-}
-
-.gallery-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.gallery-title {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--sumi);
-}
-
-/* Polaroid-style photos */
-.gallery-polaroids {
-  position: relative;
-  height: calc(100% - 180px);
-  margin: 0 16px;
-}
-
-.polaroid {
+#envelope .ebg {
   position: absolute;
-  background: white;
-  padding: 8px 8px 32px;
-  box-shadow: 2px 4px 20px rgba(0,0,0,0.2);
-  cursor: grab;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: url('/static/themes/hanagasumi/cover.jpg') center/cover;
+  opacity: 0.28; filter: sepia(0.4);
 }
-
-.polaroid:nth-child(1) {
-  width: 180px; top: 10px; left: 10px;
-  transform: rotate(-4deg);
-}
-.polaroid:nth-child(2) {
-  width: 160px; top: 30px; left: 140px;
-  transform: rotate(3deg);
-}
-.polaroid:nth-child(3) {
-  width: 170px; top: 170px; left: 40px;
-  transform: rotate(-2deg);
-}
-.polaroid:nth-child(4) {
-  width: 155px; top: 180px; left: 180px;
-  transform: rotate(5deg);
-}
-
-.polaroid:hover {
-  transform: rotate(0deg) scale(1.05) !important;
-  box-shadow: 4px 8px 30px rgba(0,0,0,0.3);
-  z-index: 10;
-}
-
-.polaroid img, .polaroid .polaroid-placeholder {
-  width: 100%; aspect-ratio: 1;
-  object-fit: cover;
-  display: block;
-}
-
-.polaroid-placeholder {
-  background: var(--misty);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; color: rgba(28,20,16,0.3); letter-spacing: 0.2em;
-  font-family: 'Noto Serif JP', serif;
-}
-
-.polaroid-caption {
-  text-align: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 11px;
-  color: rgba(28,20,16,0.4);
-  font-style: italic;
-  margin-top: 4px;
-}
-
-/* ============================================================
-   CARD 9: RSVP
-   ============================================================ */
-.card-rsvp {
-  background: var(--paper);
-  position: relative; overflow: hidden;
-}
-
-/* Brush border top */
-.card-rsvp::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--beni);
-}
-
-.rsvp-content {
-  height: 100%;
-  overflow-y: auto; scrollbar-width: none;
-  padding: 40px 28px 80px;
-}
-.rsvp-content::-webkit-scrollbar { display: none; }
-
-.rsvp-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.rsvp-title {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--sumi);
-  line-height: 1.2;
-  margin-bottom: 20px;
-}
-
-/* RSVP Form */
-.rsvp-form { display: flex; flex-direction: column; gap: 14px; }
-
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-
-.form-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  color: var(--beni);
-  text-transform: uppercase;
-}
-
-.form-input, .form-select, .form-textarea {
-  padding: 10px 14px;
-  background: white;
-  border: 1px solid rgba(155,35,53,0.25);
-  border-radius: 2px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  color: var(--sumi);
-  outline: none;
-  transition: border-color 0.3s;
-  width: 100%;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--beni);
-  box-shadow: 0 0 0 3px rgba(155,35,53,0.08);
-}
-
-.form-textarea { resize: none; height: 70px; }
-
-/* Attendance selector */
-.attendance-options {
-  display: flex; gap: 8px;
-}
-
-.attendance-btn {
-  flex: 1; padding: 10px 8px;
-  background: white;
-  border: 1px solid rgba(155,35,53,0.25);
-  border-radius: 2px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  color: rgba(28,20,16,0.6);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.attendance-btn.selected {
-  background: var(--beni);
-  border-color: var(--beni);
-  color: white;
-}
-
-/* Submit button */
-.rsvp-submit {
-  padding: 14px;
-  background: var(--beni);
-  color: var(--washi);
-  border: none;
-  border-radius: 2px;
-  font-family: 'Shippori Mincho', serif;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 4px;
-  position: relative; overflow: hidden;
-}
-
-.rsvp-submit:hover { background: var(--rouge); }
-
-.rsvp-success {
-  display: none;
-  text-align: center;
-  padding: 20px;
-  background: rgba(155,35,53,0.08);
-  border: 1px solid rgba(155,35,53,0.2);
-  border-radius: 4px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-style: italic;
-  color: var(--beni);
-  line-height: 1.6;
-}
-
-/* ============================================================
-   CARD 10: GUESTBOOK
-   ============================================================ */
-.card-guestbook {
+.curtain {
+  position: absolute;
+  top: 0; height: 100vh; width: 50%;
   background: var(--sumi);
-  position: relative; overflow: hidden;
+  z-index: 2;
+  transition: transform 1s cubic-bezier(0.76,0,0.24,1);
 }
+.curtain.L { left: 0; }
+.curtain.L::after { content:''; position:absolute; right:0; top:0; bottom:0; width:2px; background:var(--beni); }
+.curtain.R { right: 0; }
+.curtain.R::after { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--beni); }
+#envelope.open .curtain.L { transform: translateX(-101%); }
+#envelope.open .curtain.R { transform: translateX(101%); }
 
-.guestbook-content {
-  height: 100%; display: flex; flex-direction: column;
-  padding: 40px 28px 80px;
-}
-
-.guestbook-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--beni);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.guestbook-title {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--washi);
-  margin-bottom: 20px;
-}
-
-.guestbook-list {
-  flex: 1; overflow-y: auto; scrollbar-width: none;
-  display: flex; flex-direction: column; gap: 12px;
-}
-.guestbook-list::-webkit-scrollbar { display: none; }
-
-.guest-card {
-  background: rgba(245,239,224,0.06);
-  border: 1px solid rgba(245,239,224,0.1);
-  border-left: 3px solid var(--beni);
-  border-radius: 2px;
-  padding: 14px 16px;
-}
-
-.guest-name {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--washi);
-  margin-bottom: 6px;
-}
-
-.guest-message {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  font-style: italic;
-  color: rgba(245,239,224,0.65);
-  line-height: 1.6;
-}
-
-/* ============================================================
-   CARD 11: GIFT
-   ============================================================ */
-.card-gift {
-  background: var(--paper);
-  position: relative; overflow: hidden;
-}
-
-/* Gold accent top border */
-.card-gift::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--kincha);
-}
-
-.gift-content {
-  height: 100%; overflow-y: auto; scrollbar-width: none;
-  padding: 40px 28px 80px;
-}
-.gift-content::-webkit-scrollbar { display: none; }
-
-.gift-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: var(--kincha);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.gift-title {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--sumi);
-  margin-bottom: 8px;
-}
-
-.gift-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  font-style: italic;
-  color: rgba(28,20,16,0.5);
-  margin-bottom: 24px;
-}
-
-.gift-cards { display: flex; flex-direction: column; gap: 12px; }
-
-.gift-card {
-  background: white;
-  border: 1px solid rgba(196,154,60,0.3);
-  border-radius: 4px;
-  padding: 16px;
-  position: relative; overflow: hidden;
-}
-
-.gift-card::before {
-  content: '';
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 4px;
-  background: var(--kincha);
-}
-
-.gift-type {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 8px;
-  letter-spacing: 0.4em;
-  color: var(--kincha);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.gift-bank-name {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--sumi);
-  margin-bottom: 4px;
-}
-
-.gift-account {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
-  font-weight: 400;
-  color: var(--sumi);
-  letter-spacing: 0.1em;
-  margin-bottom: 2px;
-}
-
-.gift-account-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 12px;
-  color: rgba(28,20,16,0.5);
-  font-style: italic;
-  margin-bottom: 12px;
-}
-
-.copy-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid var(--kincha);
-  border-radius: 2px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 8px;
-  letter-spacing: 0.3em;
-  color: var(--kincha);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-}
-
-.copy-btn:hover, .copy-btn.copied {
-  background: var(--kincha);
-  color: white;
-}
-
-/* ============================================================
-   CARD 12: CLOSING
-   ============================================================ */
-.card-closing {
-  background: var(--beni);
-  position: relative; overflow: hidden;
-}
-
-/* Photo background */
-.closing-photo {
-  position: absolute; inset: 0;
-  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
-  background-size: cover; background-position: center;
-  opacity: 0.25; filter: sepia(0.3);
-}
-
-.closing-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(122,27,40,0.95), rgba(122,27,40,0.6));
-}
-
-.closing-content {
-  position: relative; z-index: 2;
-  height: 100%; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 32px 80px;
+.eseal {
+  position: relative; z-index: 3;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
   text-align: center;
+  padding: 0 36px;
+  animation: efloat 3s ease-in-out infinite;
 }
-
-/* Large koi SVG */
-.closing-koi-wrap {
-  margin-bottom: 28px;
-  opacity: 0.7;
+@keyframes efloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.ering {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--beni);
+  background: rgba(28,20,16,0.82);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
 }
-
-.closing-label {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  color: rgba(245,239,224,0.6);
-  text-transform: uppercase;
-  margin-bottom: 16px;
+.ering::before {
+  content:''; position:absolute; inset:6px;
+  border-radius:50%; border:1px solid rgba(155,35,53,0.4);
 }
-
-.closing-message {
-  font-family: 'IM Fell English', serif;
-  font-size: 22px;
-  font-style: italic;
-  color: var(--washi);
-  line-height: 1.7;
-  margin-bottom: 24px;
-  max-width: 300px;
+.ering svg { width:48px; height:48px; }
+.elabel {
+  font-family:'Noto Serif JP',serif;
+  font-size:10px; letter-spacing:0.5em;
+  color:rgba(245,239,224,0.5); text-transform:uppercase;
 }
-
-.closing-names {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--washi);
-  margin-bottom: 8px;
+.enames {
+  font-family:'Shippori Mincho',serif;
+  font-size:28px; font-weight:700; color:var(--washi); line-height:1.3;
 }
-
-.closing-names .amp {
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  color: var(--kincha);
+.enames em { font-family:'IM Fell English',serif; font-style:italic; color:var(--beni); font-size:24px; }
+.ebtn {
+  padding:12px 34px;
+  background:var(--beni); color:var(--washi);
+  font-family:'Noto Serif JP',serif;
+  font-size:11px; letter-spacing:0.4em; text-transform:uppercase;
+  border:none; border-radius:2px; cursor:pointer;
+  animation:epulse 2s ease-in-out infinite;
 }
+@keyframes epulse { 0%,100%{opacity:.8} 50%{opacity:1} }
 
-.closing-date {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  color: rgba(245,239,224,0.6);
-  letter-spacing: 0.3em;
-}
-
-/* Animated border */
-.closing-border {
-  position: absolute; inset: 20px;
-  border: 1px solid rgba(245,239,224,0.15);
+/* ── INVITATION ── */
+#inv {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.6s ease;
+  overflow: hidden;
+}
+#inv.show { opacity:1; pointer-events:all; }
+
+/* petal canvas */
+#cvs {
+  position: fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none;
+  z-index: 50;
 }
 
-/* ============================================================
-   AMBIENT ANIMATIONS
-   ============================================================ */
-@keyframes koiSwim {
-  0%   { transform: translate(0,0) rotate(0deg); }
-  25%  { transform: translate(10px,-8px) rotate(5deg); }
-  50%  { transform: translate(0,-16px) rotate(0deg); }
-  75%  { transform: translate(-10px,-8px) rotate(-5deg); }
-  100% { transform: translate(0,0) rotate(0deg); }
+/* progress */
+#prog {
+  position:fixed; top:0; left:0;
+  height:2px; background:var(--beni);
+  z-index:200; transition:width 0.4s ease;
 }
 
-.koi-ambient {
-  animation: koiSwim 8s ease-in-out infinite;
+/* music */
+#mbtn {
+  position:fixed; top:14px; right:14px;
+  width:40px; height:40px;
+  border-radius:50%;
+  background:rgba(28,20,16,0.78);
+  border:1px solid var(--beni);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; z-index:200;
+}
+.eq { display:flex; gap:2px; align-items:flex-end; }
+.eq span { width:2px; border-radius:1px; background:var(--washi); animation:eq .7s ease-in-out infinite; }
+.eq span:nth-child(1){ height:8px; }
+.eq span:nth-child(2){ height:14px; animation-delay:.15s; }
+.eq span:nth-child(3){ height:10px; animation-delay:.3s; }
+@keyframes eq { 0%,100%{transform:scaleY(.3)} 50%{transform:scaleY(1)} }
+#mbtn.paused .eq span { animation-play-state:paused; }
+
+/* arrows */
+#arrows {
+  position:fixed; top:50%; left:0;
+  width:100vw;
+  transform:translateY(-50%);
+  display:flex; justify-content:space-between;
+  padding:0 10px;
+  z-index:200; pointer-events:none;
+}
+.arr {
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(28,20,16,0.55);
+  border:1px solid rgba(155,35,53,0.5);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; pointer-events:all;
+  transition:background .25s;
+}
+.arr:active { background:var(--beni); }
+.arr svg { width:16px; height:16px; stroke:var(--washi); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* dots */
+#dots {
+  position:fixed; bottom:18px; left:0;
+  width:100vw;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; z-index:200;
+}
+.dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(245,239,224,.25);
+  border:1px solid rgba(245,239,224,.35);
+  cursor:pointer; transition:all .3s;
+}
+.dot.on {
+  background:var(--beni); border-color:var(--beni);
+  width:16px; border-radius:3px;
 }
 
-/* ============================================================
-   RESPONSIVE & UTILS
-   ============================================================ */
-@media (max-width: 400px) {
-  .cover-names { font-size: 34px; }
-  .event-type  { font-size: 36px; }
+/* ── TRACK ── */
+#track {
+  position:fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  z-index:10;
+}
+.card {
+  position:absolute;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  overflow:hidden;
+  transition: transform .65s cubic-bezier(.77,0,.175,1), opacity .45s ease;
+}
+.card.cur  { transform:translateX(0);    opacity:1; z-index:10; }
+.card.prev { transform:translateX(-100%); opacity:0; z-index:5; }
+.card.next { transform:translateX(100%);  opacity:0; z-index:5; }
+.card.far  { transform:translateX(200%);  opacity:0; z-index:1; }
+
+/* shared helpers */
+.tag {
+  font-family:'Noto Serif JP',serif;
+  font-size:9px; letter-spacing:.5em; color:var(--beni);
+  text-transform:uppercase; margin-bottom:10px;
+  display:flex; align-items:center; gap:10px;
+}
+.tag::before { content:''; flex:1; height:1px; background:var(--beni); }
+
+/* ── CARD 1: COVER ── */
+#c0 { background:var(--sumi); }
+#c0 .cbg {
+  position:absolute; top:0; left:0;
+  width:100vw; height:100vh;
+  background:url('/static/themes/hanagasumi/photos/couple.jpg') center top/cover;
+  opacity:.45; filter:sepia(.2) contrast(1.1);
+}
+#c0 .cov {
+  position:absolute; top:0; left:0;
+  width:100vw; height:100vh;
+  background:linear-gradient(168deg,rgba(28,20,16,.15) 0%,rgba(28,20,16,0) 30%,rgba(28,20,16,.7) 65%,rgba(28,20,16,.97) 100%);
+}
+.sun {
+  position:absolute; top:-50px; right:-50px;
+  width:190px; height:190px; border-radius:50%;
+  background:var(--beni); opacity:.7; mix-blend-mode:multiply;
+}
+.jpv {
+  position:absolute; top:40px; left:20px;
+  font-family:'Noto Serif JP',serif; font-size:11px;
+  color:rgba(196,154,60,.45); writing-mode:vertical-rl; letter-spacing:.4em;
+}
+#c0 .body {
+  position:absolute; bottom:0; left:0;
+  width:100vw; padding:28px 28px 76px;
+}
+.hnames {
+  font-family:'Shippori Mincho',serif;
+  font-size:44px; font-weight:800; color:var(--washi); line-height:1.1;
+}
+.hnames .amp {
+  display:block; font-family:'IM Fell English',serif;
+  font-style:italic; color:var(--beni); font-size:36px; margin:3px 0;
+}
+.hdate {
+  margin-top:12px; font-family:'Cormorant Garamond',serif;
+  font-size:13px; font-weight:300; color:var(--misty); letter-spacing:.3em;
 }
 
-/* Ripple effect */
-@keyframes ripple {
-  from { transform: scale(0); opacity: 0.6; }
-  to   { transform: scale(4); opacity: 0; }
+/* ── CARD 2: QURAN ── */
+#c1 {
+  background:var(--beni);
+  display:flex; align-items:center; justify-content:center;
 }
+#c1::before {
+  content:''; position:absolute; top:0; left:0;
+  width:100vw; height:100vh;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='17' fill='none' stroke='%23F5EFE0' stroke-width='0.35'/%3E%3C/svg%3E");
+  background-size:40px 40px; opacity:.07;
+}
+.qvl { position:absolute; top:36px; bottom:36px; width:1px; background:rgba(245,239,224,.18); }
+.qvl.l { left:16px; } .qvl.r { right:16px; }
+#c1 .inner {
+  position:relative; z-index:1;
+  padding:50px 32px 76px;
+  text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+}
+.qlbl { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.5em; color:rgba(245,239,224,.5); text-transform:uppercase; }
+.qarab { font-size:20px; line-height:2.2; color:var(--washi); direction:rtl; text-shadow:0 2px 14px rgba(0,0,0,.3); }
+.qline { width:46px; height:1px; background:rgba(245,239,224,.32); }
+.qtrans { font-family:'Cormorant Garamond',serif; font-size:15px; font-style:italic; font-weight:300; color:rgba(245,239,224,.84); line-height:1.85; }
+.qsrc { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.3em; color:rgba(245,239,224,.42); }
 
-.ripple-effect {
-  position: absolute; border-radius: 50%;
-  width: 20px; height: 20px;
-  background: rgba(255,255,255,0.4);
-  animation: ripple 0.6s ease-out forwards;
-  pointer-events: none;
+/* ── CARD 3: COUPLE ── */
+#c2 { background:var(--washi); }
+#c2 .head { padding:38px 24px 14px; }
+#c2 .head h2 { font-family:'Shippori Mincho',serif; font-size:21px; font-weight:600; color:var(--sumi); line-height:1.4; }
+.sphotos { display:flex; height:215px; }
+.sphoto { flex:1; overflow:hidden; position:relative; }
+.sphoto:first-child { clip-path:polygon(0 0,94% 0,100% 100%,0 100%); }
+.sphoto:last-child  { clip-path:polygon(6% 0,100% 0,100% 100%,0 100%); margin-left:-10px; }
+.sphoto img, .sphoto .ph {
+  width:100%; height:100%;
+  object-fit:cover; object-position:top;
+  filter:sepia(.1) contrast(1.05); display:block;
 }
+.sphoto .ph {
+  background:var(--misty); display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:rgba(28,20,16,.3); font-family:'Noto Serif JP',serif; letter-spacing:.2em;
+}
+.sname {
+  position:absolute; bottom:0; left:0; right:0;
+  padding:26px 10px 10px;
+  background:linear-gradient(to top,rgba(28,20,16,.75),transparent);
+  font-family:'Shippori Mincho',serif; font-size:13px; font-weight:600;
+  color:var(--washi); text-align:center;
+}
+.profs { display:flex; gap:10px; padding:13px 20px 0; }
+.prof { flex:1; background:var(--paper); border-left:3px solid var(--beni); border-radius:3px; padding:13px 11px; }
+.prole { font-family:'Noto Serif JP',serif; font-size:8px; letter-spacing:.4em; color:var(--beni); text-transform:uppercase; margin-bottom:5px; }
+.prnam { font-family:'Shippori Mincho',serif; font-size:12px; font-weight:600; color:var(--sumi); line-height:1.3; margin-bottom:7px; }
+.proof { font-family:'Cormorant Garamond',serif; font-size:9px; color:rgba(28,20,16,.42); margin-bottom:2px; letter-spacing:.1em; }
+.prpar { font-family:'Cormorant Garamond',serif; font-size:11px; color:var(--sumi); font-style:italic; line-height:1.5; }
+
+/* ── CARD 4: STORY ── */
+#c3 { background:var(--sumi); }
+#c3 .glow {
+  position:absolute; top:0; left:0; width:100vw; height:100vh;
+  background:radial-gradient(ellipse at 25% 35%,rgba(155,35,53,.14) 0%,transparent 55%),
+             radial-gradient(ellipse at 75% 65%,rgba(196,154,60,.07) 0%,transparent 45%);
+}
+#c3 .pstrip {
+  position:absolute; right:0; top:55px; bottom:55px;
+  width:85px;
+  background:url('/static/themes/hanagasumi/photos/couple.jpg') center/cover;
+  opacity:.16; clip-path:polygon(18% 0,100% 0,100% 100%,0 100%);
+}
+#c3 .body {
+  position:relative; z-index:1;
+  padding:42px 26px 76px; height:100vh;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.stag {
+  font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.5em; color:var(--beni);
+  text-transform:uppercase; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.stag::after { content:''; flex:1; height:1px; background:rgba(155,35,53,.38); }
+.stit { font-family:'IM Fell English',serif; font-size:32px; font-style:italic; color:var(--washi); line-height:1.2; margin-bottom:20px; }
+.stit span { color:var(--beni); }
+.sdiv { display:flex; align-items:center; gap:9px; margin-bottom:16px; }
+.sdivl { flex:1; height:1px; background:rgba(245,239,224,.1); }
+.sdivd { width:4px; height:4px; border-radius:50%; background:var(--beni); }
+.sbody { font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:300; color:rgba(245,239,224,.77); line-height:1.9; overflow-y:auto; scrollbar-width:none; max-height:55vh; }
+.sbody::-webkit-scrollbar { display:none; }
+
+/* ── CARD 5: AKAD ── */
+#c4 { background:var(--paper); }
+#c4::before {
+  content:''; position:absolute; top:0; left:0; width:100vw; height:100vh;
+  background:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(155,35,53,.05) 31px,rgba(155,35,53,.05) 32px);
+}
+#c4 .body { position:relative; z-index:1; padding:46px 26px 76px; height:100vh; display:flex; flex-direction:column; }
+.stamp {
+  display:inline-flex; align-self:flex-start;
+  border:2px solid var(--beni); padding:5px 13px; margin-bottom:18px; position:relative;
+}
+.stamp::before { content:''; position:absolute; inset:3px; border:1px solid rgba(155,35,53,.22); }
+.stamp span { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.4em; color:var(--beni); text-transform:uppercase; font-weight:600; }
+.evtype { font-family:'Shippori Mincho',serif; font-size:40px; font-weight:800; color:var(--sumi); line-height:1; margin-bottom:5px; }
+.evsub  { font-family:'Noto Serif JP',serif; font-size:13px; color:var(--beni); letter-spacing:.3em; margin-bottom:24px; }
+.evrows { display:flex; flex-direction:column; gap:13px; }
+.evrow { display:flex; align-items:flex-start; gap:13px; padding-bottom:13px; border-bottom:1px solid rgba(155,35,53,.11); }
+.evico { width:30px; height:30px; flex-shrink:0; border-radius:50%; background:var(--beni); display:flex; align-items:center; justify-content:center; }
+.evico svg { width:13px; height:13px; stroke:var(--washi); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.evlbl { font-family:'Noto Serif JP',serif; font-size:8px; letter-spacing:.35em; color:var(--beni); text-transform:uppercase; margin-bottom:2px; }
+.evval { font-family:'Shippori Mincho',serif; font-size:15px; font-weight:500; color:var(--sumi); line-height:1.35; }
+.evadr { font-family:'Cormorant Garamond',serif; font-size:12px; color:rgba(28,20,16,.48); font-style:italic; }
+
+/* ── CARD 6: RESEPSI ── */
+#c5 { background:var(--rouge); }
+#c5::before {
+  content:''; position:absolute; top:0; left:0; width:100vw; height:100vh;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5L55 30L30 55L5 30Z' fill='none' stroke='%23F5EFE0' stroke-width='0.35'/%3E%3C/svg%3E");
+  background-size:60px 60px; opacity:.06;
+}
+#c5 .body {
+  position:relative; z-index:1;
+  padding:46px 26px 76px; height:100vh;
+  display:flex; flex-direction:column;
+  overflow-y:auto; scrollbar-width:none;
+}
+#c5 .body::-webkit-scrollbar { display:none; }
+#c5 .stamp { border-color:var(--kincha); }
+#c5 .stamp::before { border-color:rgba(196,154,60,.22); }
+#c5 .stamp span { color:var(--kincha); }
+#c5 .evtype { color:var(--washi); }
+#c5 .evsub  { color:var(--kincha); }
+#c5 .evlbl  { color:var(--kincha); }
+#c5 .evval  { color:var(--washi); }
+#c5 .evadr  { color:rgba(245,239,224,.46); }
+#c5 .evrow  { border-color:rgba(245,239,224,.09); }
+#c5 .evico  { background:var(--kincha); }
+#c5 .evico svg { stroke:var(--rouge); }
+.mlink {
+  display:flex; align-items:center; gap:10px;
+  margin-top:18px; padding:12px 16px;
+  background:rgba(245,239,224,.08);
+  border:1px solid rgba(196,154,60,.38); border-radius:3px;
+  text-decoration:none;
+}
+.mlink:active { background:rgba(245,239,224,.16); }
+.mlink svg { width:17px; height:17px; stroke:var(--kincha); fill:none; stroke-width:1.5; flex-shrink:0; stroke-linecap:round; stroke-linejoin:round; }
+.mlink span { font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--washi); letter-spacing:.1em; }
+.memb { margin-top:10px; height:115px; border-radius:3px; overflow:hidden; border:1px solid rgba(196,154,60,.28); opacity:.82; }
+.memb iframe { width:100%; height:100%; border:none; }
+
+/* ── CARD 7: COUNTDOWN ── */
+#c6 { background:var(--sumi); }
+#c6 .cbg { position:absolute; top:0; left:0; width:100vw; height:100vh; background:url('/static/themes/hanagasumi/photos/couple.jpg') center/cover; opacity:.1; filter:sepia(.5); }
+#c6 .cov { position:absolute; top:0; left:0; width:100vw; height:100vh; background:linear-gradient(to bottom,rgba(28,20,16,.5),rgba(28,20,16,.92)); }
+#c6 .body {
+  position:relative; z-index:1;
+  width:100vw; height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:38px 22px 76px; text-align:center;
+}
+.cdtag { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.5em; color:var(--beni); text-transform:uppercase; margin-bottom:12px; }
+.cdtit { font-family:'IM Fell English',serif; font-size:27px; font-style:italic; color:var(--washi); margin-bottom:5px; }
+.cdsub { font-family:'Cormorant Garamond',serif; font-size:12px; color:rgba(245,239,224,.42); letter-spacing:.2em; margin-bottom:32px; }
+.cdgrid { display:flex; align-items:flex-end; gap:9px; margin-bottom:24px; }
+.cdunit { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.cdnum {
+  font-family:'Shippori Mincho',serif; font-size:46px; font-weight:800;
+  color:var(--washi); line-height:1; min-width:58px; text-align:center; position:relative;
+}
+.cdnum::after { content:''; position:absolute; bottom:0; left:8%; right:8%; height:2px; background:var(--beni); }
+.cdlbl { font-family:'Noto Serif JP',serif; font-size:8px; letter-spacing:.3em; color:var(--misty); text-transform:uppercase; }
+.cdsep { font-family:'Shippori Mincho',serif; font-size:34px; color:var(--beni); line-height:1; padding-bottom:14px; opacity:.6; }
+.cddate { font-family:'Cormorant Garamond',serif; font-size:12px; font-style:italic; color:rgba(245,239,224,.46); letter-spacing:.15em; }
+
+/* ── CARD 8: GALLERY ── */
+#c7 { background:var(--washi); }
+#c7 .head { padding:36px 24px 14px; }
+#c7 .head h2 { font-family:'Shippori Mincho',serif; font-size:25px; font-weight:700; color:var(--sumi); }
+.pols { position:relative; height:calc(100vh - 145px); margin:0 12px; overflow:hidden; }
+.pol {
+  position:absolute; background:white;
+  padding:7px 7px 26px;
+  box-shadow:2px 4px 16px rgba(0,0,0,.17);
+}
+.pol:nth-child(1) { width:48%; top:3%;  left:1%;  transform:rotate(-3.5deg); }
+.pol:nth-child(2) { width:43%; top:2%;  left:51%; transform:rotate(2.8deg); }
+.pol:nth-child(3) { width:46%; top:44%; left:8%;  transform:rotate(-1.8deg); }
+.pol:nth-child(4) { width:42%; top:45%; left:51%; transform:rotate(4.5deg); }
+.pol img, .pol .ph { width:100%; aspect-ratio:1; object-fit:cover; display:block; }
+.pol .ph { background:var(--misty); display:flex; align-items:center; justify-content:center; font-size:9px; color:rgba(28,20,16,.28); font-family:'Noto Serif JP',serif; letter-spacing:.2em; }
+.polcap { text-align:center; margin-top:3px; font-family:'Cormorant Garamond',serif; font-size:10px; font-style:italic; color:rgba(28,20,16,.35); }
+
+/* ── CARD 9: RSVP ── */
+#c8 { background:var(--paper); }
+#c8::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--beni); }
+#c8 .scroll { position:absolute; top:0; left:0; width:100vw; height:100vh; overflow-y:auto; scrollbar-width:none; padding:42px 24px 76px; }
+#c8 .scroll::-webkit-scrollbar { display:none; }
+#c8 h2 { font-family:'Shippori Mincho',serif; font-size:26px; font-weight:700; color:var(--sumi); line-height:1.25; margin-bottom:20px; }
+.form { display:flex; flex-direction:column; gap:13px; }
+.flbl { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.3em; color:var(--beni); text-transform:uppercase; margin-bottom:4px; }
+.finp, .fsel, .fta {
+  width:100%; padding:10px 12px;
+  background:white; border-radius:2px;
+  border:1px solid rgba(155,35,53,.2);
+  font-family:'Cormorant Garamond',serif; font-size:15px; color:var(--sumi);
+  outline:none; transition:border-color .25s; -webkit-appearance:none;
+}
+.finp:focus,.fsel:focus,.fta:focus { border-color:var(--beni); box-shadow:0 0 0 3px rgba(155,35,53,.08); }
+.fta { resize:none; height:68px; }
+.attbs { display:flex; gap:7px; }
+.attb {
+  flex:1; padding:9px 5px;
+  background:white; border:1px solid rgba(155,35,53,.2); border-radius:2px;
+  font-family:'Cormorant Garamond',serif; font-size:13px; color:rgba(28,20,16,.52);
+  cursor:pointer; text-align:center; transition:all .25s;
+}
+.attb.sel { background:var(--beni); border-color:var(--beni); color:white; }
+.fsub {
+  padding:13px; background:var(--beni); color:var(--washi);
+  border:none; border-radius:2px;
+  font-family:'Shippori Mincho',serif; font-size:13px; font-weight:600; letter-spacing:.2em;
+  cursor:pointer; margin-top:3px;
+}
+.fsub:active { background:var(--rouge); }
+#rok { display:none; text-align:center; padding:18px 14px; background:rgba(155,35,53,.08); border:1px solid rgba(155,35,53,.18); border-radius:3px; font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; color:var(--beni); line-height:1.6; }
+
+/* ── CARD 10: GUESTBOOK ── */
+#c9 { background:var(--sumi); }
+#c9 .body { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; padding:38px 24px 76px; }
+#c9 h2 { font-family:'Shippori Mincho',serif; font-size:25px; font-weight:700; color:var(--washi); margin-bottom:16px; }
+#c9 .tag { color:var(--beni); }
+#c9 .tag::before { background:rgba(155,35,53,.38); }
+.gblist { flex:1; overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column; gap:9px; }
+.gblist::-webkit-scrollbar { display:none; }
+.gbcard { background:rgba(245,239,224,.05); border:1px solid rgba(245,239,224,.09); border-left:3px solid var(--beni); border-radius:2px; padding:11px 13px; }
+.gbname { font-family:'Shippori Mincho',serif; font-size:13px; font-weight:600; color:var(--washi); margin-bottom:4px; }
+.gbmsg  { font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:rgba(245,239,224,.58); line-height:1.6; }
+.gbmpty { font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:rgba(245,239,224,.28); text-align:center; padding:28px 0; }
+
+/* ── CARD 11: GIFT ── */
+#c10 { background:var(--paper); }
+#c10::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--kincha); }
+#c10 .scroll { position:absolute; top:0; left:0; width:100vw; height:100vh; overflow-y:auto; scrollbar-width:none; padding:42px 24px 76px; }
+#c10 .scroll::-webkit-scrollbar { display:none; }
+.gtag { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.5em; color:var(--kincha); text-transform:uppercase; margin-bottom:5px; }
+#c10 h2 { font-family:'Shippori Mincho',serif; font-size:25px; font-weight:700; color:var(--sumi); margin-bottom:4px; }
+.gnote { font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:rgba(28,20,16,.43); margin-bottom:20px; }
+.gcards { display:flex; flex-direction:column; gap:11px; }
+.gcard { background:white; border:1px solid rgba(196,154,60,.28); border-left:4px solid var(--kincha); border-radius:3px; padding:14px; }
+.gtype { font-family:'Noto Serif JP',serif; font-size:8px; letter-spacing:.4em; color:var(--kincha); text-transform:uppercase; margin-bottom:6px; }
+.gbank { font-family:'Shippori Mincho',serif; font-size:15px; font-weight:600; color:var(--sumi); margin-bottom:3px; }
+.gnum  { font-family:'Cormorant Garamond',serif; font-size:19px; color:var(--sumi); letter-spacing:.1em; margin-bottom:2px; }
+.gan   { font-family:'Cormorant Garamond',serif; font-size:12px; font-style:italic; color:rgba(28,20,16,.42); margin-bottom:9px; }
+.cpbtn {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 13px; background:transparent;
+  border:1px solid var(--kincha); border-radius:2px;
+  cursor:pointer; font-family:'Noto Serif JP',serif;
+  font-size:8px; letter-spacing:.3em; color:var(--kincha); text-transform:uppercase;
+}
+.cpbtn.ok { background:var(--kincha); color:white; }
+
+/* ── CARD 12: CLOSING ── */
+#c11 { background:var(--beni); }
+#c11 .cbg { position:absolute; top:0; left:0; width:100vw; height:100vh; background:url('/static/themes/hanagasumi/photos/couple.jpg') center/cover; opacity:.18; filter:sepia(.3); }
+#c11 .cov { position:absolute; top:0; left:0; width:100vw; height:100vh; background:linear-gradient(to top,rgba(122,27,40,.96),rgba(122,27,40,.52)); }
+.cbrd { position:absolute; inset:16px; border:1px solid rgba(245,239,224,.12); z-index:1; pointer-events:none; }
+#c11 .body {
+  position:relative; z-index:2;
+  width:100vw; height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:38px 30px 76px; text-align:center;
+}
+.ckoi { margin-bottom:22px; opacity:.62; }
+.clbl { font-family:'Noto Serif JP',serif; font-size:9px; letter-spacing:.5em; color:rgba(245,239,224,.46); text-transform:uppercase; margin-bottom:12px; }
+.cmsg { font-family:'IM Fell English',serif; font-size:18px; font-style:italic; color:var(--washi); line-height:1.85; margin-bottom:20px; }
+.cnames { font-family:'Shippori Mincho',serif; font-size:32px; font-weight:800; color:var(--washi); margin-bottom:7px; }
+.cnames em { font-family:'IM Fell English',serif; font-style:italic; color:var(--kincha); }
+.cdate { font-family:'Cormorant Garamond',serif; font-size:12px; color:rgba(245,239,224,.46); letter-spacing:.3em; }
+
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     ENVELOPE INTRO SCREEN
-     ============================================================ -->
-<div id="envelope-screen" onclick="openEnvelope()">
-  <div class="env-bg"></div>
-  <div class="env-curtain-left" id="curtainL"></div>
-  <div class="env-curtain-right" id="curtainR"></div>
-
-  <div class="env-jp-left">花霞 × 結婚式へのご招待</div>
-  <div class="env-jp-right">Hanagasumi</div>
-
-  <div class="env-seal" id="seal">
-    <!-- Koi SVG seal -->
-    <div class="seal-circle">
-      <svg class="seal-koi koi-ambient" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="30" cy="28" rx="12" ry="20" fill="#9B2335" opacity="0.9"/>
-        <ellipse cx="30" cy="22" rx="6" ry="10" fill="#C8374A" opacity="0.7"/>
-        <path d="M18 40 Q10 52 22 56 Q30 58 30 50 Q30 58 38 56 Q50 52 42 40" fill="#9B2335" opacity="0.8"/>
-        <path d="M28 16 Q30 8 32 16" stroke="#F5EFE0" stroke-width="1" fill="none"/>
-        <circle cx="24" cy="20" r="2" fill="#F5EFE0"/>
-        <circle cx="25" cy="20" r="0.8" fill="#1C1410"/>
+<!-- ENVELOPE -->
+<div id="envelope" onclick="openEnv()">
+  <div class="ebg"></div>
+  <div class="curtain L"></div>
+  <div class="curtain R"></div>
+  <div class="eseal">
+    <div class="ering">
+      <svg viewBox="0 0 50 50" fill="none">
+        <ellipse cx="25" cy="22" rx="10" ry="16" fill="#9B2335" opacity=".9"/>
+        <path d="M15 34 Q8 45 18 48 Q25 50 25 42 Q25 50 32 48 Q42 45 35 34" fill="#9B2335" opacity=".8"/>
+        <ellipse cx="25" cy="16" rx="5" ry="8" fill="#C8374A" opacity=".5"/>
+        <circle cx="20" cy="16" r="2" fill="#F5EFE0"/>
+        <circle cx="21" cy="16" r=".8" fill="#1C1410"/>
       </svg>
     </div>
-
-    <div class="seal-names">
-      {{ inv.groom_name }}<span> &amp; </span>{{ inv.bride_name }}
+    <div class="elabel">— Undangan Pernikahan —</div>
+    <div class="enames">
+      {{ inv.groom_name }}<br>
+      <em>&amp;</em><br>
+      {{ inv.bride_name }}
     </div>
-
-    <div class="seal-text">— Undangan Pernikahan —</div>
-
-    <div class="seal-hint">✦ Ketuk untuk membuka ✦</div>
+    <button class="ebtn">Buka Undangan</button>
   </div>
 </div>
 
-<!-- ============================================================
-     MAIN INVITATION
-     ============================================================ -->
-<div id="invitation">
-
-  <!-- Ambient particle canvas -->
-  <canvas id="ambient-canvas"></canvas>
-
-  <!-- Progress bar -->
-  <div class="progress-bar" id="progressBar"></div>
-
-  <!-- Music player -->
-  <div class="music-player" id="musicPlayer" onclick="toggleMusic()" title="Musik">
-    <div class="music-eq" id="musicEq">
-      <span></span><span></span><span></span>
-    </div>
-    <audio id="bgMusic" loop>
-      <source src="{{ inv.music_url }}" type="audio/mpeg">
-    </audio>
+<!-- INVITATION -->
+<div id="inv">
+  <canvas id="cvs"></canvas>
+  <div id="prog"></div>
+  <div id="mbtn" onclick="toggleMusic()">
+    <div class="eq"><span></span><span></span><span></span></div>
+    <audio id="audio" loop><source src="{{ inv.music_url }}" type="audio/mpeg"></audio>
   </div>
-
-  <!-- Navigation arrows -->
-  <div class="nav-arrows">
-    <div class="nav-arrow" id="btnPrev" onclick="goTo(currentCard - 1)">
-      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-    </div>
-    <div class="nav-arrow" id="btnNext" onclick="goTo(currentCard + 1)">
-      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-    </div>
+  <div id="arrows">
+    <div class="arr" onclick="go(cur-1)"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg></div>
+    <div class="arr" onclick="go(cur+1)"><svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg></div>
   </div>
+  <div id="dots"></div>
 
-  <!-- Navigation dots -->
-  <div class="nav-dots" id="navDots"></div>
+  <div id="track">
 
-  <!-- Swipe hint -->
-  <div class="swipe-hint">Geser untuk melihat</div>
+    <!-- CARD 1: COVER -->
+    <div class="card cur" id="c0">
+      <div class="cbg"></div>
+      <div class="cov"></div>
+      <div class="sun"></div>
+      <div class="jpv">花霞の縁で結ばれた二人</div>
+      <div class="body">
+        <div class="tag">Undangan Pernikahan</div>
+        <div class="hnames">{{ inv.groom_name }}<span class="amp">&amp;</span>{{ inv.bride_name }}</div>
+        <div class="hdate">{{ inv.akad_date | format_date }}</div>
+      </div>
+    </div>
 
-  <!-- CARDS TRACK -->
-  <div class="slider-wrapper">
-    <div class="cards-track" id="cardsTrack">
+    <!-- CARD 2: QURAN -->
+    <div class="card next" id="c1">
+      <div class="qvl l"></div><div class="qvl r"></div>
+      <div class="inner">
+        <div class="qlbl">Firman Allah SWT</div>
+        <div class="qarab">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً</div>
+        <div class="qline"></div>
+        <div class="qtrans">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."</div>
+        <div class="qsrc">QS. Ar-Rum : 21</div>
+      </div>
+    </div>
 
-      <!-- ── CARD 1: COVER ── -->
-      <div class="card card-cover" data-card="0">
-        <div class="cover-photo"></div>
-        <div class="cover-sun"></div>
-        <div class="cover-overlay"></div>
-
-        <div class="cover-jp-vertical">花霞の縁で結ばれた二人</div>
-
-        <div class="cover-corner">
-          <div style="font-family:'Noto Serif JP',serif;font-size:9px;color:rgba(196,154,60,0.6);letter-spacing:0.3em;">花霞</div>
-          <div class="cover-corner-line" style="width:40px;"></div>
+    <!-- CARD 3: COUPLE -->
+    <div class="card far" id="c2">
+      <div class="head">
+        <div class="tag">Mempelai</div>
+        <h2>Dua hati yang bersatu<br>dalam ikatan suci</h2>
+      </div>
+      <div class="sphotos">
+        <div class="sphoto">
+          {% if photos and photos|length > 1 %}<img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">{% else %}<div class="ph">Foto Pria</div>{% endif %}
+          <div class="sname">{{ inv.groom_name }}</div>
         </div>
-
-        <!-- Decorative koi pair -->
-        <svg class="cover-koi-deco" width="80" height="80" viewBox="0 0 80 80" fill="none">
-          <ellipse cx="30" cy="25" rx="8" ry="16" fill="#9B2335" opacity="0.6" transform="rotate(-20 30 25)"/>
-          <path d="M18 38 Q8 50 20 54" stroke="#9B2335" stroke-width="2" fill="none" opacity="0.5"/>
-          <ellipse cx="50" cy="55" rx="8" ry="16" fill="#C8374A" opacity="0.5" transform="rotate(20 50 55)"/>
-          <path d="M62 42 Q72 30 60 26" stroke="#C8374A" stroke-width="2" fill="none" opacity="0.4"/>
-        </svg>
-
-        <div class="cover-content">
-          <div class="cover-label">Undangan Pernikahan</div>
-          <div class="cover-names">
-            {{ inv.groom_name }}
-            <span class="ampersand">&amp;</span>
-            {{ inv.bride_name }}
-          </div>
-          <div class="cover-date">{{ inv.akad_date | format_date }}</div>
+        <div class="sphoto">
+          {% if photos and photos|length > 2 %}<img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">{% else %}<div class="ph">Foto Wanita</div>{% endif %}
+          <div class="sname">{{ inv.bride_name }}</div>
         </div>
       </div>
-
-      <!-- ── CARD 2: AYAT ── -->
-      <div class="card card-quran" data-card="1">
-        <div class="quran-pattern"></div>
-        <div class="quran-vline left"></div>
-        <div class="quran-vline right"></div>
-
-        <div class="quran-content">
-          <div class="quran-label">Firman Allah SWT</div>
-
-          <div class="quran-arabic">
-            وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا
-            لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
-          </div>
-
-          <div class="quran-divider"></div>
-
-          <div class="quran-translation">
-            "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu
-            pasangan hidup dari jenismu sendiri, supaya kamu cenderung dan merasa
-            tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."
-          </div>
-
-          <div class="quran-source">QS. Ar-Rum : 21</div>
+      <div class="profs">
+        <div class="prof">
+          <div class="prole">Mempelai Pria</div>
+          <div class="prnam">{{ inv.groom_full }}</div>
+          {% if inv.show_parents %}<div class="proof">Putra dari</div><div class="prpar">{{ inv.groom_parents }}</div>{% endif %}
+        </div>
+        <div class="prof">
+          <div class="prole">Mempelai Wanita</div>
+          <div class="prnam">{{ inv.bride_full }}</div>
+          {% if inv.show_parents %}<div class="proof">Putri dari</div><div class="prpar">{{ inv.bride_parents }}</div>{% endif %}
         </div>
       </div>
+    </div>
 
-      <!-- ── CARD 3: COUPLE PROFILE ── -->
-      <div class="card card-couple" data-card="2">
-        <div class="couple-header">
-          <div class="couple-label">Mempelai</div>
-          <div class="couple-header-title">Dua hati yang bersatu<br>dalam ikatan suci</div>
+    <!-- CARD 4: STORY -->
+    <div class="card far" id="c3">
+      <div class="glow"></div>
+      <div class="pstrip"></div>
+      <div class="body">
+        <div class="stag">Kisah Kami</div>
+        <div class="stit">Sebuah <span>cerita</span><br>yang belum selesai</div>
+        <div class="sdiv"><div class="sdivl"></div><div class="sdivd"></div><div class="sdivl"></div></div>
+        <div class="sbody">{{ inv.love_story }}</div>
+      </div>
+    </div>
+
+    <!-- CARD 5: AKAD -->
+    <div class="card far" id="c4">
+      <div class="body">
+        <div class="stamp"><span>Acara Pertama</span></div>
+        <div class="evtype">Akad<br>Nikah</div>
+        <div class="evsub">عَقْدُ النِّكَاحِ</div>
+        <div class="evrows">
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div><div class="evlbl">Tanggal</div><div class="evval">{{ inv.akad_date | format_date }}</div></div>
+          </div>
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></div>
+            <div><div class="evlbl">Waktu</div><div class="evval">{{ inv.akad_time }} WIB</div></div>
+          </div>
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="evlbl">Lokasi</div><div class="evval">{{ inv.akad_venue }}</div><div class="evadr">{{ inv.akad_address }}</div></div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Split photos -->
-        <div class="couple-photos">
-          <div class="couple-photo-wrap">
-            {% if photos and photos|length > 1 %}
-              <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
-            {% else %}
-              <div class="photo-placeholder">Foto Pria</div>
+    <!-- CARD 6: RESEPSI -->
+    <div class="card far" id="c5">
+      <div class="body">
+        <div class="stamp"><span>Acara Kedua</span></div>
+        <div class="evtype">Resepsi<br>Pernikahan</div>
+        <div class="evsub">Reception</div>
+        <div class="evrows">
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div><div class="evlbl">Tanggal</div><div class="evval">{{ inv.resepsi_date | format_date }}</div></div>
+          </div>
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></div>
+            <div><div class="evlbl">Waktu</div><div class="evval">{{ inv.resepsi_time }} WIB</div></div>
+          </div>
+          <div class="evrow">
+            <div class="evico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="evlbl">Lokasi</div><div class="evval">{{ inv.resepsi_venue }}</div><div class="evadr">{{ inv.resepsi_address }}</div></div>
+          </div>
+        </div>
+        <a class="mlink" href="{{ inv.maps_url }}" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Buka di Google Maps</span>
+        </a>
+        <div class="memb">{{ inv.maps_embed_html | safe }}</div>
+      </div>
+    </div>
+
+    <!-- CARD 7: COUNTDOWN -->
+    <div class="card far" id="c6">
+      <div class="cbg"></div><div class="cov"></div>
+      <div class="body">
+        <div class="cdtag">Menuju Hari Bahagia</div>
+        <div class="cdtit">Hitung Mundur</div>
+        <div class="cdsub">{{ inv.akad_date | format_date }}</div>
+        <div class="cdgrid">
+          <div class="cdunit"><div class="cdnum" id="d">00</div><div class="cdlbl">Hari</div></div>
+          <div class="cdsep">:</div>
+          <div class="cdunit"><div class="cdnum" id="h">00</div><div class="cdlbl">Jam</div></div>
+          <div class="cdsep">:</div>
+          <div class="cdunit"><div class="cdnum" id="m">00</div><div class="cdlbl">Menit</div></div>
+          <div class="cdsep">:</div>
+          <div class="cdunit"><div class="cdnum" id="s">00</div><div class="cdlbl">Detik</div></div>
+        </div>
+        <div class="cddate">{{ inv.akad_date | format_date }} — {{ inv.akad_time }} WIB</div>
+      </div>
+    </div>
+
+    <!-- CARD 8: GALLERY -->
+    <div class="card far" id="c7">
+      <div class="head">
+        <div class="tag">Galeri</div>
+        <h2>Momen Bersama</h2>
+      </div>
+      <div class="pols">
+        <div class="pol">
+          {% if photos and photos|length > 0 %}<img src="{{ photo_src(photos[0]) }}" alt="Bersama">{% else %}<div class="ph">Couple</div>{% endif %}
+          <div class="polcap">Together</div>
+        </div>
+        <div class="pol">
+          {% if photos and photos|length > 1 %}<img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">{% else %}<div class="ph">Groom</div>{% endif %}
+          <div class="polcap">{{ inv.groom_name }}</div>
+        </div>
+        <div class="pol">
+          {% if photos and photos|length > 2 %}<img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">{% else %}<div class="ph">Bride</div>{% endif %}
+          <div class="polcap">{{ inv.bride_name }}</div>
+        </div>
+        {% if photos and photos|length > 3 %}
+        <div class="pol"><img src="{{ photo_src(photos[3]) }}" alt="Extra"><div class="polcap">Our Story</div></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- CARD 9: RSVP -->
+    <div class="card far" id="c8">
+      <div class="scroll">
+        <div class="tag">Konfirmasi</div>
+        <h2>Apakah kamu<br>hadir bersama kami?</h2>
+        <div class="form" id="rform">
+          <div><div class="flbl">Nama Lengkap</div><input type="text" class="finp" id="rn" placeholder="Nama Anda"></div>
+          <div>
+            <div class="flbl">Kehadiran</div>
+            <div class="attbs">
+              <div class="attb" onclick="att(this,'hadir')">✓ Hadir</div>
+              <div class="attb" onclick="att(this,'ragu')">? Mungkin</div>
+              <div class="attb" onclick="att(this,'tidak')">✗ Tidak</div>
+            </div>
+          </div>
+          <div><div class="flbl">Jumlah Tamu</div><select class="fsel" id="rc"><option value="1">1 orang</option><option value="2">2 orang</option><option value="3">3 orang</option><option value="4">4+ orang</option></select></div>
+          <div><div class="flbl">Pesan & Doa</div><textarea class="fta" id="rm" placeholder="Tulis doa untuk mempelai..."></textarea></div>
+          <button class="fsub" onclick="sendRsvp()">Kirim Konfirmasi</button>
+        </div>
+        <div id="rok"></div>
+      </div>
+    </div>
+
+    <!-- CARD 10: GUESTBOOK -->
+    <div class="card far" id="c9">
+      <div class="body">
+        <div class="tag">Buku Tamu</div>
+        <h2>Ucapan & Doa Tamu</h2>
+        <div class="gblist" id="gb">
+          {% for r in rsvp_list %}
+          <div class="gbcard"><div class="gbname">{{ r.guest_name }}</div><div class="gbmsg">"{{ r.message }}"</div></div>
+          {% else %}
+          <div class="gbmpty">Jadilah yang pertama mengirim doa... 🌸</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 11: GIFT -->
+    <div class="card far" id="c10">
+      <div class="scroll">
+        <div class="gtag">Wedding Gift</div>
+        <h2>Hadiah Digital</h2>
+        <div class="gnote">Kehadiran dan doa Anda adalah hadiah terbaik</div>
+        <div class="gcards">
+          {% for gift in gifts %}
+            {% if gift.bank_name %}
+            <div class="gcard">
+              <div class="gtype">Transfer Bank</div>
+              <div class="gbank">{{ gift.bank_name }}</div>
+              <div class="gnum">{{ gift.account_number }}</div>
+              <div class="gan">a.n. {{ gift.account_name }}</div>
+              <button class="cpbtn" onclick="cp('{{ gift.account_number }}',this)">Salin Nomor</button>
+            </div>
             {% endif %}
-            <div class="photo-name-tag">{{ inv.groom_name }}</div>
-          </div>
-          <div class="couple-photo-wrap">
-            {% if photos and photos|length > 2 %}
-              <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
-            {% else %}
-              <div class="photo-placeholder">Foto Wanita</div>
+            {% if gift.ewallet_type %}
+            <div class="gcard">
+              <div class="gtype">{{ gift.ewallet_type }}</div>
+              <div class="gbank">{{ gift.ewallet_type }}</div>
+              <div class="gnum">{{ gift.ewallet_number }}</div>
+              <div class="gan">a.n. {{ gift.ewallet_name }}</div>
+              <button class="cpbtn" onclick="cp('{{ gift.ewallet_number }}',this)">Salin Nomor</button>
+            </div>
             {% endif %}
-            <div class="photo-name-tag">{{ inv.bride_name }}</div>
-          </div>
-        </div>
-
-        <!-- Profile details -->
-        <div class="couple-details">
-          <!-- Groom -->
-          <div class="profile-card">
-            <div class="profile-role">Mempelai Pria</div>
-            <div class="profile-fullname">{{ inv.groom_full }}</div>
-            {% if inv.show_parents %}
-            <div class="profile-parents-label">Putra dari</div>
-            <div class="profile-parents">{{ inv.groom_parents }}</div>
-            {% endif %}
-          </div>
-          <!-- Bride -->
-          <div class="profile-card">
-            <div class="profile-role">Mempelai Wanita</div>
-            <div class="profile-fullname">{{ inv.bride_full }}</div>
-            {% if inv.show_parents %}
-            <div class="profile-parents-label">Putri dari</div>
-            <div class="profile-parents">{{ inv.bride_parents }}</div>
-            {% endif %}
-          </div>
-        </div>
-
-        <svg class="couple-brush" viewBox="0 0 80 80" fill="none">
-          <path d="M10 70 Q40 10 70 70" stroke="#9B2335" stroke-width="20" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <!-- ── CARD 4: LOVE STORY ── -->
-      <div class="card card-story" data-card="3">
-        <div class="story-ink"></div>
-        <div class="story-photo"></div>
-
-        <div class="story-content">
-          <div class="story-label">Kisah Kami</div>
-          <div class="story-title">
-            Sebuah <span class="red">cerita</span><br>yang belum selesai
-          </div>
-          <div class="story-divider">
-            <div class="story-divider-line"></div>
-            <div class="story-divider-dot"></div>
-            <div class="story-divider-line"></div>
-          </div>
-          <div class="story-text">
-            {{ inv.love_story }}
-          </div>
+          {% endfor %}
         </div>
       </div>
+    </div>
 
-      <!-- ── CARD 5: AKAD NIKAH ── -->
-      <div class="card card-akad" data-card="4">
-        <div class="akad-lines"></div>
-
-        <div class="akad-content">
-          <div class="event-stamp">
-            <div class="event-stamp-text">Acara Pertama</div>
-          </div>
-
-          <div class="event-type">Akad<br>Nikah</div>
-          <div class="event-type-jp">عَقْدُ النِّكَاحِ</div>
-
-          <div class="event-info-grid">
-            <!-- Date -->
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Tanggal</div>
-                <div class="event-info-value">{{ inv.akad_date | format_date }}</div>
-              </div>
-            </div>
-            <!-- Time -->
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Waktu</div>
-                <div class="event-info-value">{{ inv.akad_time }} WIB</div>
-              </div>
-            </div>
-            <!-- Venue -->
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Lokasi</div>
-                <div class="event-info-value">{{ inv.akad_venue }}</div>
-                <div class="event-info-sub">{{ inv.akad_address }}</div>
-              </div>
-            </div>
-          </div>
+    <!-- CARD 12: CLOSING -->
+    <div class="card far" id="c11">
+      <div class="cbg"></div><div class="cov"></div>
+      <div class="cbrd"></div>
+      <div class="body">
+        <div class="ckoi">
+          <svg width="96" height="78" viewBox="0 0 96 78" fill="none">
+            <ellipse cx="30" cy="28" rx="9" ry="16" fill="#F5EFE0" opacity=".72" transform="rotate(-18 30 28)"/>
+            <path d="M19 43Q10 55 22 59Q30 61 30 52Q30 61 38 59Q50 55 42 43" fill="#F5EFE0" opacity=".62"/>
+            <circle cx="25" cy="21" r="2.2" fill="#9B2335"/>
+            <ellipse cx="66" cy="50" rx="9" ry="16" fill="#C8374A" opacity=".62" transform="rotate(18 66 50)"/>
+            <path d="M54 35Q44 22 58 18Q66 15 66 25Q66 15 74 18Q88 22 78 35" fill="#C8374A" opacity=".52"/>
+            <circle cx="71" cy="56" r="2.2" fill="#F5EFE0"/>
+            <circle cx="48" cy="39" r="32" stroke="rgba(245,239,224,.1)" stroke-width="1" fill="none"/>
+          </svg>
         </div>
-
-        <!-- Decorative koi outline -->
-        <svg class="akad-koi-deco" width="120" height="120" viewBox="0 0 120 120" fill="none">
-          <ellipse cx="60" cy="50" rx="20" ry="35" stroke="#9B2335" stroke-width="1.5"/>
-          <path d="M40 80 Q20 105 45 110 Q60 115 60 100 Q60 115 75 110 Q100 105 80 80" stroke="#9B2335" stroke-width="1.5" fill="none"/>
-          <circle cx="50" cy="38" r="4" stroke="#9B2335" stroke-width="1"/>
-        </svg>
+        <div class="clbl">Penutup</div>
+        <div class="cmsg">Dengan penuh sukacita dan kerendahan hati,<br>kami mengundang Anda untuk menjadi saksi<br>perjalanan cinta kami.</div>
+        <div class="cnames">{{ inv.groom_name }} <em>&amp;</em> {{ inv.bride_name }}</div>
+        <div class="cdate">{{ inv.akad_date | format_date }}</div>
       </div>
+    </div>
 
-      <!-- ── CARD 6: RESEPSI ── -->
-      <div class="card card-resepsi" data-card="5">
-        <div class="resepsi-pattern"></div>
+  </div><!-- /track -->
+</div><!-- /inv -->
 
-        <div class="resepsi-content">
-          <div class="event-stamp">
-            <div class="event-stamp-text">Acara Kedua</div>
-          </div>
-
-          <div class="event-type">Resepsi<br>Pernikahan</div>
-          <div class="event-type-jp">Reception</div>
-
-          <div class="event-info-grid">
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Tanggal</div>
-                <div class="event-info-value">{{ inv.resepsi_date | format_date }}</div>
-              </div>
-            </div>
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Waktu</div>
-                <div class="event-info-value">{{ inv.resepsi_time }} WIB</div>
-              </div>
-            </div>
-            <div class="event-info-row">
-              <div class="event-info-icon">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <div>
-                <div class="event-info-label">Lokasi</div>
-                <div class="event-info-value">{{ inv.resepsi_venue }}</div>
-                <div class="event-info-sub">{{ inv.resepsi_address }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Maps -->
-          <a class="maps-btn" href="{{ inv.maps_url }}" target="_blank">
-            <svg class="maps-btn-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span class="maps-btn-text">Buka di Google Maps</span>
-          </a>
-
-          <div class="maps-embed-wrap">
-            {{ inv.maps_embed_html | safe }}
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CARD 7: COUNTDOWN ── -->
-      <div class="card card-countdown" data-card="6">
-        <div class="countdown-bg"></div>
-        <div class="countdown-overlay"></div>
-
-        <div class="countdown-content">
-          <div class="countdown-label">Menuju Hari Bahagia</div>
-          <div class="countdown-title">Hitung Mundur</div>
-          <div class="countdown-subtitle">{{ inv.akad_date | format_date }}</div>
-
-          <div class="countdown-grid">
-            <div class="countdown-unit">
-              <div class="countdown-number" id="cdDays">00</div>
-              <div class="countdown-unit-label">Hari</div>
-            </div>
-            <div class="countdown-sep">:</div>
-            <div class="countdown-unit">
-              <div class="countdown-number" id="cdHours">00</div>
-              <div class="countdown-unit-label">Jam</div>
-            </div>
-            <div class="countdown-sep">:</div>
-            <div class="countdown-unit">
-              <div class="countdown-number" id="cdMins">00</div>
-              <div class="countdown-unit-label">Menit</div>
-            </div>
-            <div class="countdown-sep">:</div>
-            <div class="countdown-unit">
-              <div class="countdown-number" id="cdSecs">00</div>
-              <div class="countdown-unit-label">Detik</div>
-            </div>
-          </div>
-
-          <div class="countdown-date">
-            {{ inv.akad_date | format_date }} — {{ inv.akad_time }} WIB
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CARD 8: GALLERY ── -->
-      <div class="card card-gallery" data-card="7">
-        <div class="gallery-header">
-          <div class="gallery-label">Galeri Foto</div>
-          <div class="gallery-title">Momen<br>Bersama Kami</div>
-        </div>
-
-        <div class="gallery-polaroids">
-          <!-- photos[0] = couple -->
-          <div class="polaroid">
-            {% if photos and photos|length > 0 %}
-              <img src="{{ photo_src(photos[0]) }}" alt="Foto Bersama">
-            {% else %}
-              <div class="polaroid-placeholder">Foto Bersama</div>
-            {% endif %}
-            <div class="polaroid-caption">Together</div>
-          </div>
-
-          <!-- photos[1] = groom -->
-          <div class="polaroid">
-            {% if photos and photos|length > 1 %}
-              <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
-            {% else %}
-              <div class="polaroid-placeholder">Mempelai Pria</div>
-            {% endif %}
-            <div class="polaroid-caption">{{ inv.groom_name }}</div>
-          </div>
-
-          <!-- photos[2] = bride -->
-          <div class="polaroid">
-            {% if photos and photos|length > 2 %}
-              <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
-            {% else %}
-              <div class="polaroid-placeholder">Mempelai Wanita</div>
-            {% endif %}
-            <div class="polaroid-caption">{{ inv.bride_name }}</div>
-          </div>
-
-          <!-- photos[3+] = additional -->
-          {% if photos and photos|length > 3 %}
-          <div class="polaroid">
-            <img src="{{ photo_src(photos[3]) }}" alt="Foto Tambahan">
-            <div class="polaroid-caption">Our Story</div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- ── CARD 9: RSVP ── -->
-      <div class="card card-rsvp" data-card="8">
-        <div class="rsvp-content">
-          <div class="rsvp-label">Konfirmasi Kehadiran</div>
-          <div class="rsvp-title">Apakah kamu<br>hadir bersama kami?</div>
-
-          <div class="rsvp-form" id="rsvpForm">
-            <!-- Name -->
-            <div class="form-group">
-              <label class="form-label">Nama Lengkap</label>
-              <input type="text" class="form-input" id="rsvpName" placeholder="Masukkan nama Anda">
-            </div>
-
-            <!-- Attendance -->
-            <div class="form-group">
-              <label class="form-label">Kehadiran</label>
-              <div class="attendance-options">
-                <button class="attendance-btn" onclick="selectAttendance(this,'hadir')">✓ Hadir</button>
-                <button class="attendance-btn" onclick="selectAttendance(this,'ragu')">? Mungkin</button>
-                <button class="attendance-btn" onclick="selectAttendance(this,'tidak')">✗ Tidak Hadir</button>
-              </div>
-            </div>
-
-            <!-- Guest count -->
-            <div class="form-group">
-              <label class="form-label">Jumlah Tamu</label>
-              <select class="form-select" id="rsvpCount">
-                <option value="1">1 orang</option>
-                <option value="2">2 orang</option>
-                <option value="3">3 orang</option>
-                <option value="4">4+ orang</option>
-              </select>
-            </div>
-
-            <!-- Message -->
-            <div class="form-group">
-              <label class="form-label">Pesan & Doa</label>
-              <textarea class="form-textarea" id="rsvpMessage" placeholder="Tulis pesan dan doa untuk mempelai..."></textarea>
-            </div>
-
-            <button class="rsvp-submit" onclick="submitRsvp()">
-              Kirim Konfirmasi
-            </button>
-          </div>
-
-          <div class="rsvp-success" id="rsvpSuccess">
-            Terima kasih, <span id="successName"></span>! 🌸<br>
-            Doa dan harapan terbaik sudah kami terima.
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CARD 10: GUESTBOOK ── -->
-      <div class="card card-guestbook" data-card="9">
-        <div class="guestbook-content">
-          <div class="guestbook-label">Buku Tamu</div>
-          <div class="guestbook-title">Ucapan &amp;<br>Doa Tamu</div>
-
-          <div class="guestbook-list" id="guestbookList">
-            {% for r in rsvp_list %}
-            <div class="guest-card">
-              <div class="guest-name">{{ r.guest_name }}</div>
-              <div class="guest-message">"{{ r.message }}"</div>
-            </div>
-            {% else %}
-            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(245,239,224,0.4);font-size:14px;text-align:center;padding:40px 0;">
-              Jadilah yang pertama mengirim doa...
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CARD 11: GIFT ── -->
-      <div class="card card-gift" data-card="10">
-        <div class="gift-content">
-          <div class="gift-label">Wedding Gift</div>
-          <div class="gift-title">Hadiah &amp;<br>Amplop Digital</div>
-          <div class="gift-subtitle">Kehadiran dan doa Anda adalah hadiah terbaik bagi kami</div>
-
-          <div class="gift-cards">
-            {% for gift in gifts %}
-              {% if gift.bank_name %}
-              <div class="gift-card">
-                <div class="gift-type">Transfer Bank</div>
-                <div class="gift-bank-name">{{ gift.bank_name }}</div>
-                <div class="gift-account">{{ gift.account_number }}</div>
-                <div class="gift-account-name">a.n. {{ gift.account_name }}</div>
-                <button class="copy-btn" onclick="copyText('{{ gift.account_number }}', this)">
-                  Salin Nomor
-                </button>
-              </div>
-              {% endif %}
-
-              {% if gift.ewallet_type %}
-              <div class="gift-card">
-                <div class="gift-type">{{ gift.ewallet_type }}</div>
-                <div class="gift-bank-name">{{ gift.ewallet_type }}</div>
-                <div class="gift-account">{{ gift.ewallet_number }}</div>
-                <div class="gift-account-name">a.n. {{ gift.ewallet_name }}</div>
-                <button class="copy-btn" onclick="copyText('{{ gift.ewallet_number }}', this)">
-                  Salin Nomor
-                </button>
-              </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CARD 12: CLOSING ── -->
-      <div class="card card-closing" data-card="11">
-        <div class="closing-photo"></div>
-        <div class="closing-overlay"></div>
-        <div class="closing-border"></div>
-
-        <div class="closing-content">
-          <!-- Large koi pair -->
-          <div class="closing-koi-wrap">
-            <svg width="100" height="80" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Koi 1 -->
-              <ellipse cx="32" cy="30" rx="10" ry="18" fill="#F5EFE0" opacity="0.8" transform="rotate(-20 32 30)"/>
-              <path d="M20 46 Q10 58 24 62 Q32 64 32 55 Q32 64 40 62 Q54 58 44 46" fill="#F5EFE0" opacity="0.7"/>
-              <circle cx="27" cy="22" r="2.5" fill="#9B2335"/>
-              <!-- Koi 2 -->
-              <ellipse cx="68" cy="50" rx="10" ry="18" fill="#C8374A" opacity="0.7" transform="rotate(20 68 50)"/>
-              <path d="M56 36 Q46 24 60 20 Q68 18 68 27 Q68 18 76 20 Q90 24 80 36" fill="#C8374A" opacity="0.6"/>
-              <circle cx="73" cy="58" r="2.5" fill="#F5EFE0"/>
-              <!-- Yin-yang circle hint -->
-              <circle cx="50" cy="40" r="35" stroke="rgba(245,239,224,0.15)" stroke-width="1"/>
-            </svg>
-          </div>
-
-          <div class="closing-label">Penutup</div>
-
-          <div class="closing-message">
-            Dengan penuh sukacita dan kerendahan hati,<br>
-            kami mengundang Anda untuk menjadi saksi<br>
-            perjalanan cinta kami.
-          </div>
-
-          <div class="closing-names">
-            {{ inv.groom_name }}
-            <span class="amp"> &amp; </span>
-            {{ inv.bride_name }}
-          </div>
-
-          <div class="closing-date">{{ inv.akad_date | format_date }}</div>
-        </div>
-      </div>
-
-    </div><!-- /cards-track -->
-  </div><!-- /slider-wrapper -->
-
-</div><!-- /invitation -->
-
-<!-- ============================================================
-     JAVASCRIPT
-     ============================================================ -->
 <script>
-// ── CONSTANTS ──────────────────────────────────────────────
-const TOTAL_CARDS = 12;
-let currentCard = 0;
-let selectedAttendance = '';
-let isAnimating = false;
+var cur=0, N=12, attVal='', busy=false;
 
-// Touch / swipe
-let touchStartX = 0, touchStartY = 0;
-let isDragging = false;
-
-// ── ENVELOPE OPEN ──────────────────────────────────────────
-function openEnvelope() {
-  const screen = document.getElementById('envelope-screen');
-  const curtainL = document.getElementById('curtainL');
-  const curtainR = document.getElementById('curtainR');
-  const inv = document.getElementById('invitation');
-
-  curtainL.style.transform = 'translateX(-105%)';
-  curtainR.style.transform = 'translateX(105%)';
-
-  setTimeout(() => {
-    screen.style.transition = 'opacity 0.5s ease';
-    screen.style.opacity = '0';
-    inv.classList.add('visible');
-  }, 900);
-
-  setTimeout(() => {
-    screen.style.display = 'none';
-  }, 1400);
-
-  // Try autoplay music
-  const music = document.getElementById('bgMusic');
-  music.play().catch(() => {});
+// ENVELOPE
+function openEnv(){
+  var el=document.getElementById('envelope');
+  el.classList.add('open');
+  setTimeout(function(){
+    el.style.transition='opacity .5s';
+    el.style.opacity='0';
+    el.style.pointerEvents='none';
+    document.getElementById('inv').classList.add('show');
+  },1000);
+  setTimeout(function(){ el.style.display='none'; },1600);
+  var a=document.getElementById('audio');
+  if(a) a.play().catch(function(){});
 }
 
-// ── CARD SLIDER ────────────────────────────────────────────
-function initCards() {
-  const track = document.getElementById('cardsTrack');
-  const cards = track.querySelectorAll('.card');
-
-  cards.forEach((card, i) => {
-    if (i === 0)       card.dataset.state = 'current';
-    else if (i === 1)  card.dataset.state = 'next';
-    else               card.dataset.state = 'far';
-  });
-
-  buildDots();
-  updateProgress();
-}
-
-function buildDots() {
-  const dotsEl = document.getElementById('navDots');
-  dotsEl.innerHTML = '';
-  for (let i = 0; i < TOTAL_CARDS; i++) {
-    const d = document.createElement('div');
-    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => goTo(i);
-    dotsEl.appendChild(d);
+// SLIDER
+function setStates(){
+  for(var i=0;i<N;i++){
+    var el=document.getElementById('c'+i);
+    if(!el) continue;
+    el.className='card '+(i===cur?'cur':i===cur-1?'prev':i===cur+1?'next':'far');
   }
+  document.querySelectorAll('.dot').forEach(function(d,i){ d.className='dot'+(i===cur?' on':''); });
+  document.getElementById('prog').style.width=((cur+1)/N*100)+'%';
+  var as=document.querySelectorAll('.arr');
+  as[0].style.opacity=cur===0?'0.2':'1';
+  as[1].style.opacity=cur===N-1?'0.2':'1';
 }
 
-function goTo(index) {
-  if (isAnimating) return;
-  if (index < 0 || index >= TOTAL_CARDS) return;
-
-  isAnimating = true;
-  const prev = currentCard;
-  currentCard = index;
-
-  const cards = document.querySelectorAll('.card');
-  cards.forEach((card, i) => {
-    const cardIdx = parseInt(card.dataset.card);
-    if (cardIdx === currentCard)     card.dataset.state = 'current';
-    else if (cardIdx < currentCard)  card.dataset.state = 'prev';
-    else if (cardIdx === currentCard + 1) card.dataset.state = 'next';
-    else                             card.dataset.state = 'far';
-  });
-
-  updateDots();
-  updateProgress();
-  updateArrows();
-
-  setTimeout(() => { isAnimating = false; }, 750);
+function go(idx){
+  if(busy||idx<0||idx>=N) return;
+  cur=idx; busy=true; setStates();
+  setTimeout(function(){ busy=false; },700);
 }
 
-function updateDots() {
-  document.querySelectorAll('.nav-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === currentCard);
-  });
-}
-
-function updateProgress() {
-  const pct = ((currentCard + 1) / TOTAL_CARDS * 100).toFixed(1);
-  document.getElementById('progressBar').style.width = pct + '%';
-}
-
-function updateArrows() {
-  document.getElementById('btnPrev').style.opacity = currentCard === 0 ? '0.2' : '1';
-  document.getElementById('btnNext').style.opacity = currentCard === TOTAL_CARDS - 1 ? '0.2' : '1';
-}
-
-// ── SWIPE / TOUCH ──────────────────────────────────────────
-document.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  isDragging = true;
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-  if (!isDragging) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-
-  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-    if (dx < 0) goTo(currentCard + 1);
-    else         goTo(currentCard - 1);
+// Build dots
+(function(){
+  var d=document.getElementById('dots');
+  for(var i=0;i<N;i++){
+    var dot=document.createElement('div');
+    dot.className='dot'+(i===0?' on':'');
+    (function(i){ dot.onclick=function(){ go(i); }; })(i);
+    d.appendChild(dot);
   }
-  isDragging = false;
-}, { passive: true });
+})();
+setStates();
 
-// Mouse swipe support
-document.addEventListener('mousedown', e => {
-  touchStartX = e.clientX;
-  isDragging = true;
-});
-document.addEventListener('mouseup', e => {
-  if (!isDragging) return;
-  const dx = e.clientX - touchStartX;
-  if (Math.abs(dx) > 60) {
-    if (dx < 0) goTo(currentCard + 1);
-    else         goTo(currentCard - 1);
-  }
-  isDragging = false;
+// SWIPE
+var tx=0,ty=0,drag=false;
+document.addEventListener('touchstart',function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; drag=true; },{passive:true});
+document.addEventListener('touchend',function(e){
+  if(!drag) return;
+  var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>42) go(dx<0?cur+1:cur-1);
+  drag=false;
+},{passive:true});
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
 });
 
-// Keyboard navigation
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(currentCard + 1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(currentCard - 1);
-});
+// MUSIC
+var playing=true;
+function toggleMusic(){
+  var a=document.getElementById('audio'), b=document.getElementById('mbtn');
+  if(playing){ a.pause(); b.classList.add('paused'); }
+  else        { a.play(); b.classList.remove('paused'); }
+  playing=!playing;
+}
 
-// ── MUSIC ──────────────────────────────────────────────────
-let musicPlaying = true;
-function toggleMusic() {
-  const music = document.getElementById('bgMusic');
-  const player = document.getElementById('musicPlayer');
-  if (musicPlaying) {
-    music.pause();
-    player.classList.add('paused');
-    musicPlaying = false;
-  } else {
-    music.play();
-    player.classList.remove('paused');
-    musicPlaying = true;
+// COUNTDOWN
+function tick(){
+  var t=new Date("{{ inv.akad_date }}T{{ inv.akad_time }}:00"), diff=t-new Date();
+  if(diff<0) diff=0;
+  document.getElementById('d').textContent=String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('h').textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('m').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('s').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+tick(); setInterval(tick,1000);
+
+// RSVP
+function att(btn,val){
+  attVal=val;
+  document.querySelectorAll('.attb').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+}
+function sendRsvp(){
+  var name=document.getElementById('rn').value.trim();
+  var msg=document.getElementById('rm').value.trim();
+  var cnt=document.getElementById('rc').value;
+  if(!name){ alert('Masukkan nama dulu!'); return; }
+  fetch('/rsvp/{{ inv.id }}',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:name,attendance:attVal,count:cnt,message:msg})
+  }).catch(function(){});
+  document.getElementById('rform').style.display='none';
+  var ok=document.getElementById('rok');
+  ok.style.display='block';
+  ok.innerHTML='Terima kasih, <strong>'+name+'</strong>! 🌸<br>Doa terbaik sudah kami terima.';
+  if(msg){
+    var gb=document.getElementById('gb');
+    var c=document.createElement('div'); c.className='gbcard';
+    c.innerHTML='<div class="gbname">'+name+'</div><div class="gbmsg">"'+msg+'"</div>';
+    var mpty=gb.querySelector('.gbmpty');
+    if(mpty) mpty.remove();
+    gb.insertBefore(c,gb.firstChild);
   }
 }
 
-// ── COUNTDOWN ──────────────────────────────────────────────
-function initCountdown() {
-  // Get akad date from data attribute or parse from DOM
-  // Fallback: use a placeholder date
-  const targetDateStr = "{{ inv.akad_date }}"; // ISO format expected: YYYY-MM-DD
-  const targetTime   = "{{ inv.akad_time }}";
-
-  function tick() {
-    const target = new Date(targetDateStr + 'T' + (targetTime || '08:00') + ':00');
-    const now    = new Date();
-    const diff   = target - now;
-
-    if (diff <= 0) {
-      document.getElementById('cdDays').textContent  = '00';
-      document.getElementById('cdHours').textContent = '00';
-      document.getElementById('cdMins').textContent  = '00';
-      document.getElementById('cdSecs').textContent  = '00';
-      return;
-    }
-
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000)  / 60000);
-    const s = Math.floor((diff % 60000)    / 1000);
-
-    document.getElementById('cdDays').textContent  = String(d).padStart(2,'0');
-    document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
-    document.getElementById('cdMins').textContent  = String(m).padStart(2,'0');
-    document.getElementById('cdSecs').textContent  = String(s).padStart(2,'0');
-  }
-
-  tick();
-  setInterval(tick, 1000);
-}
-
-// ── RSVP ───────────────────────────────────────────────────
-function selectAttendance(btn, value) {
-  selectedAttendance = value;
-  document.querySelectorAll('.attendance-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-
-async function submitRsvp() {
-  const name    = document.getElementById('rsvpName').value.trim();
-  const count   = document.getElementById('rsvpCount').value;
-  const message = document.getElementById('rsvpMessage').value.trim();
-
-  if (!name) { alert('Mohon masukkan nama Anda'); return; }
-
-  try {
-    const res = await fetch('/rsvp/{{ inv.id }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name, attendance: selectedAttendance, count, message
-      })
-    });
-
-    if (res.ok) {
-      document.getElementById('rsvpForm').style.display = 'none';
-      document.getElementById('rsvpSuccess').style.display = 'block';
-      document.getElementById('successName').textContent = name;
-
-      // Add to guestbook
-      if (message) addToGuestbook(name, message);
-    }
-  } catch (e) {
-    // Even if fetch fails in demo, show success
-    document.getElementById('rsvpForm').style.display = 'none';
-    document.getElementById('rsvpSuccess').style.display = 'block';
-    document.getElementById('successName').textContent = name;
-    if (message) addToGuestbook(name, message);
-  }
-}
-
-function addToGuestbook(name, message) {
-  const list = document.getElementById('guestbookList');
-  const card = document.createElement('div');
-  card.className = 'guest-card';
-  card.innerHTML = `
-    <div class="guest-name">${name}</div>
-    <div class="guest-message">"${message}"</div>
-  `;
-  list.insertBefore(card, list.firstChild);
-}
-
-// ── COPY BUTTON ────────────────────────────────────────────
-function copyText(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Tersalin!';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'Salin Nomor';
-      btn.classList.remove('copied');
-    }, 2000);
+// COPY
+function cp(text,btn){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent='Tersalin!'; btn.classList.add('ok');
+    setTimeout(function(){ btn.textContent='Salin Nomor'; btn.classList.remove('ok'); },2000);
   });
 }
 
-// ── AMBIENT CANVAS — Falling Petals ────────────────────────
-function initAmbientCanvas() {
-  const canvas = document.getElementById('ambient-canvas');
-  const ctx    = canvas.getContext('2d');
-
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Petal class
-  class Petal {
-    constructor() { this.reset(); }
-    reset() {
-      this.x     = Math.random() * canvas.width;
-      this.y     = -20;
-      this.size  = Math.random() * 6 + 3;
-      this.speedY = Math.random() * 0.8 + 0.3;
-      this.speedX = (Math.random() - 0.5) * 0.6;
-      this.angle  = Math.random() * Math.PI * 2;
-      this.spin   = (Math.random() - 0.5) * 0.04;
-      this.opacity = Math.random() * 0.4 + 0.1;
-      this.color  = Math.random() > 0.5 ? '#9B2335' : '#C49A3C';
-    }
-    update() {
-      this.x     += this.speedX + Math.sin(this.y * 0.02) * 0.5;
-      this.y     += this.speedY;
-      this.angle += this.spin;
-      if (this.y > canvas.height + 20) this.reset();
-    }
-    draw() {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.angle);
-      ctx.globalAlpha = this.opacity;
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  const petals = Array.from({ length: 60 }, () => {
-    const p = new Petal();
-    p.y = Math.random() * canvas.height; // scatter on init
-    return p;
-  });
-
-  function loop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    petals.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(loop);
-  }
-  loop();
+// PETALS
+var cvs=document.getElementById('cvs'), ctx=cvs.getContext('2d');
+function rsz(){ cvs.width=window.innerWidth; cvs.height=window.innerHeight; }
+rsz(); window.addEventListener('resize',rsz);
+function Petal(){ this.rst(); }
+Petal.prototype.rst=function(){
+  this.x=Math.random()*cvs.width; this.y=-18;
+  this.r=Math.random()*5+3;
+  this.vy=Math.random()*.7+.3; this.vx=(Math.random()-.5)*.5;
+  this.a=Math.random()*Math.PI*2; this.da=(Math.random()-.5)*.04;
+  this.op=Math.random()*.32+.08;
+  this.col=Math.random()>.5?'#9B2335':'#C49A3C';
+};
+Petal.prototype.upd=function(){
+  this.x+=this.vx+Math.sin(this.y*.018)*.4;
+  this.y+=this.vy; this.a+=this.da;
+  if(this.y>cvs.height+18) this.rst();
+};
+Petal.prototype.drw=function(){
+  ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.a);
+  ctx.globalAlpha=this.op; ctx.fillStyle=this.col;
+  ctx.beginPath(); ctx.ellipse(0,0,this.r,this.r*.44,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+};
+var petals=[];
+for(var i=0;i<55;i++){ var p=new Petal(); p.y=Math.random()*cvs.height; petals.push(p); }
+function loop(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  petals.forEach(function(p){ p.upd(); p.drw(); });
+  requestAnimationFrame(loop);
 }
-
-// ── RIPPLE on buttons ──────────────────────────────────────
-document.addEventListener('click', e => {
-  const btn = e.target.closest('button, .nav-arrow, .maps-btn');
-  if (!btn) return;
-  const r = document.createElement('span');
-  r.className = 'ripple-effect';
-  const rect = btn.getBoundingClientRect();
-  r.style.left = (e.clientX - rect.left - 10) + 'px';
-  r.style.top  = (e.clientY - rect.top  - 10) + 'px';
-  btn.style.position = btn.style.position || 'relative';
-  btn.appendChild(r);
-  setTimeout(() => r.remove(), 700);
-});
-
-// ── INIT ───────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  initCards();
-  initCountdown();
-  initAmbientCanvas();
-  updateArrows();
-});
+loop();
 </script>
-
 </body>
 </html>
