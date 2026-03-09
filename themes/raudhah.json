@@ -1,0 +1,46 @@
+{
+  "id": "raudhah",
+  "name": "Raudhah",
+  "description": "Keanggunan geometri Islam bertemu dengan keintiman taman Andalusia. Setiap card adalah satu ruang — gelap, hangat, dan penuh ornamen arabesque emas. Swipe terasa seperti membuka pintu sebuah istana.",
+  "preview_color": "#3B2415",
+  "accent_color": "#B89453",
+  "skeleton": "raudhah",
+  "tags": ["arabic", "islamic", "arabesque", "gold", "dark", "romantic", "andalusia"],
+  "demo_photos": [
+    "/static/themes/raudhah/photos/couple.jpg",
+    "/static/themes/raudhah/photos/groom.jpg",
+    "/static/themes/raudhah/photos/bride.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 130000,
+  "price_note": "Harga promo terbatas",
+  "palette": {
+    "oud":       "#3B2415",
+    "sand":      "#F5EDD8",
+    "gold":      "#B89453",
+    "terracotta":"#C4714A",
+    "moss":      "#4A6741",
+    "ivory":     "#FAF6EE",
+    "ink":       "#1E140A"
+  },
+  "fonts": {
+    "display": "Aref Ruqaa",
+    "serif":   "Cormorant Garamond",
+    "sans":    "Jost"
+  },
+  "features": [
+    "Swipe card navigation fullscreen (13 card)",
+    "Envelope curtain split dramatis",
+    "Geometri arabesque animated (canvas partikel berlian)",
+    "Arch SVG reveal pada halaman akad",
+    "Polaroid gallery acak berputar",
+    "Countdown real-time dengan tick animation",
+    "RSVP + Guestbook real-time",
+    "Gift copy button dengan konfirmasi",
+    "Google Maps embed",
+    "Music player floating",
+    "Ayat QS. Ar-Rum: 21 Arab + terjemahan",
+    "Responsif penuh mobile & desktop"
+  ]
+}
