@@ -637,15 +637,6 @@ def admin_edit(inv_id):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
-            # Handle clear portrait checkboxes
-            for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
-                if f.get(key):
-                    row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?',(inv_id,)).fetchone()
-                    if row and row[col]:
-                        try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
-                        except: pass
-                    conn.execute(f'UPDATE invitations SET {col}=NULL WHERE id=?',(inv_id,))
-            conn.commit()
             _save_photos(conn, inv_id, request.files, f)
             conn.commit(); conn.close()
             flash('Undangan berhasil diperbarui! ✓','success')
@@ -699,11 +690,11 @@ def admin_delete(inv_id):
             if inv_row[col]:
                 try: (UPLOAD_DIR / inv_row[col]).unlink(missing_ok=True)
                 except: pass
-    # Cascade delete semua data + row undangan (hard delete supaya storage bersih)
+    # Cascade delete semua data terkait undangan ini
     conn.execute('DELETE FROM rsvp WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
-    conn.execute('DELETE FROM invitations WHERE id=?',(inv_id,))
+    conn.execute('UPDATE invitations SET is_active=0 WHERE id=?',(inv_id,))
     conn.commit(); conn.close()
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
@@ -836,3 +827,4 @@ if __name__ == '__main__':
     print('─' * 50)
     app.run(debug=False, port=5000)
 
+	

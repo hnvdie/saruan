@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ inv.bride_name }} & {{ inv.groom_name }} — Bloom Petal</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   BLOOMPETAL — Young Romance × Javanese Garden Poetry
+   Palette: Blossom Cream, Dusty Rose, Sage Whisper, Coral Dew, Ivory Mist
+   ============================================================ */
+
+:root {
+  --cream:     #FBF5EE;
+  --rose:      #E8B4B8;
+  --rose-deep: #C98EA0;
+  --sage:      #A8B89A;
+  --sage-dark: #7A9068;
+  --coral:     #F2C4A0;
+  --ivory:     #FFF8F2;
+  --brown:     #7A5C4E;
+  --gold:      #C9A96E;
+  --muted:     #9E8880;
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-script:  'Dancing Script', cursive;
+  --font-body:    'Jost', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  background: var(--cream);
+  font-family: var(--font-body);
+  color: var(--brown);
+}
+
+/* ============================================================
+   PARTICLE CANVAS — floating petals
+   ============================================================ */
+#petal-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ============================================================
+   ENVELOPE / INTRO SCREEN
+   ============================================================ */
+#envelope-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  transition: opacity 0.8s ease, transform 1s cubic-bezier(.77,0,.175,1);
+}
+#envelope-screen.opening {
+  animation: curtainSplit 1.2s cubic-bezier(.77,0,.175,1) forwards;
+}
+@keyframes curtainSplit {
+  0%   { clip-path: inset(0 0 0 0); opacity: 1; }
+  60%  { clip-path: inset(0 50% 0 50%); opacity: 1; }
+  100% { clip-path: inset(0 50% 0 50%); opacity: 0; pointer-events: none; }
+}
+#envelope-screen.done { display: none; }
+
+.env-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    url('/static/themes/bloompetal/cover.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.88) saturate(1.1);
+}
+.env-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(251,245,238,0.55) 0%,
+    rgba(232,180,184,0.35) 50%,
+    rgba(168,184,154,0.30) 100%
+  );
+}
+.env-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: clamp(30px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 24px);
+}
+.env-tag {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 2vw, 13px);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+  opacity: 0;
+  animation: fadeUp 1s 0.4s ease forwards;
+}
+.env-names {
+  font-family: var(--font-script);
+  font-size: clamp(42px, 11vw, 96px);
+  color: var(--brown);
+  line-height: 1.1;
+  opacity: 0;
+  animation: fadeUp 1s 0.7s ease forwards;
+}
+.env-ampersand {
+  font-family: var(--font-script);
+  font-size: clamp(22px, 5vw, 48px);
+  color: var(--rose-deep);
+  display: block;
+  line-height: 1;
+}
+.env-date {
+  font-family: var(--font-display);
+  font-size: clamp(12px, 2.5vw, 18px);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  opacity: 0;
+  animation: fadeUp 1s 1s ease forwards;
+}
+.env-divider {
+  width: clamp(60px, 15vw, 140px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rose-deep), transparent);
+  opacity: 0;
+  animation: fadeUp 1s 1.1s ease forwards;
+}
+.env-btn {
+  margin-top: clamp(8px, 2vw, 20px);
+  padding: clamp(12px, 2vw, 16px) clamp(28px, 6vw, 52px);
+  border: 1.5px solid var(--rose-deep);
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(6px);
+  color: var(--brown);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(10px, 2vw, 13px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 40px;
+  transition: background 0.3s, transform 0.2s;
+  opacity: 0;
+  animation: fadeUp 1s 1.4s ease forwards;
+}
+.env-btn:hover {
+  background: rgba(232,180,184,0.45);
+  transform: scale(1.03);
+}
+
+/* ============================================================
+   CARD TRACK — SWIPE SYSTEM
+   ============================================================ */
+#track {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 10;
+}
+.card {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  transition: transform .65s cubic-bezier(.77,0,.175,1), opacity .45s ease;
+}
+.card.cur  { transform: translateX(0);     opacity: 1; z-index: 10; }
+.card.prev { transform: translateX(-100%); opacity: 0; z-index: 5;  }
+.card.next { transform: translateX(100%);  opacity: 0; z-index: 5;  }
+.card.far  { transform: translateX(200%);  opacity: 0; z-index: 1;  }
+
+/* ============================================================
+   NAV — ARROWS + DOTS
+   ============================================================ */
+#nav {
+  position: fixed;
+  bottom: clamp(18px, 4vh, 36px);
+  left: 0; width: 100vw;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 24px);
+  pointer-events: none;
+}
+.nav-arrow {
+  pointer-events: all;
+  width: clamp(32px, 5vw, 46px);
+  height: clamp(32px, 5vw, 46px);
+  border-radius: 50%;
+  border: 1.5px solid var(--rose-deep);
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(8px);
+  color: var(--brown);
+  font-size: clamp(13px, 2.5vw, 18px);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  user-select: none;
+}
+.nav-arrow:hover { background: rgba(232,180,184,0.5); transform: scale(1.08); }
+#dots {
+  display: flex;
+  gap: clamp(5px, 1.2vw, 10px);
+  align-items: center;
+  pointer-events: all;
+}
+.dot {
+  width: clamp(5px, 1vw, 8px);
+  height: clamp(5px, 1vw, 8px);
+  border-radius: 50%;
+  background: var(--rose);
+  opacity: 0.45;
+  transition: opacity 0.3s, transform 0.3s, background 0.3s;
+  cursor: pointer;
+}
+.dot.active {
+  opacity: 1;
+  transform: scale(1.5);
+  background: var(--rose-deep);
+}
+
+/* ============================================================
+   MUSIC PLAYER
+   ============================================================ */
+#music-player {
+  position: fixed;
+  top: clamp(14px, 2.5vh, 24px);
+  right: clamp(14px, 2.5vw, 24px);
+  z-index: 120;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(232,180,184,0.5);
+  border-radius: 40px;
+  padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 18px);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#music-player:hover { background: rgba(232,180,184,0.35); }
+.music-icon {
+  font-size: clamp(12px, 2vw, 15px);
+  animation: spin 3s linear infinite paused;
+}
+#music-player.playing .music-icon { animation-play-state: running; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.music-label {
+  font-family: var(--font-body);
+  font-size: clamp(8px, 1.5vw, 11px);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--brown);
+}
+
+/* ============================================================
+   CARD 1 — HERO / COVER
+   ============================================================ */
+#card-hero {
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/bloompetal/cover.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.82) saturate(1.15);
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(251,245,238,0.2) 0%,
+    rgba(251,245,238,0.65) 100%
+  );
+}
+/* Decorative SVG botanical top-left */
+.hero-botanical {
+  position: absolute;
+  top: 0; left: 0;
+  width: clamp(120px, 28vw, 260px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.hero-botanical-r {
+  position: absolute;
+  bottom: clamp(60px, 10vh, 100px);
+  right: 0;
+  width: clamp(100px, 22vw, 220px);
+  opacity: 0.45;
+  pointer-events: none;
+  transform: scaleX(-1) rotate(20deg);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(8px, 2vw, 18px);
+}
+.hero-invite-text {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(9px, 1.8vw, 12px);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.hero-couple {
+  font-family: var(--font-script);
+  font-size: clamp(52px, 13vw, 110px);
+  color: var(--brown);
+  line-height: 1.05;
+}
+.hero-couple .amp {
+  font-size: 0.55em;
+  color: var(--rose-deep);
+  display: block;
+}
+.hero-date-line {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(13px, 2.5vw, 19px);
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.hero-quran-teaser {
+  max-width: min(480px, 82vw);
+  font-family: var(--font-display);
+  font-size: clamp(11px, 2vw, 14px);
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: clamp(4px, 1vw, 10px);
+}
+
+/* ============================================================
+   CARD 2 — QURAN + BRIDE/GROOM INTRO
+   ============================================================ */
+#card-quran {
+  background: linear-gradient(145deg, var(--ivory) 0%, #F9EDE5 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 5vw, 60px);
+}
+.quran-card-inner {
+  max-width: min(640px, 90vw);
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(16px, 3vw, 30px);
+}
+.quran-arabic {
+  font-size: clamp(22px, 5vw, 38px);
+  color: var(--brown);
+  line-height: 1.9;
+  direction: rtl;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+}
+.quran-source {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 1.8vw, 12px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.quran-translation {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(14px, 2.5vw, 19px);
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 520px;
+}
+.quran-divider {
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rose-deep), transparent);
+}
+
+/* Couple portrait strip below quran */
+.couple-strip {
+  display: flex;
+  gap: clamp(16px, 4vw, 40px);
+  margin-top: clamp(10px, 2.5vw, 24px);
+  align-items: flex-start;
+  justify-content: center;
+}
+.portrait-frame {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+}
+.portrait-img {
+  width: clamp(70px, 15vw, 130px);
+  height: clamp(90px, 19vw, 165px);
+  object-fit: cover;
+  border-radius: clamp(50px, 10vw, 90px) clamp(50px, 10vw, 90px) 12px 12px;
+  border: 3px solid rgba(232,180,184,0.5);
+  box-shadow: 0 8px 30px rgba(201,142,160,0.2);
+}
+.portrait-name {
+  font-family: var(--font-script);
+  font-size: clamp(16px, 3.5vw, 26px);
+  color: var(--brown);
+}
+.portrait-full {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 1.5vw, 12px);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.portrait-parents {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(10px, 1.8vw, 13px);
+  color: var(--sage-dark);
+  text-align: center;
+  line-height: 1.5;
+}
+.couple-middle-amp {
+  font-family: var(--font-script);
+  font-size: clamp(28px, 6vw, 52px);
+  color: var(--rose-deep);
+  align-self: center;
+  margin-top: clamp(-10px, -2vh, -20px);
+}
+
+/* ============================================================
+   CARD 3 — LOVE STORY
+   ============================================================ */
+#card-story {
+  background: linear-gradient(170deg, #FCEAE8 0%, var(--cream) 60%, #EFF3EC 100%);
+  display: flex; align-items: center;
+}
+.story-layout {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+.story-photo-col {
+  position: relative;
+  overflow: hidden;
+}
+.story-photo {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/bloompetal/photos/couple.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.story-photo::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 60%, #FBF5EE 100%);
+}
+.story-text-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(24px, 6vw, 72px) clamp(20px, 5vw, 60px) clamp(24px, 6vw, 72px) clamp(10px, 3vw, 40px);
+  gap: clamp(10px, 2vw, 20px);
+  overflow-y: auto;
+}
+.story-label {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(9px, 1.6vw, 11px);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.story-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 5vw, 48px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--brown);
+  line-height: 1.2;
+}
+.story-body {
+  font-family: var(--font-display);
+  font-size: clamp(13px, 2vw, 16px);
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 680px) {
+  .story-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 40vh 1fr;
+  }
+  .story-photo::after {
+    background: linear-gradient(180deg, transparent 50%, #FBF5EE 100%);
+  }
+  .story-text-col {
+    padding: clamp(16px, 5vw, 32px) clamp(20px, 6vw, 40px);
+  }
+}
+
+/* ============================================================
+   CARD 4 — AKAD
+   ============================================================ */
+#card-akad {
+  background: linear-gradient(135deg, #FFF5F0 0%, var(--cream) 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 4vw, 50px);
+}
+.event-card-wrap {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.event-inner {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(14px, 2.5vw, 26px);
+  text-align: center;
+  max-width: min(520px, 88vw);
+}
+.event-tag {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(9px, 1.8vw, 12px);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--sage-dark);
+}
+.event-name {
+  font-family: var(--font-script);
+  font-size: clamp(36px, 9vw, 72px);
+  color: var(--brown);
+  line-height: 1;
+}
+.event-date-box {
+  border: 1px solid rgba(201,142,160,0.4);
+  border-radius: 16px;
+  padding: clamp(14px, 3vw, 26px) clamp(24px, 5vw, 48px);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(6px);
+  display: flex; flex-direction: column;
+  gap: clamp(6px, 1.2vw, 12px);
+}
+.event-date-main {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 4vw, 30px);
+  font-weight: 400;
+  color: var(--brown);
+}
+.event-time {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(14px, 2.5vw, 20px);
+  color: var(--rose-deep);
+}
+.event-venue {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(11px, 2vw, 15px);
+  color: var(--muted);
+  line-height: 1.6;
+}
+.event-maps-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: clamp(8px, 1.5vw, 12px) clamp(18px, 4vw, 30px);
+  border: 1.5px solid var(--sage-dark);
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--sage-dark);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 1.6vw, 12px);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  transition: background 0.25s;
+}
+.event-maps-btn:hover { background: rgba(168,184,154,0.2); }
+
+/* decorative corner accent */
+.event-corner {
+  position: absolute;
+  width: clamp(80px, 18vw, 180px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+.event-corner.tl { top: 0; left: 0; }
+.event-corner.br { bottom: 0; right: 0; transform: rotate(180deg); }
+
+/* ============================================================
+   CARD 5 — RESEPSI
+   ============================================================ */
+#card-resepsi {
+  background: linear-gradient(135deg, #EFF3EC 0%, var(--cream) 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 4vw, 50px);
+}
+
+/* ============================================================
+   CARD 6 — COUNTDOWN
+   ============================================================ */
+#card-countdown {
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.countdown-bg-photo {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/bloompetal/photos/couple.jpg');
+  background-size: cover; background-position: center top;
+  filter: brightness(0.6) saturate(0.8);
+}
+.countdown-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(251,245,238,0.1) 0%, rgba(122,90,78,0.7) 100%);
+}
+.countdown-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(16px, 3vw, 30px);
+  padding: clamp(20px, 5vw, 60px);
+}
+.countdown-label {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(9px, 1.8vw, 12px);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+.countdown-names {
+  font-family: var(--font-script);
+  font-size: clamp(32px, 8vw, 64px);
+  color: #fff;
+  line-height: 1.1;
+}
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(10px, 3vw, 24px);
+}
+.count-box {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  padding: clamp(12px, 3vw, 24px) clamp(14px, 3.5vw, 28px);
+  min-width: clamp(60px, 14vw, 100px);
+}
+.count-number {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 7vw, 56px);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+}
+.count-unit {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(8px, 1.4vw, 11px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   CARD 7 — GALLERY
+   ============================================================ */
+#card-gallery {
+  background: var(--ivory);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.gallery-layout {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 1.1fr;
+  grid-template-rows: 1.3fr 1fr;
+  gap: clamp(4px, 1vw, 10px);
+  padding: clamp(10px, 2vw, 20px);
+}
+.gal-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.gal-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(.25,.46,.45,.94);
+}
+.gal-item:hover img { transform: scale(1.07); }
+.gal-item:nth-child(1) { grid-row: 1 / 3; }
+.gal-item:nth-child(4) { grid-column: 2 / 4; }
+
+/* Gallery label overlay */
+.gallery-label-overlay {
+  position: absolute;
+  bottom: clamp(16px, 4vh, 36px);
+  left: clamp(16px, 4vw, 36px);
+  z-index: 5;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.gallery-label-overlay .gl-tag {
+  font-family: var(--font-body);
+  font-size: clamp(9px, 1.6vw, 11px);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+}
+.gallery-label-overlay .gl-title {
+  font-family: var(--font-script);
+  font-size: clamp(22px, 5vw, 42px);
+  color: #fff;
+}
+
+@media (max-width: 680px) {
+  .gallery-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+  }
+  .gal-item:nth-child(1) { grid-row: 1 / 2; grid-column: 1 / 3; }
+  .gal-item:nth-child(4) { grid-column: 1 / 3; }
+}
+
+/* ============================================================
+   CARD 8 — MAPS
+   ============================================================ */
+#card-maps {
+  background: var(--cream);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.maps-inner {
+  width: 100vw; height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.maps-header {
+  padding: clamp(24px, 5vw, 50px) clamp(24px, 6vw, 60px) clamp(12px, 2vw, 24px);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-align: center;
+}
+.maps-label {
+  font-family: var(--font-body); font-weight: 200;
+  font-size: clamp(9px, 1.6vw, 11px);
+  letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.maps-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 5vw, 38px);
+  font-style: italic; font-weight: 300;
+  color: var(--brown);
+}
+.maps-embed-wrap {
+  width: 100%;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 0;
+}
+.maps-embed-wrap iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+  display: block;
+}
+.maps-open-btn {
+  position: absolute;
+  bottom: clamp(70px, 12vh, 100px);
+  left: 50%; transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: clamp(10px, 2vw, 14px) clamp(20px, 5vw, 36px);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--rose-deep);
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--brown);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 1.6vw, 12px);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   CARD 9 — RSVP
+   ============================================================ */
+#card-rsvp {
+  background: linear-gradient(145deg, #FBF0F2 0%, var(--cream) 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 4vw, 50px);
+}
+.rsvp-inner {
+  width: min(480px, 88vw);
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(12px, 2.5vw, 22px);
+  text-align: center;
+}
+.rsvp-title {
+  font-family: var(--font-script);
+  font-size: clamp(30px, 7vw, 56px);
+  color: var(--brown);
+}
+.rsvp-sub {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(12px, 2vw, 15px);
+  color: var(--muted);
+}
+.rsvp-form {
+  width: 100%;
+  display: flex; flex-direction: column;
+  gap: clamp(10px, 2vw, 16px);
+}
+.rsvp-input, .rsvp-select, .rsvp-textarea {
+  width: 100%;
+  padding: clamp(10px, 2vw, 14px) clamp(14px, 2.5vw, 20px);
+  border: 1px solid rgba(201,142,160,0.4);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(12px, 2vw, 14px);
+  color: var(--brown);
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.rsvp-input:focus, .rsvp-select:focus, .rsvp-textarea:focus {
+  border-color: var(--rose-deep);
+}
+.rsvp-textarea { resize: none; min-height: clamp(70px, 12vh, 100px); }
+.rsvp-btn {
+  padding: clamp(12px, 2.5vw, 16px);
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(11px, 2vw, 14px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.rsvp-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.rsvp-msg { font-family: var(--font-display); font-style: italic; font-size: clamp(12px, 2vw, 15px); color: var(--sage-dark); }
+
+/* ============================================================
+   CARD 10 — GUESTBOOK
+   ============================================================ */
+#card-guestbook {
+  background: linear-gradient(145deg, #F0F4ED 0%, var(--cream) 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 4vw, 50px);
+}
+.guestbook-inner {
+  width: min(540px, 90vw);
+  max-height: 85vh;
+  display: flex; flex-direction: column;
+  gap: clamp(10px, 2vw, 18px);
+  text-align: center;
+}
+.gb-title {
+  font-family: var(--font-script);
+  font-size: clamp(28px, 6vw, 50px);
+  color: var(--brown);
+}
+.gb-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  gap: clamp(8px, 1.5vw, 14px);
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rose) transparent;
+}
+.gb-item {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(232,180,184,0.3);
+  border-radius: 12px;
+  padding: clamp(10px, 2vw, 16px) clamp(14px, 2.5vw, 20px);
+  text-align: left;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.gb-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(12px, 2vw, 15px);
+  color: var(--brown);
+}
+.gb-msg {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(11px, 1.8vw, 14px);
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   CARD 11 — GIFT
+   ============================================================ */
+#card-gift {
+  background: linear-gradient(145deg, #FBF5EE 0%, #FFF0EC 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(20px, 4vw, 50px);
+}
+.gift-inner {
+  width: min(520px, 88vw);
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(12px, 2.5vw, 22px);
+  text-align: center;
+}
+.gift-title {
+  font-family: var(--font-script);
+  font-size: clamp(28px, 7vw, 52px);
+  color: var(--brown);
+}
+.gift-sub {
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(12px, 2vw, 15px);
+  color: var(--muted);
+}
+.gift-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 2vw, 18px);
+}
+@media (max-width: 480px) { .gift-grid { grid-template-columns: 1fr; } }
+.gift-box {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(201,142,160,0.35);
+  border-radius: 14px;
+  padding: clamp(12px, 2.5vw, 20px);
+  display: flex; flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  position: relative;
+}
+.gift-type {
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: clamp(8px, 1.4vw, 10px);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.gift-bank-name {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-weight: 500;
+  color: var(--brown);
+}
+.gift-number {
+  font-family: var(--font-body);
+  font-size: clamp(12px, 2vw, 15px);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.gift-holder {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(11px, 1.8vw, 14px);
+  color: var(--brown);
+}
+.gift-copy-btn {
+  position: absolute;
+  top: clamp(8px, 1.5vw, 12px); right: clamp(8px, 1.5vw, 12px);
+  padding: 5px 12px;
+  border: 1px solid var(--rose);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--rose-deep);
+  font-family: var(--font-body);
+  font-size: clamp(8px, 1.4vw, 10px);
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.gift-copy-btn:hover { background: rgba(232,180,184,0.3); }
+.gift-copy-btn.copied { color: var(--sage-dark); border-color: var(--sage-dark); }
+
+/* ============================================================
+   CARD 12 — CLOSING
+   ============================================================ */
+#card-closing {
+  background: linear-gradient(150deg, #FBF0F2 0%, var(--cream) 50%, #EFF3EC 100%);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.closing-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(12px, 2.5vw, 24px);
+  padding: clamp(24px, 6vw, 70px);
+}
+.closing-top {
+  font-family: var(--font-body); font-weight: 200;
+  font-size: clamp(9px, 1.6vw, 12px);
+  letter-spacing: 0.45em; text-transform: uppercase;
+  color: var(--rose-deep);
+}
+.closing-headline {
+  font-family: var(--font-script);
+  font-size: clamp(36px, 10vw, 88px);
+  color: var(--brown);
+  line-height: 1.05;
+}
+.closing-names {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(16px, 3vw, 26px);
+  color: var(--muted);
+}
+.closing-message {
+  max-width: min(440px, 80vw);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(12px, 2vw, 15px);
+  color: var(--muted);
+  line-height: 1.8;
+}
+.closing-divider {
+  width: 90px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rose-deep), transparent);
+}
+.closing-tag {
+  font-family: var(--font-body); font-weight: 200;
+  font-size: clamp(8px, 1.5vw, 11px);
+  letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--sage-dark);
+}
+/* large decorative botanical bg */
+.closing-deco-l {
+  position: absolute; left: -40px; bottom: -20px;
+  width: clamp(160px, 35vw, 340px);
+  opacity: 0.2; pointer-events: none;
+}
+.closing-deco-r {
+  position: absolute; right: -40px; top: -20px;
+  width: clamp(140px, 30vw, 300px);
+  opacity: 0.18; pointer-events: none;
+  transform: rotate(180deg) scaleX(-1);
+}
+
+/* ============================================================
+   SHARED ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Card entrance animation */
+.card.cur .card-inner-anim {
+  animation: fadeUp 0.75s 0.1s cubic-bezier(.25,.46,.45,.94) both;
+}
+
+/* ============================================================
+   SVG BOTANICAL INLINE DECO
+   ============================================================ */
+.svg-botanical {
+  display: block;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     PETAL PARTICLE CANVAS
+     ============================================================ -->
+<canvas id="petal-canvas"></canvas>
+
+<!-- ============================================================
+     AUDIO
+     ============================================================ -->
+<audio id="bgm" loop preload="auto">
+  <source src="{{ inv.music_url }}" type="audio/mpeg">
+</audio>
+
+<!-- ============================================================
+     MUSIC PLAYER FLOATING
+     ============================================================ -->
+<div id="music-player" onclick="toggleMusic()">
+  <span class="music-icon">🌸</span>
+  <span class="music-label" id="music-label">PLAY MUSIC</span>
+</div>
+
+<!-- ============================================================
+     ENVELOPE INTRO
+     ============================================================ -->
+<div id="envelope-screen">
+  <div class="env-bg"></div>
+  <div class="env-overlay"></div>
+  <!-- Botanical SVG top-left -->
+  <svg class="hero-botanical" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;width:clamp(120px,28vw,260px);opacity:0.5;pointer-events:none;">
+    <path d="M10 200 Q40 140 80 100 Q110 68 140 40 Q165 18 190 5" stroke="#C98EA0" stroke-width="1.5" fill="none"/>
+    <ellipse cx="80" cy="100" rx="28" ry="18" fill="#E8B4B8" opacity="0.35" transform="rotate(-35 80 100)"/>
+    <ellipse cx="110" cy="68" rx="22" ry="14" fill="#A8B89A" opacity="0.3" transform="rotate(-55 110 68)"/>
+    <ellipse cx="140" cy="40" rx="18" ry="11" fill="#E8B4B8" opacity="0.3" transform="rotate(-70 140 40)"/>
+    <circle cx="50" cy="150" r="6" fill="#C98EA0" opacity="0.25"/>
+    <circle cx="160" cy="25" r="4" fill="#A8B89A" opacity="0.3"/>
+    <path d="M60 160 Q55 175 65 180" stroke="#C98EA0" stroke-width="1" fill="none"/>
+    <path d="M155 30 Q165 22 170 30" stroke="#A8B89A" stroke-width="1" fill="none"/>
+  </svg>
+  <div class="env-content">
+    <p class="env-tag">Undangan Pernikahan</p>
+    <div class="env-names">
+      {{ inv.bride_name }}<span class="env-ampersand">&</span>{{ inv.groom_name }}
+    </div>
+    <div class="env-divider"></div>
+    <p class="env-date">{{ inv.resepsi_date | format_date }}</p>
+    <button class="env-btn" onclick="openEnvelope()">✦ Buka Undangan ✦</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     CARD TRACK
+     ============================================================ -->
+<div id="track"></div>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<div id="nav">
+  <button class="nav-arrow" onclick="go(-1)" aria-label="Sebelumnya">&#8592;</button>
+  <div id="dots"></div>
+  <button class="nav-arrow" onclick="go(1)" aria-label="Berikutnya">&#8594;</button>
+</div>
+
+
+<!-- ============================================================
+     CARDS HTML TEMPLATES (built by JS)
+     ============================================================ -->
+<template id="tpl-hero">
+  <div class="card far" id="card-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <!-- Botanical deco -->
+    <svg class="hero-botanical" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 200 Q40 140 80 100 Q110 68 140 40 Q165 18 190 5" stroke="#C98EA0" stroke-width="1.5" fill="none"/>
+      <ellipse cx="80" cy="100" rx="28" ry="18" fill="#E8B4B8" opacity="0.4" transform="rotate(-35 80 100)"/>
+      <ellipse cx="110" cy="68" rx="22" ry="14" fill="#A8B89A" opacity="0.35" transform="rotate(-55 110 68)"/>
+      <ellipse cx="140" cy="40" rx="18" ry="11" fill="#E8B4B8" opacity="0.35" transform="rotate(-70 140 40)"/>
+      <circle cx="50" cy="150" r="7" fill="#C98EA0" opacity="0.3"/>
+      <path d="M60 160 Q55 175 65 180" stroke="#C98EA0" stroke-width="1.2" fill="none"/>
+    </svg>
+    <svg class="hero-botanical-r" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 200 Q40 140 80 100 Q110 68 140 40 Q165 18 190 5" stroke="#A8B89A" stroke-width="1.5" fill="none"/>
+      <ellipse cx="80" cy="100" rx="28" ry="18" fill="#A8B89A" opacity="0.35" transform="rotate(-35 80 100)"/>
+      <ellipse cx="110" cy="68" rx="22" ry="14" fill="#E8B4B8" opacity="0.3" transform="rotate(-55 110 68)"/>
+      <ellipse cx="140" cy="40" rx="18" ry="11" fill="#A8B89A" opacity="0.3" transform="rotate(-70 140 40)"/>
+    </svg>
+    <div class="hero-content card-inner-anim">
+      <p class="hero-invite-text">Dengan penuh kasih, kami mengundang</p>
+      <div class="hero-couple">
+        {{ inv.bride_name }}<span class="amp">&</span>{{ inv.groom_name }}
+      </div>
+      <p class="hero-date-line">{{ inv.resepsi_date | format_date }}</p>
+      <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#C98EA0,transparent);margin:4px auto;"></div>
+      <p class="hero-quran-teaser">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri…"</p>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-quran">
+  <div class="card far" id="card-quran">
+    <div class="quran-card-inner card-inner-anim">
+      <p class="quran-source">QS. Ar-Rum: 21</p>
+      <p class="quran-arabic">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ</p>
+      <div class="quran-divider"></div>
+      <p class="quran-translation">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."</p>
+      <div class="quran-divider"></div>
+      <p style="font-family:var(--font-body);font-weight:200;font-size:clamp(10px,1.8vw,13px);letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);">Bismillahirrahmanirrahim</p>
+      <!-- Couple portraits -->
+      <div class="couple-strip">
+        <div class="portrait-frame">
+          <img class="portrait-img"
+               src="{% if inv.groom_photo_url %}{{ inv.groom_photo_url }}{% elif photos and photos|length > 1 %}{{ photo_src(photos[1]) }}{% else %}/static/themes/bloompetal/photos/groom.jpg{% endif %}"
+               alt="{{ inv.groom_name }}">
+          <span class="portrait-name">{{ inv.groom_name }}</span>
+          <span class="portrait-full">{{ inv.groom_full }}</span>
+          {% if inv.show_parents %}
+          <span class="portrait-parents">Putra dari<br>{{ inv.groom_parents }}</span>
+          {% endif %}
+        </div>
+        <span class="couple-middle-amp">&</span>
+        <div class="portrait-frame">
+          <img class="portrait-img"
+               src="{% if inv.bride_photo_url %}{{ inv.bride_photo_url }}{% elif photos and photos|length > 2 %}{{ photo_src(photos[2]) }}{% else %}/static/themes/bloompetal/photos/bride.jpg{% endif %}"
+               alt="{{ inv.bride_name }}">
+          <span class="portrait-name">{{ inv.bride_name }}</span>
+          <span class="portrait-full">{{ inv.bride_full }}</span>
+          {% if inv.show_parents %}
+          <span class="portrait-parents">Putri dari<br>{{ inv.bride_parents }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-story">
+  <div class="card far" id="card-story">
+    <div class="story-layout">
+      <div class="story-photo-col">
+        <div class="story-photo" style="background-image:url('/static/themes/bloompetal/photos/couple.jpg')"></div>
+      </div>
+      <div class="story-text-col card-inner-anim">
+        <span class="story-label">Our Story</span>
+        <h2 class="story-title">Sebuah Kisah<br>yang Ditulis Bersama</h2>
+        <p class="story-body">{{ inv.love_story }}</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-akad">
+  <div class="card far" id="card-akad">
+    <!-- Corner botanical -->
+    <svg class="event-corner tl" viewBox="0 0 120 120" fill="none">
+      <path d="M0 100 Q30 60 60 40 Q85 22 110 5" stroke="#C98EA0" stroke-width="1.2" fill="none"/>
+      <ellipse cx="60" cy="40" rx="20" ry="12" fill="#E8B4B8" opacity="0.3" transform="rotate(-40 60 40)"/>
+      <ellipse cx="88" cy="22" rx="15" ry="9" fill="#A8B89A" opacity="0.3" transform="rotate(-60 88 22)"/>
+    </svg>
+    <svg class="event-corner br" viewBox="0 0 120 120" fill="none">
+      <path d="M0 100 Q30 60 60 40 Q85 22 110 5" stroke="#A8B89A" stroke-width="1.2" fill="none"/>
+      <ellipse cx="60" cy="40" rx="20" ry="12" fill="#A8B89A" opacity="0.3" transform="rotate(-40 60 40)"/>
+    </svg>
+    <div class="event-card-wrap">
+      <div class="event-inner card-inner-anim">
+        <span class="event-tag">Akad Nikah</span>
+        <h2 class="event-name">Akad</h2>
+        <div class="event-date-box">
+          <p class="event-date-main">{{ inv.akad_date | format_date }}</p>
+          <p class="event-time">{{ inv.akad_time }} WIB</p>
+          <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,#C98EA0,transparent);margin:4px auto;"></div>
+          <p class="event-venue" style="font-family:var(--font-display);font-size:clamp(14px,2.5vw,19px);color:var(--brown);font-weight:400;">{{ inv.akad_venue }}</p>
+          <p class="event-venue">{{ inv.akad_address }}</p>
+        </div>
+        <a class="event-maps-btn" href="{{ inv.maps_url }}" target="_blank">📍 &nbsp; Lihat Lokasi</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-resepsi">
+  <div class="card far" id="card-resepsi">
+    <!-- Corner botanical -->
+    <svg class="event-corner tl" viewBox="0 0 120 120" fill="none">
+      <path d="M0 100 Q30 60 60 40 Q85 22 110 5" stroke="#A8B89A" stroke-width="1.2" fill="none"/>
+      <ellipse cx="60" cy="40" rx="20" ry="12" fill="#A8B89A" opacity="0.3" transform="rotate(-40 60 40)"/>
+      <ellipse cx="88" cy="22" rx="15" ry="9" fill="#E8B4B8" opacity="0.3" transform="rotate(-60 88 22)"/>
+    </svg>
+    <svg class="event-corner br" viewBox="0 0 120 120" fill="none">
+      <path d="M0 100 Q30 60 60 40 Q85 22 110 5" stroke="#C98EA0" stroke-width="1.2" fill="none"/>
+      <ellipse cx="60" cy="40" rx="20" ry="12" fill="#E8B4B8" opacity="0.3" transform="rotate(-40 60 40)"/>
+    </svg>
+    <div class="event-card-wrap">
+      <div class="event-inner card-inner-anim">
+        <span class="event-tag">Resepsi Pernikahan</span>
+        <h2 class="event-name">Resepsi</h2>
+        <div class="event-date-box">
+          <p class="event-date-main">{{ inv.resepsi_date | format_date }}</p>
+          <p class="event-time">{{ inv.resepsi_time }} WIB</p>
+          <div style="width:50px;height:1px;background:linear-gradient(90deg,transparent,#A8B89A,transparent);margin:4px auto;"></div>
+          <p class="event-venue" style="font-family:var(--font-display);font-size:clamp(14px,2.5vw,19px);color:var(--brown);font-weight:400;">{{ inv.resepsi_venue }}</p>
+          <p class="event-venue">{{ inv.resepsi_address }}</p>
+        </div>
+        <a class="event-maps-btn" href="{{ inv.maps_url }}" target="_blank">📍 &nbsp; Lihat Lokasi</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-countdown">
+  <div class="card far" id="card-countdown">
+    <div class="countdown-bg-photo" style="background-image:url('/static/themes/bloompetal/photos/couple.jpg')"></div>
+    <div class="countdown-overlay"></div>
+    <div class="countdown-content card-inner-anim">
+      <p class="countdown-label">Menghitung Hari</p>
+      <div class="countdown-names">{{ inv.bride_name }} & {{ inv.groom_name }}</div>
+      <div style="width:70px;height:1px;background:rgba(255,255,255,0.4);margin:0 auto;"></div>
+      <div class="countdown-grid">
+        <div class="count-box"><span class="count-number" id="cd-days">00</span><span class="count-unit">Hari</span></div>
+        <div class="count-box"><span class="count-number" id="cd-hours">00</span><span class="count-unit">Jam</span></div>
+        <div class="count-box"><span class="count-number" id="cd-mins">00</span><span class="count-unit">Menit</span></div>
+        <div class="count-box"><span class="count-number" id="cd-secs">00</span><span class="count-unit">Detik</span></div>
+      </div>
+      <p style="font-family:var(--font-display);font-style:italic;font-size:clamp(12px,2vw,16px);color:rgba(255,255,255,0.7);">{{ inv.resepsi_date | format_date }}</p>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-gallery">
+  <div class="card far" id="card-gallery">
+    <div class="gallery-layout">
+      <div class="gal-item">
+        {% if photos %}
+        <img src="{{ photo_src(photos[0]) }}" alt="Foto Couple" loading="lazy">
+        {% else %}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#E8B4B8,#C98EA0);"></div>
+        {% endif %}
+      </div>
+      <div class="gal-item">
+        {% if photos and photos|length > 1 %}
+        <img src="{{ photo_src(photos[1]) }}" alt="Mempelai Pria" loading="lazy">
+        {% else %}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#A8B89A,#7A9068);"></div>
+        {% endif %}
+      </div>
+      <div class="gal-item">
+        {% if photos and photos|length > 2 %}
+        <img src="{{ photo_src(photos[2]) }}" alt="Mempelai Wanita" loading="lazy">
+        {% else %}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#F2C4A0,#C98EA0);"></div>
+        {% endif %}
+      </div>
+      <div class="gal-item">
+        {% if photos and photos|length > 3 %}
+        <img src="{{ photo_src(photos[3]) }}" alt="Foto Tambahan" loading="lazy">
+        {% else %}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#FBF5EE,#E8B4B8);"></div>
+        {% endif %}
+      </div>
+    </div>
+    <!-- Label overlay on first item -->
+    <div class="gallery-label-overlay">
+      <span class="gl-tag">Our Moments</span>
+      <span class="gl-title">Galeri</span>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-maps">
+  <div class="card far" id="card-maps">
+    <div class="maps-inner">
+      <div class="maps-header card-inner-anim">
+        <span class="maps-label">Lokasi</span>
+        <h2 class="maps-title">Temukan Kami di Sini</h2>
+      </div>
+      <div class="maps-embed-wrap">
+        {{ inv.maps_embed_html | safe }}
+      </div>
+    </div>
+    <a class="maps-open-btn" href="{{ inv.maps_url }}" target="_blank">📍 &nbsp; Buka di Google Maps</a>
+  </div>
+</template>
+
+<template id="tpl-rsvp">
+  <div class="card far" id="card-rsvp">
+    <div class="rsvp-inner card-inner-anim">
+      <h2 class="rsvp-title">Konfirmasi</h2>
+      <p class="rsvp-sub">Kehadiranmu adalah kebahagiaan kami yang sesungguhnya</p>
+      <div class="rsvp-form">
+        <input class="rsvp-input" id="rsvp-name" type="text" placeholder="Nama Lengkap">
+        <select class="rsvp-select" id="rsvp-attend">
+          <option value="">Kehadiran</option>
+          <option value="hadir">Hadir dengan senang hati 🌸</option>
+          <option value="tidak">Mohon maaf tidak bisa hadir</option>
+        </select>
+        <input class="rsvp-input" id="rsvp-count" type="number" placeholder="Jumlah Tamu" min="1">
+        <textarea class="rsvp-textarea" id="rsvp-msg" placeholder="Pesan & Doa untuk kedua mempelai…"></textarea>
+        <button class="rsvp-btn" onclick="submitRSVP()">Kirim Konfirmasi ✦</button>
+      </div>
+      <p class="rsvp-msg" id="rsvp-response" style="display:none;"></p>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-guestbook">
+  <div class="card far" id="card-guestbook">
+    <div class="guestbook-inner card-inner-anim">
+      <h2 class="gb-title">Buku Tamu</h2>
+      <div class="gb-list" id="gb-list">
+        {% for r in rsvp_list %}
+        <div class="gb-item">
+          <span class="gb-name">{{ r.guest_name }}</span>
+          <span class="gb-msg">{{ r.message }}</span>
+        </div>
+        {% else %}
+        <p style="font-family:var(--font-display);font-style:italic;color:var(--muted);text-align:center;">Jadilah yang pertama mengisi buku tamu ✦</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-gift">
+  <div class="card far" id="card-gift">
+    <div class="gift-inner card-inner-anim">
+      <h2 class="gift-title">Hadiah Kasih</h2>
+      <p class="gift-sub">Doa restu Anda adalah anugerah terindah bagi kami. Namun jika ingin memberikan tanda kasih:</p>
+      <div class="gift-grid">
+        {% for gift in gifts %}
+          {% if gift.bank_name %}
+          <div class="gift-box">
+            <span class="gift-type">Transfer Bank</span>
+            <span class="gift-bank-name">{{ gift.bank_name }}</span>
+            <span class="gift-number" id="gn-{{ loop.index0 }}-bank">{{ gift.account_number }}</span>
+            <span class="gift-holder">{{ gift.account_name }}</span>
+            <button class="gift-copy-btn" onclick="copyGift('gn-{{ loop.index0 }}-bank', this)">Salin</button>
+          </div>
+          {% endif %}
+          {% if gift.ewallet_type %}
+          <div class="gift-box">
+            <span class="gift-type">{{ gift.ewallet_type }}</span>
+            <span class="gift-bank-name">{{ gift.ewallet_type }}</span>
+            <span class="gift-number" id="gn-{{ loop.index0 }}-ew">{{ gift.ewallet_number }}</span>
+            <span class="gift-holder">{{ gift.ewallet_name }}</span>
+            <button class="gift-copy-btn" onclick="copyGift('gn-{{ loop.index0 }}-ew', this)">Salin</button>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-closing">
+  <div class="card far" id="card-closing">
+    <!-- Decorative botanical -->
+    <svg class="closing-deco-l" viewBox="0 0 200 220" fill="none">
+      <path d="M10 200 Q40 140 80 100 Q110 68 140 40 Q165 18 190 5" stroke="#C98EA0" stroke-width="2" fill="none"/>
+      <ellipse cx="80" cy="100" rx="35" ry="22" fill="#E8B4B8" opacity="0.4" transform="rotate(-35 80 100)"/>
+      <ellipse cx="110" cy="68" rx="28" ry="17" fill="#A8B89A" opacity="0.35" transform="rotate(-55 110 68)"/>
+      <ellipse cx="140" cy="40" rx="22" ry="13" fill="#E8B4B8" opacity="0.35" transform="rotate(-70 140 40)"/>
+      <circle cx="50" cy="150" r="9" fill="#C98EA0" opacity="0.25"/>
+      <circle cx="30" cy="180" r="5" fill="#A8B89A" opacity="0.2"/>
+    </svg>
+    <svg class="closing-deco-r" viewBox="0 0 200 220" fill="none">
+      <path d="M10 200 Q40 140 80 100 Q110 68 140 40 Q165 18 190 5" stroke="#A8B89A" stroke-width="2" fill="none"/>
+      <ellipse cx="80" cy="100" rx="35" ry="22" fill="#A8B89A" opacity="0.35" transform="rotate(-35 80 100)"/>
+      <ellipse cx="110" cy="68" rx="28" ry="17" fill="#E8B4B8" opacity="0.3" transform="rotate(-55 110 68)"/>
+      <ellipse cx="140" cy="40" rx="22" ry="13" fill="#A8B89A" opacity="0.3" transform="rotate(-70 140 40)"/>
+    </svg>
+    <div class="closing-content card-inner-anim">
+      <span class="closing-top">Terima Kasih</span>
+      <div class="closing-headline">
+        Sampai<br>Jumpa
+      </div>
+      <div class="closing-divider"></div>
+      <p class="closing-names">{{ inv.bride_name }} & {{ inv.groom_name }}</p>
+      <p class="closing-message">Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.</p>
+      <div class="closing-divider"></div>
+      <span class="closing-tag">Bloom Petal · {{ inv.resepsi_date | format_date }}</span>
+    </div>
+  </div>
+</template>
+
+<script>
+/* ============================================================
+   CARDS SETUP
+   ============================================================ */
+const CARD_TEMPLATES = [
+  'tpl-hero','tpl-quran','tpl-story','tpl-akad','tpl-resepsi',
+  'tpl-countdown','tpl-gallery','tpl-maps','tpl-rsvp','tpl-guestbook',
+  'tpl-gift','tpl-closing'
+];
+
+const track  = document.getElementById('track');
+const dotsEl = document.getElementById('dots');
+let cur = 0;
+const cards = [];
+
+// Build cards from templates
+CARD_TEMPLATES.forEach((tplId, i) => {
+  const tpl = document.getElementById(tplId);
+  if (!tpl) return;
+  const node = tpl.content.cloneNode(true).firstElementChild;
+  track.appendChild(node);
+  cards.push(node);
+
+  const dot = document.createElement('button');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.setAttribute('aria-label', `Slide ${i+1}`);
+  dot.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(dot);
+});
+
+function applyClasses() {
+  cards.forEach((c, i) => {
+    c.classList.remove('cur','prev','next','far');
+    if (i === cur)       c.classList.add('cur');
+    else if (i === cur-1) c.classList.add('prev');
+    else if (i === cur+1) c.classList.add('next');
+    else                  c.classList.add('far');
+  });
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === cur);
+  });
+}
+applyClasses();
+
+function go(dir) { goTo(cur + dir); }
+function goTo(n) {
+  if (n < 0 || n >= cards.length) return;
+  cur = n;
+  applyClasses();
+  if (cur === 5) startCountdown();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+});
+
+// Touch/swipe nav
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 45) go(dx < 0 ? 1 : -1);
+}, {passive:true});
+
+/* ============================================================
+   ENVELOPE OPEN
+   ============================================================ */
+function openEnvelope() {
+  const env = document.getElementById('envelope-screen');
+  env.classList.add('opening');
+  setTimeout(() => {
+    env.classList.add('done');
+    startMusic();
+  }, 1200);
+}
+
+/* ============================================================
+   MUSIC PLAYER
+   ============================================================ */
+const bgm = document.getElementById('bgm');
+const mp  = document.getElementById('music-player');
+const ml  = document.getElementById('music-label');
+let playing = false;
+
+function startMusic() {
+  bgm.play().then(() => {
+    playing = true;
+    mp.classList.add('playing');
+    ml.textContent = 'PLAYING';
+  }).catch(() => {});
+}
+function toggleMusic() {
+  if (playing) {
+    bgm.pause(); playing = false;
+    mp.classList.remove('playing');
+    ml.textContent = 'PLAY MUSIC';
+  } else {
+    startMusic();
+  }
+}
+
+/* ============================================================
+   COUNTDOWN
+   ============================================================ */
+let cdInterval = null;
+function startCountdown() {
+  if (cdInterval) return;
+  const target = new Date('{{ inv.resepsi_date }}T{{ inv.resepsi_time }}:00');
+  function tick() {
+    const now  = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      clearInterval(cdInterval);
+      ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '00';
+      });
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+    const pad = n => String(n).padStart(2,'0');
+    const dEl = document.getElementById('cd-days');
+    const hEl = document.getElementById('cd-hours');
+    const mEl = document.getElementById('cd-mins');
+    const sEl = document.getElementById('cd-secs');
+    if (dEl) dEl.textContent = pad(d);
+    if (hEl) hEl.textContent = pad(h);
+    if (mEl) mEl.textContent = pad(m);
+    if (sEl) sEl.textContent = pad(s);
+  }
+  tick();
+  cdInterval = setInterval(tick, 1000);
+}
+
+/* ============================================================
+   RSVP SUBMIT
+   ============================================================ */
+async function submitRSVP() {
+  const name     = document.getElementById('rsvp-name')?.value.trim();
+  const attend   = document.getElementById('rsvp-attend')?.value;
+  const count    = document.getElementById('rsvp-count')?.value;
+  const message  = document.getElementById('rsvp-msg')?.value.trim();
+  const respEl   = document.getElementById('rsvp-response');
+
+  if (!name || !attend) {
+    if (respEl) { respEl.style.display='block'; respEl.textContent='Mohon isi nama dan kehadiran ✦'; }
+    return;
+  }
+
+  try {
+    const res = await fetch('/rsvp/{{ inv.id }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, attendance: attend, count: parseInt(count)||1, message })
+    });
+    const data = await res.json();
+    if (respEl) {
+      respEl.style.display = 'block';
+      respEl.textContent = attend === 'hadir'
+        ? `Terima kasih ${name}! Sampai jumpa di hari bahagia kami 🌸`
+        : `Terima kasih ${name} atas doanya 💐`;
+    }
+    // Append to guestbook if exists
+    if (message) {
+      const gbList = document.getElementById('gb-list');
+      if (gbList) {
+        const item = document.createElement('div');
+        item.className = 'gb-item';
+        item.innerHTML = `<span class="gb-name">${name}</span><span class="gb-msg">${message}</span>`;
+        gbList.prepend(item);
+      }
+    }
+  } catch(e) {
+    if (respEl) { respEl.style.display='block'; respEl.textContent='Maaf, terjadi kesalahan. Coba lagi ya.'; }
+  }
+}
+
+/* ============================================================
+   GIFT COPY
+   ============================================================ */
+function copyGift(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Tersalin ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ============================================================
+   FLOATING PETAL PARTICLES
+   ============================================================ */
+(function initPetals() {
+  const canvas = document.getElementById('petal-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#E8B4B8','#C98EA0','#A8B89A','#F2C4A0','#FBF5EE','#C9A96E'];
+  const petals = [];
+
+  class Petal {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x  = Math.random() * canvas.width;
+      this.y  = init ? Math.random() * canvas.height : -20;
+      this.sz = Math.random() * 7 + 4;
+      this.sp = Math.random() * 0.7 + 0.3;
+      this.wx = Math.random() * 0.6 - 0.3;
+      this.rot   = Math.random() * Math.PI * 2;
+      this.rotSp = (Math.random() - 0.5) * 0.03;
+      this.op = Math.random() * 0.45 + 0.15;
+      this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+    update() {
+      this.y   += this.sp;
+      this.x   += this.wx + Math.sin(this.y * 0.012) * 0.4;
+      this.rot += this.rotSp;
+      if (this.y > canvas.height + 20) this.reset(false);
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot);
+      ctx.globalAlpha = this.op;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      // Petal shape
+      ctx.moveTo(0, -this.sz);
+      ctx.bezierCurveTo(this.sz*0.8, -this.sz*0.5, this.sz*0.8, this.sz*0.5, 0, this.sz);
+      ctx.bezierCurveTo(-this.sz*0.8, this.sz*0.5, -this.sz*0.8, -this.sz*0.5, 0, -this.sz);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 38; i++) petals.push(new Petal());
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    petals.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>

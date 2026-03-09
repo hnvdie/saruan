@@ -17,14 +17,12 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
 DB_PATH         = BASE_DIR / 'data' / 'undangan.db'
-UPLOAD_DIR           = BASE_DIR / 'static' / 'uploads' / 'invitations'
-THEMES_DIR           = BASE_DIR / 'themes'
-DEMO_PHOTOS_DIR      = BASE_DIR / 'static' / 'demo-photos'
-DEMO_PORTRAIT_DIR    = BASE_DIR / 'static' / 'demo-photos' / 'individual'  # groom.*/bride.* khusus preview
+UPLOAD_DIR      = BASE_DIR / 'static' / 'uploads' / 'invitations'
+THEMES_DIR      = BASE_DIR / 'themes'
+DEMO_PHOTOS_DIR = BASE_DIR / 'static' / 'demo-photos'
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 DEMO_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
-DEMO_PORTRAIT_DIR.mkdir(parents=True, exist_ok=True)
 
 MAX_UPLOAD_MB   = 5
 ALLOWED_EXT     = {'jpg','jpeg','png','webp'}
@@ -140,6 +138,7 @@ def init_db():
             resepsi_date TEXT, resepsi_time TEXT, resepsi_venue TEXT, resepsi_address TEXT,
             maps_url TEXT, maps_embed TEXT,
             love_story TEXT, music_url TEXT, cover_photo TEXT,
+            groom_photo TEXT, bride_photo TEXT,
             is_active INTEGER DEFAULT 1, expires_at TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -173,9 +172,9 @@ def init_db():
         ('invitations', 'cover_photo TEXT'),
         ('invitations', 'expires_at TEXT'),
         ('invitations', 'updated_at TEXT'),
+        ('invitations', 'groom_photo TEXT'),
+        ('invitations', 'bride_photo TEXT'),
         ('invitation_photos', 'is_url INTEGER DEFAULT 0'),
-        ('invitations', 'groom_photo TEXT'),   # filename di UPLOAD_DIR
-        ('invitations', 'bride_photo TEXT'),   # filename di UPLOAD_DIR
     ]
     for table, coldef in migrations:
         try: c.execute(f'ALTER TABLE {table} ADD COLUMN {coldef}')
@@ -188,22 +187,6 @@ def secure_name(fn):
     ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'jpg'
     return f'{uuid.uuid4().hex}.{ext}'
 
-_THEME_DEFAULTS = {
-    'name': '', 'description': '',
-    'preview_color': '#cccccc', 'accent_color': '#999999',
-    'tags': [], 'demo_photos': [], 'features': [],
-    'price': 0, 'price_label': '', 'price_original': 0, 'price_note': '',
-    'palette': {}, 'fonts': {},
-}
-
-def _normalize_theme(data: dict) -> dict:
-    """Pastikan semua field yang diakses template selalu ada — cegah Jinja Undefined / tojson error."""
-    result = {**_THEME_DEFAULTS, **data}
-    if not isinstance(result['tags'], list):        result['tags'] = []
-    if not isinstance(result['demo_photos'], list): result['demo_photos'] = []
-    if not isinstance(result['features'], list):    result['features'] = []
-    return result
-
 def get_all_themes():
     themes = []
     if THEMES_DIR.exists():
@@ -212,18 +195,15 @@ def get_all_themes():
                 continue
             try:
                 data = json.load(open(f))
+                # Must have 'id' field to be a valid theme
                 if 'id' in data:
-                    themes.append(_normalize_theme(data))
+                    themes.append(data)
             except: pass
     return themes
 
 def get_theme(tid):
     p = THEMES_DIR / f'{tid}.json'
-    if not p.exists(): return None
-    try:
-        return _normalize_theme(json.load(open(p)))
-    except:
-        return None
+    return json.load(open(p)) if p.exists() else None
 
 def get_inv_photos(conn, inv_id):
     return conn.execute(
@@ -246,13 +226,10 @@ def delete_photo_file(row):
         except: pass
 
 def get_demo_photos():
-    """Return list of /static/demo-photos/* URLs sorted — EXCLUDE subfolder individual/"""
+    """Return list of /static/demo-photos/* URLs sorted"""
     photos = []
     if DEMO_PHOTOS_DIR.exists():
         for f in sorted(DEMO_PHOTOS_DIR.iterdir()):
-            # skip subfolder (termasuk individual/)
-            if f.is_dir():
-                continue
             if f.suffix.lower() in DEMO_PHOTOS_EXTS:
                 photos.append(f'/static/demo-photos/{f.name}')
     return photos
@@ -347,33 +324,21 @@ def themes_page():
     themes = get_all_themes()
     return render_template('themes_catalog.html', themes=themes)
 
-def get_demo_portrait(name: str) -> str | None:
-    """Cari static/demo-photos/individual/groom.* atau bride.*
-    Folder individual/ terpisah supaya TIDAK ikut masuk gallery demo."""
-    for ext in ('jpg', 'jpeg', 'png', 'webp'):
-        p = DEMO_PORTRAIT_DIR / f'{name}.{ext}'
-        if p.exists():
-            return f'/static/demo-photos/individual/{name}.{ext}'
-    # fallback: root demo-photos (kompatibilitas setup lama yg belum pindah)
-    for ext in ('jpg', 'jpeg', 'png', 'webp'):
-        p = DEMO_PHOTOS_DIR / f'{name}.{ext}'
-        if p.exists():
-            return f'/static/demo-photos/{name}.{ext}'
-    return None
-
-
+@app.route('/preview/<theme_id>')
 def preview_theme(theme_id):
     theme = get_theme(theme_id)
     if not theme: abort(404)
     demo_photos = get_demo_photos()
-    # get_demo_photos() sudah exclude folder individual/, jadi langsung pakai semua
+    # Build photo-like dicts for templates
     photos = [{'filename': p, 'is_url': 1, 'id': i} for i, p in enumerate(demo_photos)]
     dummy = dict(
         id='preview', slug='preview', theme_id=theme_id,
-        groom_name='Zaid', bride_name='Zainab',
-        groom_full='Zaid bin Haritsah', bride_full='Zainab binti Jahsy',
-        groom_parents='Haritsah bin Syurahbil & Su’da binti Tsa’labah',
-        bride_parents='Jahsy bin Ri’ab & Umamah binti Abdul Muththalib',
+        groom_name = 'Zaid',
+        bride_name = 'Zainab',
+        groom_full = 'Zaid bin Haritsah',
+        bride_full = 'Zainab binti Jahsy',
+        groom_parents = 'Haritsah bin Syurahbil & Su’da binti Tsa’labah',
+        bride_parents = 'Jahsy bin Ri’ab & Umamah binti Abdul Muththalib',
         show_parents=1,
         akad_date='2029-12-20', akad_time='08:00',
         akad_venue='Masjid Al-Ikhlas',
@@ -385,9 +350,8 @@ def preview_theme(theme_id):
         maps_embed=extract_maps_embed_src('https://maps.google.com/?q=Hotel+Indonesia+Kempinski'),
         maps_embed_html=make_maps_iframe(extract_maps_embed_src('https://maps.google.com/?q=Hotel+Indonesia+Kempinski')),
         love_story='Kami pertama bertemu di kampus pada tahun 2019. Berawal dari teman sekelas yang sering belajar bersama, lalu menjadi sahabat yang saling menguatkan. Kini dengan penuh rasa syukur, kami memutuskan untuk melangkah bersama menuju jenjang pernikahan yang penuh berkah dan cinta.',
-        cover_photo=None, music_url='/static/assets/moon.mp3', expires_at=None, is_preview=True,
-        groom_photo_url=get_demo_portrait('groom'),
-        bride_photo_url=get_demo_portrait('bride'),
+        cover_photo=None, music_url="/static/assets/moon.mp3", expires_at=None, is_preview=True,
+        groom_photo_url=None, bride_photo_url=None,
     )
     dummy_gifts = [
         {
@@ -404,10 +368,6 @@ def preview_theme(theme_id):
     return render_template(f'themes/{theme_id}.html',
                            inv=dummy, theme=theme, rsvp_list=[], gifts=dummy_gifts,
                            photos=photos, is_preview=True)
-
-@app.route('/preview/<theme_id>')
-def theme_preview(theme_id):
-    return preview_theme(theme_id)
 
 @app.route('/i/<slug>')
 def view_invitation(slug):
@@ -428,9 +388,9 @@ def view_invitation(slug):
         inv['maps_embed'] = extract_maps_embed_src(inv['maps_embed'])
     # Inject maps_embed_html = full iframe HTML (untuk tema yang pakai | safe)
     inv['maps_embed_html'] = make_maps_iframe(inv.get('maps_embed', ''))
-    # Inject portrait photo URLs dari kolom groom_photo / bride_photo
+    # Inject portrait photo URLs (accessible in templates as inv.groom_photo_url etc)
     inv['groom_photo_url'] = f'/uploads/{inv["groom_photo"]}' if inv.get('groom_photo') else None
-    inv['bride_photo_url'] = f'/uploads/{inv["bride_photo"]}' if inv.get('bride_photo') else None
+    inv['bride_photo_url']  = f'/uploads/{inv["bride_photo"]}' if inv.get('bride_photo') else None
     conn.close()
     return render_template(f'themes/{inv["theme_id"]}.html',
                            inv=inv, theme=theme, rsvp_list=rsvps,
@@ -577,15 +537,18 @@ def admin_create():
                  groom_parents,bride_parents,show_parents,
                  akad_date,akad_time,akad_venue,akad_address,
                  resepsi_date,resepsi_time,resepsi_venue,resepsi_address,
-                 maps_url,maps_embed,love_story,music_url,expires_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                 maps_url,maps_embed,love_story,music_url,expires_at,
+                 groom_photo,bride_photo)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                 (iid,slug,f['theme_id'],f['groom_name'],f['bride_name'],
                  f.get('groom_full'),f.get('bride_full'),
                  f.get('groom_parents'),f.get('bride_parents'),
                  1 if f.get('show_parents') else 0,
                  f.get('akad_date'),f.get('akad_time'),f.get('akad_venue'),f.get('akad_address'),
                  f.get('resepsi_date'),f.get('resepsi_time'),f.get('resepsi_venue'),f.get('resepsi_address'),
-                 f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),exp))
+                 f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),exp,
+                 _save_portrait(request.files, 'groom_photo'),
+                 _save_portrait(request.files, 'bride_photo')))
             if f.get('bank_name'):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (iid,f['bank_name'],f.get('account_number'),f.get('account_name')))
@@ -617,12 +580,36 @@ def admin_edit(inv_id):
         f = request.form
         maps_embed = f.get('maps_embed','').strip() or extract_maps_embed_src(f.get('maps_url',''))
         try:
+            # Resolve new portrait uploads — only replace if new file was uploaded
+            new_groom_photo = _save_portrait(request.files, 'groom_photo')
+            new_bride_photo = _save_portrait(request.files, 'bride_photo')
+            # Delete old portrait file if a new one is replacing it
+            if new_groom_photo and inv.get('groom_photo'):
+                try: (UPLOAD_DIR / inv['groom_photo']).unlink(missing_ok=True)
+                except: pass
+            if new_bride_photo and inv.get('bride_photo'):
+                try: (UPLOAD_DIR / inv['bride_photo']).unlink(missing_ok=True)
+                except: pass
+            # Handle "hapus foto" checkboxes
+            if f.get('clear_groom_photo') and not new_groom_photo:
+                if inv.get('groom_photo'):
+                    try: (UPLOAD_DIR / inv['groom_photo']).unlink(missing_ok=True)
+                    except: pass
+                new_groom_photo = ''   # set to empty string to clear
+            if f.get('clear_bride_photo') and not new_bride_photo:
+                if inv.get('bride_photo'):
+                    try: (UPLOAD_DIR / inv['bride_photo']).unlink(missing_ok=True)
+                    except: pass
+                new_bride_photo = ''
+
             conn.execute('''UPDATE invitations SET
                 theme_id=?,groom_name=?,bride_name=?,groom_full=?,bride_full=?,
                 groom_parents=?,bride_parents=?,show_parents=?,
                 akad_date=?,akad_time=?,akad_venue=?,akad_address=?,
                 resepsi_date=?,resepsi_time=?,resepsi_venue=?,resepsi_address=?,
                 maps_url=?,maps_embed=?,love_story=?,music_url=?,expires_at=?,
+                groom_photo=CASE WHEN ? IS NULL THEN groom_photo ELSE ? END,
+                bride_photo=CASE WHEN ? IS NULL THEN bride_photo ELSE ? END,
                 updated_at=CURRENT_TIMESTAMP WHERE id=?''',
                 (f['theme_id'],f['groom_name'],f['bride_name'],
                  f.get('groom_full'),f.get('bride_full'),
@@ -631,20 +618,14 @@ def admin_edit(inv_id):
                  f.get('akad_date'),f.get('akad_time'),f.get('akad_venue'),f.get('akad_address'),
                  f.get('resepsi_date'),f.get('resepsi_time'),f.get('resepsi_venue'),f.get('resepsi_address'),
                  f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),
-                 f.get('expires_at'),inv_id))
+                 f.get('expires_at'),
+                 new_groom_photo, new_groom_photo,
+                 new_bride_photo, new_bride_photo,
+                 inv_id))
             conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
             if f.get('bank_name'):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
-            conn.commit()
-            # Handle clear portrait checkboxes
-            for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
-                if f.get(key):
-                    row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?',(inv_id,)).fetchone()
-                    if row and row[col]:
-                        try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
-                        except: pass
-                    conn.execute(f'UPDATE invitations SET {col}=NULL WHERE id=?',(inv_id,))
             conn.commit()
             _save_photos(conn, inv_id, request.files, f)
             conn.commit(); conn.close()
@@ -689,21 +670,13 @@ def admin_extend(inv_id):
 @login_required
 def admin_delete(inv_id):
     conn = get_db()
-    # Hapus file gallery
     for p in conn.execute('SELECT * FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchall():
         delete_photo_file(dict(p))
-    # Hapus file portrait (groom_photo & bride_photo)
-    inv_row = conn.execute('SELECT groom_photo, bride_photo FROM invitations WHERE id=?',(inv_id,)).fetchone()
-    if inv_row:
-        for col in ('groom_photo', 'bride_photo'):
-            if inv_row[col]:
-                try: (UPLOAD_DIR / inv_row[col]).unlink(missing_ok=True)
-                except: pass
-    # Cascade delete semua data + row undangan (hard delete supaya storage bersih)
+    # Cascade delete semua data terkait undangan ini
     conn.execute('DELETE FROM rsvp WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
-    conn.execute('DELETE FROM invitations WHERE id=?',(inv_id,))
+    conn.execute('UPDATE invitations SET is_active=0 WHERE id=?',(inv_id,))
     conn.commit(); conn.close()
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
@@ -767,53 +740,38 @@ def update_theme_price(theme_id):
 # See README.md for full config reference.
 
 # ─── PHOTO SAVE HELPER ───────────────────────────────────────────────────────
-# Keys reserved for portrait uploads — disimpan ke kolom invitations, BUKAN gallery table
-_PORTRAIT_KEYS = {'groom_photo', 'bride_photo'}
-
-def _save_portrait(conn, inv_id, key: str, f) -> bool:
-    """Simpan satu file portrait ke UPLOAD_DIR dan update kolom DB.
-    Return True jika berhasil."""
+def _save_portrait(files, key) -> str | None:
+    """Save a single portrait photo (groom_photo / bride_photo). Returns filename or None."""
+    f = files.get(key)
     if not f or not f.filename or not allowed_file(f.filename):
-        return False
+        return None
     f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
     if size > MAX_UPLOAD_MB * 1024 * 1024:
-        return False
-    # Hapus file lama jika ada
-    col = 'groom_photo' if key == 'groom_photo' else 'bride_photo'
-    row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?', (inv_id,)).fetchone()
-    if row and row[col]:
-        try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
-        except: pass
+        return None
     fname = secure_name(f.filename)
     f.save(str(UPLOAD_DIR / fname))
-    conn.execute(f'UPDATE invitations SET {col}=? WHERE id=?', (fname, inv_id))
-    return True
+    return fname
 
-def _save_photos(conn, inv_id, files, form):
+
     existing = conn.execute('SELECT COUNT(*) as c FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchone()['c']
     saved = 0
     for key in files:
-        if key in _PORTRAIT_KEYS:
-            # Portrait → simpan ke kolom groom_photo/bride_photo, bukan gallery
-            _save_portrait(conn, inv_id, key, files.get(key))
-            continue
-        file_list = files.getlist(key)
-        for f in file_list:
-            if saved + existing >= MAX_PHOTOS: break
-            if not f or not f.filename or not allowed_file(f.filename): continue
-            f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
-            if size > MAX_UPLOAD_MB * 1024 * 1024: continue
-            fname = secure_name(f.filename)
-            f.save(str(UPLOAD_DIR / fname))
-            conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,0,?)',
-                         (inv_id, fname, existing + saved))
-            saved += 1
+        if saved+existing >= MAX_PHOTOS: break
+        f = files[key]
+        if not f or not f.filename or not allowed_file(f.filename): continue
+        f.stream.seek(0,2); size=f.stream.tell(); f.stream.seek(0)
+        if size > MAX_UPLOAD_MB*1024*1024: continue
+        fname = secure_name(f.filename)
+        f.save(str(UPLOAD_DIR/fname))
+        conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,0,?)',
+                     (inv_id, fname, existing+saved))
+        saved += 1
     for i in range(10):
-        if saved + existing >= MAX_PHOTOS: break
-        url = form.get(f'photo_url_{i}', '').strip() if form else ''
-        if not url or not url.startswith(('http://', 'https://')): continue
+        if saved+existing >= MAX_PHOTOS: break
+        url = form.get(f'photo_url_{i}','').strip() if form else ''
+        if not url or not url.startswith(('http://','https://')): continue
         conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,1,?)',
-                     (inv_id, url, existing + saved))
+                     (inv_id, url, existing+saved))
         saved += 1
 
 #other

@@ -5,16 +5,20 @@
   "preview_color": "#5D4037",
   "accent_color": "#D4AF37",
   "skeleton": "gendis-jawi",
-  "tags": ["jawa", "elegant", "classic", "warm", "swipe"],
-  "demo_photos": [
-    "/static/themes/gendis-jawi/photos/couple.jpg",
-    "/static/themes/gendis-jawi/photos/groom.jpg",
-    "/static/themes/gendis-jawi/photos/bride.jpg"
+  "tags": [
+    "jawa",
+    "elegant",
+    "classic",
+    "warm",
+    "swipe"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga promo Grand Launch",
+  "demo_photos": [
+    "/static/themes/gendis-jawi/demo_65cb5025.jpg"
+  ],
+  "price": 15000,
+  "price_label": "Rp. 15.000",
+  "price_original": 25000,
+  "price_note": "",
   "palette": {
     "teak_brown": "#5D4037",
     "gold_leaf": "#D4AF37",

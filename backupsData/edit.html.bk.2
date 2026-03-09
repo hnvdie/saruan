@@ -26,31 +26,12 @@ body{font-family:'DM Sans',sans-serif;font-weight:300;background:var(--bg);color
 textarea.form-input{resize:vertical;min-height:80px;}
 .helper{font-size:.68rem;color:#bbb;margin-top:.25rem;line-height:1.4;}
 .error{background:#fff3f3;border:1px solid #ffd5d5;color:#c62828;padding:.75rem 1rem;border-radius:4px;font-size:.82rem;margin-bottom:1.25rem;}
-
-/* ── THEME SEARCH PICKER ── */
-.theme-search-wrap{position:relative;margin-bottom:.6rem;}
-.theme-search-input{width:100%;padding:.72rem .9rem .72rem 2.2rem;border:1px solid #e0e0e0;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:300;color:#1a1a1a;outline:none;transition:border .2s;background:#fff;}
-.theme-search-input:focus{border-color:var(--gold);}
-.theme-search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);font-size:.8rem;color:#bbb;pointer-events:none;}
-.theme-results{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.09);max-height:300px;overflow-y:auto;z-index:50;}
-.theme-results.open{display:block;}
-.tr-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;}
-.tr-item:last-child{border-bottom:none;}
-.tr-item:hover,.tr-item.focused{background:var(--bg);}
-.tr-swatch{width:36px;height:36px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-style:italic;}
-.tr-info{flex:1;min-width:0;}
-.tr-name{font-size:.82rem;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tr-tags{font-size:.64rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tr-price{font-size:.7rem;color:var(--gold);flex-shrink:0;}
-.theme-selected{display:none;align-items:center;gap:.85rem;padding:.75rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-top:.4rem;}
-.theme-selected.show{display:flex;}
-.ts-swatch{width:44px;height:44px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-style:italic;overflow:hidden;}
-.ts-info{flex:1;}
-.ts-name{font-size:.88rem;font-weight:400;}
-.ts-id{font-size:.68rem;color:#aaa;font-family:monospace;}
-.ts-clear{font-size:.7rem;color:#aaa;cursor:pointer;padding:.25rem .5rem;border-radius:3px;transition:all .12s;white-space:nowrap;}
-.ts-clear:hover{color:var(--red);}
-.no-results{padding:1rem;text-align:center;font-size:.78rem;color:#aaa;}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
+.theme-opt input{display:none;}
+.theme-opt label{display:block;border:2px solid var(--border);border-radius:5px;overflow:hidden;cursor:pointer;transition:border .2s;}
+.theme-opt input:checked + label{border-color:var(--gold);}
+.tp-prev{height:55px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-style:italic;}
+.tp-name{padding:.35rem .55rem;font-size:.7rem;font-weight:500;border-top:1px solid var(--border);}
 
 /* Photos */
 .existing-photos{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;}
@@ -58,12 +39,8 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .ep-img{width:70px;height:70px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
 .ep-del{position:absolute;top:-5px;right:-5px;width:18px;height:18px;background:var(--red);color:#fff;border:none;border-radius:50%;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .photo-upload-zone{border:2px dashed #ddd;border-radius:6px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
-.photo-upload-zone:hover,.photo-upload-zone.dragover{border-color:var(--gold);background:#fffdf5;}
-.photo-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.puz-text{font-size:.78rem;color:#888;}
-.portrait-zone{border:2px dashed #ddd;border-radius:6px;padding:.9rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
-.portrait-zone:hover{border-color:var(--gold);background:#fffdf5;}
-.portrait-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-upload-zone:hover{border-color:var(--gold);}
+.photo-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
 .puz-text{font-size:.78rem;color:#888;}
 .url-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem;}
 .url-row input{flex:1;}
@@ -100,20 +77,19 @@ textarea.form-input{resize:vertical;min-height:80px;}
     <!-- TEMA -->
     <div class="card">
       <div class="card-title">Tema</div>
-      <input type="hidden" name="theme_id" id="theme_id_input" value="{{ inv.theme_id }}">
-      <div class="theme-search-wrap">
-        <span class="theme-search-icon">⌕</span>
-        <input type="text" class="theme-search-input" id="themeSearch"
-               placeholder="Cari nama atau tag tema..." autocomplete="off">
-        <div class="theme-results" id="themeResults"></div>
-      </div>
-      <div class="theme-selected show" id="themeSelected">
-        <div class="ts-swatch" id="tsSwatchEl"></div>
-        <div class="ts-info">
-          <div class="ts-name" id="tsNameEl">—</div>
-          <div class="ts-id" id="tsIdEl"></div>
+      <div class="theme-grid">
+        {% for t in themes %}
+        <div class="theme-opt">
+          <input type="radio" name="theme_id" id="t_{{ t.id }}" value="{{ t.id }}"
+                 {{ 'checked' if t.id == inv.theme_id }}>
+          <label for="t_{{ t.id }}">
+            <div class="tp-prev" style="background:{{ t.preview_color }}">
+              <span style="color:{{ t.accent_color }}">✦</span>
+            </div>
+            <div class="tp-name">{{ t.name }}</div>
+          </label>
         </div>
-        <span class="ts-clear" onclick="clearTheme()">✕ Ganti tema</span>
+        {% endfor %}
       </div>
     </div>
 
@@ -157,7 +133,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             </div>
           </div>
           {% endif %}
-          <div class="portrait-zone">
+          <div class="photo-upload-zone" style="padding:.9rem">
             <input type="file" name="groom_photo" accept=".jpg,.jpeg,.png,.webp" onchange="previewPortrait(this,'prev-groom')">
             <div class="puz-text" style="font-size:.72rem">📷 {{ 'Ganti' if inv.groom_photo else 'Upload' }} foto pria</div>
             <div style="font-size:.63rem;color:#bbb;margin-top:.15rem">JPG/PNG/WebP · maks 5MB</div>
@@ -180,7 +156,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
             </div>
           </div>
           {% endif %}
-          <div class="portrait-zone">
+          <div class="photo-upload-zone" style="padding:.9rem">
             <input type="file" name="bride_photo" accept=".jpg,.jpeg,.png,.webp" onchange="previewPortrait(this,'prev-bride')">
             <div class="puz-text" style="font-size:.72rem">📷 {{ 'Ganti' if inv.bride_photo else 'Upload' }} foto wanita</div>
             <div style="font-size:.63rem;color:#bbb;margin-top:.15rem">JPG/PNG/WebP · maks 5MB</div>
@@ -217,7 +193,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
     <!-- FOTO -->
     <div class="card">
-      <div class="card-title">Foto Prewed — Gallery</div>
+      <div class="card-title">Foto Prewed</div>
       {% if photos %}
       <div class="existing-photos">
         {% for p in photos %}
@@ -228,9 +204,9 @@ textarea.form-input{resize:vertical;min-height:80px;}
         {% endfor %}
       </div>
       {% endif %}
-      <div class="photo-upload-zone" id="galleryZone">
-        <input type="file" name="photos" accept=".jpg,.jpeg,.png,.webp" multiple onchange="previewPhotos(this)">
-        <div class="puz-text">📸 Klik atau seret foto baru — bisa pilih banyak sekaligus</div>
+      <div class="photo-upload-zone">
+        <input type="file" name="photo0" accept=".jpg,.jpeg,.png,.webp" multiple onchange="previewPhotos(this)">
+        <div class="puz-text">📸 Klik atau seret foto baru</div>
         <div style="font-size:.68rem;color:#bbb;margin-top:.2rem">Maks 5MB per foto • JPG/PNG/WebP</div>
       </div>
       <div class="photo-preview-row" id="photoPreview"></div>
@@ -290,150 +266,30 @@ textarea.form-input{resize:vertical;min-height:80px;}
 </div>
 
 <script>
-// ── THEME DATA ──
-const THEMES = [
-  {% for t in themes %}
-  {id:{{ t.id|tojson }},name:{{ t.name|tojson }},preview_color:{{ t.preview_color|tojson }},accent_color:{{ t.accent_color|tojson }},tags:{{ (t.tags or [])|tojson }},price_label:{{ (t.price_label or '')|tojson }},demo_photo:{{ ((t.demo_photos or [None])[0])|tojson }}}{% if not loop.last %},{% endif %}
-  {% endfor %}
-];
-
-// ── THEME SEARCH PICKER ──
-const searchInput = document.getElementById('themeSearch');
-const resultsBox  = document.getElementById('themeResults');
-const hiddenInput = document.getElementById('theme_id_input');
-const selectedBox = document.getElementById('themeSelected');
-const tsSwatchEl  = document.getElementById('tsSwatchEl');
-const tsNameEl    = document.getElementById('tsNameEl');
-const tsIdEl      = document.getElementById('tsIdEl');
-let focusedIdx = -1;
-let filteredList = [];
-
-// Pre-select current theme on page load
-const initId = hiddenInput.value;
-if (initId) { const t = THEMES.find(x => x.id === initId); if (t) applyTheme(t); }
-
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim().toLowerCase();
-  focusedIdx = -1;
-  if (!q) { closeResults(); return; }
-  filteredList = THEMES.filter(t =>
-    t.name.toLowerCase().includes(q) ||
-    t.id.toLowerCase().includes(q) ||
-    (t.tags||[]).some(tag => tag.toLowerCase().includes(q))
-  );
-  renderResults();
-});
-
-searchInput.addEventListener('keydown', e => {
-  const items = resultsBox.querySelectorAll('.tr-item');
-  if (!items.length) return;
-  if (e.key === 'ArrowDown')  { e.preventDefault(); focusedIdx = Math.min(focusedIdx+1, items.length-1); highlight(items); }
-  else if (e.key === 'ArrowUp')   { e.preventDefault(); focusedIdx = Math.max(focusedIdx-1, 0); highlight(items); }
-  else if (e.key === 'Enter' && focusedIdx >= 0) { e.preventDefault(); pickTheme(focusedIdx); }
-  else if (e.key === 'Escape')    { closeResults(); }
-});
-
-function highlight(items) {
-  items.forEach((el,i) => el.classList.toggle('focused', i===focusedIdx));
-  if (focusedIdx >= 0) items[focusedIdx].scrollIntoView({block:'nearest'});
-}
-
-function renderResults() {
-  if (!filteredList.length) {
-    resultsBox.innerHTML = '<div class="no-results">Tidak ada tema ditemukan</div>';
-  } else {
-    resultsBox.innerHTML = filteredList.map((t,i) => {
-      const thumb = t.demo_photo
-        ? `<img src="${t.demo_photo}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;flex-shrink:0" loading="lazy">`
-        : `<div class="tr-swatch" style="background:${t.preview_color}"><span style="color:${t.accent_color}">✦</span></div>`;
-      const tags = (t.tags||[]).slice(0,4).join(', ');
-      const price = t.price_label ? `<span class="tr-price">${t.price_label}</span>` : '';
-      return `<div class="tr-item" onclick="pickTheme(${i})">
-        ${thumb}
-        <div class="tr-info">
-          <div class="tr-name">${t.name}</div>
-          ${tags ? `<div class="tr-tags">${tags}</div>` : ''}
-        </div>${price}</div>`;
-    }).join('');
-  }
-  resultsBox.classList.add('open');
-}
-
-function pickTheme(idx) {
-  const t = filteredList[idx];
-  if (!t) return;
-  applyTheme(t);
-  closeResults();
-  searchInput.value = '';
-}
-
-function applyTheme(t) {
-  hiddenInput.value = t.id;
-  if (t.demo_photo) {
-    tsSwatchEl.innerHTML = `<img src="${t.demo_photo}" style="width:44px;height:44px;object-fit:cover;border-radius:4px">`;
-  } else {
-    tsSwatchEl.style.background = t.preview_color;
-    tsSwatchEl.innerHTML = `<span style="color:${t.accent_color}">✦</span>`;
-  }
-  tsNameEl.textContent = t.name;
-  tsIdEl.textContent   = t.id;
-  selectedBox.classList.add('show');
-}
-
-function clearTheme() {
-  hiddenInput.value = '';
-  selectedBox.classList.remove('show');
-  searchInput.value = '';
-  searchInput.focus();
-}
-
-function closeResults() { resultsBox.classList.remove('open'); focusedIdx = -1; }
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('.theme-search-wrap')) closeResults();
-});
-
-// ── PORTRAIT PREVIEW ──
 function previewPortrait(inp, previewId) {
   const img = document.getElementById(previewId);
   if (!inp.files || !inp.files[0]) return;
   img.src = URL.createObjectURL(inp.files[0]);
   img.style.display = 'block';
 }
-
-// ── GALLERY PREVIEW ──
-function previewPhotos(inp) {
-  const pr = document.getElementById('photoPreview');
-  pr.innerHTML = '';
-  Array.from(inp.files).slice(0,10).forEach(f => {
-    const img = document.createElement('img');
-    img.className = 'photo-thumb';
-    img.src = URL.createObjectURL(f);
-    pr.appendChild(img);
-  });
+let urlCount=1;
+function addUrlField(){
+  if(urlCount>=9)return;
+  const d=document.createElement('div');d.className='url-row';
+  d.innerHTML=`<input class="form-input" type="url" name="photo_url_${urlCount}" placeholder="https://...">`;
+  document.getElementById('url-fields').appendChild(d);urlCount++;
 }
-
-// Drag & drop feedback
-const galleryZone = document.getElementById('galleryZone');
-galleryZone.addEventListener('dragover', e => { e.preventDefault(); galleryZone.classList.add('dragover'); });
-['dragleave','drop'].forEach(ev => galleryZone.addEventListener(ev, () => galleryZone.classList.remove('dragover')));
-
-// ── URL FIELDS ──
-let urlCount = 1;
-function addUrlField() {
-  if (urlCount >= 9) return;
-  const d = document.createElement('div');
-  d.className = 'url-row';
-  d.innerHTML = `<input class="form-input" type="url" name="photo_url_${urlCount}" placeholder="https://...">`;
-  document.getElementById('url-fields').appendChild(d);
-  urlCount++;
+function previewPhotos(inp){
+  const pr=document.getElementById('photoPreview');pr.innerHTML='';
+  for(let i=0;i<Math.min(inp.files.length,10);i++){
+    const img=document.createElement('img');img.className='photo-thumb';
+    img.src=URL.createObjectURL(inp.files[i]);pr.appendChild(img);
+  }
 }
-
-// ── DELETE PHOTO ──
-async function deletePhoto(id) {
-  if (!confirm('Hapus foto ini?')) return;
-  const r = await fetch(`/admin/photo/delete/${id}`, {method:'POST'});
-  if ((await r.json()).success) document.getElementById(`ep-${id}`).remove();
+async function deletePhoto(id){
+  if(!confirm('Hapus foto ini?'))return;
+  const r=await fetch(`/admin/photo/delete/${id}`,{method:'POST'});
+  if((await r.json()).success)document.getElementById(`ep-${id}`).remove();
 }
 </script>
 </body>

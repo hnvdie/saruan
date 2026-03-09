@@ -21,22 +21,11 @@ Buat BENAR-BENAR UNIK — bukan template. Ini karya, bukan form.
 {{ inv.maps_url }}, {{ inv.maps_embed_html }}
 {{ inv.love_story }}, {{ inv.id }}, {{ inv.music_url }}
 
-Foto Profil Mempelai (opsional — bisa None):
-{{ inv.groom_photo_url }}  ← URL foto portrait pria (dari upload khusus, bukan gallery)
-{{ inv.bride_photo_url }}  ← URL foto portrait wanita (dari upload khusus, bukan gallery)
-
-Cara pakai di template:
-{% if inv.groom_photo_url %}
-  <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
-{% elif photos and photos|length > 1 %}
-  <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">  {# fallback ke gallery #}
-{% endif %}
-
-Photos (gallery umum):
+Photos:
 {% if photos %}{% for p in photos %}{{ photo_src(p) }}{% endfor %}{% endif %}
 - photos[0] = foto couple/bersama
-- photos[1] = foto mempelai pria (jika groom_photo_url kosong, pakai ini sebagai fallback)
-- photos[2] = foto mempelai wanita (jika bride_photo_url kosong, pakai ini sebagai fallback)
+- photos[1] = foto mempelai pria
+- photos[2] = foto mempelai wanita
 - photos[3+] = foto tambahan
 
 Gifts:

@@ -1,0 +1,48 @@
+{
+  "id": "bloompetal",
+  "name": "Bloom Petal",
+  "description": "Romansa taman bunga Jawa bertemu elegance Belle Époque — lembut, hangat, dan penuh kebahagiaan muda. Kelopak melayang, tipografi kaligrafi, dan palet krem-rose-sage yang membuat hati bergetar.",
+  "preview_color": "#E8B4B8",
+  "accent_color": "#C98EA0",
+  "skeleton": "bloompetal",
+  "tags": ["romantic", "soft", "pastel", "young", "floral", "elegant", "jawa", "garden"],
+  "demo_photos": [
+    "/static/themes/bloompetal/photos/couple.jpg",
+    "/static/themes/bloompetal/photos/groom.jpg",
+    "/static/themes/bloompetal/photos/bride.jpg"
+  ],
+  "price": 85000,
+  "price_label": "Rp. 85.000",
+  "price_original": 120000,
+  "price_note": "Harga promo terbatas",
+  "palette": {
+    "blossom_cream": "#FBF5EE",
+    "dusty_rose": "#E8B4B8",
+    "rose_deep": "#C98EA0",
+    "sage_whisper": "#A8B89A",
+    "sage_dark": "#7A9068",
+    "coral_dew": "#F2C4A0",
+    "warm_brown": "#7A5C4E",
+    "antique_gold": "#C9A96E",
+    "muted_mocha": "#9E8880",
+    "ivory_mist": "#FFF8F2"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "serif": "Cormorant Garamond",
+    "script": "Dancing Script",
+    "sans": "Jost"
+  },
+  "features": [
+    "Swipe card navigation fullscreen",
+    "Envelope opening dengan efek curtain split dramatis",
+    "Sistem partikel kelopak bunga melayang (canvas)",
+    "Countdown timer real-time hari/jam/menit/detik",
+    "Galeri foto masonry kreatif 2x2 asimetris",
+    "RSVP form dengan append guestbook real-time",
+    "Gift section bank + e-wallet dengan copy button",
+    "Music player floating dengan animasi rotating icon",
+    "Google Maps embed terintegrasi fullscreen",
+    "Fully responsive mobile (360px+) dan desktop (1024px+)"
+  ]
+}

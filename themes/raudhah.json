@@ -5,29 +5,35 @@
   "preview_color": "#3B2415",
   "accent_color": "#B89453",
   "skeleton": "raudhah",
-  "tags": ["arabic", "islamic", "arabesque", "gold", "dark", "romantic", "andalusia"],
-  "demo_photos": [
-    "/static/themes/raudhah/photos/couple.jpg",
-    "/static/themes/raudhah/photos/groom.jpg",
-    "/static/themes/raudhah/photos/bride.jpg"
+  "tags": [
+    "arabic",
+    "islamic",
+    "arabesque",
+    "gold",
+    "dark",
+    "romantic",
+    "andalusia"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 130000,
-  "price_note": "Harga promo terbatas",
+  "demo_photos": [
+    "/static/themes/raudhah/demo_f9347364.jpg"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
-    "oud":       "#3B2415",
-    "sand":      "#F5EDD8",
-    "gold":      "#B89453",
-    "terracotta":"#C4714A",
-    "moss":      "#4A6741",
-    "ivory":     "#FAF6EE",
-    "ink":       "#1E140A"
+    "oud": "#3B2415",
+    "sand": "#F5EDD8",
+    "gold": "#B89453",
+    "terracotta": "#C4714A",
+    "moss": "#4A6741",
+    "ivory": "#FAF6EE",
+    "ink": "#1E140A"
   },
   "fonts": {
     "display": "Aref Ruqaa",
-    "serif":   "Cormorant Garamond",
-    "sans":    "Jost"
+    "serif": "Cormorant Garamond",
+    "sans": "Jost"
   },
   "features": [
     "Swipe card navigation fullscreen (13 card)",

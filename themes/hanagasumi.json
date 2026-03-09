@@ -5,16 +5,22 @@
   "preview_color": "#9B2335",
   "accent_color": "#C49A3C",
   "skeleton": "hanagasumi",
-  "tags": ["japanese", "poster", "modern", "dramatic", "koi", "meiji", "swipe"],
-  "demo_photos": [
-    "/static/themes/hanagasumi/photos/couple.jpg",
-    "/static/themes/hanagasumi/photos/groom.jpg",
-    "/static/themes/hanagasumi/photos/bride.jpg"
+  "tags": [
+    "japanese",
+    "poster",
+    "modern",
+    "dramatic",
+    "koi",
+    "meiji",
+    "swipe"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga promo terbatas",
+  "demo_photos": [
+    "/static/themes/hanagasumi/demo_90da07cb.jpg"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "washi": "#F5EFE0",
     "sumi": "#1C1410",

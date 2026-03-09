@@ -188,22 +188,6 @@ def secure_name(fn):
     ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'jpg'
     return f'{uuid.uuid4().hex}.{ext}'
 
-_THEME_DEFAULTS = {
-    'name': '', 'description': '',
-    'preview_color': '#cccccc', 'accent_color': '#999999',
-    'tags': [], 'demo_photos': [], 'features': [],
-    'price': 0, 'price_label': '', 'price_original': 0, 'price_note': '',
-    'palette': {}, 'fonts': {},
-}
-
-def _normalize_theme(data: dict) -> dict:
-    """Pastikan semua field yang diakses template selalu ada — cegah Jinja Undefined / tojson error."""
-    result = {**_THEME_DEFAULTS, **data}
-    if not isinstance(result['tags'], list):        result['tags'] = []
-    if not isinstance(result['demo_photos'], list): result['demo_photos'] = []
-    if not isinstance(result['features'], list):    result['features'] = []
-    return result
-
 def get_all_themes():
     themes = []
     if THEMES_DIR.exists():
@@ -212,18 +196,15 @@ def get_all_themes():
                 continue
             try:
                 data = json.load(open(f))
+                # Must have 'id' field to be a valid theme
                 if 'id' in data:
-                    themes.append(_normalize_theme(data))
+                    themes.append(data)
             except: pass
     return themes
 
 def get_theme(tid):
     p = THEMES_DIR / f'{tid}.json'
-    if not p.exists(): return None
-    try:
-        return _normalize_theme(json.load(open(p)))
-    except:
-        return None
+    return json.load(open(p)) if p.exists() else None
 
 def get_inv_photos(conn, inv_id):
     return conn.execute(
@@ -637,15 +618,6 @@ def admin_edit(inv_id):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
-            # Handle clear portrait checkboxes
-            for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
-                if f.get(key):
-                    row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?',(inv_id,)).fetchone()
-                    if row and row[col]:
-                        try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
-                        except: pass
-                    conn.execute(f'UPDATE invitations SET {col}=NULL WHERE id=?',(inv_id,))
-            conn.commit()
             _save_photos(conn, inv_id, request.files, f)
             conn.commit(); conn.close()
             flash('Undangan berhasil diperbarui! ✓','success')
@@ -699,11 +671,11 @@ def admin_delete(inv_id):
             if inv_row[col]:
                 try: (UPLOAD_DIR / inv_row[col]).unlink(missing_ok=True)
                 except: pass
-    # Cascade delete semua data + row undangan (hard delete supaya storage bersih)
+    # Cascade delete semua data terkait undangan ini
     conn.execute('DELETE FROM rsvp WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
-    conn.execute('DELETE FROM invitations WHERE id=?',(inv_id,))
+    conn.execute('UPDATE invitations SET is_active=0 WHERE id=?',(inv_id,))
     conn.commit(); conn.close()
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
