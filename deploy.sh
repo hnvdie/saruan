@@ -34,7 +34,7 @@ echo ""
 # ── 1. SYSTEM DEPENDENCIES ──────────────────────────────────────
 info "Install system dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y -qq python3 python3-pip nginx certbot python3-certbot-nginx openssl curl
+sudo apt-get install -y -qq python3 python3-pip nginx certbot python3-certbot-nginx openssl curl imagemagick
 success "System dependencies OK"
 
 # ── 2. PYTHON DEPENDENCIES ──────────────────────────────────────
@@ -94,6 +94,10 @@ mkdir -p "$APP_DIR/logs"
 mkdir -p "$APP_DIR/static/uploads/invitations"
 mkdir -p "$APP_DIR/static/demo-photos/individual"
 chmod -R 755 "$APP_DIR/static"
+# Beri nginx akses ke /root kalau deploy sebagai root
+if [ "$APP_USER" = "root" ]; then
+    chmod o+x /root
+fi
 success "Folder OK"
 
 # ── 7. SSL DUMMY CERT (block scanner via IP) ────────────────────
@@ -173,11 +177,24 @@ server {
     location ^~ /data/  { deny all; return 404; }
     location ^~ /.git/  { deny all; return 404; }
 
+    # Upload limit
+    client_max_body_size 20M;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css application/javascript application/json
+               image/svg+xml image/jpeg image/png image/webp audio/mpeg;
+    gzip_min_length 1024;
+
     # Static files langsung dari Nginx
     location /static/ {
         alias ${STATIC_PATH}/;
         expires 30d;
         add_header Cache-Control "public, immutable";
+        access_log off;
     }
 
     # RSVP — rate limit ketat
@@ -276,6 +293,29 @@ else
     warn "  sudo certbot --nginx -d $DOMAIN -d $DOMAIN_WWW"
     warn "Sementara pakai dummy cert (HTTP tetap jalan via Nginx)"
 fi
+
+# ── 11. COMPRESS IMAGES ────────────────────────────────────────
+info "Compress static images..."
+BEFORE=$(du -sh "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/" 2>/dev/null | awk '{sum+=$1} END{print sum}')
+
+find "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/"     \( -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | while read f; do
+    # Skip kalau file < 50KB (sudah kecil)
+    size=$(stat -c%s "$f" 2>/dev/null || echo 0)
+    if [ "$size" -gt 51200 ]; then
+        convert "$f" -strip -quality 82 -resize "1200x>" "$f" 2>/dev/null && echo "  ✓ $(basename $f)"
+    fi
+done
+
+# Compress PNG (assets tema seperti rumahbanjar, gerbangzen)
+find "$APP_DIR/static/themes/" -name "*.png" 2>/dev/null | while read f; do
+    size=$(stat -c%s "$f" 2>/dev/null || echo 0)
+    if [ "$size" -gt 51200 ]; then
+        convert "$f" -strip -quality 85 "$f" 2>/dev/null && echo "  ✓ $(basename $f)"
+    fi
+done
+
+AFTER=$(du -sh "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/" 2>/dev/null | awk '{sum+=$1} END{print sum}')
+success "Images compressed — sebelum: ~${BEFORE}MB → sesudah: ~${AFTER}MB"
 
 # ── SELESAI ──────────────────────────────────────────────────────
 echo ""

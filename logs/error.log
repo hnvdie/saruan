@@ -1,0 +1,6 @@
+[2026-03-09 20:07:38 +0000] [15786] [INFO] Starting gunicorn 25.1.0
+[2026-03-09 20:07:38 +0000] [15786] [INFO] Listening at: http://127.0.0.1:5000 (15786)
+[2026-03-09 20:07:38 +0000] [15786] [INFO] Using worker: sync
+[2026-03-09 20:07:38 +0000] [15786] [INFO] Control socket listening at /root/saruan/gunicorn.ctl
+[2026-03-09 20:07:38 +0000] [15827] [INFO] Booting worker with pid: 15827
+[2026-03-09 20:07:38 +0000] [15828] [INFO] Booting worker with pid: 15828
