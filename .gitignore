@@ -9,6 +9,7 @@ data/
 *.db
 *.sqlite
 *.sqlite3
+logs/
 
 # Upload user
 static/uploads/
