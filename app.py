@@ -11,6 +11,10 @@ from functools import wraps
 from pathlib import Path
 from flask import send_from_directory
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
