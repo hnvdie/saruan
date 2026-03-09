@@ -182,6 +182,7 @@ TEKNIS:
    - Single file, CSS + JS inline
    - Jinja2 template lengkap
    - Kode bersih, diberi komentar per section
+   - responsive pada mobile & desktop mode
 
 2. [namatema].json
    Struktur WAJIB PERSIS seperti ini:
@@ -194,13 +195,11 @@ TEKNIS:
      "skeleton": "namatema",
      "tags": ["tag1", "tag2", "tag3"],
      "demo_photos": [
-       "/static/themes/namatema/photos/couple.jpg",
-       "/static/themes/namatema/photos/groom.jpg",
-       "/static/themes/namatema/photos/bride.jpg"
+       "/static/themes/namatema/photos/example.jpg",
      ],
-     "price": 85000,
-     "price_label": "Rp. 85.000",
-     "price_original": 120000,
+     "price": 25000,
+     "price_label": "Rp. 25.000",
+     "price_original": 50000,
      "price_note": "Harga promo terbatas",
      "palette": {
        "nama_warna_1": "#hex",
