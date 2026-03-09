@@ -455,8 +455,11 @@ def _build_og_tags(inv: dict, theme: dict, photos: list, site_name: str) -> str:
     image_url = None
     if photos:
         for p in photos:
-            fn     = p['filename'] if isinstance(p, dict) else p.filename
-            is_url = p['is_url']   if isinstance(p, dict) else p.is_url
+            try:
+                fn     = p['filename']
+                is_url = p['is_url']
+            except (KeyError, TypeError):
+                fn = is_url = None
             if fn:
                 image_url = fn if is_url else f'https://{site_name}/uploads/{fn}'
                 break
