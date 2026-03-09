@@ -1,66 +1,13 @@
 <!DOCTYPE html>
-<html lang="id" prefix="og: https://ogp.me/ns#">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-
-{# ── SEO ── #}
-<title>{{ site_name }} — Undangan Digital Pernikahan Elegan &amp; Modern</title>
-<meta name="description" content="Undangan digital pernikahan elegan dengan {{ themes|length }}+ tema eksklusif, animasi unik, RSVP otomatis, galeri foto, dan countdown timer. Siap dalam 24 jam. Mulai dari Rp 25.000.">
-<meta name="keywords" content="undangan digital pernikahan, undangan online nikah, undangan pernikahan online, undangan digital murah, undangan nikah digital, undangan web pernikahan, {{ site_name }}">
-<meta name="author" content="{{ site_name }}">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://{{ site_name }}/">
-
-{# ── Open Graph (Facebook, WhatsApp, Telegram) ── #}
-<meta property="og:type"        content="website">
-<meta property="og:url"         content="https://{{ site_name }}/">
-<meta property="og:site_name"   content="{{ site_name }}">
-<meta property="og:title"       content="{{ site_name }} — Undangan Digital Pernikahan Elegan">
-<meta property="og:description" content="{{ themes|length }}+ tema eksklusif dengan animasi unik. RSVP otomatis, galeri foto, countdown timer. Siap 24 jam. Mulai Rp 25.000.">
-<meta property="og:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
-<meta property="og:image:width"  content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt"   content="{{ site_name }} — Undangan Digital Pernikahan">
-<meta property="og:locale"      content="id_ID">
-
-{# ── Twitter / X Card ── #}
-<meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="{{ site_name }} — Undangan Digital Pernikahan Elegan">
-<meta name="twitter:description" content="{{ themes|length }}+ tema eksklusif dengan animasi unik. RSVP otomatis, galeri foto. Mulai Rp 25.000.">
-<meta name="twitter:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
-<meta name="twitter:image:alt"   content="{{ site_name }} — Undangan Digital Pernikahan">
-
-{# ── Favicon ── #}
+<title>{{ site_name }} — Undangan Digital Pernikahan</title>
+<meta name="description" content="Undangan digital pernikahan elegan. Berbagai tema eksklusif, RSVP otomatis, galeri foto.">
+<meta property="og:title" content="{{ site_name }} — Undangan Digital Pernikahan">
+<meta property="og:description" content="Undangan digital pernikahan elegan dengan animasi unik dan RSVP otomatis.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
-
-{# ── Schema.org JSON-LD ── #}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "{{ site_name }}",
-  "url": "https://{{ site_name }}",
-  "description": "Undangan digital pernikahan elegan dengan {{ themes|length }}+ tema eksklusif, animasi unik, RSVP otomatis, dan galeri foto. Siap dalam 24 jam.",
-  "image": "https://{{ site_name }}/static/themes/banner.jpg",
-  "priceRange": "Rp 25.000 - Rp 100.000",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "customer service",
-    "availableLanguage": "Indonesian"
-  },
-  "sameAs": [],
-  "offers": {
-    "@type": "AggregateOffer",
-    "priceCurrency": "IDR",
-    "lowPrice": "25000",
-    "highPrice": "100000",
-    "offerCount": "{{ themes|length }}"
-  }
-}
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
@@ -280,7 +227,7 @@ footer{
 </nav>
 
 <div class="site-banner">
-  <img src="/static/themes/banner.jpg" alt="{{ site_name }} — Undangan Digital Pernikahan Elegan" width="1200" height="340" loading="eager" fetchpriority="high">
+  <img src="/static/themes/banner.jpg" alt="{{ site_name }}">
 </div>
 
 <section id="hero">

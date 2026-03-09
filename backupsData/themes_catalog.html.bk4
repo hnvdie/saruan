@@ -1,57 +1,11 @@
 <!DOCTYPE html>
-<html lang="id" prefix="og: https://ogp.me/ns#">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-
-{# ── SEO ── #}
-<title>Katalog Tema Undangan Digital — {{ themes|length }}+ Tema Eksklusif | {{ site_name }}</title>
-<meta name="description" content="Katalog {{ themes|length }}+ tema undangan digital pernikahan eksklusif. Tema romantic, modern, islami, Jawa, Jepang, dan lebih banyak lagi. Lihat demo langsung sebelum pesan.">
-<meta name="keywords" content="tema undangan digital, katalog undangan pernikahan online, undangan digital romantic, undangan digital islami, undangan digital modern, undangan digital jawa, {{ site_name }}">
-<meta name="author" content="{{ site_name }}">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://{{ site_name }}/themes">
-
-{# ── Open Graph (Facebook, WhatsApp, Telegram) ── #}
-<meta property="og:type"        content="website">
-<meta property="og:url"         content="https://{{ site_name }}/themes">
-<meta property="og:site_name"   content="{{ site_name }}">
-<meta property="og:title"       content="{{ themes|length }}+ Tema Undangan Digital Pernikahan Eksklusif — {{ site_name }}">
-<meta property="og:description" content="Pilih dari {{ themes|length }}+ tema eksklusif dengan animasi unik. Tema romantic, islami, modern, Jawa, dan lainnya. Demo langsung tersedia.">
-<meta property="og:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
-<meta property="og:image:width"  content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt"   content="Katalog Tema Undangan Digital — {{ site_name }}">
-<meta property="og:locale"      content="id_ID">
-
-{# ── Twitter / X Card ── #}
-<meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="{{ themes|length }}+ Tema Undangan Digital Pernikahan — {{ site_name }}">
-<meta name="twitter:description" content="Pilih dari {{ themes|length }}+ tema eksklusif. Demo langsung tersedia. Mulai Rp 25.000.">
-<meta name="twitter:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
-<meta name="twitter:image:alt"   content="Katalog Tema Undangan Digital — {{ site_name }}">
-
-{# ── Favicon ── #}
+<title>Katalog Tema — {{ site_name }}</title>
+<meta name="description" content="{{ themes|length }} tema undangan digital pernikahan eksklusif. Lihat demo langsung.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
-
-{# ── Schema.org JSON-LD ── #}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "Katalog Tema Undangan Digital — {{ site_name }}",
-  "url": "https://{{ site_name }}/themes",
-  "description": "Katalog {{ themes|length }}+ tema undangan digital pernikahan eksklusif dengan animasi unik.",
-  "image": "https://{{ site_name }}/static/themes/banner.jpg",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "{{ site_name }}",
-    "url": "https://{{ site_name }}"
-  }
-}
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}

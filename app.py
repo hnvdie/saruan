@@ -5,7 +5,7 @@ Config via environment variables (see README).
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory)
-import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, imghdr
+import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -43,7 +43,7 @@ SESSION_HOURS   = 8
 
 # Simple rate limit — no owner IP concept, just use reCAPTCHA for protection
 RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
-RATE_MAX_ATTEMPTS = 30        # 30 percobaan per window
+RATE_MAX_ATTEMPTS = 5        # 30 percobaan per window
 RATE_STORE: dict  = {}
 
 # RSVP-specific rate limit (anti-spam bot)
@@ -549,7 +549,7 @@ def admin_login():
                 return redirect(url_for('admin_dashboard'))
             else:
                 left = attempts_left(ip)
-                error = f'Username atau password salah.' + (f' ({left} percobaan tersisa dalam window ini)' if left < RATE_MAX_ATTEMPTS else '')
+                error = f'Username atau password salah.' + (f' ({left})' if left < RATE_MAX_ATTEMPTS else '')
 
     return render_template('admin/login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
 
