@@ -3,7 +3,7 @@ UndanganKita v3 — Flask Wedding Invitation App
 Config via environment variables (see README).
 """
 
-from flask import (Flask, render_template, request, redirect, url_for, make_response,
+from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory)
 import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
@@ -412,58 +412,71 @@ def theme_preview(theme_id):
 # ─── OG TAGS INJECTOR ───────────────────────────────────────────────────────
 def _build_og_tags(inv: dict, theme: dict, photos: list, site_name: str) -> str:
     """Build OG/Twitter meta tags dinamis dari data undangan — disuntik ke <head> tiap tema."""
-    groom   = inv.get('groom_name', '')
-    bride   = inv.get('bride_name', '')
-    slug    = inv.get('slug', '')
-    url     = f'https://{site_name}/i/{slug}'
+    groom = inv.get('groom_name', '')
+    bride = inv.get('bride_name', '')
+    slug  = inv.get('slug', '')
+    url   = f'https://{site_name}/i/{slug}'
 
-    # Judul & deskripsi
-    title   = f"Undangan Pernikahan {groom} & {bride}"
+    # ── Title natural — tanpa nama tema ──────────────────────────
+    # Format: "Undangan Pernikahan Rizky & Alya — 12 April 2026"
     resepsi_date = inv.get('resepsi_date', '')
+    akad_date    = inv.get('akad_date', '')
     venue        = inv.get('resepsi_venue', '') or inv.get('akad_venue', '')
+    tgl = ''
+    tgl_pendek = ''
     try:
         from datetime import datetime as _dt
-        d = _dt.strptime(resepsi_date, '%Y-%m-%d')
+        d = _dt.strptime(resepsi_date or akad_date, '%Y-%m-%d')
         days   = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']
         months = ['Januari','Februari','Maret','April','Mei','Juni','Juli',
                   'Agustus','September','Oktober','November','Desember']
-        tgl = f"{days[d.weekday()]}, {d.day} {months[d.month-1]} {d.year}"
+        tgl        = f"{days[d.weekday()]}, {d.day} {months[d.month-1]} {d.year}"
+        tgl_pendek = f"{d.day} {months[d.month-1]} {d.year}"
     except:
-        tgl = resepsi_date
+        tgl = resepsi_date or akad_date
 
-    desc_parts = [f"Kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan {groom} & {bride}."]
-    if tgl:   desc_parts.append(f"📅 {tgl}")
-    if venue: desc_parts.append(f"📍 {venue}")
-    desc_parts.append(f"Buka undangan digital di: {url}")
+    # Title: "Undangan Pernikahan Rizky & Alya — 12 April 2026"
+    title = f"Undangan Pernikahan {groom} & {bride}"
+    if tgl_pendek:
+        title += f" — {tgl_pendek}"
+
+    # ── Deskripsi kaya, layaknya preview undangan asli ───────────
+    desc_parts = []
+    desc_parts.append(f"💌 {groom} & {bride} mengundang kehadiran Bapak/Ibu/Saudara/i")
+    if tgl:
+        desc_parts.append(f"📅 {tgl}")
+    if venue:
+        desc_parts.append(f"📍 {venue}")
+    desc_parts.append(f"Buka undangan & konfirmasi kehadiran di: {url}")
     description = " · ".join(desc_parts)
 
-    # Gambar OG — prioritas: cover_photo > groom_photo > foto gallery pertama > banner
+    # ── Gambar OG — prioritas: foto gallery > groom_photo > cover > banner ──
+    # Gallery foto prewed lebih menarik untuk preview sosmed
     image_url = None
-    if inv.get('cover_photo'):
-        image_url = f'https://{site_name}/uploads/{inv["cover_photo"]}'
-    elif inv.get('groom_photo'):
+    if photos:
+        for p in photos:
+            fn     = p['filename'] if isinstance(p, dict) else p.filename
+            is_url = p['is_url']   if isinstance(p, dict) else p.is_url
+            if fn:
+                image_url = fn if is_url else f'https://{site_name}/uploads/{fn}'
+                break
+    if not image_url and inv.get('groom_photo'):
         image_url = f'https://{site_name}/uploads/{inv["groom_photo"]}'
-    elif photos:
-        first = photos[0]
-        fn = first['filename'] if isinstance(first, dict) else first.filename
-        is_url = first['is_url'] if isinstance(first, dict) else first.is_url
-        if is_url:
-            image_url = fn
-        else:
-            image_url = f'https://{site_name}/uploads/{fn}'
+    if not image_url and inv.get('cover_photo'):
+        image_url = f'https://{site_name}/uploads/{inv["cover_photo"]}'
     if not image_url:
         image_url = f'https://{site_name}/static/themes/banner.jpg'
 
-    theme_name = theme.get('name', '') if theme else ''
-
     tags = f"""
-  <!-- OG Tags — auto-inject by UndanganKita, no tema edit needed -->
+  <!-- OG Tags — auto-inject UndanganKita -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="{url}">
   <meta property="og:site_name"   content="{site_name}">
   <meta property="og:title"       content="{title}">
   <meta property="og:description" content="{description}">
   <meta property="og:image"       content="{image_url}">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:image:alt"   content="Undangan Pernikahan {groom} &amp; {bride}">
   <meta property="og:locale"      content="id_ID">
   <meta name="twitter:card"        content="summary_large_image">
@@ -471,7 +484,7 @@ def _build_og_tags(inv: dict, theme: dict, photos: list, site_name: str) -> str:
   <meta name="twitter:description" content="{description}">
   <meta name="twitter:image"       content="{image_url}">
   <meta name="description"         content="{description}">
-  <title>{title}{(' — ' + theme_name) if theme_name else ''}</title>"""
+  <title>{title}</title>"""
     return tags
 
 def _inject_og(html: str, og_tags: str) -> str:
