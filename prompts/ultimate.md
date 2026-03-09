@@ -134,7 +134,6 @@ TEKNIS:
    - Single file, CSS + JS inline
    - Jinja2 template lengkap
    - Kode bersih, diberi komentar per section
-   - Max-width 480px, mobile-first
 
 2. [namatema].json
    Struktur:
@@ -146,8 +145,8 @@ TEKNIS:
      "accent_color": "#hex",
      "skeleton": "namatema",
      "tags": [...],
-     "demo_photos": ["/static/themes/namatema/cover.jpg"],
-     "price": 85000,
+     "demo_photos": ["/static/themes/namatema/e.g.jpg"],
+     "price": 25.000,
      "price_label": "Rp. 85.000",
      "price_original": 120000,
      "price_note": "...",

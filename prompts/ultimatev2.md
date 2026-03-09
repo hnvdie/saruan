@@ -136,7 +136,7 @@ TEKNIS:
    - Single file, CSS + JS inline
    - Jinja2 template lengkap
    - Kode bersih, diberi komentar per section
-   - Max-width 480px, mobile-first
+   - responsive mobile & desktop
 
 2. [namatema].json
    Struktur:
