@@ -9,20 +9,10 @@ import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
-from werkzeug.middleware.proxy_fix import ProxyFix
-from dotenv import load_dotenv
-load_dotenv()
+from flask import send_from_directory
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-
-# SECRET_KEY wajib di-set via env var — jangan pakai fallback random di produksi
-_sk = os.environ.get('SECRET_KEY')
-if not _sk:
-    import sys
-    print('[WARNING] SECRET_KEY env var tidak di-set! Session tidak persisten antar restart.', file=sys.stderr)
-    _sk = secrets.token_hex(32)
-app.secret_key = _sk
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
@@ -43,7 +33,7 @@ SESSION_HOURS   = 8
 
 # Simple rate limit — no owner IP concept, just use reCAPTCHA for protection
 RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
-RATE_MAX_ATTEMPTS = 5        # 30 percobaan per window
+RATE_MAX_ATTEMPTS = 30        # 30 percobaan per window
 RATE_STORE: dict  = {}
 
 # RSVP-specific rate limit (anti-spam bot)
@@ -193,19 +183,7 @@ def init_db():
     c.commit(); c.close()
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
-# Magic bytes untuk validasi konten file — bukan hanya ekstensi
 def allowed_file(fn): return '.' in fn and fn.rsplit('.',1)[1].lower() in ALLOWED_EXT
-
-def validate_image_bytes(stream) -> bool:
-    """Validasi magic bytes — cegah file non-gambar yang diganti ekstensi."""
-    stream.seek(0)
-    header = stream.read(12)
-    stream.seek(0)
-    if header[:3] == b'\xff\xd8\xff': return True   # JPEG
-    if header[:4] == b'\x89PNG': return True           # PNG
-    if header[:4] == b'RIFF' and header[8:12] == b'WEBP': return True  # WebP
-    return False
-
 def secure_name(fn):
     ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'jpg'
     return f'{uuid.uuid4().hex}.{ext}'
@@ -339,31 +317,7 @@ def inject_globals():
         'site_name': SITE_NAME,
         'photo_src': photo_src,
         'recaptcha_key': RECAPTCHA_KEY,
-        'csrf_token': generate_csrf_token(),
     }
-
-# ─── CSRF PROTECTION ────────────────────────────────────────────────────────
-def generate_csrf_token() -> str:
-    if 'csrf_token' not in session:
-        session['csrf_token'] = secrets.token_hex(32)
-    return session['csrf_token']
-
-def csrf_protect(f):
-    """Decorator: validasi CSRF token di semua admin POST request."""
-    @wraps(f)
-    def dec(*a, **kw):
-        if request.method == 'POST':
-            token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken', '')
-            if isinstance(token, str) and token:
-                pass
-            else:
-                # coba dari JSON body
-                body = request.get_json(silent=True, force=True) or {}
-                token = body.get('csrf_token', '')
-            if not token or not hmac.compare_digest(token, session.get('csrf_token', '')):
-                abort(403)
-        return f(*a, **kw)
-    return dec
 
 # ─── ERROR HANDLERS ──────────────────────────────────────────────────────────
 @app.errorhandler(404)
@@ -455,6 +409,80 @@ def preview_theme(theme_id):
 def theme_preview(theme_id):
     return preview_theme(theme_id)
 
+# ─── OG TAGS INJECTOR ───────────────────────────────────────────────────────
+def _build_og_tags(inv: dict, theme: dict, photos: list, site_name: str) -> str:
+    """Build OG/Twitter meta tags dinamis dari data undangan — disuntik ke <head> tiap tema."""
+    groom   = inv.get('groom_name', '')
+    bride   = inv.get('bride_name', '')
+    slug    = inv.get('slug', '')
+    url     = f'https://{site_name}/i/{slug}'
+
+    # Judul & deskripsi
+    title   = f"Undangan Pernikahan {groom} & {bride}"
+    resepsi_date = inv.get('resepsi_date', '')
+    venue        = inv.get('resepsi_venue', '') or inv.get('akad_venue', '')
+    try:
+        from datetime import datetime as _dt
+        d = _dt.strptime(resepsi_date, '%Y-%m-%d')
+        days   = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']
+        months = ['Januari','Februari','Maret','April','Mei','Juni','Juli',
+                  'Agustus','September','Oktober','November','Desember']
+        tgl = f"{days[d.weekday()]}, {d.day} {months[d.month-1]} {d.year}"
+    except:
+        tgl = resepsi_date
+
+    desc_parts = [f"Kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan {groom} & {bride}."]
+    if tgl:   desc_parts.append(f"📅 {tgl}")
+    if venue: desc_parts.append(f"📍 {venue}")
+    desc_parts.append(f"Buka undangan digital di: {url}")
+    description = " · ".join(desc_parts)
+
+    # Gambar OG — prioritas: cover_photo > groom_photo > foto gallery pertama > banner
+    image_url = None
+    if inv.get('cover_photo'):
+        image_url = f'https://{site_name}/uploads/{inv["cover_photo"]}'
+    elif inv.get('groom_photo'):
+        image_url = f'https://{site_name}/uploads/{inv["groom_photo"]}'
+    elif photos:
+        first = photos[0]
+        fn = first['filename'] if isinstance(first, dict) else first.filename
+        is_url = first['is_url'] if isinstance(first, dict) else first.is_url
+        if is_url:
+            image_url = fn
+        else:
+            image_url = f'https://{site_name}/uploads/{fn}'
+    if not image_url:
+        image_url = f'https://{site_name}/static/themes/banner.jpg'
+
+    theme_name = theme.get('name', '') if theme else ''
+
+    tags = f"""
+  <!-- OG Tags — auto-inject by UndanganKita, no tema edit needed -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="{url}">
+  <meta property="og:site_name"   content="{site_name}">
+  <meta property="og:title"       content="{title}">
+  <meta property="og:description" content="{description}">
+  <meta property="og:image"       content="{image_url}">
+  <meta property="og:image:alt"   content="Undangan Pernikahan {groom} &amp; {bride}">
+  <meta property="og:locale"      content="id_ID">
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="{title}">
+  <meta name="twitter:description" content="{description}">
+  <meta name="twitter:image"       content="{image_url}">
+  <meta name="description"         content="{description}">
+  <title>{title}{(' — ' + theme_name) if theme_name else ''}</title>"""
+    return tags
+
+def _inject_og(html: str, og_tags: str) -> str:
+    """Sisipkan OG tags tepat setelah tag <head> — replace <title> bawaan tema juga."""
+    import re
+    # Hapus <title> bawaan tema supaya tidak duplikat
+    html = re.sub(r'<title>[^<]*</title>', '', html, count=1)
+    # Sisipkan setelah <head> atau <head ...>
+    html = re.sub(r'(<head[^>]*>)', r'\1' + og_tags, html, count=1)
+    return html
+
 @app.route('/i/<slug>')
 def view_invitation(slug):
     conn = get_db()
@@ -478,9 +506,15 @@ def view_invitation(slug):
     inv['groom_photo_url'] = f'/uploads/{inv["groom_photo"]}' if inv.get('groom_photo') else None
     inv['bride_photo_url'] = f'/uploads/{inv["bride_photo"]}' if inv.get('bride_photo') else None
     conn.close()
-    return render_template(f'themes/{inv["theme_id"]}.html',
+    html = render_template(f'themes/{inv["theme_id"]}.html',
                            inv=inv, theme=theme, rsvp_list=rsvps,
                            gifts=gifts, photos=photos, is_preview=False)
+    # Inject OG tags dinamis — tanpa perlu ubah tiap file tema
+    og  = _build_og_tags(inv, theme, list(photos), SITE_NAME)
+    html = _inject_og(html, og)
+    resp = make_response(html)
+    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return resp
 
 @app.route('/rsvp/<inv_id>', methods=['POST'])
 def submit_rsvp(inv_id):
@@ -509,9 +543,8 @@ def submit_rsvp(inv_id):
 
     conn.execute(
         'INSERT INTO rsvp(invitation_id,guest_name,attendance,guest_count,message) VALUES(?,?,?,?,?)',
-        (inv_id, data['name'].strip()[:100],
-         data.get('attendance','hadir') if data.get('attendance') in ('hadir','tidak_hadir') else 'hadir',
-         min(max(int(data.get('count',1)),1),20), data.get('message','')[:500]))
+        (inv_id, data['name'].strip()[:100], data.get('attendance','hadir'),
+         min(int(data.get('count',1)),20), data.get('message','')[:500]))
     conn.commit()
     total = conn.execute('SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?',(inv_id,)).fetchone()['c']
     conn.close()
@@ -549,7 +582,7 @@ def admin_login():
                 return redirect(url_for('admin_dashboard'))
             else:
                 left = attempts_left(ip)
-                error = f'Username atau password salah.' + (f' ({left})' if left < RATE_MAX_ATTEMPTS else '')
+                error = f'Username atau password salah.' + (f' ({left} percobaan tersisa dalam window ini)' if left < RATE_MAX_ATTEMPTS else '')
 
     return render_template('admin/login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
 
@@ -603,7 +636,6 @@ def admin_dashboard():
 # ─── ADMIN CREATE ────────────────────────────────────────────────────────────
 @app.route('/admin/create', methods=['GET','POST'])
 @login_required
-@csrf_protect
 def admin_create():
     themes = get_all_themes()
     if request.method == 'POST':
@@ -653,7 +685,6 @@ def admin_create():
 # ─── ADMIN EDIT ──────────────────────────────────────────────────────────────
 @app.route('/admin/edit/<inv_id>', methods=['GET','POST'])
 @login_required
-@csrf_protect
 def admin_edit(inv_id):
     conn = get_db()
     inv  = conn.execute('SELECT * FROM invitations WHERE id=?',(inv_id,)).fetchone()
@@ -686,9 +717,9 @@ def admin_edit(inv_id):
                 conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                              (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
-            # Handle clear portrait checkboxes — col dari whitelist hardcoded, bukan user input
-            for form_key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
-                if f.get(form_key):
+            # Handle clear portrait checkboxes
+            for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
+                if f.get(key):
                     row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?',(inv_id,)).fetchone()
                     if row and row[col]:
                         try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
@@ -710,7 +741,6 @@ def admin_edit(inv_id):
 
 @app.route('/admin/photo/delete/<int:pid>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_delete_photo(pid):
     conn = get_db()
     row  = conn.execute('SELECT * FROM invitation_photos WHERE id=?',(pid,)).fetchone()
@@ -723,7 +753,6 @@ def admin_delete_photo(pid):
 
 @app.route('/admin/extend/<inv_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_extend(inv_id):
     conn = get_db()
     inv  = conn.execute('SELECT expires_at FROM invitations WHERE id=?',(inv_id,)).fetchone()
@@ -738,7 +767,6 @@ def admin_extend(inv_id):
 
 @app.route('/admin/delete/<inv_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def admin_delete(inv_id):
     conn = get_db()
     # Hapus file gallery
@@ -763,7 +791,6 @@ def admin_delete(inv_id):
 # Theme demo photo management
 @app.route('/admin/theme-demo/<theme_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def upload_theme_demo(theme_id):
     theme = get_theme(theme_id)
     if not theme: abort(404)
@@ -788,7 +815,6 @@ def upload_theme_demo(theme_id):
 
 @app.route('/admin/theme-demo/<theme_id>/delete', methods=['POST'])
 @login_required
-@csrf_protect
 def delete_theme_demo(theme_id):
     data  = request.get_json()
     photo = data.get('photo','')
@@ -804,7 +830,6 @@ def delete_theme_demo(theme_id):
 # Theme pricing
 @app.route('/admin/theme-price/<theme_id>', methods=['POST'])
 @login_required
-@csrf_protect
 def update_theme_price(theme_id):
     theme = get_theme(theme_id)
     if not theme: abort(404)
@@ -825,9 +850,6 @@ def update_theme_price(theme_id):
 # Keys reserved for portrait uploads — disimpan ke kolom invitations, BUKAN gallery table
 _PORTRAIT_KEYS = {'groom_photo', 'bride_photo'}
 
-# Whitelist kolom portrait — aman dari f-string injection
-_PORTRAIT_COL_MAP = {'groom_photo': 'groom_photo', 'bride_photo': 'bride_photo'}
-
 def _save_portrait(conn, inv_id, key: str, f) -> bool:
     """Simpan satu file portrait ke UPLOAD_DIR dan update kolom DB.
     Return True jika berhasil."""
@@ -836,11 +858,8 @@ def _save_portrait(conn, inv_id, key: str, f) -> bool:
     f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
     if size > MAX_UPLOAD_MB * 1024 * 1024:
         return False
-    if not validate_image_bytes(f.stream):
-        return False
-    # Whitelist col — aman dari injection
-    col = _PORTRAIT_COL_MAP.get(key)
-    if not col: return False
+    # Hapus file lama jika ada
+    col = 'groom_photo' if key == 'groom_photo' else 'bride_photo'
     row = conn.execute(f'SELECT {col} FROM invitations WHERE id=?', (inv_id,)).fetchone()
     if row and row[col]:
         try: (UPLOAD_DIR / row[col]).unlink(missing_ok=True)
@@ -864,7 +883,6 @@ def _save_photos(conn, inv_id, files, form):
             if not f or not f.filename or not allowed_file(f.filename): continue
             f.stream.seek(0, 2); size = f.stream.tell(); f.stream.seek(0)
             if size > MAX_UPLOAD_MB * 1024 * 1024: continue
-            if not validate_image_bytes(f.stream): continue
             fname = secure_name(f.filename)
             f.save(str(UPLOAD_DIR / fname))
             conn.execute('INSERT INTO invitation_photos(invitation_id,filename,is_url,sort_order) VALUES(?,?,0,?)',
