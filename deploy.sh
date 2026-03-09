@@ -294,29 +294,6 @@ else
     warn "Sementara pakai dummy cert (HTTP tetap jalan via Nginx)"
 fi
 
-# ── 11. COMPRESS IMAGES ────────────────────────────────────────
-info "Compress static images..."
-BEFORE=$(du -sh "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/" 2>/dev/null | awk '{sum+=$1} END{print sum}')
-
-find "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/"     \( -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | while read f; do
-    # Skip kalau file < 50KB (sudah kecil)
-    size=$(stat -c%s "$f" 2>/dev/null || echo 0)
-    if [ "$size" -gt 51200 ]; then
-        convert "$f" -strip -quality 82 -resize "1200x>" "$f" 2>/dev/null && echo "  ✓ $(basename $f)"
-    fi
-done
-
-# Compress PNG (assets tema seperti rumahbanjar, gerbangzen)
-find "$APP_DIR/static/themes/" -name "*.png" 2>/dev/null | while read f; do
-    size=$(stat -c%s "$f" 2>/dev/null || echo 0)
-    if [ "$size" -gt 51200 ]; then
-        convert "$f" -strip -quality 85 "$f" 2>/dev/null && echo "  ✓ $(basename $f)"
-    fi
-done
-
-AFTER=$(du -sh "$APP_DIR/static/themes/" "$APP_DIR/static/demo-photos/" 2>/dev/null | awk '{sum+=$1} END{print sum}')
-success "Images compressed — sebelum: ~${BEFORE}MB → sesudah: ~${AFTER}MB"
-
 # ── SELESAI ──────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
@@ -328,6 +305,7 @@ echo -e "  Domain     : https://${DOMAIN}"
 echo -e "  Admin      : https://${DOMAIN}/admin"
 echo -e "  Log app    : ${APP_DIR}/logs/error.log"
 echo -e "  DB backup  : ${APP_DIR}/data/undangan.db.backup (harian 03:00)"
+echo -e "  Compress   : ${YELLOW}bash compress.sh${NC}  ← jalankan manual, bukan tiap deploy"
 echo ""
 echo -e "  Cek status : ${YELLOW}sudo systemctl status habarkita${NC}"
 echo -e "  Cek log    : ${YELLOW}journalctl -u habarkita -f${NC}"
