@@ -39,7 +39,7 @@ success "System dependencies OK"
 
 # ── 2. PYTHON DEPENDENCIES ──────────────────────────────────────
 info "Install Python dependencies..."
-pip install --quiet flask werkzeug gunicorn python-dotenv --break-system-packages
+pip install --quiet flask werkzeug gunicorn python-dotenv --break-system-packages --ignore-installed
 GUNICORN_BIN=$(which gunicorn)
 success "Python dependencies OK — gunicorn: $GUNICORN_BIN"
 
