@@ -3,7 +3,7 @@ UndanganKita v3 — Flask Wedding Invitation App
 Config via environment variables (see README).
 """
 
-from flask import (Flask, render_template, request, redirect, url_for,
+from flask import (Flask, render_template, request, redirect, url_for, make_response,
                    jsonify, abort, session, flash, send_from_directory)
 import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta

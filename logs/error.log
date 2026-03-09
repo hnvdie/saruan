@@ -4,3 +4,129 @@
 [2026-03-09 20:07:38 +0000] [15786] [INFO] Control socket listening at /root/saruan/gunicorn.ctl
 [2026-03-09 20:07:38 +0000] [15827] [INFO] Booting worker with pid: 15827
 [2026-03-09 20:07:38 +0000] [15828] [INFO] Booting worker with pid: 15828
+[2026-03-09 21:11:43 +0000] [15786] [INFO] Handling signal: term
+[2026-03-09 21:11:43 +0000] [15827] [INFO] Worker exiting (pid: 15827)
+[2026-03-09 21:11:43 +0000] [15828] [INFO] Worker exiting (pid: 15828)
+[2026-03-09 21:11:44 +0000] [15786] [INFO] Worker (pid:15827) was sent SIGTERM!
+[2026-03-09 21:11:44 +0000] [15786] [INFO] Worker (pid:15828) was sent SIGTERM!
+[2026-03-09 21:11:44 +0000] [15786] [INFO] Shutting down: Master
+[2026-03-09 21:11:44 +0000] [17963] [INFO] Starting gunicorn 25.1.0
+[2026-03-09 21:11:44 +0000] [17963] [INFO] Listening at: http://127.0.0.1:5000 (17963)
+[2026-03-09 21:11:44 +0000] [17963] [INFO] Using worker: sync
+[2026-03-09 21:11:44 +0000] [17963] [INFO] Control socket listening at /root/saruan/gunicorn.ctl
+[2026-03-09 21:11:44 +0000] [17965] [INFO] Booting worker with pid: 17965
+[2026-03-09 21:11:44 +0000] [17966] [INFO] Booting worker with pid: 17966
+[2026-03-09 21:11:52,901] ERROR in app: Exception on /i/rizky-alya-2026 [GET]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/saruan/app.py", line 515, in view_invitation
+    resp = make_response(html)
+           ^^^^^^^^^^^^^
+NameError: name 'make_response' is not defined
+[2026-03-09 21:11:59,168] ERROR in app: Exception on /i/rizky-alya-2026 [GET]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/saruan/app.py", line 515, in view_invitation
+    resp = make_response(html)
+           ^^^^^^^^^^^^^
+NameError: name 'make_response' is not defined
+[2026-03-09 21:13:04 +0000] [17965] [INFO] Worker exiting (pid: 17965)
+[2026-03-09 21:13:04 +0000] [17966] [INFO] Worker exiting (pid: 17966)
+[2026-03-09 21:13:04 +0000] [17963] [INFO] Handling signal: term
+[2026-03-09 21:13:04 +0000] [17963] [INFO] Worker (pid:17965) was sent SIGTERM!
+[2026-03-09 21:13:04 +0000] [17963] [INFO] Worker (pid:17966) was sent SIGTERM!
+[2026-03-09 21:13:04 +0000] [17963] [INFO] Shutting down: Master
+[2026-03-09 21:13:04 +0000] [18547] [INFO] Starting gunicorn 25.1.0
+[2026-03-09 21:13:04 +0000] [18547] [INFO] Listening at: http://127.0.0.1:5000 (18547)
+[2026-03-09 21:13:04 +0000] [18547] [INFO] Using worker: sync
+[2026-03-09 21:13:04 +0000] [18547] [INFO] Control socket listening at /root/saruan/gunicorn.ctl
+[2026-03-09 21:13:04 +0000] [18553] [INFO] Booting worker with pid: 18553
+[2026-03-09 21:13:04 +0000] [18554] [INFO] Booting worker with pid: 18554
+[2026-03-09 21:13:36,442] ERROR in app: Exception on /i/rizky-alya-2026 [GET]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/saruan/app.py", line 515, in view_invitation
+    resp = make_response(html)
+           ^^^^^^^^^^^^^
+NameError: name 'make_response' is not defined
+[2026-03-09 21:14:42,503] ERROR in app: Exception on /i/rizky-alya-2026 [GET]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/saruan/app.py", line 515, in view_invitation
+    resp = make_response(html)
+           ^^^^^^^^^^^^^
+NameError: name 'make_response' is not defined
+[2026-03-09 21:14:43,652] ERROR in app: Exception on /i/rizky-alya-2026 [GET]
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/saruan/app.py", line 515, in view_invitation
+    resp = make_response(html)
+           ^^^^^^^^^^^^^
+NameError: name 'make_response' is not defined
+[2026-03-09 21:15:04 +0000] [18553] [INFO] Worker exiting (pid: 18553)
+[2026-03-09 21:15:04 +0000] [18554] [INFO] Worker exiting (pid: 18554)
+[2026-03-09 21:15:04 +0000] [18547] [INFO] Handling signal: term
+[2026-03-09 21:15:04 +0000] [18547] [INFO] Worker (pid:18553) was sent SIGTERM!
+[2026-03-09 21:15:04 +0000] [18547] [INFO] Worker (pid:18554) was sent SIGTERM!
+[2026-03-09 21:15:04 +0000] [18547] [INFO] Shutting down: Master
+[2026-03-09 21:15:04 +0000] [18867] [INFO] Starting gunicorn 25.1.0
+[2026-03-09 21:15:04 +0000] [18867] [INFO] Listening at: http://127.0.0.1:5000 (18867)
+[2026-03-09 21:15:04 +0000] [18867] [INFO] Using worker: sync
+[2026-03-09 21:15:04 +0000] [18867] [INFO] Control socket listening at /root/saruan/gunicorn.ctl
+[2026-03-09 21:15:04 +0000] [18869] [INFO] Booting worker with pid: 18869
+[2026-03-09 21:15:04 +0000] [18870] [INFO] Booting worker with pid: 18870
