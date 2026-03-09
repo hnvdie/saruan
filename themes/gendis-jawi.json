@@ -1,10 +1,8 @@
 {
-  "id": "gendis-jawi",
   "name": "Gendis Jawi",
   "description": "Perpaduan romantis antara tradisi Jawa Mangkunegaran dengan sentuhan Art Nouveau yang elegan dan hangat.",
   "preview_color": "#5D4037",
   "accent_color": "#D4AF37",
-  "skeleton": "gendis-jawi",
   "tags": [
     "jawa",
     "elegant",
@@ -13,7 +11,14 @@
     "swipe"
   ],
   "demo_photos": [
-    "/static/themes/gendis-jawi/demo_65cb5025.jpg"
+    "/static/themes/gendis-jawi/demo_8cb0c580.jpg"
+  ],
+  "features": [
+    "Navigasi Fullscreen Swipe Card",
+    "Animasi Partikel Kelopak Melati (Canvas)",
+    "Dramatis Clip-path Envelope Opening",
+    "Galeri Foto Collage Artistik",
+    "Real-time Countdown & RSVP System"
   ],
   "price": 15000,
   "price_label": "Rp. 15.000",
@@ -30,11 +35,6 @@
     "serif": "Playfair Display",
     "sans": "Inter"
   },
-  "features": [
-    "Navigasi Fullscreen Swipe Card",
-    "Animasi Partikel Kelopak Melati (Canvas)",
-    "Dramatis Clip-path Envelope Opening",
-    "Galeri Foto Collage Artistik",
-    "Real-time Countdown & RSVP System"
-  ]
+  "id": "gendis-jawi",
+  "skeleton": "gendis-jawi"
 }

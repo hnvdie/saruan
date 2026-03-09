@@ -1,20 +1,37 @@
 {
-  "id": "bloompetal",
   "name": "Bloom Petal",
   "description": "Romansa taman bunga Jawa bertemu elegance Belle Époque — lembut, hangat, dan penuh kebahagiaan muda. Kelopak melayang, tipografi kaligrafi, dan palet krem-rose-sage yang membuat hati bergetar.",
   "preview_color": "#E8B4B8",
   "accent_color": "#C98EA0",
-  "skeleton": "bloompetal",
-  "tags": ["romantic", "soft", "pastel", "young", "floral", "elegant", "jawa", "garden"],
-  "demo_photos": [
-    "/static/themes/bloompetal/photos/couple.jpg",
-    "/static/themes/bloompetal/photos/groom.jpg",
-    "/static/themes/bloompetal/photos/bride.jpg"
+  "tags": [
+    "romantic",
+    "soft",
+    "pastel",
+    "young",
+    "floral",
+    "elegant",
+    "jawa",
+    "garden"
   ],
-  "price": 85000,
-  "price_label": "Rp. 85.000",
-  "price_original": 120000,
-  "price_note": "Harga promo terbatas",
+  "demo_photos": [
+    "/static/themes/bloompetal/demo_c65b1950.jpg"
+  ],
+  "features": [
+    "Swipe card navigation fullscreen",
+    "Envelope opening dengan efek curtain split dramatis",
+    "Sistem partikel kelopak bunga melayang (canvas)",
+    "Countdown timer real-time hari/jam/menit/detik",
+    "Galeri foto masonry kreatif 2x2 asimetris",
+    "RSVP form dengan append guestbook real-time",
+    "Gift section bank + e-wallet dengan copy button",
+    "Music player floating dengan animasi rotating icon",
+    "Google Maps embed terintegrasi fullscreen",
+    "Fully responsive mobile (360px+) dan desktop (1024px+)"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
   "palette": {
     "blossom_cream": "#FBF5EE",
     "dusty_rose": "#E8B4B8",
@@ -33,16 +50,6 @@
     "script": "Dancing Script",
     "sans": "Jost"
   },
-  "features": [
-    "Swipe card navigation fullscreen",
-    "Envelope opening dengan efek curtain split dramatis",
-    "Sistem partikel kelopak bunga melayang (canvas)",
-    "Countdown timer real-time hari/jam/menit/detik",
-    "Galeri foto masonry kreatif 2x2 asimetris",
-    "RSVP form dengan append guestbook real-time",
-    "Gift section bank + e-wallet dengan copy button",
-    "Music player floating dengan animasi rotating icon",
-    "Google Maps embed terintegrasi fullscreen",
-    "Fully responsive mobile (360px+) dan desktop (1024px+)"
-  ]
+  "id": "bloompetal",
+  "skeleton": "bloompetal"
 }
