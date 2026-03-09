@@ -182,7 +182,6 @@ TEKNIS:
    - Single file, CSS + JS inline
    - Jinja2 template lengkap
    - Kode bersih, diberi komentar per section
-   - Max-width 480px, mobile-first
 
 2. [namatema].json
    Struktur WAJIB PERSIS seperti ini:

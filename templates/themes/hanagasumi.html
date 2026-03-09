@@ -1,0 +1,2499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>{{ inv.groom_name }} & {{ inv.bride_name }} — Hanagasumi</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;500;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   HANAGASUMI — 花霞
+   Japanese Poster × Intimate Paper Letter
+   Wedding Invitation Theme
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --washi:     #F5EFE0;
+  --sumi:      #1C1410;
+  --beni:      #9B2335;
+  --kurenai:   #C8374A;
+  --kincha:    #C49A3C;
+  --misty:     #D4C5A9;
+  --ink:       #2D2218;
+  --paper:     #EDE4CF;
+  --rouge:     #7A1B28;
+  --fog:       rgba(245,239,224,0.85);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--sumi);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--sumi);
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+}
+
+/* ============================================================
+   ENVELOPE INTRO
+   ============================================================ */
+#envelope-screen {
+  position: fixed; inset: 0;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sumi);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.env-bg {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/hanagasumi/cover.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  filter: sepia(0.4);
+  transition: opacity 0.6s;
+}
+
+/* Washi texture overlay */
+.env-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.015) 3px,
+    rgba(0,0,0,0.015) 4px
+  );
+}
+
+.env-seal {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 24px;
+  animation: sealFloat 3s ease-in-out infinite;
+}
+
+@keyframes sealFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.seal-circle {
+  width: 120px; height: 120px;
+  border: 2px solid var(--beni);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  background: rgba(28,20,16,0.7);
+  backdrop-filter: blur(4px);
+}
+
+.seal-circle::before {
+  content: '';
+  position: absolute; inset: 6px;
+  border: 1px solid rgba(155,35,53,0.5);
+  border-radius: 50%;
+}
+
+.seal-koi {
+  width: 60px; height: 60px;
+}
+
+.seal-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--misty);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.seal-names {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--washi);
+  letter-spacing: 0.05em;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.seal-names span {
+  color: var(--beni);
+  font-style: italic;
+}
+
+.seal-hint {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--misty);
+  opacity: 0.7;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+/* Envelope open animation */
+.env-curtain-left, .env-curtain-right {
+  position: absolute; top: 0; bottom: 0; z-index: 3;
+  width: 50%;
+  background: var(--sumi);
+  transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.env-curtain-left  { left: 0;  transform: translateX(0); }
+.env-curtain-right { right: 0; transform: translateX(0); }
+
+/* Red stripe on curtains */
+.env-curtain-left::after, .env-curtain-right::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--beni);
+}
+.env-curtain-left::after  { right: 0; }
+.env-curtain-right::after { left: 0; }
+
+.envelope-screen.open .env-curtain-left  { transform: translateX(-105%); }
+.envelope-screen.open .env-curtain-right { transform: translateX(105%); }
+
+/* Japanese vertical text decorations */
+.env-jp-left, .env-jp-right {
+  position: absolute; top: 50%; z-index: 1;
+  transform: translateY(-50%);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 11px;
+  color: rgba(196,154,60,0.3);
+  writing-mode: vertical-rl;
+  letter-spacing: 0.3em;
+}
+.env-jp-left  { left: 20px; }
+.env-jp-right { right: 20px; text-orientation: mixed; }
+
+/* ============================================================
+   MAIN INVITATION — CARD SLIDER
+   ============================================================ */
+#invitation {
+  position: fixed; inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease 0.4s;
+}
+
+#invitation.visible { opacity: 1; }
+
+/* Ambient Koi particles canvas */
+#ambient-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+}
+
+/* ============================================================
+   CARD SLIDER SYSTEM
+   ============================================================ */
+.slider-wrapper {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.cards-track {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Each card */
+.card {
+  position: absolute;
+  width: min(100vw, 480px);
+  height: 100dvh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1),
+              opacity 0.5s ease,
+              scale 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: transform, opacity;
+  user-select: none;
+}
+
+.card[data-state="current"] {
+  transform: translateX(0); opacity: 1; scale: 1;
+  z-index: 10;
+}
+.card[data-state="prev"] {
+  transform: translateX(-110%); opacity: 0; scale: 0.92;
+  z-index: 5;
+}
+.card[data-state="next"] {
+  transform: translateX(110%); opacity: 0; scale: 0.92;
+  z-index: 5;
+}
+.card[data-state="far"] {
+  transform: translateX(200%); opacity: 0; scale: 0.85;
+  z-index: 1;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav-dots {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  display: flex; gap: 8px; align-items: center;
+}
+
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(245,239,224,0.3);
+  border: 1px solid rgba(245,239,224,0.4);
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.nav-dot.active {
+  background: var(--beni);
+  border-color: var(--beni);
+  width: 18px;
+  border-radius: 3px;
+}
+
+.nav-arrows {
+  position: fixed; top: 50%; z-index: 100;
+  width: min(100vw, 480px);
+  left: 50%; transform: translate(-50%, -50%);
+  display: flex; justify-content: space-between;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+.nav-arrow {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(28,20,16,0.5);
+  border: 1px solid rgba(155,35,53,0.5);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.nav-arrow:hover {
+  background: var(--beni);
+  border-color: var(--beni);
+}
+
+.nav-arrow svg { width: 16px; height: 16px; fill: var(--washi); }
+
+/* Progress bar top */
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 2px; background: var(--beni);
+  z-index: 200;
+  transition: width 0.5s ease;
+}
+
+/* Swipe hint */
+.swipe-hint {
+  position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: rgba(245,239,224,0.4);
+  text-transform: uppercase;
+  animation: hintFade 3s ease-in-out 2s both;
+}
+
+@keyframes hintFade {
+  0%, 100% { opacity: 0; }
+  30%, 70% { opacity: 1; }
+}
+
+/* ============================================================
+   MUSIC PLAYER
+   ============================================================ */
+.music-player {
+  position: fixed; top: 16px; right: 16px; z-index: 200;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(28,20,16,0.8);
+  border: 1px solid var(--beni);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.music-player:hover { background: var(--beni); }
+
+.music-player svg { width: 16px; height: 16px; fill: var(--washi); }
+
+.music-eq {
+  display: flex; gap: 2px; align-items: flex-end;
+}
+.music-eq span {
+  width: 2px; background: var(--washi); border-radius: 1px;
+  animation: eq 0.8s ease-in-out infinite;
+}
+.music-eq span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.music-eq span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+.music-eq span:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.music-player.paused .music-eq span { animation-play-state: paused; }
+
+/* ============================================================
+   CARD 1: COVER / HERO
+   ============================================================ */
+.card-cover {
+  background: var(--sumi);
+  position: relative;
+}
+
+.card-cover .cover-photo {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
+  background-size: cover; background-position: center top;
+  opacity: 0.5; filter: sepia(0.3) contrast(1.1);
+}
+
+/* Diagonal ink wash overlay */
+.card-cover .cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    170deg,
+    rgba(28,20,16,0.3) 0%,
+    rgba(28,20,16,0.0) 40%,
+    rgba(28,20,16,0.7) 70%,
+    rgba(28,20,16,0.95) 100%
+  );
+}
+
+/* Red sun circle — like the poster */
+.cover-sun {
+  position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: var(--beni);
+  opacity: 0.75;
+  mix-blend-mode: multiply;
+}
+
+/* Vertical JP text */
+.cover-jp-vertical {
+  position: absolute; top: 40px; left: 24px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: rgba(245,239,224,0.6);
+  writing-mode: vertical-rl;
+  letter-spacing: 0.5em;
+  line-height: 1;
+}
+
+/* Corner ornament */
+.cover-corner {
+  position: absolute; top: 24px; right: 24px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+.cover-corner-line {
+  height: 1px; background: var(--beni);
+  animation: lineGrow 1s ease 0.5s both;
+}
+@keyframes lineGrow { from { width: 0; } to { width: 100%; } }
+
+/* Main content at bottom */
+.cover-content {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 32px 32px 80px;
+}
+
+.cover-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cover-label::before {
+  content: '';
+  flex: 1; height: 1px; background: var(--beni);
+}
+
+.cover-names {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--washi);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.cover-names .ampersand {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: var(--beni);
+  font-size: 36px;
+  display: block;
+  margin: 4px 0;
+}
+
+.cover-date {
+  margin-top: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--misty);
+  letter-spacing: 0.3em;
+}
+
+/* Koi silhouette decorative lines */
+.cover-koi-deco {
+  position: absolute; right: 32px; bottom: 120px;
+  opacity: 0.15;
+}
+
+/* ============================================================
+   CARD 2: AYAT AL-QURAN
+   ============================================================ */
+.card-quran {
+  background: var(--beni);
+  position: relative; overflow: hidden;
+}
+
+.quran-pattern {
+  position: absolute; inset: 0;
+  opacity: 0.06;
+  background-image: 
+    radial-gradient(circle at 30% 30%, var(--kincha) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, var(--washi) 0%, transparent 50%);
+}
+
+/* Seigaiha pattern */
+.quran-pattern::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='18' fill='none' stroke='%23F5EFE0' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+  opacity: 0.12;
+}
+
+.quran-content {
+  position: relative; z-index: 1;
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 32px 80px;
+  text-align: center;
+}
+
+.quran-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: rgba(245,239,224,0.6);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.quran-arabic {
+  font-size: 22px;
+  line-height: 2;
+  color: var(--washi);
+  direction: rtl;
+  font-family: 'Noto Serif JP', serif;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.quran-divider {
+  width: 60px; height: 1px;
+  background: rgba(245,239,224,0.4);
+  margin: 0 auto 24px;
+}
+
+.quran-translation {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(245,239,224,0.85);
+  line-height: 1.8;
+  max-width: 320px;
+}
+
+.quran-source {
+  margin-top: 20px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(245,239,224,0.5);
+}
+
+/* Decorative vertical lines */
+.quran-vline {
+  position: absolute;
+  width: 1px; background: rgba(245,239,224,0.2);
+  top: 40px; bottom: 40px;
+}
+.quran-vline.left  { left: 20px; }
+.quran-vline.right { right: 20px; }
+
+/* ============================================================
+   CARD 3: COUPLE PROFILE
+   ============================================================ */
+.card-couple {
+  background: var(--washi);
+  position: relative; overflow: hidden;
+}
+
+/* Paper texture */
+.card-couple::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1;
+}
+
+.couple-header {
+  padding: 40px 28px 0;
+  position: relative; z-index: 2;
+}
+
+.couple-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.couple-header-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--sumi);
+  line-height: 1.3;
+}
+
+/* Couple photos — Japanese split style */
+.couple-photos {
+  display: flex; gap: 0;
+  height: 240px;
+  margin: 20px 0 0;
+  position: relative; z-index: 2;
+}
+
+.couple-photo-wrap {
+  flex: 1; overflow: hidden; position: relative;
+}
+
+.couple-photo-wrap img, .couple-photo-wrap .photo-placeholder {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top;
+  filter: sepia(0.15) contrast(1.05);
+  display: block;
+}
+
+.photo-placeholder {
+  background: var(--misty);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: rgba(28,20,16,0.3);
+  letter-spacing: 0.2em; font-family: 'Noto Serif JP', serif;
+}
+
+/* Diagonal cut between photos */
+.couple-photo-wrap:first-child {
+  clip-path: polygon(0 0, 95% 0, 100% 100%, 0 100%);
+}
+.couple-photo-wrap:last-child {
+  clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
+  margin-left: -12px;
+}
+
+/* Name tag overlays */
+.photo-name-tag {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 32px 16px 12px;
+  background: linear-gradient(to top, rgba(28,20,16,0.8), transparent);
+  font-family: 'Shippori Mincho', serif;
+  color: var(--washi);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Profile details */
+.couple-details {
+  padding: 0 28px; z-index: 2; position: relative;
+  display: flex; gap: 12px;
+  margin-top: 16px;
+}
+
+.profile-card {
+  flex: 1;
+  padding: 16px 14px;
+  background: var(--paper);
+  border-radius: 4px;
+  border-left: 3px solid var(--beni);
+  position: relative;
+}
+
+.profile-role {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 8px;
+  letter-spacing: 0.4em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.profile-fullname {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sumi);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.profile-parents-label {
+  font-size: 9px;
+  color: rgba(28,20,16,0.5);
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.profile-parents {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  color: var(--ink);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Red brush stroke decorations */
+.couple-brush {
+  position: absolute; bottom: 0; right: 0;
+  width: 80px; height: 80px;
+  opacity: 0.06; pointer-events: none; z-index: 1;
+}
+
+/* ============================================================
+   CARD 4: LOVE STORY
+   ============================================================ */
+.card-story {
+  background: var(--sumi);
+  position: relative; overflow: hidden;
+}
+
+/* Ink wash background */
+.story-ink {
+  position: absolute; top: -20%; left: -20%;
+  width: 140%; height: 140%;
+  background: radial-gradient(ellipse at 30% 40%, rgba(155,35,53,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 60%, rgba(196,154,60,0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.story-content {
+  position: relative; z-index: 2;
+  height: 100%; display: flex; flex-direction: column;
+  padding: 40px 32px 80px;
+  justify-content: center;
+}
+
+.story-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.story-label::after {
+  content: ''; flex: 1; height: 1px; background: rgba(155,35,53,0.4);
+}
+
+.story-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 36px;
+  font-style: italic;
+  color: var(--washi);
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.story-title .red { color: var(--beni); }
+
+.story-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.story-divider-line {
+  flex: 1; height: 1px; background: rgba(245,239,224,0.15);
+}
+.story-divider-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--beni);
+}
+
+.story-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(245,239,224,0.8);
+  line-height: 1.9;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: 4px;
+}
+.story-text::-webkit-scrollbar { display: none; }
+
+/* Vertical photo strip on right */
+.story-photo {
+  position: absolute; right: 0; top: 80px; bottom: 80px;
+  width: 100px;
+  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
+  background-size: cover; background-position: center;
+  opacity: 0.2;
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* ============================================================
+   CARD 5: AKAD NIKAH
+   ============================================================ */
+.card-akad {
+  background: var(--paper);
+  position: relative; overflow: hidden;
+}
+
+/* Washi paper lines */
+.akad-lines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 31px,
+    rgba(155,35,53,0.06) 31px, rgba(155,35,53,0.06) 32px
+  );
+}
+
+.akad-content {
+  position: relative; z-index: 2;
+  height: 100%; display: flex; flex-direction: column;
+  padding: 50px 32px 80px;
+}
+
+/* Stamp-style header */
+.event-stamp {
+  display: inline-flex;
+  border: 2px solid var(--beni);
+  padding: 6px 16px;
+  margin-bottom: 24px;
+  position: relative;
+  align-self: flex-start;
+}
+.event-stamp::before {
+  content: '';
+  position: absolute; inset: 3px;
+  border: 1px solid rgba(155,35,53,0.3);
+}
+
+.event-stamp-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--beni);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.event-type {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--sumi);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.event-type-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--beni);
+  letter-spacing: 0.3em;
+  margin-bottom: 32px;
+}
+
+/* Event info blocks */
+.event-info-grid {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.event-info-row {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(155,35,53,0.15);
+}
+
+.event-info-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--beni);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-info-icon svg { width: 14px; height: 14px; fill: var(--washi); }
+
+.event-info-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.event-info-value {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--sumi);
+  line-height: 1.4;
+}
+
+.event-info-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: rgba(28,20,16,0.55);
+  font-style: italic;
+}
+
+/* Decorative koi outline */
+.akad-koi-deco {
+  position: absolute; bottom: 60px; right: 20px;
+  opacity: 0.06; pointer-events: none;
+}
+
+/* ============================================================
+   CARD 6: RESEPSI
+   ============================================================ */
+.card-resepsi {
+  background: var(--rouge);
+  position: relative; overflow: hidden;
+}
+
+/* Pattern overlay */
+.resepsi-pattern {
+  position: absolute; inset: 0;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30 Z' fill='none' stroke='%23F5EFE0' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+.resepsi-content {
+  position: relative; z-index: 2;
+  height: 100%; display: flex; flex-direction: column;
+  padding: 50px 32px 80px;
+}
+
+.resepsi-content .event-type { color: var(--washi); }
+.resepsi-content .event-type-jp { color: var(--kincha); }
+.resepsi-content .event-stamp { border-color: var(--kincha); }
+.resepsi-content .event-stamp-text { color: var(--kincha); }
+.resepsi-content .event-stamp::before { border-color: rgba(196,154,60,0.3); }
+.resepsi-content .event-info-label { color: var(--kincha); }
+.resepsi-content .event-info-value { color: var(--washi); }
+.resepsi-content .event-info-sub { color: rgba(245,239,224,0.55); }
+.resepsi-content .event-info-row { border-color: rgba(245,239,224,0.1); }
+.resepsi-content .event-info-icon { background: var(--kincha); }
+.resepsi-content .event-info-icon svg { fill: var(--rouge); }
+
+.maps-btn {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 24px;
+  padding: 14px 20px;
+  background: rgba(245,239,224,0.1);
+  border: 1px solid rgba(196,154,60,0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.maps-btn:hover {
+  background: rgba(245,239,224,0.2);
+}
+
+.maps-btn-icon { width: 20px; height: 20px; fill: var(--kincha); flex-shrink: 0; }
+
+.maps-btn-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--washi);
+  letter-spacing: 0.1em;
+}
+
+/* Maps embed */
+.maps-embed-wrap {
+  margin-top: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 120px;
+  border: 1px solid rgba(196,154,60,0.3);
+  opacity: 0.85;
+}
+.maps-embed-wrap iframe { width: 100%; height: 100%; }
+
+/* ============================================================
+   CARD 7: COUNTDOWN
+   ============================================================ */
+.card-countdown {
+  background: var(--sumi);
+  position: relative; overflow: hidden;
+}
+
+.countdown-bg {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
+  background-size: cover; background-position: center;
+  opacity: 0.12; filter: sepia(0.5);
+}
+
+.countdown-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(28,20,16,0.6), rgba(28,20,16,0.9));
+}
+
+.countdown-content {
+  position: relative; z-index: 2;
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 32px 80px;
+  text-align: center;
+}
+
+.countdown-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.countdown-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 28px;
+  font-style: italic;
+  color: var(--washi);
+  margin-bottom: 8px;
+}
+
+.countdown-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: rgba(245,239,224,0.5);
+  letter-spacing: 0.2em;
+  margin-bottom: 40px;
+}
+
+.countdown-grid {
+  display: flex; gap: 16px; justify-content: center;
+  margin-bottom: 32px;
+}
+
+.countdown-unit {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+
+.countdown-number {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--washi);
+  line-height: 1;
+  min-width: 68px; text-align: center;
+  position: relative;
+}
+
+.countdown-number::after {
+  content: '';
+  position: absolute; bottom: 0; left: 10%; right: 10%;
+  height: 2px; background: var(--beni);
+}
+
+.countdown-unit-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: var(--misty);
+  text-transform: uppercase;
+}
+
+.countdown-sep {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 40px;
+  color: var(--beni);
+  line-height: 1;
+  padding-top: 4px;
+  opacity: 0.6;
+}
+
+/* Date reminder */
+.countdown-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: rgba(245,239,224,0.6);
+  letter-spacing: 0.15em;
+}
+
+/* ============================================================
+   CARD 8: GALLERY
+   ============================================================ */
+.card-gallery {
+  background: var(--washi);
+  position: relative; overflow: hidden;
+}
+
+.gallery-header {
+  padding: 40px 28px 20px;
+  position: relative; z-index: 2;
+}
+
+.gallery-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.gallery-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--sumi);
+}
+
+/* Polaroid-style photos */
+.gallery-polaroids {
+  position: relative;
+  height: calc(100% - 180px);
+  margin: 0 16px;
+}
+
+.polaroid {
+  position: absolute;
+  background: white;
+  padding: 8px 8px 32px;
+  box-shadow: 2px 4px 20px rgba(0,0,0,0.2);
+  cursor: grab;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.polaroid:nth-child(1) {
+  width: 180px; top: 10px; left: 10px;
+  transform: rotate(-4deg);
+}
+.polaroid:nth-child(2) {
+  width: 160px; top: 30px; left: 140px;
+  transform: rotate(3deg);
+}
+.polaroid:nth-child(3) {
+  width: 170px; top: 170px; left: 40px;
+  transform: rotate(-2deg);
+}
+.polaroid:nth-child(4) {
+  width: 155px; top: 180px; left: 180px;
+  transform: rotate(5deg);
+}
+
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+  box-shadow: 4px 8px 30px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.polaroid img, .polaroid .polaroid-placeholder {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.polaroid-placeholder {
+  background: var(--misty);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: rgba(28,20,16,0.3); letter-spacing: 0.2em;
+  font-family: 'Noto Serif JP', serif;
+}
+
+.polaroid-caption {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  color: rgba(28,20,16,0.4);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   CARD 9: RSVP
+   ============================================================ */
+.card-rsvp {
+  background: var(--paper);
+  position: relative; overflow: hidden;
+}
+
+/* Brush border top */
+.card-rsvp::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--beni);
+}
+
+.rsvp-content {
+  height: 100%;
+  overflow-y: auto; scrollbar-width: none;
+  padding: 40px 28px 80px;
+}
+.rsvp-content::-webkit-scrollbar { display: none; }
+
+.rsvp-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rsvp-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--sumi);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+/* RSVP Form */
+.rsvp-form { display: flex; flex-direction: column; gap: 14px; }
+
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+
+.form-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--beni);
+  text-transform: uppercase;
+}
+
+.form-input, .form-select, .form-textarea {
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid rgba(155,35,53,0.25);
+  border-radius: 2px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  color: var(--sumi);
+  outline: none;
+  transition: border-color 0.3s;
+  width: 100%;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--beni);
+  box-shadow: 0 0 0 3px rgba(155,35,53,0.08);
+}
+
+.form-textarea { resize: none; height: 70px; }
+
+/* Attendance selector */
+.attendance-options {
+  display: flex; gap: 8px;
+}
+
+.attendance-btn {
+  flex: 1; padding: 10px 8px;
+  background: white;
+  border: 1px solid rgba(155,35,53,0.25);
+  border-radius: 2px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: rgba(28,20,16,0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.attendance-btn.selected {
+  background: var(--beni);
+  border-color: var(--beni);
+  color: white;
+}
+
+/* Submit button */
+.rsvp-submit {
+  padding: 14px;
+  background: var(--beni);
+  color: var(--washi);
+  border: none;
+  border-radius: 2px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 4px;
+  position: relative; overflow: hidden;
+}
+
+.rsvp-submit:hover { background: var(--rouge); }
+
+.rsvp-success {
+  display: none;
+  text-align: center;
+  padding: 20px;
+  background: rgba(155,35,53,0.08);
+  border: 1px solid rgba(155,35,53,0.2);
+  border-radius: 4px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--beni);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   CARD 10: GUESTBOOK
+   ============================================================ */
+.card-guestbook {
+  background: var(--sumi);
+  position: relative; overflow: hidden;
+}
+
+.guestbook-content {
+  height: 100%; display: flex; flex-direction: column;
+  padding: 40px 28px 80px;
+}
+
+.guestbook-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--beni);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.guestbook-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--washi);
+  margin-bottom: 20px;
+}
+
+.guestbook-list {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.guestbook-list::-webkit-scrollbar { display: none; }
+
+.guest-card {
+  background: rgba(245,239,224,0.06);
+  border: 1px solid rgba(245,239,224,0.1);
+  border-left: 3px solid var(--beni);
+  border-radius: 2px;
+  padding: 14px 16px;
+}
+
+.guest-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--washi);
+  margin-bottom: 6px;
+}
+
+.guest-message {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(245,239,224,0.65);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   CARD 11: GIFT
+   ============================================================ */
+.card-gift {
+  background: var(--paper);
+  position: relative; overflow: hidden;
+}
+
+/* Gold accent top border */
+.card-gift::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--kincha);
+}
+
+.gift-content {
+  height: 100%; overflow-y: auto; scrollbar-width: none;
+  padding: 40px 28px 80px;
+}
+.gift-content::-webkit-scrollbar { display: none; }
+
+.gift-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: var(--kincha);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.gift-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--sumi);
+  margin-bottom: 8px;
+}
+
+.gift-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(28,20,16,0.5);
+  margin-bottom: 24px;
+}
+
+.gift-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.gift-card {
+  background: white;
+  border: 1px solid rgba(196,154,60,0.3);
+  border-radius: 4px;
+  padding: 16px;
+  position: relative; overflow: hidden;
+}
+
+.gift-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--kincha);
+}
+
+.gift-type {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 8px;
+  letter-spacing: 0.4em;
+  color: var(--kincha);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.gift-bank-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sumi);
+  margin-bottom: 4px;
+}
+
+.gift-account {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--sumi);
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.gift-account-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: rgba(28,20,16,0.5);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--kincha);
+  border-radius: 2px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  color: var(--kincha);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.copy-btn:hover, .copy-btn.copied {
+  background: var(--kincha);
+  color: white;
+}
+
+/* ============================================================
+   CARD 12: CLOSING
+   ============================================================ */
+.card-closing {
+  background: var(--beni);
+  position: relative; overflow: hidden;
+}
+
+/* Photo background */
+.closing-photo {
+  position: absolute; inset: 0;
+  background-image: url('/static/themes/hanagasumi/photos/couple.jpg');
+  background-size: cover; background-position: center;
+  opacity: 0.25; filter: sepia(0.3);
+}
+
+.closing-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(122,27,40,0.95), rgba(122,27,40,0.6));
+}
+
+.closing-content {
+  position: relative; z-index: 2;
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 32px 80px;
+  text-align: center;
+}
+
+/* Large koi SVG */
+.closing-koi-wrap {
+  margin-bottom: 28px;
+  opacity: 0.7;
+}
+
+.closing-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9px;
+  letter-spacing: 0.5em;
+  color: rgba(245,239,224,0.6);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.closing-message {
+  font-family: 'IM Fell English', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--washi);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-width: 300px;
+}
+
+.closing-names {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--washi);
+  margin-bottom: 8px;
+}
+
+.closing-names .amp {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: var(--kincha);
+}
+
+.closing-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: rgba(245,239,224,0.6);
+  letter-spacing: 0.3em;
+}
+
+/* Animated border */
+.closing-border {
+  position: absolute; inset: 20px;
+  border: 1px solid rgba(245,239,224,0.15);
+  pointer-events: none;
+}
+
+/* ============================================================
+   AMBIENT ANIMATIONS
+   ============================================================ */
+@keyframes koiSwim {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  25%  { transform: translate(10px,-8px) rotate(5deg); }
+  50%  { transform: translate(0,-16px) rotate(0deg); }
+  75%  { transform: translate(-10px,-8px) rotate(-5deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+
+.koi-ambient {
+  animation: koiSwim 8s ease-in-out infinite;
+}
+
+/* ============================================================
+   RESPONSIVE & UTILS
+   ============================================================ */
+@media (max-width: 400px) {
+  .cover-names { font-size: 34px; }
+  .event-type  { font-size: 36px; }
+}
+
+/* Ripple effect */
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.6; }
+  to   { transform: scale(4); opacity: 0; }
+}
+
+.ripple-effect {
+  position: absolute; border-radius: 50%;
+  width: 20px; height: 20px;
+  background: rgba(255,255,255,0.4);
+  animation: ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ENVELOPE INTRO SCREEN
+     ============================================================ -->
+<div id="envelope-screen" onclick="openEnvelope()">
+  <div class="env-bg"></div>
+  <div class="env-curtain-left" id="curtainL"></div>
+  <div class="env-curtain-right" id="curtainR"></div>
+
+  <div class="env-jp-left">花霞 × 結婚式へのご招待</div>
+  <div class="env-jp-right">Hanagasumi</div>
+
+  <div class="env-seal" id="seal">
+    <!-- Koi SVG seal -->
+    <div class="seal-circle">
+      <svg class="seal-koi koi-ambient" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="30" cy="28" rx="12" ry="20" fill="#9B2335" opacity="0.9"/>
+        <ellipse cx="30" cy="22" rx="6" ry="10" fill="#C8374A" opacity="0.7"/>
+        <path d="M18 40 Q10 52 22 56 Q30 58 30 50 Q30 58 38 56 Q50 52 42 40" fill="#9B2335" opacity="0.8"/>
+        <path d="M28 16 Q30 8 32 16" stroke="#F5EFE0" stroke-width="1" fill="none"/>
+        <circle cx="24" cy="20" r="2" fill="#F5EFE0"/>
+        <circle cx="25" cy="20" r="0.8" fill="#1C1410"/>
+      </svg>
+    </div>
+
+    <div class="seal-names">
+      {{ inv.groom_name }}<span> &amp; </span>{{ inv.bride_name }}
+    </div>
+
+    <div class="seal-text">— Undangan Pernikahan —</div>
+
+    <div class="seal-hint">✦ Ketuk untuk membuka ✦</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN INVITATION
+     ============================================================ -->
+<div id="invitation">
+
+  <!-- Ambient particle canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Music player -->
+  <div class="music-player" id="musicPlayer" onclick="toggleMusic()" title="Musik">
+    <div class="music-eq" id="musicEq">
+      <span></span><span></span><span></span>
+    </div>
+    <audio id="bgMusic" loop>
+      <source src="{{ inv.music_url }}" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <!-- Navigation arrows -->
+  <div class="nav-arrows">
+    <div class="nav-arrow" id="btnPrev" onclick="goTo(currentCard - 1)">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="nav-arrow" id="btnNext" onclick="goTo(currentCard + 1)">
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  </div>
+
+  <!-- Navigation dots -->
+  <div class="nav-dots" id="navDots"></div>
+
+  <!-- Swipe hint -->
+  <div class="swipe-hint">Geser untuk melihat</div>
+
+  <!-- CARDS TRACK -->
+  <div class="slider-wrapper">
+    <div class="cards-track" id="cardsTrack">
+
+      <!-- ── CARD 1: COVER ── -->
+      <div class="card card-cover" data-card="0">
+        <div class="cover-photo"></div>
+        <div class="cover-sun"></div>
+        <div class="cover-overlay"></div>
+
+        <div class="cover-jp-vertical">花霞の縁で結ばれた二人</div>
+
+        <div class="cover-corner">
+          <div style="font-family:'Noto Serif JP',serif;font-size:9px;color:rgba(196,154,60,0.6);letter-spacing:0.3em;">花霞</div>
+          <div class="cover-corner-line" style="width:40px;"></div>
+        </div>
+
+        <!-- Decorative koi pair -->
+        <svg class="cover-koi-deco" width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <ellipse cx="30" cy="25" rx="8" ry="16" fill="#9B2335" opacity="0.6" transform="rotate(-20 30 25)"/>
+          <path d="M18 38 Q8 50 20 54" stroke="#9B2335" stroke-width="2" fill="none" opacity="0.5"/>
+          <ellipse cx="50" cy="55" rx="8" ry="16" fill="#C8374A" opacity="0.5" transform="rotate(20 50 55)"/>
+          <path d="M62 42 Q72 30 60 26" stroke="#C8374A" stroke-width="2" fill="none" opacity="0.4"/>
+        </svg>
+
+        <div class="cover-content">
+          <div class="cover-label">Undangan Pernikahan</div>
+          <div class="cover-names">
+            {{ inv.groom_name }}
+            <span class="ampersand">&amp;</span>
+            {{ inv.bride_name }}
+          </div>
+          <div class="cover-date">{{ inv.akad_date | format_date }}</div>
+        </div>
+      </div>
+
+      <!-- ── CARD 2: AYAT ── -->
+      <div class="card card-quran" data-card="1">
+        <div class="quran-pattern"></div>
+        <div class="quran-vline left"></div>
+        <div class="quran-vline right"></div>
+
+        <div class="quran-content">
+          <div class="quran-label">Firman Allah SWT</div>
+
+          <div class="quran-arabic">
+            وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا
+            لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
+          </div>
+
+          <div class="quran-divider"></div>
+
+          <div class="quran-translation">
+            "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu
+            pasangan hidup dari jenismu sendiri, supaya kamu cenderung dan merasa
+            tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."
+          </div>
+
+          <div class="quran-source">QS. Ar-Rum : 21</div>
+        </div>
+      </div>
+
+      <!-- ── CARD 3: COUPLE PROFILE ── -->
+      <div class="card card-couple" data-card="2">
+        <div class="couple-header">
+          <div class="couple-label">Mempelai</div>
+          <div class="couple-header-title">Dua hati yang bersatu<br>dalam ikatan suci</div>
+        </div>
+
+        <!-- Split photos -->
+        <div class="couple-photos">
+          <div class="couple-photo-wrap">
+            {% if photos and photos|length > 1 %}
+              <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
+            {% else %}
+              <div class="photo-placeholder">Foto Pria</div>
+            {% endif %}
+            <div class="photo-name-tag">{{ inv.groom_name }}</div>
+          </div>
+          <div class="couple-photo-wrap">
+            {% if photos and photos|length > 2 %}
+              <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
+            {% else %}
+              <div class="photo-placeholder">Foto Wanita</div>
+            {% endif %}
+            <div class="photo-name-tag">{{ inv.bride_name }}</div>
+          </div>
+        </div>
+
+        <!-- Profile details -->
+        <div class="couple-details">
+          <!-- Groom -->
+          <div class="profile-card">
+            <div class="profile-role">Mempelai Pria</div>
+            <div class="profile-fullname">{{ inv.groom_full }}</div>
+            {% if inv.show_parents %}
+            <div class="profile-parents-label">Putra dari</div>
+            <div class="profile-parents">{{ inv.groom_parents }}</div>
+            {% endif %}
+          </div>
+          <!-- Bride -->
+          <div class="profile-card">
+            <div class="profile-role">Mempelai Wanita</div>
+            <div class="profile-fullname">{{ inv.bride_full }}</div>
+            {% if inv.show_parents %}
+            <div class="profile-parents-label">Putri dari</div>
+            <div class="profile-parents">{{ inv.bride_parents }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <svg class="couple-brush" viewBox="0 0 80 80" fill="none">
+          <path d="M10 70 Q40 10 70 70" stroke="#9B2335" stroke-width="20" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- ── CARD 4: LOVE STORY ── -->
+      <div class="card card-story" data-card="3">
+        <div class="story-ink"></div>
+        <div class="story-photo"></div>
+
+        <div class="story-content">
+          <div class="story-label">Kisah Kami</div>
+          <div class="story-title">
+            Sebuah <span class="red">cerita</span><br>yang belum selesai
+          </div>
+          <div class="story-divider">
+            <div class="story-divider-line"></div>
+            <div class="story-divider-dot"></div>
+            <div class="story-divider-line"></div>
+          </div>
+          <div class="story-text">
+            {{ inv.love_story }}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 5: AKAD NIKAH ── -->
+      <div class="card card-akad" data-card="4">
+        <div class="akad-lines"></div>
+
+        <div class="akad-content">
+          <div class="event-stamp">
+            <div class="event-stamp-text">Acara Pertama</div>
+          </div>
+
+          <div class="event-type">Akad<br>Nikah</div>
+          <div class="event-type-jp">عَقْدُ النِّكَاحِ</div>
+
+          <div class="event-info-grid">
+            <!-- Date -->
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Tanggal</div>
+                <div class="event-info-value">{{ inv.akad_date | format_date }}</div>
+              </div>
+            </div>
+            <!-- Time -->
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Waktu</div>
+                <div class="event-info-value">{{ inv.akad_time }} WIB</div>
+              </div>
+            </div>
+            <!-- Venue -->
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Lokasi</div>
+                <div class="event-info-value">{{ inv.akad_venue }}</div>
+                <div class="event-info-sub">{{ inv.akad_address }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decorative koi outline -->
+        <svg class="akad-koi-deco" width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <ellipse cx="60" cy="50" rx="20" ry="35" stroke="#9B2335" stroke-width="1.5"/>
+          <path d="M40 80 Q20 105 45 110 Q60 115 60 100 Q60 115 75 110 Q100 105 80 80" stroke="#9B2335" stroke-width="1.5" fill="none"/>
+          <circle cx="50" cy="38" r="4" stroke="#9B2335" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <!-- ── CARD 6: RESEPSI ── -->
+      <div class="card card-resepsi" data-card="5">
+        <div class="resepsi-pattern"></div>
+
+        <div class="resepsi-content">
+          <div class="event-stamp">
+            <div class="event-stamp-text">Acara Kedua</div>
+          </div>
+
+          <div class="event-type">Resepsi<br>Pernikahan</div>
+          <div class="event-type-jp">Reception</div>
+
+          <div class="event-info-grid">
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Tanggal</div>
+                <div class="event-info-value">{{ inv.resepsi_date | format_date }}</div>
+              </div>
+            </div>
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Waktu</div>
+                <div class="event-info-value">{{ inv.resepsi_time }} WIB</div>
+              </div>
+            </div>
+            <div class="event-info-row">
+              <div class="event-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="event-info-label">Lokasi</div>
+                <div class="event-info-value">{{ inv.resepsi_venue }}</div>
+                <div class="event-info-sub">{{ inv.resepsi_address }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Maps -->
+          <a class="maps-btn" href="{{ inv.maps_url }}" target="_blank">
+            <svg class="maps-btn-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="maps-btn-text">Buka di Google Maps</span>
+          </a>
+
+          <div class="maps-embed-wrap">
+            {{ inv.maps_embed_html | safe }}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 7: COUNTDOWN ── -->
+      <div class="card card-countdown" data-card="6">
+        <div class="countdown-bg"></div>
+        <div class="countdown-overlay"></div>
+
+        <div class="countdown-content">
+          <div class="countdown-label">Menuju Hari Bahagia</div>
+          <div class="countdown-title">Hitung Mundur</div>
+          <div class="countdown-subtitle">{{ inv.akad_date | format_date }}</div>
+
+          <div class="countdown-grid">
+            <div class="countdown-unit">
+              <div class="countdown-number" id="cdDays">00</div>
+              <div class="countdown-unit-label">Hari</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-number" id="cdHours">00</div>
+              <div class="countdown-unit-label">Jam</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-number" id="cdMins">00</div>
+              <div class="countdown-unit-label">Menit</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-number" id="cdSecs">00</div>
+              <div class="countdown-unit-label">Detik</div>
+            </div>
+          </div>
+
+          <div class="countdown-date">
+            {{ inv.akad_date | format_date }} — {{ inv.akad_time }} WIB
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 8: GALLERY ── -->
+      <div class="card card-gallery" data-card="7">
+        <div class="gallery-header">
+          <div class="gallery-label">Galeri Foto</div>
+          <div class="gallery-title">Momen<br>Bersama Kami</div>
+        </div>
+
+        <div class="gallery-polaroids">
+          <!-- photos[0] = couple -->
+          <div class="polaroid">
+            {% if photos and photos|length > 0 %}
+              <img src="{{ photo_src(photos[0]) }}" alt="Foto Bersama">
+            {% else %}
+              <div class="polaroid-placeholder">Foto Bersama</div>
+            {% endif %}
+            <div class="polaroid-caption">Together</div>
+          </div>
+
+          <!-- photos[1] = groom -->
+          <div class="polaroid">
+            {% if photos and photos|length > 1 %}
+              <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
+            {% else %}
+              <div class="polaroid-placeholder">Mempelai Pria</div>
+            {% endif %}
+            <div class="polaroid-caption">{{ inv.groom_name }}</div>
+          </div>
+
+          <!-- photos[2] = bride -->
+          <div class="polaroid">
+            {% if photos and photos|length > 2 %}
+              <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
+            {% else %}
+              <div class="polaroid-placeholder">Mempelai Wanita</div>
+            {% endif %}
+            <div class="polaroid-caption">{{ inv.bride_name }}</div>
+          </div>
+
+          <!-- photos[3+] = additional -->
+          {% if photos and photos|length > 3 %}
+          <div class="polaroid">
+            <img src="{{ photo_src(photos[3]) }}" alt="Foto Tambahan">
+            <div class="polaroid-caption">Our Story</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ── CARD 9: RSVP ── -->
+      <div class="card card-rsvp" data-card="8">
+        <div class="rsvp-content">
+          <div class="rsvp-label">Konfirmasi Kehadiran</div>
+          <div class="rsvp-title">Apakah kamu<br>hadir bersama kami?</div>
+
+          <div class="rsvp-form" id="rsvpForm">
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-input" id="rsvpName" placeholder="Masukkan nama Anda">
+            </div>
+
+            <!-- Attendance -->
+            <div class="form-group">
+              <label class="form-label">Kehadiran</label>
+              <div class="attendance-options">
+                <button class="attendance-btn" onclick="selectAttendance(this,'hadir')">✓ Hadir</button>
+                <button class="attendance-btn" onclick="selectAttendance(this,'ragu')">? Mungkin</button>
+                <button class="attendance-btn" onclick="selectAttendance(this,'tidak')">✗ Tidak Hadir</button>
+              </div>
+            </div>
+
+            <!-- Guest count -->
+            <div class="form-group">
+              <label class="form-label">Jumlah Tamu</label>
+              <select class="form-select" id="rsvpCount">
+                <option value="1">1 orang</option>
+                <option value="2">2 orang</option>
+                <option value="3">3 orang</option>
+                <option value="4">4+ orang</option>
+              </select>
+            </div>
+
+            <!-- Message -->
+            <div class="form-group">
+              <label class="form-label">Pesan & Doa</label>
+              <textarea class="form-textarea" id="rsvpMessage" placeholder="Tulis pesan dan doa untuk mempelai..."></textarea>
+            </div>
+
+            <button class="rsvp-submit" onclick="submitRsvp()">
+              Kirim Konfirmasi
+            </button>
+          </div>
+
+          <div class="rsvp-success" id="rsvpSuccess">
+            Terima kasih, <span id="successName"></span>! 🌸<br>
+            Doa dan harapan terbaik sudah kami terima.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 10: GUESTBOOK ── -->
+      <div class="card card-guestbook" data-card="9">
+        <div class="guestbook-content">
+          <div class="guestbook-label">Buku Tamu</div>
+          <div class="guestbook-title">Ucapan &amp;<br>Doa Tamu</div>
+
+          <div class="guestbook-list" id="guestbookList">
+            {% for r in rsvp_list %}
+            <div class="guest-card">
+              <div class="guest-name">{{ r.guest_name }}</div>
+              <div class="guest-message">"{{ r.message }}"</div>
+            </div>
+            {% else %}
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(245,239,224,0.4);font-size:14px;text-align:center;padding:40px 0;">
+              Jadilah yang pertama mengirim doa...
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 11: GIFT ── -->
+      <div class="card card-gift" data-card="10">
+        <div class="gift-content">
+          <div class="gift-label">Wedding Gift</div>
+          <div class="gift-title">Hadiah &amp;<br>Amplop Digital</div>
+          <div class="gift-subtitle">Kehadiran dan doa Anda adalah hadiah terbaik bagi kami</div>
+
+          <div class="gift-cards">
+            {% for gift in gifts %}
+              {% if gift.bank_name %}
+              <div class="gift-card">
+                <div class="gift-type">Transfer Bank</div>
+                <div class="gift-bank-name">{{ gift.bank_name }}</div>
+                <div class="gift-account">{{ gift.account_number }}</div>
+                <div class="gift-account-name">a.n. {{ gift.account_name }}</div>
+                <button class="copy-btn" onclick="copyText('{{ gift.account_number }}', this)">
+                  Salin Nomor
+                </button>
+              </div>
+              {% endif %}
+
+              {% if gift.ewallet_type %}
+              <div class="gift-card">
+                <div class="gift-type">{{ gift.ewallet_type }}</div>
+                <div class="gift-bank-name">{{ gift.ewallet_type }}</div>
+                <div class="gift-account">{{ gift.ewallet_number }}</div>
+                <div class="gift-account-name">a.n. {{ gift.ewallet_name }}</div>
+                <button class="copy-btn" onclick="copyText('{{ gift.ewallet_number }}', this)">
+                  Salin Nomor
+                </button>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 12: CLOSING ── -->
+      <div class="card card-closing" data-card="11">
+        <div class="closing-photo"></div>
+        <div class="closing-overlay"></div>
+        <div class="closing-border"></div>
+
+        <div class="closing-content">
+          <!-- Large koi pair -->
+          <div class="closing-koi-wrap">
+            <svg width="100" height="80" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Koi 1 -->
+              <ellipse cx="32" cy="30" rx="10" ry="18" fill="#F5EFE0" opacity="0.8" transform="rotate(-20 32 30)"/>
+              <path d="M20 46 Q10 58 24 62 Q32 64 32 55 Q32 64 40 62 Q54 58 44 46" fill="#F5EFE0" opacity="0.7"/>
+              <circle cx="27" cy="22" r="2.5" fill="#9B2335"/>
+              <!-- Koi 2 -->
+              <ellipse cx="68" cy="50" rx="10" ry="18" fill="#C8374A" opacity="0.7" transform="rotate(20 68 50)"/>
+              <path d="M56 36 Q46 24 60 20 Q68 18 68 27 Q68 18 76 20 Q90 24 80 36" fill="#C8374A" opacity="0.6"/>
+              <circle cx="73" cy="58" r="2.5" fill="#F5EFE0"/>
+              <!-- Yin-yang circle hint -->
+              <circle cx="50" cy="40" r="35" stroke="rgba(245,239,224,0.15)" stroke-width="1"/>
+            </svg>
+          </div>
+
+          <div class="closing-label">Penutup</div>
+
+          <div class="closing-message">
+            Dengan penuh sukacita dan kerendahan hati,<br>
+            kami mengundang Anda untuk menjadi saksi<br>
+            perjalanan cinta kami.
+          </div>
+
+          <div class="closing-names">
+            {{ inv.groom_name }}
+            <span class="amp"> &amp; </span>
+            {{ inv.bride_name }}
+          </div>
+
+          <div class="closing-date">{{ inv.akad_date | format_date }}</div>
+        </div>
+      </div>
+
+    </div><!-- /cards-track -->
+  </div><!-- /slider-wrapper -->
+
+</div><!-- /invitation -->
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────
+const TOTAL_CARDS = 12;
+let currentCard = 0;
+let selectedAttendance = '';
+let isAnimating = false;
+
+// Touch / swipe
+let touchStartX = 0, touchStartY = 0;
+let isDragging = false;
+
+// ── ENVELOPE OPEN ──────────────────────────────────────────
+function openEnvelope() {
+  const screen = document.getElementById('envelope-screen');
+  const curtainL = document.getElementById('curtainL');
+  const curtainR = document.getElementById('curtainR');
+  const inv = document.getElementById('invitation');
+
+  curtainL.style.transform = 'translateX(-105%)';
+  curtainR.style.transform = 'translateX(105%)';
+
+  setTimeout(() => {
+    screen.style.transition = 'opacity 0.5s ease';
+    screen.style.opacity = '0';
+    inv.classList.add('visible');
+  }, 900);
+
+  setTimeout(() => {
+    screen.style.display = 'none';
+  }, 1400);
+
+  // Try autoplay music
+  const music = document.getElementById('bgMusic');
+  music.play().catch(() => {});
+}
+
+// ── CARD SLIDER ────────────────────────────────────────────
+function initCards() {
+  const track = document.getElementById('cardsTrack');
+  const cards = track.querySelectorAll('.card');
+
+  cards.forEach((card, i) => {
+    if (i === 0)       card.dataset.state = 'current';
+    else if (i === 1)  card.dataset.state = 'next';
+    else               card.dataset.state = 'far';
+  });
+
+  buildDots();
+  updateProgress();
+}
+
+function buildDots() {
+  const dotsEl = document.getElementById('navDots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < TOTAL_CARDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+}
+
+function goTo(index) {
+  if (isAnimating) return;
+  if (index < 0 || index >= TOTAL_CARDS) return;
+
+  isAnimating = true;
+  const prev = currentCard;
+  currentCard = index;
+
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((card, i) => {
+    const cardIdx = parseInt(card.dataset.card);
+    if (cardIdx === currentCard)     card.dataset.state = 'current';
+    else if (cardIdx < currentCard)  card.dataset.state = 'prev';
+    else if (cardIdx === currentCard + 1) card.dataset.state = 'next';
+    else                             card.dataset.state = 'far';
+  });
+
+  updateDots();
+  updateProgress();
+  updateArrows();
+
+  setTimeout(() => { isAnimating = false; }, 750);
+}
+
+function updateDots() {
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentCard);
+  });
+}
+
+function updateProgress() {
+  const pct = ((currentCard + 1) / TOTAL_CARDS * 100).toFixed(1);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateArrows() {
+  document.getElementById('btnPrev').style.opacity = currentCard === 0 ? '0.2' : '1';
+  document.getElementById('btnNext').style.opacity = currentCard === TOTAL_CARDS - 1 ? '0.2' : '1';
+}
+
+// ── SWIPE / TOUCH ──────────────────────────────────────────
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  isDragging = true;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!isDragging) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (dx < 0) goTo(currentCard + 1);
+    else         goTo(currentCard - 1);
+  }
+  isDragging = false;
+}, { passive: true });
+
+// Mouse swipe support
+document.addEventListener('mousedown', e => {
+  touchStartX = e.clientX;
+  isDragging = true;
+});
+document.addEventListener('mouseup', e => {
+  if (!isDragging) return;
+  const dx = e.clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) goTo(currentCard + 1);
+    else         goTo(currentCard - 1);
+  }
+  isDragging = false;
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(currentCard + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(currentCard - 1);
+});
+
+// ── MUSIC ──────────────────────────────────────────────────
+let musicPlaying = true;
+function toggleMusic() {
+  const music = document.getElementById('bgMusic');
+  const player = document.getElementById('musicPlayer');
+  if (musicPlaying) {
+    music.pause();
+    player.classList.add('paused');
+    musicPlaying = false;
+  } else {
+    music.play();
+    player.classList.remove('paused');
+    musicPlaying = true;
+  }
+}
+
+// ── COUNTDOWN ──────────────────────────────────────────────
+function initCountdown() {
+  // Get akad date from data attribute or parse from DOM
+  // Fallback: use a placeholder date
+  const targetDateStr = "{{ inv.akad_date }}"; // ISO format expected: YYYY-MM-DD
+  const targetTime   = "{{ inv.akad_time }}";
+
+  function tick() {
+    const target = new Date(targetDateStr + 'T' + (targetTime || '08:00') + ':00');
+    const now    = new Date();
+    const diff   = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('cdDays').textContent  = '00';
+      document.getElementById('cdHours').textContent = '00';
+      document.getElementById('cdMins').textContent  = '00';
+      document.getElementById('cdSecs').textContent  = '00';
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+
+    document.getElementById('cdDays').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cdMins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('cdSecs').textContent  = String(s).padStart(2,'0');
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ── RSVP ───────────────────────────────────────────────────
+function selectAttendance(btn, value) {
+  selectedAttendance = value;
+  document.querySelectorAll('.attendance-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+async function submitRsvp() {
+  const name    = document.getElementById('rsvpName').value.trim();
+  const count   = document.getElementById('rsvpCount').value;
+  const message = document.getElementById('rsvpMessage').value.trim();
+
+  if (!name) { alert('Mohon masukkan nama Anda'); return; }
+
+  try {
+    const res = await fetch('/rsvp/{{ inv.id }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, attendance: selectedAttendance, count, message
+      })
+    });
+
+    if (res.ok) {
+      document.getElementById('rsvpForm').style.display = 'none';
+      document.getElementById('rsvpSuccess').style.display = 'block';
+      document.getElementById('successName').textContent = name;
+
+      // Add to guestbook
+      if (message) addToGuestbook(name, message);
+    }
+  } catch (e) {
+    // Even if fetch fails in demo, show success
+    document.getElementById('rsvpForm').style.display = 'none';
+    document.getElementById('rsvpSuccess').style.display = 'block';
+    document.getElementById('successName').textContent = name;
+    if (message) addToGuestbook(name, message);
+  }
+}
+
+function addToGuestbook(name, message) {
+  const list = document.getElementById('guestbookList');
+  const card = document.createElement('div');
+  card.className = 'guest-card';
+  card.innerHTML = `
+    <div class="guest-name">${name}</div>
+    <div class="guest-message">"${message}"</div>
+  `;
+  list.insertBefore(card, list.firstChild);
+}
+
+// ── COPY BUTTON ────────────────────────────────────────────
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Tersalin!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Salin Nomor';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── AMBIENT CANVAS — Falling Petals ────────────────────────
+function initAmbientCanvas() {
+  const canvas = document.getElementById('ambient-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Petal class
+  class Petal {
+    constructor() { this.reset(); }
+    reset() {
+      this.x     = Math.random() * canvas.width;
+      this.y     = -20;
+      this.size  = Math.random() * 6 + 3;
+      this.speedY = Math.random() * 0.8 + 0.3;
+      this.speedX = (Math.random() - 0.5) * 0.6;
+      this.angle  = Math.random() * Math.PI * 2;
+      this.spin   = (Math.random() - 0.5) * 0.04;
+      this.opacity = Math.random() * 0.4 + 0.1;
+      this.color  = Math.random() > 0.5 ? '#9B2335' : '#C49A3C';
+    }
+    update() {
+      this.x     += this.speedX + Math.sin(this.y * 0.02) * 0.5;
+      this.y     += this.speedY;
+      this.angle += this.spin;
+      if (this.y > canvas.height + 20) this.reset();
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.globalAlpha = this.opacity;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  const petals = Array.from({ length: 60 }, () => {
+    const p = new Petal();
+    p.y = Math.random() * canvas.height; // scatter on init
+    return p;
+  });
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    petals.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ── RIPPLE on buttons ──────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button, .nav-arrow, .maps-btn');
+  if (!btn) return;
+  const r = document.createElement('span');
+  r.className = 'ripple-effect';
+  const rect = btn.getBoundingClientRect();
+  r.style.left = (e.clientX - rect.left - 10) + 'px';
+  r.style.top  = (e.clientY - rect.top  - 10) + 'px';
+  btn.style.position = btn.style.position || 'relative';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 700);
+});
+
+// ── INIT ───────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initCards();
+  initCountdown();
+  initAmbientCanvas();
+  updateArrows();
+});
+</script>
+
+</body>
+</html>
