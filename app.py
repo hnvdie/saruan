@@ -4,7 +4,7 @@ Config via environment variables (see README).
 """
 
 from flask import (Flask, render_template, request, redirect, url_for,
-                   jsonify, abort, session, flash, send_from_directory)
+                   jsonify, abort, session, flash, send_from_directory, make_response)
 import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
