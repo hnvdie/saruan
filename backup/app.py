@@ -686,9 +686,11 @@ def admin_create():
                  f.get('akad_date'),f.get('akad_time'),f.get('akad_venue'),f.get('akad_address'),
                  f.get('resepsi_date'),f.get('resepsi_time'),f.get('resepsi_venue'),f.get('resepsi_address'),
                  f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),exp))
+            if f.get('bank_name'):
+                conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
+                             (iid,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
             _save_photos(conn, iid, request.files, f)
-            _save_gifts(conn, iid, f)
             conn.commit(); conn.close()
             flash('Undangan berhasil dibuat! 🎉','success')
             return redirect(url_for('admin_dashboard'))
@@ -731,7 +733,9 @@ def admin_edit(inv_id):
                  f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),
                  f.get('expires_at'),inv_id))
             conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
-            _save_gifts(conn, inv_id, f)
+            if f.get('bank_name'):
+                conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
+                             (inv_id,f['bank_name'],f.get('account_number'),f.get('account_name')))
             conn.commit()
             # Handle clear portrait checkboxes
             for key, col in (('clear_groom_photo','groom_photo'), ('clear_bride_photo','bride_photo')):
@@ -749,10 +753,11 @@ def admin_edit(inv_id):
         except Exception as e:
             conn.close()
             return render_template('admin/edit.html', inv=inv, themes=themes,
-                                   gifts=list(gifts), photos=list(photos), error=str(e))
+                                   gift=dict(gifts[0]) if gifts else {}, photos=list(photos), error=str(e))
+    gift = dict(gifts[0]) if gifts else {}
     conn.close()
     return render_template('admin/edit.html', inv=inv, themes=themes,
-                           gifts=list(gifts), photos=list(photos))
+                           gift=gift, photos=list(photos))
 
 @app.route('/admin/photo/delete/<int:pid>', methods=['POST'])
 @login_required
@@ -883,29 +888,6 @@ def _save_portrait(conn, inv_id, key: str, f) -> bool:
     f.save(str(UPLOAD_DIR / fname))
     conn.execute(f'UPDATE invitations SET {col}=? WHERE id=?', (fname, inv_id))
     return True
-
-def _save_gifts(conn, inv_id: str, form):
-    """Baca gift_0_* … gift_3_* dari form, insert ke tabel gifts.
-    Dipanggil setelah DELETE gifts WHERE invitation_id sudah dilakukan di caller."""
-    MAX_GIFTS = 4
-    for i in range(MAX_GIFTS):
-        gtype = form.get(f'gift_{i}_type', 'bank')
-        if gtype == 'ewallet':
-            ewallet_type   = (form.get(f'gift_{i}_ewallet_type') or '').strip()
-            ewallet_number = (form.get(f'gift_{i}_ewallet_number') or '').strip()
-            ewallet_name   = (form.get(f'gift_{i}_ewallet_name') or '').strip()
-            if ewallet_type and ewallet_number:
-                conn.execute(
-                    'INSERT INTO gifts(invitation_id,ewallet_type,ewallet_number,ewallet_name) VALUES(?,?,?,?)',
-                    (inv_id, ewallet_type, ewallet_number, ewallet_name))
-        else:
-            bank_name      = (form.get(f'gift_{i}_bank_name') or '').strip()
-            account_number = (form.get(f'gift_{i}_account_number') or '').strip()
-            account_name   = (form.get(f'gift_{i}_account_name') or '').strip()
-            if bank_name and account_number:
-                conn.execute(
-                    'INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
-                    (inv_id, bank_name, account_number, account_name))
 
 def _save_photos(conn, inv_id, files, form):
     existing = conn.execute('SELECT COUNT(*) as c FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchone()['c']

@@ -907,7 +907,7 @@ def _save_gifts(conn, inv_id: str, form):
                     'INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
                     (inv_id, bank_name, account_number, account_name))
 
-def _save_photos(conn, inv_id, files, form):
+
     existing = conn.execute('SELECT COUNT(*) as c FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchone()['c']
     saved = 0
     for key in files:

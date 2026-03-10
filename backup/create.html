@@ -79,15 +79,7 @@ textarea.form-input{resize:vertical;min-height:80px;}
 .btn-primary:hover{background:#333;}
 .btn-ghost{background:transparent;border-color:#ddd;color:#666;}
 .btn-ghost:hover{border-color:#aaa;}
-/* ── GIFT ENTRIES ── */
-.gift-entry{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:.75rem;position:relative;}
-.gift-entry-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
-.gift-entry-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:#888;font-weight:400;}
-.gift-remove{background:none;border:none;color:#ccc;cursor:pointer;font-size:.8rem;padding:.2rem .4rem;border-radius:3px;transition:color .15s;}
-.gift-remove:hover{color:var(--red);}
-.gift-type-tabs{display:flex;gap:.4rem;margin-bottom:.85rem;}
-.gift-tab{padding:.3rem .75rem;border:1px solid #ddd;border-radius:20px;font-size:.7rem;cursor:pointer;background:#fff;color:#888;transition:all .15s;}
-.gift-tab.active{border-color:var(--gold);color:var(--gold);background:#fffdf5;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -271,12 +263,12 @@ textarea.form-input{resize:vertical;min-height:80px;}
 
     <!-- REKENING -->
     <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Rekening / E-Wallet Hadiah <span style="font-weight:300;color:#bbb;text-transform:none;letter-spacing:0">(opsional, maks 4)</span></span>
-        <button type="button" class="add-url-btn" id="addGiftBtn" onclick="addGift()">+ Tambah</button>
+      <div class="card-title">Rekening Hadiah (Opsional)</div>
+      <div class="form-row">
+        <div class="form-group"><label>Nama Bank</label><input class="form-input" type="text" name="bank_name" value="{{ form.get('bank_name','') }}" placeholder="BCA / BNI / Mandiri"></div>
+        <div class="form-group"><label>Nomor Rekening</label><input class="form-input" type="text" name="account_number" value="{{ form.get('account_number','') }}"></div>
       </div>
-      <div id="gift-list"></div>
-      <p class="helper" style="margin-top:.5rem">Bisa bank transfer, GoPay, OVO, Dana, dll. Kosongkan semua jika tidak ingin menampilkan hadiah.</p>
+      <div class="form-group"><label>Nama Pemilik Rekening</label><input class="form-input" type="text" name="account_name" value="{{ form.get('account_name','') }}"></div>
     </div>
 
     <div class="submit-area">
@@ -426,76 +418,7 @@ function addUrlField() {
   urlCount++;
 }
 
-// ── GIFT ENTRIES ──
-const MAX_GIFTS = 4;
-let giftCount = 0;
-
-function addGift(data) {
-  if (giftCount >= MAX_GIFTS) return;
-  const idx = giftCount++;
-  const isBank = !data || data.type !== 'ewallet';
-  const div = document.createElement('div');
-  div.className = 'gift-entry';
-  div.id = `gift-entry-${idx}`;
-  div.innerHTML = `
-    <div class="gift-entry-header">
-      <span class="gift-entry-label">Hadiah #${idx + 1}</span>
-      <button type="button" class="gift-remove" onclick="removeGift(${idx})" title="Hapus">✕ Hapus</button>
-    </div>
-    <div class="gift-type-tabs">
-      <button type="button" class="gift-tab ${isBank ? 'active' : ''}" onclick="switchGiftType(${idx},'bank')">🏦 Bank Transfer</button>
-      <button type="button" class="gift-tab ${!isBank ? 'active' : ''}" onclick="switchGiftType(${idx},'ewallet')">📱 E-Wallet</button>
-    </div>
-    <input type="hidden" name="gift_${idx}_type" id="gift_${idx}_type" value="${isBank ? 'bank' : 'ewallet'}">
-    <div id="gift-${idx}-bank" style="display:${isBank ? 'block' : 'none'}">
-      <div class="form-row">
-        <div class="form-group"><label>Nama Bank</label><input class="form-input" type="text" name="gift_${idx}_bank_name" value="${(data && data.bank_name) || ''}" placeholder="BCA / BNI / Mandiri / dll"></div>
-        <div class="form-group"><label>Nomor Rekening</label><input class="form-input" type="text" name="gift_${idx}_account_number" value="${(data && data.account_number) || ''}" placeholder="1234567890"></div>
-      </div>
-      <div class="form-group"><label>Nama Pemilik</label><input class="form-input" type="text" name="gift_${idx}_account_name" value="${(data && data.account_name) || ''}" placeholder="Nama sesuai rekening"></div>
-    </div>
-    <div id="gift-${idx}-ewallet" style="display:${!isBank ? 'block' : 'none'}">
-      <div class="form-row">
-        <div class="form-group"><label>Jenis E-Wallet</label>
-          <select class="form-input" name="gift_${idx}_ewallet_type">
-            ${['GoPay','OVO','Dana','ShopeePay','LinkAja','Qris'].map(e => `<option value="${e}" ${(data && data.ewallet_type === e) ? 'selected' : ''}>${e}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Nomor / ID</label><input class="form-input" type="text" name="gift_${idx}_ewallet_number" value="${(data && data.ewallet_number) || ''}" placeholder="08xxxxxxxxxx"></div>
-      </div>
-      <div class="form-group"><label>Nama Pemilik</label><input class="form-input" type="text" name="gift_${idx}_ewallet_name" value="${(data && data.ewallet_name) || ''}" placeholder="Nama terdaftar"></div>
-    </div>`;
-  document.getElementById('gift-list').appendChild(div);
-  updateAddBtn();
-}
-
-function removeGift(idx) {
-  const el = document.getElementById(`gift-entry-${idx}`);
-  if (el) el.remove();
-  giftCount--;
-  // Re-number labels
-  document.querySelectorAll('.gift-entry').forEach((el, i) => {
-    el.querySelector('.gift-entry-label').textContent = `Hadiah #${i + 1}`;
-  });
-  updateAddBtn();
-}
-
-function switchGiftType(idx, type) {
-  document.getElementById(`gift_${idx}_type`).value = type;
-  document.getElementById(`gift-${idx}-bank`).style.display = type === 'bank' ? 'block' : 'none';
-  document.getElementById(`gift-${idx}-ewallet`).style.display = type === 'ewallet' ? 'block' : 'none';
-  document.querySelectorAll(`#gift-entry-${idx} .gift-tab`).forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && type === 'bank') || (i === 1 && type === 'ewallet'));
-  });
-}
-
-function updateAddBtn() {
-  const btn = document.getElementById('addGiftBtn');
-  btn.style.display = giftCount >= MAX_GIFTS ? 'none' : '';
-}
-
-// Init: start with 1 empty gift entry
-addGift();
+// ── SUBMIT VALIDATION ──
 document.getElementById('mainForm').addEventListener('submit', e => {
   if (!hiddenInput.value) {
     e.preventDefault();
