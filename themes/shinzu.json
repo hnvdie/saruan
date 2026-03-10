@@ -1,10 +1,8 @@
 {
-  "id": "shinzu",
   "name": "Shinzu",
   "description": "Tenang, elegan, dan penuh makna. Nuansa kuil Jepang, kelopak sakura melayang, dan harmoni tradisi dengan modernitas — untuk pernikahan yang khidmat dan tak terlupakan.",
   "preview_color": "#c8556a",
   "accent_color": "#d4a574",
-  "skeleton": "shinzu",
   "tags": [
     "japanese",
     "zen",
@@ -17,8 +15,24 @@
   "demo_photos": [
     "/static/themes/shinzu/demo_3dbb12ac.jpg"
   ],
+  "features": [
+    "envelope_intro",
+    "falling_sakura_petals",
+    "quran_verse",
+    "japanese_dividers",
+    "vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_bg",
+    "masonry_gallery",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music",
+    "ink_brush_animations"
+  ],
   "price": 25000,
-  "price_label": "Rp. 25000",
+  "price_label": "Rp. 25.000",
   "price_original": 50000,
   "price_note": "",
   "palette": {
@@ -36,20 +50,6 @@
     "serif": "Cormorant Garamond",
     "sans": "Nunito"
   },
-  "features": [
-    "envelope_intro",
-    "falling_sakura_petals",
-    "quran_verse",
-    "japanese_dividers",
-    "vertical_timeline",
-    "schedule_timeline",
-    "hero_photo_bg",
-    "masonry_gallery",
-    "countdown",
-    "rsvp",
-    "gift",
-    "love_story",
-    "music",
-    "ink_brush_animations"
-  ]
+  "id": "shinzu",
+  "skeleton": "shinzu"
 }

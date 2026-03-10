@@ -25,10 +25,10 @@
     "Music player floating dengan spinning ring",
     "Google Maps embed + link"
   ],
-  "price": 85000,
-  "price_label": "Rp 85.000",
-  "price_original": 120000,
-  "price_note": "Harga promo terbatas",
+  "price": 25000,
+  "price_label": "Rp 25.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "deep_ocean": "#0d2233",
     "teal": "#1a4a5e",
