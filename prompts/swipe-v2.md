@@ -1,4 +1,3 @@
-# PROMPT_SWIPE — Wedding Invitation Mode Swipe Card
 > Gunakan prompt ini untuk tema dengan navigasi swipe kiri/kanan (1 layar penuh, tanpa scroll)
 
 ---
@@ -137,7 +136,7 @@ SECTION IDENTITY:
 ## FITUR WAJIB — SEMUA HARUS ADA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✦ Envelope/cover intro — cover.jpg sebagai fullscreen background, efek buka DRAMATIS
+✦ Envelope/cover intro — cover.jpg sebagai fullscreen background, tombol "Buka Undangan"
 ✦ Nama mempelai + tanggal
 ✦ Profil mempelai pria & wanita + orang tua
 ✦ Love story
@@ -152,7 +151,7 @@ SECTION IDENTITY:
 ✦ Music player floating (autoplay setelah envelope dibuka)
 ✦ Closing
 
-posisi sangat boleh diacak-acak urutannya jika ingin menyesuaikan dengan design tidak ada masalah urutannya.
+posisi sangat boleh diacak-acak urutannya jika ingin menyesuaikan dengan design.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## ANIMASI
@@ -162,9 +161,30 @@ AMBIENT:
 - Wajib 1 sistem partikel canvas unik sesuai tema (bukan bintang sci-fi)
   Contoh: kelopak melayang, kunang-kunang, uap teh, butir pasir, dll
 
-ENVELOPE:
-- Efek buka DRAMATIS — bukan sekadar fade
-  Contoh: curtain split, zoom out, iris transition, burn effect, dll
+ENVELOPE — WAJIB IKUTI PERSIS:
+- Efek buka: FADE OUT halus saja
+- DILARANG: curtain split, iris transition, zoom out, burn effect,
+  atau efek terbelah/dramatis apapun bentuknya
+- Flow: tombol "Buka Undangan" diklik → envelope fade out → konten muncul
+
+CSS envelope — WAJIB pakai ini persis:
+```css
+#envelope.opening { opacity: 0; transition: opacity .6s ease; pointer-events: none; }
+#envelope.gone    { display: none; }
+```
+
+JS envelope — WAJIB pakai ini persis:
+```js
+function openEnvelope() {
+  env.classList.add('opening');
+  setTimeout(() => {
+    env.classList.add('gone');
+    app.classList.add('visible');
+    // autoplay musik di sini jika ada
+  }, 650);
+}
+env.addEventListener('click', openEnvelope);
+```
 
 TEKNIS:
 - Pure CSS + Vanilla JS — DILARANG GSAP, AOS, library luar
@@ -191,9 +211,9 @@ TEKNIS:
   "accent_color": "#hex",
   "skeleton": "namatema",
   "tags": ["tag1", "tag2", "tag3"],
-  "demo_photos": "kosongkan",
+  "demo_photos": [],
   "price": 85000,
-  "price_label": "Rp. 85.000",
+  "price_label": "Rp 85.000",
   "price_original": 120000,
   "price_note": "Harga promo terbatas",
   "palette": {
@@ -214,8 +234,8 @@ TEKNIS:
 }
 ```
 
-PENTING: demo_photos = foto pasangan sample, BUKAN cover.jpg
-cover.jpg = background envelope/hero dekorasi
+PENTING: demo_photos = kosongkan (array kosong [])
+cover.jpg = background envelope/hero dekorasi, bukan foto pasangan
 
 **ASSETS_GUIDE.md**
 - Tabel semua file di /static/themes/[namatema]/
@@ -236,4 +256,3 @@ cover.jpg = background envelope/hero dekorasi
 - Setiap card bisa berdiri sendiri sebagai scene yang indah
 - Test mental: "Kalau gw terima undangan ini, apakah gw terharu dan excited?"
   Kalau jawabannya tidak — desain ulang.
-
