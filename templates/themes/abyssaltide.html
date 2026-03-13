@@ -1378,55 +1378,71 @@
       <h2 class="couple-title reveal rev-up" style="--delay:0.1s">Dua Jiwa, Satu Samudra</h2>
     </div>
 
-    <!-- Groom -->
-    <div class="person-card reveal rev-left" style="--delay:0.2s">
-      <div class="person-photo-wrap">
-        {% if photos and photos|length > 1 %}
-        <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}" />
-        {% else %}
-        <div style="width:100%;height:100%;background:linear-gradient(135deg,#071428,#0d2b52)"></div>
-        {% endif %}
-      </div>
-      <div class="person-info">
-        <p class="person-role">Mempelai Pria</p>
-        <h3 class="person-name">{{ inv.groom_full }}</h3>
-        {% if inv.show_parents %}
-        <p class="person-parents-label">Putra dari</p>
-        <p class="person-parents">{{ inv.groom_parents }}</p>
-        {% endif %}
-        <svg class="person-ornament" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="24" cy="24" r="20" stroke="#00d4c8" stroke-width="1.5"/>
-          <circle cx="24" cy="24" r="12" stroke="#00d4c8" stroke-width="1"/>
-          <circle cx="24" cy="24" r="4"  fill="#00d4c8"/>
-        </svg>
-      </div>
-    </div>
+<!-- Groom -->
+<div class="person-card reveal rev-left" style="--delay:0.2s">
+  <div class="person-photo-wrap">
 
-    <!-- Bride -->
-    <div class="person-card reveal rev-right" style="--delay:0.3s">
-      <div class="person-photo-wrap">
-        {% if photos and photos|length > 2 %}
-        <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}" />
-        {% else %}
-        <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a1f3d,#071428)"></div>
-        {% endif %}
-      </div>
-      <div class="person-info">
-        <p class="person-role">Mempelai Wanita</p>
-        <h3 class="person-name">{{ inv.bride_full }}</h3>
-        {% if inv.show_parents %}
-        <p class="person-parents-label">Putri dari</p>
-        <p class="person-parents">{{ inv.bride_parents }}</p>
-        {% endif %}
-        <svg class="person-ornament" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="24" cy="24" r="20" stroke="#7fffd4" stroke-width="1.5"/>
-          <circle cx="24" cy="24" r="12" stroke="#7fffd4" stroke-width="1"/>
-          <circle cx="24" cy="24" r="4"  fill="#7fffd4"/>
-        </svg>
-      </div>
-    </div>
-  </section>
+    {% if inv.groom_photo_url %}
+      <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}" />
 
+    {% elif photos and photos|length > 1 %}
+      <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}" />
+
+    {% else %}
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#071428,#0d2b52)"></div>
+    {% endif %}
+
+  </div>
+
+  <div class="person-info">
+    <p class="person-role">Mempelai Pria</p>
+    <h3 class="person-name">{{ inv.groom_full }}</h3>
+
+    {% if inv.show_parents %}
+      <p class="person-parents-label">Putra dari</p>
+      <p class="person-parents">{{ inv.groom_parents }}</p>
+    {% endif %}
+
+    <svg class="person-ornament" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="20" stroke="#00d4c8" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="12" stroke="#00d4c8" stroke-width="1"/>
+      <circle cx="24" cy="24" r="4" fill="#00d4c8"/>
+    </svg>
+  </div>
+</div>
+
+<!-- Bride -->
+<div class="person-card reveal rev-right" style="--delay:0.3s">
+  <div class="person-photo-wrap">
+
+    {% if inv.bride_photo_url %}
+      <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}" />
+
+    {% elif photos and photos|length > 2 %}
+      <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}" />
+
+    {% else %}
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a1f3d,#071428)"></div>
+    {% endif %}
+
+  </div>
+
+  <div class="person-info">
+    <p class="person-role">Mempelai Wanita</p>
+    <h3 class="person-name">{{ inv.bride_full }}</h3>
+
+    {% if inv.show_parents %}
+      <p class="person-parents-label">Putri dari</p>
+      <p class="person-parents">{{ inv.bride_parents }}</p>
+    {% endif %}
+
+    <svg class="person-ornament" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="20" stroke="#7fffd4" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="12" stroke="#7fffd4" stroke-width="1"/>
+      <circle cx="24" cy="24" r="4" fill="#7fffd4"/>
+    </svg>
+  </div>
+</div>
   <!-- ── SECTION: LOVE STORY ──────────────────────────── -->
   <section id="love-story">
     <div class="story-header">

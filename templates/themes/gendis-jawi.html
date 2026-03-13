@@ -793,41 +793,58 @@
         </div>
     </section>
 
-    <!-- S3 GROOM -->
-    <section class="card far" id="s3">
-        <div class="card-inner">
-            <p class="section-label">MEMPELAI PRIA</p>
-            <div class="profile-layout">
-                <div class="profile-photo-wrap">
-                    <img src="{% if photos %}{{ photo_src(photos[1]) }}{% endif %}" alt="{{ inv.groom_name }}">
-                    <div class="profile-photo-accent"></div>
-                    <div class="profile-badge">MEMPELAI PRIA</div>
-                </div>
-                <p class="profile-fullname">{{ inv.groom_full }}</p>
-                <p class="profile-name">{{ inv.groom_name }}</p>
-                <div class="ornament-line"><span></span><em>✦</em><span></span></div>
-                <p class="profile-parents body-text">Putra dari Bapak {{ inv.groom_parents }}</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- S4 BRIDE -->
-    <section class="card far" id="s4">
-        <div class="card-inner">
-            <p class="section-label">MEMPELAI WANITA</p>
-            <div class="profile-layout">
-                <div class="profile-photo-wrap">
-                    <img src="{% if photos %}{{ photo_src(photos[2]) }}{% endif %}" alt="{{ inv.bride_name }}">
-                    <div class="profile-photo-accent"></div>
-                    <div class="profile-badge">MEMPELAI WANITA</div>
-                </div>
-                <p class="profile-fullname">{{ inv.bride_full }}</p>
-                <p class="profile-name">{{ inv.bride_name }}</p>
-                <div class="ornament-line"><span></span><em>✦</em><span></span></div>
-                <p class="profile-parents body-text">Putri dari Bapak {{ inv.bride_parents }}</p>
+
+<!-- S3 GROOM -->
+<section class="card far" id="s3">
+    <div class="card-inner">
+        <p class="section-label">MEMPELAI PRIA</p>
+        <div class="profile-layout">
+            <div class="profile-photo-wrap">
+
+                {% if inv.groom_photo_url %}
+                    <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+                {% elif photos and photos|length > 1 %}
+                    <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
+                {% endif %}
+
+                <div class="profile-photo-accent"></div>
+                <div class="profile-badge">MEMPELAI PRIA</div>
             </div>
+
+            <p class="profile-fullname">{{ inv.groom_full }}</p>
+            <p class="profile-name">{{ inv.groom_name }}</p>
+            <div class="ornament-line"><span></span><em>✦</em><span></span></div>
+            <p class="profile-parents body-text">Putra dari Bapak {{ inv.groom_parents }}</p>
         </div>
-    </section>
+    </div>
+</section>
+
+
+<!-- S4 BRIDE -->
+<section class="card far" id="s4">
+    <div class="card-inner">
+        <p class="section-label">MEMPELAI WANITA</p>
+        <div class="profile-layout">
+            <div class="profile-photo-wrap">
+
+                {% if inv.bride_photo_url %}
+                    <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}">
+                {% elif photos and photos|length > 2 %}
+                    <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
+                {% endif %}
+
+                <div class="profile-photo-accent"></div>
+                <div class="profile-badge">MEMPELAI WANITA</div>
+            </div>
+
+            <p class="profile-fullname">{{ inv.bride_full }}</p>
+            <p class="profile-name">{{ inv.bride_name }}</p>
+            <div class="ornament-line"><span></span><em>✦</em><span></span></div>
+            <p class="profile-parents body-text">Putri dari Bapak {{ inv.bride_parents }}</p>
+        </div>
+    </div>
+</section>
 
     <!-- S5 DETAIL ACARA -->
     <section class="card far" id="s5">

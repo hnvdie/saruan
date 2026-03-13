@@ -174,7 +174,7 @@
         <section class="profile-container">
             <div class="profile-card reveal" style="margin-right: 40px;">
                 <div class="photo-frame">
-                    <img src="{% if photos %}{{ photo_src(photos[1]) }}{% endif %}" alt="Groom">
+                    <img src="{% if inv.groom_photo_url%} {{ inv.groom_photo_url }} {% elif photos %}{{ photo_src(photos[1]) }}{% endif %}" alt="Groom">
                 </div>
                 <div class="profile-info">
                     <h2>{{ inv.groom_full }}</h2>
@@ -184,7 +184,7 @@
 
             <div class="profile-card reveal" style="margin-left: 40px;">
                 <div class="photo-frame" style="border-radius: 0 0 150px 150px; box-shadow: -20px -20px 0 var(--clay);">
-                    <img src="{% if photos %}{{ photo_src(photos[2]) }}{% endif %}" alt="Bride">
+                    <img src="{% if inv.bride_photo_url %} {{ inv.bride_photo_url }} {% elif photos %}{{ photo_src(photos[2]) }}{% endif %}" alt="Bride">
                 </div>
                 <div class="profile-info" style="margin-top: 20px; margin-left: 0; margin-right: auto;">
                     <h2>{{ inv.bride_full }}</h2>

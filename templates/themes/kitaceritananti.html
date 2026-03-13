@@ -1648,7 +1648,9 @@ body::after {
   <!-- Mempelai Wanita -->
   <div class="profile-card bride reveal from-right" style="transition-delay:0.1s">
     <div class="photo-frame-wrapper">
-      {% if photos and photos|length > 2 %}
+      {% if inv.bride_photo_url %}
+      <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}">
+      {% elif photos and photos|length > 2 %}
       <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
       {% else %}
       <img src="cover.jpg" alt="{{ inv.bride_name }}">
@@ -1673,7 +1675,9 @@ body::after {
   <!-- Mempelai Pria -->
   <div class="profile-card groom reveal from-left" style="transition-delay:0.2s">
     <div class="photo-frame-wrapper">
-      {% if photos and photos|length > 1 %}
+      {% if inv.groom_photo_url %}
+      <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+      {% elif photos and photos|length > 1 %}
       <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
       {% else %}
       <img src="cover.jpg" alt="{{ inv.groom_name }}">

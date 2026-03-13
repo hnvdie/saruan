@@ -608,35 +608,61 @@ html, body {
       </div>
     </div>
 
-    <!-- CARD 3: COUPLE -->
-    <div class="card far" id="c2">
-      <div class="head">
-        <div class="tag">Mempelai</div>
-        <h2>Dua hati yang bersatu<br>dalam ikatan suci</h2>
-      </div>
-      <div class="sphotos">
-        <div class="sphoto">
-          {% if photos and photos|length > 1 %}<img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">{% else %}<div class="ph">Foto Pria</div>{% endif %}
-          <div class="sname">{{ inv.groom_name }}</div>
-        </div>
-        <div class="sphoto">
-          {% if photos and photos|length > 2 %}<img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">{% else %}<div class="ph">Foto Wanita</div>{% endif %}
-          <div class="sname">{{ inv.bride_name }}</div>
-        </div>
-      </div>
-      <div class="profs">
-        <div class="prof">
-          <div class="prole">Mempelai Pria</div>
-          <div class="prnam">{{ inv.groom_full }}</div>
-          {% if inv.show_parents %}<div class="proof">Putra dari</div><div class="prpar">{{ inv.groom_parents }}</div>{% endif %}
-        </div>
-        <div class="prof">
-          <div class="prole">Mempelai Wanita</div>
-          <div class="prnam">{{ inv.bride_full }}</div>
-          {% if inv.show_parents %}<div class="proof">Putri dari</div><div class="prpar">{{ inv.bride_parents }}</div>{% endif %}
-        </div>
-      </div>
+<!-- CARD 3: COUPLE -->
+<div class="card far" id="c2">
+  <div class="head">
+    <div class="tag">Mempelai</div>
+    <h2>Dua hati yang bersatu<br>dalam ikatan suci</h2>
+  </div>
+
+  <div class="sphotos">
+
+    <!-- Groom -->
+    <div class="sphoto">
+      {% if inv.groom_photo_url %}
+        <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+      {% elif photos and photos|length > 1 %}
+        <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
+      {% else %}
+        <div class="ph">Foto Pria</div>
+      {% endif %}
+      <div class="sname">{{ inv.groom_name }}</div>
     </div>
+
+    <!-- Bride -->
+    <div class="sphoto">
+      {% if inv.bride_photo_url %}
+        <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}">
+      {% elif photos and photos|length > 2 %}
+        <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
+      {% else %}
+        <div class="ph">Foto Wanita</div>
+      {% endif %}
+      <div class="sname">{{ inv.bride_name }}</div>
+    </div>
+
+  </div>
+
+  <div class="profs">
+    <div class="prof">
+      <div class="prole">Mempelai Pria</div>
+      <div class="prnam">{{ inv.groom_full }}</div>
+      {% if inv.show_parents %}
+        <div class="proof">Putra dari</div>
+        <div class="prpar">{{ inv.groom_parents }}</div>
+      {% endif %}
+    </div>
+
+    <div class="prof">
+      <div class="prole">Mempelai Wanita</div>
+      <div class="prnam">{{ inv.bride_full }}</div>
+      {% if inv.show_parents %}
+        <div class="proof">Putri dari</div>
+        <div class="prpar">{{ inv.bride_parents }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
     <!-- CARD 4: STORY -->
     <div class="card far" id="c3">
