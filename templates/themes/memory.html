@@ -1389,7 +1389,7 @@
       <!-- Groom -->
       <div class="person-card">
         <div class="person-photo-wrap">
-          {% if inv.bride_photo_url %}
+          {% if inv.groom_photo_url %}
 		<img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
                     {% elif photos and photos|length > 1 %}
             <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
