@@ -1383,7 +1383,9 @@ body {
     <!-- GROOM -->
     <div class="couple-card anim-fade-left">
       <div class="couple-photo-wrap">
-        {% if photos %}
+        {% if inv.groom_photo_url %}
+        <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+        {% elif photos %}
           <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}" loading="lazy">
         {% else %}
           <div style="width:100%;height:100%;background:var(--brown);display:flex;align-items:center;justify-content:center;">
@@ -1411,7 +1413,9 @@ body {
     <!-- BRIDE -->
     <div class="couple-card right anim-fade-right">
       <div class="couple-photo-wrap">
-        {% if photos %}
+        {% if inv.bride_photo_url %}
+          <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}" loading="lazy">
+        {% elif photos %}
           <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}" loading="lazy">
         {% else %}
           <div style="width:100%;height:100%;background:var(--maroon);display:flex;align-items:center;justify-content:center;">

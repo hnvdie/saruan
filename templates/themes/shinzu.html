@@ -994,8 +994,10 @@ textarea.form-control { resize: none; height: 80px; }
       <div class="couple-card groom reveal">
         <p class="card-role">Mempelai Pria</p>
         <div class="card-photo">
-          {% if photos and photos|length >= 2 %}
-          <img src="{{ photo_src(photos[1]) }}" alt="Foto Pria" loading="lazy"/>
+          {% if inv.groom_photo_url %}
+          <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}" loading="lazy">
+          {% elif photos and photos|length >= 2 %}
+          <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}" loading="lazy"/>
           {% else %}
           <div class="photo-ph">Foto<br/>Pria</div>
           {% endif %}
@@ -1007,7 +1009,9 @@ textarea.form-control { resize: none; height: 80px; }
       <div class="couple-card bride reveal">
         <p class="card-role">Mempelai Wanita</p>
         <div class="card-photo">
-          {% if photos and photos|length >= 3 %}
+          {% if inv.bride_photo_url %}
+          <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}" loading="lazy">
+          {% elif photos and photos|length >= 3 %}
           <img src="{{ photo_src(photos[2]) }}" alt="Foto Wanita" loading="lazy"/>
           {% else %}
           <div class="photo-ph">Foto<br/>Wanita</div>
