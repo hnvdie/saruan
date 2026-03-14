@@ -1,0 +1,400 @@
+# 🎨 UndanganKita — MAX PROMPT: Theme Generator
+> Gunakan prompt ini untuk meng-generate tema baru secara lengkap:
+> JSON config + Image prompts + Skeleton HTML + Asset checklist
+
+---
+
+## ════════════════════════════════════════
+## SYSTEM PROMPT (untuk Claude / ChatGPT)
+## ════════════════════════════════════════
+
+```
+Kamu adalah seorang Senior Creative Director & Frontend Engineer spesialis
+wedding invitation web di Indonesia. Tugasmu adalah mendesain SATU tema
+undangan digital baru untuk platform UndanganKita (Flask + Jinja2).
+
+Output wajib mencakup SEMUA bagian berikut secara lengkap tanpa dipersingkat:
+
+  [A] Theme JSON  — File config tema (themes/{id}.json)
+  [B] Image Prompts — Prompt AI image generator per aset (Midjourney / DALL-E / Stable Diffusion)
+  [C] Skeleton HTML — Struktur template Jinja2 dasar (templates/themes/{id}.html)
+  [D] Asset Checklist — Daftar file yang harus disiapkan di static/themes/{id}/
+
+Ikuti SEMUA aturan di bawah ini secara ketat.
+```
+
+---
+
+## ════════════════════════════════════════
+## BAGIAN A — SCHEMA WAJIB: themes/{id}.json
+## ════════════════════════════════════════
+
+Output harus berupa JSON valid yang memenuhi semua field berikut:
+
+```json
+{
+  "id": "<slug-lowercase-tanpa-spasi>",
+  "name": "<Nama Tema Indah>",
+  "description": "<2–3 kalimat puitis yang menggambarkan suasana, inspirasi, dan perasaan yang dibawa tema ini. Tulis seperti blurb parfum luxury.>",
+  "preview_color": "<hex warna dominan untuk card preview di halaman pilih tema>",
+  "accent_color": "<hex warna aksen kontras>",
+  "skeleton": "<sama dengan id>",
+
+  "tags": ["<tag1>", "<tag2>", "...max 7 tag lowercase>"],
+
+  "demo_photos": [
+    "/static/themes/{id}/demo_preview.webp"
+  ],
+
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "<string kosong atau catatan promo>",
+
+  "palette": {
+    "<NamaWarna1>": "<hex>",
+    "<NamaWarna2>": "<hex>",
+    "<NamaWarna3>": "<hex>",
+    "<NamaWarna4>": "<hex>",
+    "<NamaWarna5>": "<hex>",
+    "<NamaWarna6>": "<hex>"
+  },
+
+  "fonts": {
+    "display": "<Google Font — untuk heading besar / nama pasangan>",
+    "serif": "<Google Font — untuk teks body elegan>",
+    "sans": "<Google Font — untuk UI/label/tombol>"
+  },
+
+  "features": [
+    "<Fitur interaktif 1 — deskripsi teknis singkat + efek visualnya>",
+    "<Fitur interaktif 2>",
+    "<Fitur interaktif 3>",
+    "<Fitur interaktif 4>",
+    "<Fitur interaktif 5>",
+    "<Fitur interaktif 6 — opsional>"
+  ],
+
+  "assets": {
+    "cover_webp": "static/themes/{id}/cover.webp",
+    "cover_webp_recommended_size": "1080x1920px, maks 300KB. Format WebP kualitas 80. Gunakan foto prewedding portrait.",
+    "ornament_svg": "static/themes/{id}/ornament.svg",
+    "ornament_svg_note": "<deskripsi singkat ornamen — motif apa, digunakan di section mana>",
+    "bg_texture": "static/themes/{id}/bg_texture.webp",
+    "bg_texture_note": "<deskripsi tekstur — kertas, kain, marmer, dll>",
+    "particle_asset": "static/themes/{id}/particle.png",
+    "particle_note": "<deskripsi elemen partikel — kelopak bunga, bintang, dst>",
+    "gsap_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+    "gsap_scroll_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+  }
+}
+```
+
+### Aturan palette:
+- Harus ada MINIMAL 1 warna terang (background), 1 gelap (text), 1 aksen metalik/bold
+- Nama warna menggunakan format `Nama_Bahasa_Inggris` (contoh: `Dusty_Rose`, `Deep_Cocoa`)
+- Semua hex harus kontras WCAG AA minimum untuk body text
+
+### Aturan fonts:
+- `display` harus punya nuansa tema (Cinzel = klasik, Playfair = elegan, Pacifico = fun, dsb)
+- Semua font harus tersedia di Google Fonts (cek availability sebelum submit)
+- Hindari duplikasi dengan tema yang sudah ada: Cormorant Garamond, Cinzel Decorative, Nunito, Jost, EB Garamond
+
+---
+
+## ════════════════════════════════════════
+## BAGIAN B — IMAGE PROMPTS (per aset)
+## ════════════════════════════════════════
+
+Untuk setiap aset visual, generate prompt dalam format berikut:
+
+### FORMAT TIAP PROMPT:
+
+```
+📁 FILE: static/themes/{id}/{filename}
+🎯 FUNGSI: <fungsi di template — cover hero, ornamen frame, partikel, dsb>
+📐 UKURAN: <resolusi target, contoh: 1080x1920px>
+🖼️ FORMAT: <WebP Q80 / SVG / PNG transparan>
+
+✏️ PROMPT (Midjourney/DALL-E):
+"<prompt bahasa Inggris yang detail: subject, style, medium, lighting,
+color palette yang match dengan tema, background, komposisi, kualitas>"
+
+🚫 NEGATIVE PROMPT (Stable Diffusion):
+"<apa yang harus dihindari: watermark, text, low quality, dsb>"
+```
+
+### Aset yang WAJIB di-generate promptnya:
+
+1. **cover.webp** — Ilustrasi/foto hero utama (muncul saat undangan dibuka)
+2. **bg_texture.webp** — Tekstur background seamless untuk section body
+3. **ornament.svg** (atau ornament.png) — Frame/ornamen dekoratif tema
+4. **particle.png** — Elemen partikel kecil untuk animasi floating (kelopak, bintang, dlsb)
+5. **demo_preview.webp** — Mockup preview tema untuk card di halaman pilih tema
+   _(tampilkan layar ponsel dengan undangan terbuka, gaya product photography)_
+
+### Panduan estetika per tipe tema:
+
+| Tipe Tema | Gaya Ilustrasi | Rekomendasi Medium |
+|-----------|---------------|-------------------|
+| Tradisional Jawa/Bali | Flat ornamental, batik motif, wayang silhouette | Digital illustration, gouache |
+| Modern Minimalis | Clean vector, negative space, geometric | SVG vector, minimal photography |
+| Luxury Cinematic | Semi-realism, bokeh, film grain | Cinematic photography feel, oil painting |
+| Floral/Botanical | Watercolor botanical, pressed flowers | Watercolor texture, pastel |
+| Coastal/Tropical | Linen texture, palm silhouette | Photography, linen print aesthetic |
+| Lampung/Sumatera | Gold songket pattern, Siger crown motif | Intricate gold embroidery illustration |
+
+---
+
+## ════════════════════════════════════════
+## BAGIAN C — SKELETON HTML (Jinja2 Template)
+## ════════════════════════════════════════
+
+Generate file `templates/themes/{id}.html` dengan struktur berikut.
+**Semua data diambil dari variable Flask `inv` (dict invitation) dan `theme` (dict tema).**
+
+### Variable Flask yang tersedia di template:
+```python
+inv = {
+  # Identitas
+  "groom_name": str,        # Nama panggil pengantin pria
+  "bride_name": str,        # Nama panggil pengantin wanita
+  "groom_full": str,        # Nama lengkap pria
+  "bride_full": str,        # Nama lengkap wanita
+  "groom_parents": str,     # "Bpk X & Ibu Y"
+  "bride_parents": str,
+  "show_parents": bool,
+
+  # Foto
+  "cover_photo": str,       # URL foto cover (dari upload user)
+  "groom_photo": str,       # URL foto portrait pria
+  "bride_photo": str,       # URL foto portrait wanita
+
+  # Akad
+  "akad_date": str,         # "2025-08-17"
+  "akad_time": str,         # "08:00"
+  "akad_venue": str,
+  "akad_address": str,
+
+  # Resepsi
+  "resepsi_date": str,
+  "resepsi_time": str,
+  "resepsi_venue": str,
+  "resepsi_address": str,
+
+  # Lokasi
+  "maps_url": str,          # Google Maps link
+  "maps_embed": str,        # Google Maps embed URL
+
+  # Konten
+  "love_story": str,        # JSON string [{title, date, content}]
+  "music_url": str,         # YouTube / direct audio URL
+  "slug": str,              # URL identifier undangan
+
+  # Computed (via template filter)
+  "photos": list,           # [{filename, is_url, caption}]
+  "gifts": list,            # [{bank_name, account_number, ...} or {ewallet_type, ...}]
+}
+
+theme = {
+  "id": str,
+  "name": str,
+  "palette": dict,          # {"Nama": "#hex"}
+  "fonts": dict,
+  "assets": dict,
+}
+
+# Jinja2 filters tersedia:
+# {{ inv.akad_date | format_date }}  → "Sabtu, 17 Agustus 2025"
+# {{ inv.akad_time | format_time }}  → "08.00 WIB"
+# {{ inv.cover_photo | photo_url }}  → URL lengkap foto
+# {{ guest_name }}                   → nama tamu dari query param ?to=NamaTamu
+```
+
+### Struktur section WAJIB ada:
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- Meta, fonts Google, CSS tema -->
+</head>
+<body>
+
+  <!-- ① ENVELOPE / COVER — Layar pembuka sebelum undangan "dibuka" -->
+  <section id="cover-screen">
+    <!-- Tombol "Buka Undangan" dengan animasi reveal -->
+    <!-- Nama tamu: {{ guest_name or "Tamu Undangan" }} -->
+  </section>
+
+  <!-- ② HERO — Nama pasangan + foto cover + countdown timer -->
+  <section id="hero">
+    <!-- {{ inv.groom_name }} & {{ inv.bride_name }} -->
+    <!-- Countdown ke resepsi_date -->
+  </section>
+
+  <!-- ③ PASANGAN — Foto + biodata singkat groom & bride -->
+  <section id="couple">
+    <!-- groom_photo, bride_photo, groom_full, bride_full, parents -->
+  </section>
+
+  <!-- ④ ACARA — Detail waktu & lokasi akad + resepsi -->
+  <section id="event">
+    <!-- Akad: akad_date, akad_time, akad_venue, akad_address -->
+    <!-- Resepsi: resepsi_date, resepsi_time, resepsi_venue, resepsi_address -->
+    <!-- Tombol "Lihat Peta" → maps_url -->
+  </section>
+
+  <!-- ⑤ LOVE STORY — Timeline momen pasangan (opsional, tampil jika ada data) -->
+  {% if inv.love_story %}
+  <section id="lovestory">
+    <!-- Parse JSON love_story, render timeline -->
+  </section>
+  {% endif %}
+
+  <!-- ⑥ GALERI — Foto-foto dari invitation_photos -->
+  {% if inv.photos %}
+  <section id="gallery">
+    {% for photo in inv.photos %}
+      <!-- render tiap foto -->
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- ⑦ RSVP — Form konfirmasi kehadiran -->
+  <section id="rsvp">
+    <!-- POST ke /rsvp/{{ inv.slug }} -->
+    <!-- Fields: guest_name, attendance (hadir/tidak), guest_count, message -->
+  </section>
+
+  <!-- ⑧ HADIAH DIGITAL — Bank transfer & e-wallet (opsional) -->
+  {% if inv.gifts %}
+  <section id="gifts">
+    {% for gift in inv.gifts %}
+      <!-- render tiap rekening/ewallet -->
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- ⑨ FOOTER — Ucapan penutup, credit -->
+  <section id="footer">
+    <!-- "Dibuat dengan ❤️ oleh habarkita.com" -->
+  </section>
+
+  <!-- FLOATING: Music player (jika music_url ada) -->
+  {% if inv.music_url %}
+  <div id="music-player">
+    <!-- Tombol play/pause audio -->
+  </div>
+  {% endif %}
+
+  <!-- JS: GSAP, parallax, partikel, countdown, lightbox, RSVP fetch -->
+</body>
+</html>
+```
+
+### Panduan CSS tema:
+```css
+/* Gunakan CSS custom properties untuk konsistensi */
+:root {
+  --color-bg:      <palette.warna_terang>;
+  --color-text:    <palette.warna_gelap>;
+  --color-accent:  <palette.warna_aksen>;
+  --color-muted:   <palette.warna_muted>;
+  --font-display:  '<fonts.display>', serif;
+  --font-serif:    '<fonts.serif>', serif;
+  --font-sans:     '<fonts.sans>', sans-serif;
+}
+```
+
+---
+
+## ════════════════════════════════════════
+## BAGIAN D — ASSET CHECKLIST
+## ════════════════════════════════════════
+
+Generate tabel ini dengan status per file:
+
+```
+static/themes/{id}/
+├── cover.webp          ← Foto/ilustrasi hero (1080×1920px, <300KB)
+├── bg_texture.webp     ← Tekstur background tile (<100KB)
+├── ornament.svg        ← Frame/ornamen dekoratif (bisa inline di HTML)
+├── particle.png        ← Sprite partikel floating (PNG transparan, 64×64px)
+├── demo_preview.webp   ← Preview mockup untuk admin panel (<200KB)
+└── (opsional)
+    ├── pattern_tile.svg   ← Pola geometrik berulang
+    ├── divider.svg        ← Pembatas section
+    └── icon_ring.svg      ← Ikon cincin/bunga untuk detail
+```
+
+---
+
+## ════════════════════════════════════════
+## CONTOH PENGGUNAAN PROMPT INI
+## ════════════════════════════════════════
+
+### Cara memanggil prompt ini:
+
+**Opsi 1 — Tema Bebas:**
+```
+[Paste SYSTEM PROMPT di atas]
+
+Buatkan tema baru untuk UndanganKita dengan konsep:
+"Pernikahan adat Lampung modern — memadukan motif Tapis Lampung dan Siger 
+dengan estetika kontemporer. Warna dominan: burgundy & emas. 
+Nama tema: Siger Emas"
+```
+
+**Opsi 2 — Tema dengan Referensi Visual:**
+```
+[Paste SYSTEM PROMPT di atas]
+
+Buatkan tema terinspirasi dari:
+- Estetika: Bali ubud resort, tanaman tropis, kain tenun
+- Mood: Hangat, earthy, intimate outdoor wedding
+- Target market: Pasangan millennial yang suka nature & sustainability
+- Nama tema: bebas
+```
+
+**Opsi 3 — Iterasi dari Tema yang Sudah Ada:**
+```
+[Paste SYSTEM PROMPT di atas]
+
+Ini adalah tema yang sudah ada: [paste JSON tema existing]
+
+Buatkan VARIASI warna gelap (dark mode) dari tema ini.
+Pertahankan semua struktur, ubah hanya palette & nuansa visual.
+```
+
+---
+
+## ════════════════════════════════════════
+## RULES TAMBAHAN UNTUK AI
+## ════════════════════════════════════════
+
+```
+RULES WAJIB DIIKUTI:
+1. Output harus LENGKAP — jangan dipersingkat, jangan pakai "..." atau "[dst]"
+2. JSON harus valid — bisa di-parse tanpa error
+3. Semua image prompt harus dalam Bahasa Inggris
+4. Font harus tersedia di fonts.google.com — jangan mengarang nama font
+5. Palette minimum 6 warna, semua hex valid (#RRGGBB)
+6. Feature list minimum 5 item, tiap item deskriptif teknis + visual
+7. HTML skeleton harus menggunakan semua variable inv.* yang relevan
+8. Setiap asset HARUS ada prompt-nya di bagian B
+9. Tema harus unik — beda dari: sekarjagad, cahayapudar
+10. Nama ID tema: lowercase, no space, no special char, max 20 karakter
+
+DILARANG:
+- Menggunakan font yang sama dengan tema existing (Cormorant Garamond, 
+  Cinzel Decorative, Nunito, Jost, EB Garamond)
+- Palette monokromatik penuh (harus ada kontras yang kuat)
+- Image prompt yang ambigu atau terlalu pendek (<30 kata)
+- Melewatkan section HTML yang wajib ada
+```
+
+---
+
+*Max-Prompt v1.0 — UndanganKita Theme Generator*
+*Kompatibel dengan: app.py v3 | themes/*.json schema | Flask Jinja2*

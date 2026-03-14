@@ -1,0 +1,553 @@
+Kamu adalah expert creative developer spesialis WebGL, CSS 3D, dan immersive digital experience.
+
+Tugasmu: Buat tema undangan pernikahan digital dengan EFEK 3D SPATIAL SCENE yang beneran — bukan sekadar parallax website biasa. Hasilnya harus terasa seperti kamu sedang MELIHAT KE DALAM sebuah adegan 3D nyata yang memiliki kedalaman ruang, bukan scroll halaman web datar.
+
+Hasilkan TEPAT 2 file:
+1. `[namatema].html` → Template Jinja2 lengkap (templates/themes/)
+2. `[namatema].json` → Konfigurasi tema (themes/)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FILOSOFI DESAIN — BACA INI DULU SEBELUM CODING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### ❌ YANG HARUS DIHINDARI (website biasa dengan parallax):
+- Elemen bergerak dengan kecepatan Y berbeda saat scroll → ini cuma paralaks 2D
+- Section-section konten yang di-scroll seperti halaman web biasa
+- CSS `translateY` saja untuk "kedalaman" → TIDAK ADA kedalaman nyata
+- Box, card, grid layout yang kaku → terasa flat dan biasa
+- Background bergerak lambat + foreground cepat → efek klise
+
+### ✅ YANG HARUS DIBANGUN (true 3D spatial scene):
+- **Scene/Stage 3D nyata**: Semua elemen hidup di ruang XYZ beneran, bukan cuma XY
+- **CSS Perspective Camera**: `perspective: 800px` pada container scene — seperti ada "kamera" yang melihat ke dalam ruang
+- **Z-Depth Positioning**: Elemen-elemen ditempatkan di kedalaman berbeda menggunakan `translateZ()`:
+  - Layer paling jauh: `translateZ(-600px)` — elemen latar, kabur, kecil
+  - Layer tengah-jauh: `translateZ(-300px)` — ornamen ambient
+  - Layer tengah: `translateZ(-100px)` — bingkai, dekorasi utama
+  - Layer depan: `translateZ(0px)` — teks nama pasangan
+  - Layer paling depan: `translateZ(100px)` — elemen interaktif, detail close-up
+- **`transform-style: preserve-3d`** pada semua container scene — wajib agar Z-depth diwariskan
+- **Mouse parallax yang terasa "camera tilt"**: Saat mouse bergerak, SELURUH scene ikut miring sedikit pada sumbu X dan Y — seperti kamu menggerakkan kanvas 3D dengan tangan
+- **Scroll = perjalanan melalui ruang Z**: Scroll ke bawah bukan "scroll halaman", tapi "meluncur maju" melalui scene 3D menuju layer berikutnya. Gunakan `translateZ` pada camera/viewport.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 1 — TEKNIK 3D SCENE WAJIB DIIMPLEMENTASIKAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### A. CSS 3D Stage Setup (WAJIB)
+
+```css
+/* Container utama — ini adalah "kamera" yang melihat ke scene */
+.stage {
+  perspective: 900px;
+  perspective-origin: 50% 40%; /* titik pandang sedikit di atas tengah */
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Scene 3D — ini adalah "dunia" yang bisa diputar */
+.scene {
+  transform-style: preserve-3d;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  /* Digerakkan oleh mouse dan scroll */
+  transition: transform 0.1s ease-out;
+}
+
+/* Setiap layer di kedalaman berbeda */
+.layer-bg     { transform: translateZ(-500px) scale(1.6); }
+.layer-mid-far{ transform: translateZ(-280px) scale(1.3); }
+.layer-mid    { transform: translateZ(-120px) scale(1.15); }
+.layer-near   { transform: translateZ(0px); }
+.layer-front  { transform: translateZ(80px); }
+.layer-closest{ transform: translateZ(160px); }
+
+/* Semua elemen dalam scene harus preserve-3d */
+.layer-bg, .layer-mid-far, .layer-mid, .layer-near, .layer-front {
+  transform-style: preserve-3d;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+```
+
+### B. Mouse = Camera Tilt (WAJIB)
+
+```javascript
+// Saat mouse bergerak, SELURUH scene miring seperti kanvas 3D dipegang tangan
+document.addEventListener('mousemove', (e) => {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const dx = (e.clientX - cx) / cx; // -1 sampai 1
+  const dy = (e.clientY - cy) / cy; // -1 sampai 1
+  
+  // Rotasi scene terasa seperti "mengintip dari sudut berbeda"
+  const rotX = dy * -8;   // max 8 derajat rotasi X
+  const rotY = dx * 12;   // max 12 derajat rotasi Y
+  
+  scene.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+});
+
+// Smooth dengan lerp untuk feel yang halus
+let currentRotX = 0, currentRotY = 0;
+let targetRotX = 0, targetRotY = 0;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function updateScene() {
+  currentRotX = lerp(currentRotX, targetRotX, 0.06);
+  currentRotY = lerp(currentRotY, targetRotY, 0.06);
+  scene.style.transform = `rotateX(${currentRotX}deg) rotateY(${currentRotY}deg)`;
+  requestAnimationFrame(updateScene);
+}
+updateScene();
+```
+
+### C. Scroll = Perjalanan Menembus Ruang (WAJIB)
+
+```javascript
+// Scroll BUKAN geser halaman — tapi "terbang masuk" ke scene berikutnya
+// Gunakan GSAP ScrollTrigger untuk drive translateZ pada camera/stage
+
+gsap.to(".scene", {
+  scrollTrigger: {
+    trigger: ".main-wrapper",
+    start: "top top",
+    end: "bottom bottom",
+    scrub: 1.5
+  },
+  // "Kamera" bergerak maju menembus Z-space
+  z: 400,  // Kamera maju 400px sepanjang scroll
+  ease: "none"
+});
+
+// Atau: tiap section punya "scene sendiri" yang reveal dengan translateZ
+gsap.from(".section-scene", {
+  scrollTrigger: { trigger: ".section-scene", start: "top 80%", scrub: 1 },
+  z: -200,
+  opacity: 0,
+  rotateX: 15,
+  transformOrigin: "center top"
+});
+```
+
+### D. Entry Animation (WAJIB — saat halaman pertama dibuka)
+
+```javascript
+// Semua elemen masuk dari kedalaman Z, seolah "muncul dari jauh"
+const tl = gsap.timeline({ delay: 0.5 });
+
+// Cover: elemen-elemen datang dari kedalaman Z yang berbeda
+tl.from(".layer-bg .bg-element", { 
+  z: -800, opacity: 0, duration: 2, ease: "power2.out" 
+})
+.from(".layer-mid .ornament", { 
+  z: -400, opacity: 0, rotateY: 20, duration: 1.5, ease: "back.out(1.4)", stagger: 0.15 
+}, "-=1.5")
+.from(".layer-near .couple-names", { 
+  z: -200, opacity: 0, y: 30, duration: 1.2, ease: "power3.out" 
+}, "-=1")
+.from(".layer-front .cta-button", { 
+  z: -100, opacity: 0, scale: 0.8, duration: 0.8, ease: "back.out(2)" 
+}, "-=0.5");
+```
+
+### E. Per-Element 3D Depth Detail
+
+Untuk setiap elemen, tambahkan kedalaman individual:
+
+```javascript
+// Setiap ornamen berputar di orbitnya sendiri dalam Z-space
+gsap.to(".floating-ornament", {
+  rotateY: 360,
+  duration: 20,
+  repeat: -1,
+  ease: "none",
+  transformOrigin: "center center"
+});
+
+// Teks nama pasangan: slight depth-breathing
+gsap.to(".couple-name-text", {
+  z: 20,
+  duration: 3,
+  yoyo: true,
+  repeat: -1,
+  ease: "sine.inOut"
+});
+
+// Foto pasangan: hover = zoom in + tilt 3D
+photoEl.addEventListener('mouseenter', () => {
+  gsap.to(photoEl, { z: 60, rotateY: -8, scale: 1.05, duration: 0.4 });
+});
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 2 — VISUAL LANGUAGE WAJIB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### Ornamen & Dekorasi (harus ada SVG/Canvas dalam scene):
+
+Ornamen TIDAK boleh flat — harus punya kedalaman dan posisi Z:
+
+```html
+<!-- Ornamen di layer jauh — terlihat kecil dan sedikit blur karena Z depth -->
+<div class="layer-mid-far">
+  <svg class="ornament-far" style="transform: translateZ(0); opacity: 0.4;">
+    <!-- Bunga, rangkaian daun, geometrik, batik, dll — sesuai tema -->
+  </svg>
+</div>
+
+<!-- Ornamen di layer tengah — lebih besar, lebih jelas -->
+<div class="layer-mid">
+  <svg class="ornament-wreath" style="filter: none;">
+    <!-- Bingkai melingkar / mahkota bunga / frame ornamental -->
+  </svg>
+</div>
+
+<!-- Elemen terdepan — terlihat "melayang di depan" nama pasangan -->
+<div class="layer-front">
+  <div class="floating-petal" style="transform: translateZ(80px);">🌸</div>
+</div>
+```
+
+### Partikel 3D di Canvas:
+
+```javascript
+// Partikel bergerak dalam ruang 3D nyata — bukan hanya X/Y
+const particles = Array.from({ length: 80 }, () => ({
+  x: Math.random() * W,
+  y: Math.random() * H,
+  z: Math.random() * 600 - 300,  // Z dari -300 sampai +300
+  vx: (Math.random() - 0.5) * 0.3,
+  vy: (Math.random() - 0.5) * 0.3,
+  vz: (Math.random() - 0.5) * 0.5,
+  size: Math.random() * 3 + 1,
+}));
+
+function drawParticles() {
+  particles.forEach(p => {
+    // Proyeksi perspektif: elemen yang lebih jauh (Z rendah) terlihat lebih kecil
+    const fov = 500;
+    const scale = fov / (fov - p.z);
+    const screenX = (p.x - W/2) * scale + W/2;
+    const screenY = (p.y - H/2) * scale + H/2;
+    const alpha = Math.max(0, Math.min(1, (p.z + 300) / 600));
+    
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.fillStyle = primaryColor;
+    ctx.beginPath();
+    ctx.arc(screenX, screenY, p.size * scale, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Update posisi Z
+    p.z += p.vz;
+    if (p.z > 300) p.z = -300;
+    if (p.z < -300) p.z = 300;
+  });
+}
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 3 — ARSITEKTUR SCENE (BUKAN HALAMAN BIASA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Struktur HTML harus seperti ini — BUKAN div section biasa:
+
+```html
+<!-- LOADING SCREEN - muncul dulu sebelum scene 3D siap -->
+<div id="loading-screen">...</div>
+
+<!-- MUSIK PLAYER FLOATING -->
+<div id="music-player">...</div>
+
+<!-- NAVIGATION DOT (vertical, di sisi kanan) -->
+<nav id="scene-nav">...</nav>
+
+<!-- MAIN SCROLL WRAPPER — ini yang di-scroll -->
+<div id="scroll-wrapper">
+
+  <!-- ══ SCENE 1: COVER / HERO ══ -->
+  <div class="scene-section" id="scene-cover">
+    <div class="stage">                         <!-- Viewport kamera -->
+      <div class="scene preserve3d">            <!-- Dunia 3D -->
+        
+        <!-- Layer Z paling jauh: gradient/texture bg -->
+        <div class="layer layer-bg">
+          <div class="bg-texture"></div>
+          <div class="bg-gradient"></div>
+        </div>
+        
+        <!-- Layer mid-far: ornamen ambient -->
+        <div class="layer layer-mid-far">
+          <svg class="ornament-ambient">...</svg>
+          <canvas class="particle-canvas-3d"></canvas>
+        </div>
+        
+        <!-- Layer mid: bingkai utama (wreath/frame) -->
+        <div class="layer layer-mid">
+          <div class="main-frame">
+            <svg class="ornamental-wreath">...</svg>
+          </div>
+        </div>
+        
+        <!-- Layer near: foto pasangan -->
+        <div class="layer layer-near">
+          <div class="couple-portrait">
+            {% if inv.groom_photo_url %}
+              <img src="{{ inv.groom_photo_url }}" class="portrait-photo groom-photo">
+            {% endif %}
+            {% if inv.bride_photo_url %}
+              <img src="{{ inv.bride_photo_url }}" class="portrait-photo bride-photo">
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Layer front: teks nama (paling depan, paling besar terlihat) -->
+        <div class="layer layer-front">
+          <div class="cover-text">
+            <p class="wedding-label">The Wedding of</p>
+            <h1 class="groom-name">{{ inv.groom_name }}</h1>
+            <div class="name-divider">
+              <svg><!-- ornamen pemisah --></svg>
+              <span>&</span>
+              <svg><!-- ornamen pemisah --></svg>
+            </div>
+            <h1 class="bride-name">{{ inv.bride_name }}</h1>
+            <p class="wedding-date">{{ inv.resepsi_date | format_date }}</p>
+          </div>
+        </div>
+        
+        <!-- Layer closest: CTA button (paling depan dari semua) -->
+        <div class="layer layer-closest">
+          <button class="open-invitation-btn" id="btnOpen">
+            Buka Undangan
+          </button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <!-- ══ END SCENE 1 ══ -->
+
+  <!-- ══ SCENE 2: COUPLE + COUNTDOWN ══ -->
+  <!-- Setiap scene baru juga punya .stage > .scene preserve3d sendiri -->
+  <div class="scene-section" id="scene-couple">
+    <div class="stage">
+      <div class="scene preserve3d">
+        <!-- ... layer-layer dengan konten couple & countdown ... -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Lanjutkan untuk scene: love-story, acara, lokasi, gallery, rsvp, gifts, penutup -->
+
+</div><!-- end scroll-wrapper -->
+```
+
+### Aturan transisi antar Scene:
+- Saat scroll dari scene 1 ke scene 2: scene lama `translateZ(300px)` + `opacity: 0` (meluncur ke depan/pergi)
+- Scene baru masuk dari `translateZ(-500px)` + `opacity: 0` (datang dari jauh)
+- Gunakan GSAP ScrollTrigger pin + timeline untuk efek ini
+- Atau: full-page scroll-snap dengan transisi CSS 3D transform
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 4 — VARIABEL JINJA2 (FLASK APP)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Template WAJIB pakai variabel berikut (semua dijamin tersedia):
+
+### Objek `inv`:
+```
+inv.id                → ID unik undangan
+inv.slug              → URL slug
+inv.groom_name        → Nama panggilan pria  (mis: "Zaid")
+inv.bride_name        → Nama panggilan wanita (mis: "Zainab")
+inv.groom_full        → Nama lengkap pria    (mis: "Zaid bin Haritsah")
+inv.bride_full        → Nama lengkap wanita  (mis: "Zainab binti Jahsy")
+inv.groom_parents     → Nama orang tua pria
+inv.bride_parents     → Nama orang tua wanita
+inv.show_parents      → 1 = tampilkan ortu, 0 = sembunyikan
+inv.akad_date         → 'YYYY-MM-DD'
+inv.akad_time         → 'HH:MM'
+inv.akad_venue        → Nama tempat akad
+inv.akad_address      → Alamat akad
+inv.resepsi_date      → 'YYYY-MM-DD'
+inv.resepsi_time      → 'HH:MM'
+inv.resepsi_venue     → Nama tempat resepsi
+inv.resepsi_address   → Alamat resepsi
+inv.maps_url          → URL Google Maps
+inv.maps_embed        → URL embed maps (untuk src iframe)
+inv.maps_embed_html   → Full iframe HTML (gunakan | safe)
+inv.love_story        → Teks cerita cinta
+inv.music_url         → URL audio mp3
+inv.cover_photo       → Filename foto cover (bisa None)
+inv.groom_photo_url   → URL foto pengantin pria (bisa None)
+inv.bride_photo_url   → URL foto pengantin wanita (bisa None)
+inv.expires_at        → 'YYYY-MM-DD' (bisa None)
+```
+
+### List `photos`:
+```
+photos                      → List semua foto undangan
+{{ photo_src(photo) }}      → URL foto (WAJIB pakai ini, bukan .filename)
+photo.caption               → Caption (bisa None)
+```
+
+### List `gifts`:
+```
+gifts[i].bank_name          → Nama bank (None jika e-wallet)
+gifts[i].account_number     → Nomor rekening
+gifts[i].account_name       → Nama rekening
+gifts[i].ewallet_type       → "GoPay"/"OVO"/"Dana" (None jika bank)
+gifts[i].ewallet_number     → Nomor e-wallet
+gifts[i].ewallet_name       → Nama e-wallet
+```
+
+### List `rsvp_list`:
+```
+rsvp_list[i].guest_name     → Nama tamu
+rsvp_list[i].attendance     → "hadir" atau "tidak_hadir"
+rsvp_list[i].guest_count    → Jumlah tamu
+rsvp_list[i].message        → Pesan/ucapan
+```
+
+### Globals & Filters:
+```
+wa_number                   → Nomor WhatsApp
+site_name                   → Nama situs
+now                         → datetime.now()
+is_preview                  → True/False
+recaptcha_key               → String (kosong = disabled)
+
+{{ inv.akad_date | format_date }}      → "Kamis, 20 Desember 2029"
+{{ inv.resepsi_date | days_left }}     → integer sisa hari
+{{ inv.maps_embed_html | safe }}       → iframe Google Maps
+```
+
+### RSVP Endpoint:
+```javascript
+fetch('/rsvp/{{ inv.id }}', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ name, attendance, count, message })
+})
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 5 — SECTION WAJIB DAN KONTENNYA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Setiap section WAJIB ada, masing-masing sebagai "scene 3D" sendiri:
+
+1. **COVER** — Nama pasangan, tanggal, CTA buka undangan (full 3D scene, layar penuh)
+2. **COUNTDOWN** — Hitung mundur ke hari-H (angka-angka mengapung di 3D space)
+3. **COUPLE** — Foto & profil pasangan (preserve3d, foto di layer berbeda dari teks)
+4. **LOVE STORY** — `inv.love_story` (teks muncul dari kedalaman Z)
+5. **ACARA** — Akad & Resepsi (`| format_date`, jam, venue) 
+6. **LOKASI** — Google Maps (`inv.maps_embed_html | safe`)
+7. **GALLERY** — `{% for photo in photos %}{{ photo_src(photo) }}{% endfor %}` — foto 3D tilt on hover
+8. **RSVP** — Form AJAX (tampilkan juga `rsvp_list` yang sudah masuk)
+9. **HADIAH** — `{% for gift in gifts %}{% if gift.bank_name %}...{% elif gift.ewallet_type %}...{% endif %}{% endfor %}`
+10. **PENUTUP** — Ucapan terima kasih + credit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 6 — ATURAN KODE TEKNIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### CDN yang digunakan:
+```html
+<!-- GSAP + ScrollTrigger (WAJIB) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- Google Fonts (sesuai tema) -->
+<link href="https://fonts.googleapis.com/css2?family=...&display=swap" rel="stylesheet">
+```
+
+### CSS:
+```css
+:root {
+  --color-primary: #...;
+  --color-accent: #...;
+  --color-bg: #...;
+  --color-text: #...;
+  --color-gold: #...;
+  --color-mist: #...;
+  --font-display: 'NamaFont', serif;
+  --font-serif: 'NamaFont', serif;
+  --font-sans: 'NamaFont', sans-serif;
+}
+
+/* KUNCI 3D — WAJIB ada */
+.stage          { perspective: 900px; perspective-origin: 50% 40%; }
+.preserve3d     { transform-style: preserve-3d; }
+.will-animate   { will-change: transform, opacity; }
+```
+
+### JavaScript:
+- GSAP harus diregistrasi: `gsap.registerPlugin(ScrollTrigger);`
+- Countdown dari Jinja: `const target = new Date("{{ inv.resepsi_date or inv.akad_date }}T{{ inv.resepsi_time or '08:00' }}");`
+- Semua GSAP init setelah DOM ready
+- JANGAN pakai `onclick` inline — pakai `addEventListener`
+- Copy rekening: `navigator.clipboard.writeText(nomor)`
+- Loading screen hilang setelah `window.load` atau timeout 2.5s
+- Musik: `{% if inv.music_url %}<audio id="bgm" src="{{ inv.music_url }}" loop></audio>{% endif %}`
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BAGIAN 7 — FILE JSON (SKEMA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+```json
+{
+  "id": "namatema",
+  "name": "Nama Tema",
+  "description": "Deskripsi poetic 2-3 kalimat tentang nuansa tema.",
+  "preview_color": "#HEXCOLOR",
+  "accent_color": "#HEXCOLOR",
+  "skeleton": "namatema",
+  "tags": ["3D", "Spatial", "TagKonsep1", "TagKonsep2"],
+  "demo_photos": [],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
+  "palette": {
+    "Nama1": "#HEX",
+    "Nama2": "#HEX",
+    "Nama3": "#HEX",
+    "Nama4": "#HEX",
+    "Nama5": "#HEX",
+    "Nama6": "#HEX"
+  },
+  "fonts": {
+    "display": "Nama Font Display",
+    "serif": "Nama Font Serif",
+    "sans": "Nama Font Sans"
+  },
+  "features": [
+    "CSS 3D Spatial Scene dengan Z-depth positioning nyata",
+    "Mouse Camera Tilt — scene miring mengikuti gerakan kursor",
+    "Scroll menembus ruang Z, bukan sekadar scroll halaman",
+    "Partikel ambient 3D dengan proyeksi perspektif",
+    "Fitur unik khusus tema ini..."
+  ]
+}
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## [KUSTOMISASI OPSIONAL — TAMBAHKAN DI SINI]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tambahkan instruksi spesifikmu di sini. Contoh:
+
+> Nama tema: mahkotasenja
+> Konsep: Royal Javanese — bingkai emas batik parang, dominan emas tua dan hitam pekat
+> Ornamen utama: SVG ukiran batik mega mendung di layer paling jauh, keris stilisasi di layer tengah
+> Partikel: Kelopak bunga kenanga jatuh dalam 3D space
+> Efek spesial: Saat pertama dibuka, scene seperti "bocah" membuka tirai — curtain reveal di Z-axis
+> Font: Cinzel Decorative (display), Cormorant Garamond (serif), Jost (sans)
+> Warna: hitam pekat, emas tua, merah marun, krem gading, perunggu
+
+[TULIS DI SINI — ATAU HAPUS UNTUK GENERATE OTOMATIS] ````
