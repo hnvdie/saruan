@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Undangan | {{ inv.groom_name }} &amp; {{ inv.bride_name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════════════════
+   SENJA JANI — Wedding Invitation
+   Tema: Langit Senja × Akar Bumi
+   habarkita.com
+   ════════════════════════════════════════════ */
+
+:root {
+  --lav:      #c2a8e2;
+  --lav-lt:   #ede0ff;
+  --rose:     #e0a8c5;
+  --rose-lt:  #fce0ee;
+  --peach:    #efbf96;
+  --peach-lt: #fde8d4;
+  --sky:      #a8c4e0;
+  --deep:     #6a428a;
+  --earth:    #8a5c38;
+  --gold:     #c49650;
+  --text:     #362440;
+  --text-m:   #7a5a8a;
+  --cream:    #fdf7f4;
+  --w:        #ffffff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: var(--text);
+}
+
+/* ─── CANVAS AMBIENT ─────────────────────── */
+#particles {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   ENVELOPE
+══════════════════════════════════════════ */
+#envelope {
+  position: fixed; inset: 0;
+  z-index: 9999; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+#envelope.opening { opacity: 0; transition: opacity .65s ease; pointer-events: none; }
+#envelope.gone    { display: none; }
+
+/* Background photo or gradient — full lavender, no split */
+.env-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(175deg, #dcd0f0 0%, #c8b4e8 35%, #d4b8e8 65%, #c2a8e2 100%);
+  background-size: cover; background-position: center;
+}
+.env-bg-photo { filter: brightness(.72) saturate(1.1); }
+
+/* ─── Cloud panels — putih lavender saja, no warna kuning/peach ─── */
+.cloud-half {
+  position: absolute; top: 0; height: 100%; width: 56%;
+  pointer-events: none;
+  transition: transform .9s cubic-bezier(.77,0,.175,1), opacity .9s ease;
+  overflow: hidden;
+}
+/* Keduanya warna lavender-putih, biar seamless */
+.cloud-half-l { left: 0;  background: linear-gradient(110deg, rgba(240,234,255,.96) 0%, rgba(210,190,240,.92) 50%, rgba(200,180,235,.75) 80%, transparent 100%); }
+.cloud-half-r { right: 0; background: linear-gradient(290deg, rgba(240,234,255,.96) 0%, rgba(210,190,240,.92) 50%, rgba(200,180,235,.75) 80%, transparent 100%); }
+
+/* Cloud blobs on panels — putih lembut */
+.cloud-half::before, .cloud-half::after {
+  content: ''; position: absolute;
+  background: rgba(255,255,255,.32); border-radius: 50%; filter: blur(32px);
+}
+.cloud-half-l::before { width: 80%; height: 60%; top: 4%; left: 5%; }
+.cloud-half-l::after  { width: 62%; height: 45%; bottom: 8%; right: -5%; }
+.cloud-half-r::before { width: 72%; height: 58%; top: 7%; right: 4%; }
+.cloud-half-r::after  { width: 58%; height: 42%; bottom: 12%; left: -2%; }
+
+/* Parting animation */
+#envelope.opening .cloud-half-l { transform: translateX(-100%); opacity: 0; }
+#envelope.opening .cloud-half-r { transform: translateX(100%);  opacity: 0; }
+
+/* Envelope center text */
+.env-center {
+  position: relative; z-index: 5;
+  text-align: center;
+  padding: clamp(24px, 5vw, 64px);
+}
+.env-to {
+  font-style: italic; font-size: clamp(13px, 3vw, 18px);
+  color: var(--text-m); letter-spacing: .1em;
+  margin-bottom: clamp(4px, 1.5vh, 10px);
+}
+.env-guest {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(22px, 6vw, 44px);
+  color: var(--deep); margin-bottom: clamp(18px, 4vh, 40px);
+}
+.env-ornament {
+  display: flex; align-items: center; gap: 14px; justify-content: center;
+  margin-bottom: clamp(10px, 2.5vh, 20px); color: var(--gold);
+}
+.env-ornament::before, .env-ornament::after {
+  content: ''; height: 1px; width: 55px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.env-ornament::after { background: linear-gradient(90deg, var(--gold), transparent); }
+.env-names {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(36px, 11vw, 80px);
+  line-height: .95; margin-bottom: clamp(8px, 2vh, 18px);
+  text-shadow: 0 2px 20px rgba(106,66,138,.15);
+}
+.env-names .n-bride  { display: block; color: var(--deep); }
+.env-names .n-amp    { display: block; font-family: 'Playfair Display', serif; font-style: italic; font-size: .45em; color: var(--rose); line-height: 1.6; }
+.env-names .n-groom  { display: block; color: var(--text); }
+.env-date {
+  font-size: clamp(11px, 2.5vw, 15px); letter-spacing: .22em;
+  text-transform: uppercase; color: var(--text-m);
+  margin-bottom: clamp(24px, 5vh, 52px);
+}
+.btn-open {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: clamp(12px, 2.5vw, 17px) clamp(28px, 6vw, 52px);
+  background: linear-gradient(135deg, var(--lav) 0%, var(--rose) 100%);
+  color: var(--w); border: none; border-radius: 100px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 3vw, 18px); letter-spacing: .1em;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(106,66,138,.28), 0 0 0 1px rgba(255,255,255,.3) inset;
+  transition: transform .22s, box-shadow .22s;
+}
+.btn-open:hover { transform: translateY(-3px); box-shadow: 0 14px 44px rgba(106,66,138,.38); }
+.btn-open svg   { width: 18px; height: 18px; animation: float 2.2s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+/* ══════════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════════ */
+#app {
+  width: 100vw; height: 100vh; overflow: hidden;
+  position: relative; opacity: 0; pointer-events: none;
+  transition: opacity .5s ease .25s;
+}
+#app.visible { opacity: 1; pointer-events: all; }
+
+#track {
+  position: fixed; top: 0; left: 0; width: 100vw;
+  will-change: transform;
+  transition: transform .65s cubic-bezier(.77,0,.175,1);
+}
+
+.section { width: 100vw; height: 100vh; overflow: hidden; position: relative; }
+
+/* ─── Navigation ─────────────────────────── */
+#dots {
+  position: fixed; right: clamp(12px,3vw,24px); top: 50%;
+  transform: translateY(-50%); display: flex;
+  flex-direction: column; gap: 8px; z-index: 100;
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.38); cursor: pointer;
+  transition: background .3s, transform .3s; border: none;
+}
+.dot.active { background: #fff; transform: scale(1.45); }
+
+.nav-btn {
+  position: fixed; right: clamp(12px,3vw,24px); z-index: 100;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.32);
+  border-radius: 50%; width: 40px; height: 40px;
+  cursor: pointer; backdrop-filter: blur(6px);
+  color: white; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; line-height: 1;
+}
+.nav-btn:hover { background: rgba(255,255,255,.32); }
+#btn-up   { top:    clamp(12px,5vh,40px); }
+#btn-down { bottom: clamp(12px,5vh,40px); }
+
+/* ─── Music player ──────────────────────── */
+#music-player {
+  position: fixed; bottom: 20px; left: 20px; z-index: 200;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.18); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.42); border-radius: 100px;
+  padding: 8px 18px; cursor: pointer; transition: background .2s;
+}
+#music-player:hover { background: rgba(255,255,255,.32); }
+#music-note { font-size: 18px; animation: spin 5s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#music-label { font-size: 12px; color: rgba(255,255,255,.9); letter-spacing: .06em; }
+
+/* ─── ENTRY ANIMATIONS ─────────────────── */
+.anim-l, .anim-r, .anim-u, .anim-d {
+  opacity: 0;
+  transition: opacity .78s cubic-bezier(.4,0,.2,1), transform .78s cubic-bezier(.4,0,.2,1);
+}
+.anim-l { transform: translateX(-52px); }
+.anim-r { transform: translateX(52px);  }
+.anim-u { transform: translateY(42px);  }
+.anim-d { transform: translateY(-38px); }
+.anim-l.in,.anim-r.in,.anim-u.in,.anim-d.in { opacity: 1; transform: translate(0); }
+.d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.28s}
+.d4{transition-delay:.38s}.d5{transition-delay:.48s}.d6{transition-delay:.58s}
+.d7{transition-delay:.68s}.d8{transition-delay:.78s}
+
+/* ─── Reusable clouds deco ──────────────── */
+.cdeco { position: absolute; pointer-events: none; }
+
+/* ─── Root SVG base ──────────────────────── */
+.roots-base { position: absolute; left: 0; width: 100%; pointer-events: none; }
+
+/* ══════════════════════════════════════════
+   S1 — HERO
+══════════════════════════════════════════ */
+#s-hero {
+  background: linear-gradient(160deg, #c2a8e2 0%, #d4bcf0 38%, #e2aac8 72%, #efbf96 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.hero-wrap { position: relative; z-index: 2; text-align: center; padding: clamp(20px,5vw,60px); }
+.hero-quran {
+  font-size: clamp(22px, 5.5vw, 42px); color: var(--deep);
+  line-height: 1.6; margin-bottom: clamp(6px,1.5vh,14px); opacity: .88;
+}
+.hero-quran-ref {
+  font-style: italic; font-size: clamp(11px,2.4vw,16px); color: var(--text-m);
+  max-width: 68vw; line-height: 1.9; margin: 0 auto clamp(20px,4vh,44px);
+}
+.hero-sep {
+  display: flex; align-items: center; gap: 14px; justify-content: center;
+  color: var(--gold); font-size: 16px; margin-bottom: clamp(10px,2.5vh,22px);
+}
+.hero-sep::before,.hero-sep::after { content: ''; width: 48px; height: 1px; background: var(--gold); opacity: .6; }
+.hero-names {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(50px, 16vw, 118px); line-height: .92;
+  margin-bottom: clamp(10px,2vh,22px);
+}
+.hero-names .hn-b { display: block; color: var(--deep); }
+.hero-names .hn-a {
+  display: block; font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: .44em; color: var(--rose); line-height: 1.55;
+}
+.hero-names .hn-g { display: block; color: var(--text); }
+.hero-tagdate {
+  font-size: clamp(11px,2.4vw,16px); letter-spacing: .22em;
+  text-transform: uppercase; color: var(--text-m);
+}
+
+/* ══════════════════════════════════════════
+   S2/S3 — COUPLE PROFILES
+══════════════════════════════════════════ */
+.couple-sec {
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+@media(max-width:600px){
+  .couple-sec { grid-template-columns: 1fr; grid-template-rows: 45vh 55vh; }
+}
+.cpl-photo { position: relative; overflow: hidden; }
+.cpl-photo img { width: 100%; height: 100%; object-fit: cover; }
+.cpl-photo .photo-tint {
+  position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(194,168,226,.22), rgba(224,168,197,.22));
+}
+.cpl-info {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(28px,6vw,80px); position: relative;
+}
+.cpl-role {
+  font-style: italic; font-size: clamp(12px,2.5vw,17px);
+  color: var(--gold); letter-spacing: .16em; margin-bottom: 8px;
+}
+.cpl-name {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(36px,8.5vw,68px); color: var(--text); line-height: 1;
+  margin-bottom: clamp(6px,1.5vh,14px);
+}
+.cpl-full {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px,3vw,22px); color: var(--deep); margin-bottom: 8px;
+}
+.cpl-parents {
+  font-size: clamp(12px,2.4vw,16px); color: var(--text-m); line-height: 2;
+}
+.cpl-parents strong { color: var(--text); }
+/* Corner root deco on profile */
+.cpl-root {
+  position: absolute; width: 55%; pointer-events: none;
+  overflow: visible; opacity: .1;
+}
+
+/* ══════════════════════════════════════════
+   S4 — LOVE STORY
+══════════════════════════════════════════ */
+#s-lovestory {
+  background: linear-gradient(175deg, #f0e6ff 0%, #fde8d4 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(28px,5.5vw,72px);
+}
+.section-title-script {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(30px,8vw,62px); color: var(--deep);
+  text-align: center; margin-bottom: clamp(18px,4vh,40px);
+}
+.story-scroll {
+  width: 100%; max-width: 660px; max-height: 62vh;
+  overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: clamp(12px,2.5vh,22px);
+  padding-right: 4px;
+}
+.story-scroll::-webkit-scrollbar { display: none; }
+.story-row { display: flex; gap: 14px; align-items: flex-start; }
+.story-dot {
+  flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold); margin-top: 8px;
+  box-shadow: 0 0 0 5px rgba(196,150,80,.18);
+}
+.story-card {
+  background: rgba(255,255,255,.48); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.72); border-radius: 14px;
+  padding: clamp(12px,2.5vw,22px); flex: 1;
+}
+.story-card-date {
+  font-size: clamp(10px,2vw,13px); color: var(--gold);
+  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 5px;
+}
+.story-card-text { font-size: clamp(13px,2.5vw,17px); line-height: 1.85; }
+
+/* ══════════════════════════════════════════
+   S5/S6 — EVENT (AKAD & RESEPSI)
+══════════════════════════════════════════ */
+.event-sec {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(28px,5.5vw,72px); text-align: center;
+  position: relative;
+}
+.event-badge {
+  font-style: italic; font-size: clamp(12px,2.5vw,17px);
+  color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.event-h {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px,10vw,76px); color: var(--deep); margin-bottom: clamp(14px,3vh,30px);
+  line-height: 1;
+}
+.event-card {
+  background: rgba(255,255,255,.44); backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.72); border-radius: 22px;
+  padding: clamp(20px,4vw,50px); max-width: 520px; width: 100%;
+  box-shadow: 0 8px 40px rgba(106,66,138,.1);
+}
+.event-date {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(26px,7vw,54px); color: var(--deep); margin-bottom: 8px;
+}
+.event-time {
+  font-size: clamp(14px,3vw,20px); color: var(--text-m);
+  letter-spacing: .12em; margin-bottom: clamp(10px,2vh,18px);
+}
+.event-rule { border: none; border-top: 1px solid rgba(106,66,138,.14); margin: clamp(10px,2vh,18px) 0; }
+.event-venue {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(16px,4vw,26px); color: var(--text); margin-bottom: 6px;
+}
+.event-address { font-size: clamp(12px,2.5vw,15px); color: var(--text-m); line-height: 1.75; }
+
+/* ══════════════════════════════════════════
+   S7 — COUNTDOWN
+══════════════════════════════════════════ */
+#s-countdown {
+  background: linear-gradient(160deg, #6a428a 0%, #4a2868 52%, #8a5c38 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#count-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cd-label {
+  font-style: italic; font-size: clamp(16px,3.5vw,27px);
+  color: rgba(255,255,255,.78); letter-spacing: .14em; text-align: center;
+  margin-bottom: clamp(16px,4vh,44px);
+}
+.cd-row {
+  display: flex; gap: clamp(10px,3.5vw,38px); align-items: flex-start;
+  margin-bottom: clamp(18px,4vh,50px); position: relative; z-index: 2;
+}
+.cd-unit { text-align: center; }
+.cd-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px,15vw,108px); color: #fff; line-height: 1; display: block;
+  min-width: 2ch; text-shadow: 0 4px 24px rgba(0,0,0,.25);
+}
+.cd-lbl {
+  font-size: clamp(10px,2vw,13px); color: rgba(255,255,255,.58);
+  letter-spacing: .22em; text-transform: uppercase;
+}
+.cd-sep {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(44px,12vw,88px); color: rgba(255,255,255,.28);
+  line-height: 1; padding-top: 4px;
+}
+.cd-eventdate {
+  font-style: italic; font-size: clamp(14px,3vw,22px);
+  color: rgba(255,255,255,.65); position: relative; z-index: 2;
+}
+
+/* ══════════════════════════════════════════
+   S8 — GALLERY
+══════════════════════════════════════════ */
+#s-gallery {
+  background: linear-gradient(158deg, #f8f0ff 0%, #fff0e8 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(22px,4.5vw,56px);
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px,1.8vw,16px);
+  width: 100%; max-height: 68vh;
+}
+@media(max-width:520px){ .gallery-grid { grid-template-columns: repeat(2,1fr); } }
+.g-item {
+  position: relative; overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 28px rgba(106,66,138,.13);
+  aspect-ratio: 3/4;
+  transition: transform .4s cubic-bezier(.4,0,.2,1), box-shadow .4s;
+}
+.g-item:nth-child(2) { aspect-ratio: 1/1; }
+.g-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.g-item:hover img { transform: scale(1.06); }
+.g-item::after {
+  content: ''; position: absolute; inset: 0;
+  border: 3px solid rgba(255,255,255,.55); border-radius: 12px;
+  pointer-events: none;
+}
+.g-item:nth-child(odd)  { transform: rotate(-1.4deg); }
+.g-item:nth-child(even) { transform: rotate(1.1deg); }
+.g-item:hover { transform: rotate(0) scale(1.03) !important; z-index: 10; box-shadow: 0 14px 44px rgba(106,66,138,.22); }
+.g-empty {
+  width: 100%; height: 100%;
+  background: rgba(194,168,226,.2); display: flex;
+  align-items: center; justify-content: center;
+  font-style: italic; color: var(--text-m); font-size: clamp(12px,2.5vw,15px);
+}
+
+/* ══════════════════════════════════════════
+   S9 — MAPS
+══════════════════════════════════════════ */
+#s-maps {
+  background: linear-gradient(158deg, #e8d8f8 0%, #fde8d4 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(24px,5vw,60px);
+}
+.maps-frame {
+  width: 100%; max-width: 700px;
+  height: clamp(200px,40vh,380px); border-radius: 20px;
+  overflow: hidden; margin-bottom: clamp(12px,3vh,26px);
+  border: 3px solid rgba(255,255,255,.72);
+  box-shadow: 0 12px 44px rgba(106,66,138,.18);
+}
+.maps-frame iframe { width: 100%; height: 100%; border: none; }
+.btn-maps {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 34px;
+  background: linear-gradient(135deg, var(--lav), var(--rose));
+  color: #fff; text-decoration: none; border-radius: 100px;
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3vw,17px);
+  letter-spacing: .08em; box-shadow: 0 6px 26px rgba(106,66,138,.26);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-maps:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(106,66,138,.36); }
+
+/* ══════════════════════════════════════════
+   S10 — RSVP
+══════════════════════════════════════════ */
+#s-rsvp {
+  background: linear-gradient(158deg, #fff0e8 0%, #f0e4ff 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(22px,5vw,60px); overflow-y: auto;
+}
+.rsvp-sub {
+  font-style: italic; color: var(--text-m);
+  font-size: clamp(13px,2.5vw,17px); text-align: center;
+  margin-bottom: clamp(14px,3vh,30px);
+}
+.rsvp-form {
+  width: 100%; max-width: 490px;
+  display: flex; flex-direction: column; gap: clamp(10px,2vh,15px);
+}
+.rsvp-input,.rsvp-sel,.rsvp-ta {
+  width: 100%; padding: clamp(10px,2vw,14px) clamp(14px,3vw,20px);
+  background: rgba(255,255,255,.58); border: 1px solid rgba(194,168,226,.38);
+  border-radius: 13px; font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px,3vw,17px); color: var(--text);
+  backdrop-filter: blur(8px); outline: none;
+  transition: border .2s, box-shadow .2s;
+}
+.rsvp-input:focus,.rsvp-sel:focus,.rsvp-ta:focus {
+  border-color: var(--lav); box-shadow: 0 0 0 3px rgba(194,168,226,.2);
+}
+.rsvp-ta { resize: none; height: 88px; }
+.btn-rsvp {
+  padding: clamp(12px,2.5vw,15px);
+  background: linear-gradient(135deg, var(--deep), var(--rose));
+  color: #fff; border: none; border-radius: 13px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px,3vw,18px); letter-spacing: .08em;
+  cursor: pointer; transition: opacity .2s, transform .2s;
+}
+.btn-rsvp:hover { opacity: .88; transform: translateY(-1px); }
+#rsvp-fb { text-align: center; font-style: italic; color: var(--deep); font-size: clamp(12px,2.5vw,15px); min-height: 22px; }
+
+/* ══════════════════════════════════════════
+   S11 — GIFT
+══════════════════════════════════════════ */
+#s-gift {
+  background: linear-gradient(158deg, #f8f0ff 0%, #fde8d4 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(24px,5vw,60px);
+}
+.gift-grid {
+  display: flex; flex-wrap: wrap; gap: clamp(10px,2.5vw,22px);
+  justify-content: center; max-width: 700px; margin-top: clamp(14px,3vh,28px);
+}
+.gift-card {
+  background: rgba(255,255,255,.55); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.8); border-radius: 18px;
+  padding: clamp(16px,3vw,30px); min-width: 230px; text-align: center;
+  box-shadow: 0 6px 26px rgba(106,66,138,.1);
+}
+.gift-bank {
+  font-family: 'Playfair Display', serif; font-size: clamp(14px,3vw,20px);
+  color: var(--deep); margin-bottom: 8px;
+}
+.gift-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px,4vw,27px); color: var(--text);
+  letter-spacing: .14em; margin-bottom: 5px;
+}
+.gift-holder { font-size: clamp(12px,2.4vw,14px); color: var(--text-m); margin-bottom: 14px; }
+.btn-copy {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--lav), var(--rose));
+  color: #fff; border: none; border-radius: 100px;
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(12px,2.5vw,15px);
+  cursor: pointer; transition: opacity .2s;
+}
+.btn-copy:hover { opacity: .84; }
+
+/* ══════════════════════════════════════════
+   S12 — GUESTBOOK
+══════════════════════════════════════════ */
+#s-guestbook {
+  background: linear-gradient(158deg, #e8d8f8 0%, #fff0e8 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: clamp(24px,5vw,60px);
+}
+.gb-list {
+  width: 100%; max-width: 560px; max-height: 56vh;
+  overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.gb-list::-webkit-scrollbar { display: none; }
+.gb-item {
+  background: rgba(255,255,255,.52); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.72); border-radius: 14px;
+  padding: clamp(12px,2.5vw,20px);
+}
+.gb-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px,3vw,18px); color: var(--deep); margin-bottom: 4px;
+}
+.gb-msg {
+  font-style: italic; font-size: clamp(12px,2.5vw,15px);
+  color: var(--text-m); line-height: 1.75;
+}
+
+/* ══════════════════════════════════════════
+   S13 — CLOSING
+══════════════════════════════════════════ */
+#s-closing {
+  background: linear-gradient(162deg, #6a428a 0%, #4a2868 52%, #2a1840 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: clamp(24px,5vw,60px);
+}
+.cl-thanks {
+  font-style: italic; font-size: clamp(14px,3vw,22px);
+  color: rgba(255,255,255,.68); letter-spacing: .1em;
+  margin-bottom: clamp(10px,2.5vh,22px);
+}
+.cl-names {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(42px,13vw,98px); line-height: .92;
+  margin-bottom: clamp(8px,2vh,18px);
+}
+.cl-names .cn-b { display: block; color: #fff; }
+.cl-names .cn-a {
+  display: block; font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: .44em; color: var(--rose); line-height: 1.6;
+}
+.cl-names .cn-g { display: block; color: #fff; }
+.cl-date {
+  font-size: clamp(11px,2.5vw,16px); letter-spacing: .22em;
+  color: rgba(255,255,255,.55); text-transform: uppercase;
+  margin-bottom: clamp(22px,5vh,60px);
+}
+.cl-dua {
+  font-style: italic; font-size: clamp(12px,2.5vw,17px);
+  color: rgba(255,255,255,.6); max-width: 380px; line-height: 1.9;
+  margin: 0 auto;
+}
+
+/* Footer */
+.footer-brand {
+  position: absolute; bottom: clamp(12px,3vh,24px); left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(10px,1.8vw,13px); color: rgba(255,255,255,.42);
+  text-align: center; white-space: nowrap; z-index: 5; pointer-events: auto;
+}
+.footer-brand a {
+  color: rgba(255,255,255,.65); text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.28); transition: color .2s;
+}
+.footer-brand a:hover { color: #fff; }
+
+.sec-footer {
+  position: absolute; bottom: clamp(8px,2vh,14px); left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(9px,1.7vw,12px); color: rgba(54,36,64,.28);
+  white-space: nowrap; z-index: 5; pointer-events: none; letter-spacing: .04em;
+}
+.sec-footer.lt { color: rgba(255,255,255,.28); }
+
+</style>
+</head>
+<body>
+
+<!-- ░░░ CANVAS PARTICLES ░░░ -->
+<canvas id="particles"></canvas>
+
+<!-- ████████████████████████████████████████
+     ENVELOPE
+████████████████████████████████████████ -->
+<div id="envelope">
+
+  {#
+    Prioritas background envelope:
+    1. cover.webp  → taruh di /static/themes/awankita/cover.webp
+    2. photos[0]   → foto couple upload user
+    3. groom_photo_url
+    4. gradient CSS (fallback)
+  #}
+  {% if photos and photos|length > 0 %}
+    <div class="env-bg env-bg-photo" style="background-image:url('/static/themes/awankita/cover.webp'),url('{{ photo_src(photos[0]) }}')"></div>
+  {% elif inv.groom_photo_url %}
+    <div class="env-bg env-bg-photo" style="background-image:url('/static/themes/awankita/cover.webp'),url('{{ inv.groom_photo_url }}')"></div>
+  {% else %}
+    <div class="env-bg env-bg-photo" style="background-image:url('/static/themes/awankita/cover.webp')"></div>
+  {% endif %}
+
+  <!-- Cloud left panel -->
+  <div class="cloud-half cloud-half-l">
+    <svg viewBox="0 0 440 700" style="position:absolute;inset:0;width:100%;height:100%;opacity:.38" preserveAspectRatio="xMidYMid slice">
+      <ellipse cx="220" cy="140" rx="220" ry="135" fill="white" opacity=".32"/>
+      <ellipse cx="100" cy="310" rx="170" ry="110" fill="white" opacity=".24"/>
+      <ellipse cx="280" cy="490" rx="195" ry="120" fill="white" opacity=".2"/>
+      <ellipse cx="160" cy="620" rx="145" ry="88" fill="white" opacity=".16"/>
+    </svg>
+  </div>
+
+  <!-- Cloud right panel -->
+  <div class="cloud-half cloud-half-r">
+    <svg viewBox="0 0 440 700" style="position:absolute;inset:0;width:100%;height:100%;opacity:.38" preserveAspectRatio="xMidYMid slice">
+      <ellipse cx="220" cy="170" rx="205" ry="130" fill="white" opacity=".32"/>
+      <ellipse cx="340" cy="350" rx="160" ry="105" fill="white" opacity=".26"/>
+      <ellipse cx="160" cy="520" rx="185" ry="115" fill="white" opacity=".2"/>
+      <ellipse cx="290" cy="655" rx="150" ry="90" fill="white" opacity=".16"/>
+    </svg>
+  </div>
+
+  <!-- Center content -->
+  <div class="env-center">
+    <p class="env-to">Kepada Yth.</p>
+    <p class="env-guest">{{ request.args.get('to', 'Bapak / Ibu / Saudara/i') }}</p>
+    <div class="env-ornament"><span>✦</span></div>
+    <div class="env-names">
+      <span class="n-bride">{{ inv.bride_name }}</span>
+      <span class="n-amp">&amp;</span>
+      <span class="n-groom">{{ inv.groom_name }}</span>
+    </div>
+    <p class="env-date">{{ inv.resepsi_date | format_date }}</p>
+    <button class="btn-open" onclick="openEnvelope()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 12V22H4V12"/><path d="M22 7H2v5l10 5 10-5V7z"/>
+        <path d="M12 22V7"/><path d="M22 7l-10-4L2 7"/>
+      </svg>
+      Buka Undangan
+    </button>
+  </div>
+
+</div><!-- /envelope -->
+
+
+<!-- ████████████████████████████████████████
+     MAIN APP
+████████████████████████████████████████ -->
+<div id="app">
+  <div id="track">
+
+
+    <!-- ══════════════════════════════════
+         SECTION 0 — HERO
+    ══════════════════════════════════ -->
+    <section class="section" id="s-hero" data-idx="0">
+
+      <!-- Background cloud decorations -->
+      <svg class="cdeco" style="top:-6%;left:-6%;width:44%;opacity:.18" viewBox="0 0 500 300">
+        <ellipse cx="250" cy="150" rx="240" ry="140" fill="white"/>
+        <ellipse cx="380" cy="90"  rx="160" ry="95"  fill="white"/>
+        <ellipse cx="110" cy="200" rx="140" ry="85"  fill="white"/>
+      </svg>
+      <svg class="cdeco" style="bottom:8%;right:-4%;width:36%;opacity:.15" viewBox="0 0 500 300">
+        <ellipse cx="250" cy="155" rx="220" ry="125" fill="white"/>
+        <ellipse cx="90"  cy="100" rx="145" ry="88"  fill="white"/>
+      </svg>
+
+      <div class="hero-wrap">
+        <p class="hero-quran anim-d d1">وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا</p>
+        <p class="hero-quran-ref anim-d d2">
+          "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu istri-istri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya."
+          <em style="display:block;margin-top:6px;opacity:.75">— QS. Ar-Rum: 21</em>
+        </p>
+        <div class="hero-sep anim-u d3"><span>✦</span></div>
+        <div class="hero-names">
+          <span class="hn-b anim-l d3">{{ inv.bride_name }}</span>
+          <span class="hn-a anim-u d4">&amp;</span>
+          <span class="hn-g anim-r d5">{{ inv.groom_name }}</span>
+        </div>
+        <p class="hero-tagdate anim-u d6">{{ inv.akad_date | format_date }}</p>
+      </div>
+
+      <!-- Root / branch decoration at bottom -->
+      <svg class="roots-base" style="bottom:0;height:175px;opacity:.22" viewBox="0 0 1200 175" preserveAspectRatio="xMidYMax meet">
+        <path d="M600,175 Q598,145 595,112 Q590,78 582,44 Q576,18 570,0" stroke="#8a5c38" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <path d="M582,112 Q558,88 532,70 Q506,52 488,26" stroke="#8a5c38" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M595,90 Q622,66 648,46 Q672,28 688,2" stroke="#8a5c38" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M532,70 Q515,55 502,42" stroke="#8a5c38" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M648,46 Q662,30 668,12" stroke="#8a5c38" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M600,165 Q540,155 476,140 Q412,126 346,105 Q282,84 224,56 Q168,30 120,0" stroke="#8a5c38" fill="none" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+        <path d="M600,165 Q660,155 724,140 Q788,126 854,105 Q918,84 976,56 Q1032,30 1080,0" stroke="#8a5c38" fill="none" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+        <path d="M476,140 Q468,120 465,98" stroke="#8a5c38" fill="none" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <path d="M346,105 Q338,84 336,64" stroke="#8a5c38" fill="none" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <path d="M724,140 Q732,120 735,98" stroke="#8a5c38" fill="none" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <path d="M854,105 Q862,84 864,64" stroke="#8a5c38" fill="none" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+      </svg>
+
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 1 — GROOM PROFILE
+    ══════════════════════════════════ -->
+    <section class="section" id="s-groom" data-idx="1">
+      <div style="background:linear-gradient(158deg,#a8c4e0 0%,#c4a8e2 55%,#d4bcf0 100%);position:absolute;inset:0"></div>
+      <div class="couple-sec" style="position:relative;z-index:2;height:100%">
+
+        <!-- Photo left -->
+        <div class="cpl-photo anim-l">
+          {% if inv.groom_photo_url %}
+            <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+          {% elif photos and photos|length > 1 %}
+            <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
+          {% else %}
+            <div style="width:100%;height:100%;background:linear-gradient(160deg,#a8c4e0,#c4a8e2);display:flex;align-items:center;justify-content:center">
+              <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="30" r="18" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+                <path d="M10 72c0-16.6 13.4-30 30-30s30 13.4 30 30" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              </svg>
+            </div>
+          {% endif %}
+          <div class="photo-tint"></div>
+        </div>
+
+        <!-- Info right -->
+        <div class="cpl-info">
+          <p class="cpl-role anim-r d1">Mempelai Pria</p>
+          <h2 class="cpl-name anim-r d2">{{ inv.groom_name }}</h2>
+          <p class="cpl-full anim-r d3">{{ inv.groom_full }}</p>
+          {% if inv.show_parents %}
+          <p class="cpl-parents anim-r d4">Putra dari<br><strong>{{ inv.groom_parents }}</strong></p>
+          {% endif %}
+          <!-- Corner root SVG -->
+          <svg class="cpl-root" style="bottom:0;right:0" viewBox="0 0 260 180">
+            <path d="M260,180 Q220,145 178,115 Q136,85 110,48 Q92,22 82,0" stroke="#8a5c38" fill="none" stroke-width="2.2"/>
+            <path d="M178,115 Q158,94 140,84 Q122,74 108,54" stroke="#8a5c38" fill="none" stroke-width="1.5"/>
+            <path d="M220,145 Q248,124 260,108" stroke="#8a5c38" fill="none" stroke-width="1.5"/>
+            <path d="M110,48 Q98,28 92,8" stroke="#8a5c38" fill="none" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+
+      <svg class="cdeco" style="top:-5%;right:-6%;width:38%;opacity:.14" viewBox="0 0 500 300">
+        <ellipse cx="250" cy="150" rx="230" ry="135" fill="white"/>
+        <ellipse cx="100" cy="95"  rx="145" ry="90"  fill="white"/>
+      </svg>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 2 — BRIDE PROFILE
+    ══════════════════════════════════ -->
+    <section class="section" id="s-bride" data-idx="2">
+      <div style="background:linear-gradient(205deg,#f0c8a8 0%,#e0a8c5 42%,#c2a8e2 100%);position:absolute;inset:0"></div>
+      <div class="couple-sec" style="position:relative;z-index:2;height:100%">
+
+        <!-- Info left -->
+        <div class="cpl-info">
+          <p class="cpl-role anim-l d1">Mempelai Wanita</p>
+          <h2 class="cpl-name anim-l d2">{{ inv.bride_name }}</h2>
+          <p class="cpl-full anim-l d3">{{ inv.bride_full }}</p>
+          {% if inv.show_parents %}
+          <p class="cpl-parents anim-l d4">Putri dari<br><strong>{{ inv.bride_parents }}</strong></p>
+          {% endif %}
+          <!-- Corner root SVG -->
+          <svg class="cpl-root" style="bottom:0;left:0;transform:scaleX(-1)" viewBox="0 0 260 180">
+            <path d="M260,180 Q220,145 178,115 Q136,85 110,48 Q92,22 82,0" stroke="#8a5c38" fill="none" stroke-width="2.2"/>
+            <path d="M178,115 Q158,94 140,84 Q122,74 108,54" stroke="#8a5c38" fill="none" stroke-width="1.5"/>
+            <path d="M220,145 Q248,124 260,108" stroke="#8a5c38" fill="none" stroke-width="1.5"/>
+            <path d="M110,48 Q98,28 92,8" stroke="#8a5c38" fill="none" stroke-width="1"/>
+          </svg>
+        </div>
+
+        <!-- Photo right -->
+        <div class="cpl-photo anim-r">
+          {% if inv.bride_photo_url %}
+            <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}">
+          {% elif photos and photos|length > 2 %}
+            <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
+          {% else %}
+            <div style="width:100%;height:100%;background:linear-gradient(160deg,#f0c8a8,#e0a8c5);display:flex;align-items:center;justify-content:center">
+              <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="30" r="18" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+                <path d="M10 72c0-16.6 13.4-30 30-30s30 13.4 30 30" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              </svg>
+            </div>
+          {% endif %}
+          <div class="photo-tint"></div>
+        </div>
+      </div>
+
+      <svg class="cdeco" style="top:-5%;left:-6%;width:38%;opacity:.14" viewBox="0 0 500 300">
+        <ellipse cx="250" cy="150" rx="230" ry="130" fill="white"/>
+        <ellipse cx="380" cy="95"  rx="140" ry="85"  fill="white"/>
+      </svg>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 3 — LOVE STORY
+    ══════════════════════════════════ -->
+    <section class="section" id="s-lovestory" data-idx="3">
+      <div style="background:linear-gradient(178deg,#f0e6ff 0%,#fde8d4 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="top:0;right:-5%;width:30%;opacity:.18" viewBox="0 0 400 250">
+        <ellipse cx="200" cy="125" rx="190" ry="115" fill="white"/>
+      </svg>
+      <div style="position:relative;z-index:2;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:clamp(28px,5.5vw,72px)">
+        <h2 class="section-title-script anim-u">Our Story</h2>
+        <div class="story-scroll">
+          {% if inv.love_story %}
+            {# — handle plain string — #}
+            {% if inv.love_story is string %}
+              {% set paragraphs = inv.love_story.split('\n') %}
+              {% for para in paragraphs %}
+                {% set pt = para.strip() %}
+                {% if pt %}
+                <div class="story-row {% if loop.index is odd %}anim-l{% else %}anim-r{% endif %} {% if loop.index <= 8 %}d{{ loop.index }}{% else %}d8{% endif %}">
+                  <div class="story-dot"></div>
+                  <div class="story-card">
+                    <p class="story-card-text">{{ pt }}</p>
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            {# — handle list of dicts {date, text} — #}
+            {% else %}
+              {% for story in inv.love_story %}
+              <div class="story-row {% if loop.index is odd %}anim-l{% else %}anim-r{% endif %} {% if loop.index <= 8 %}d{{ loop.index }}{% else %}d8{% endif %}">
+                <div class="story-dot"></div>
+                <div class="story-card">
+                  {% if story.date %}<p class="story-card-date">{{ story.date }}</p>{% endif %}
+                  <p class="story-card-text">{{ story.text if story.text else story }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            {% endif %}
+          {% else %}
+          <div class="story-row anim-l d1">
+            <div class="story-dot"></div>
+            <div class="story-card"><p class="story-card-date">Sebuah Pertemuan</p><p class="story-card-text">Setiap kisah cinta dimulai dari sebuah pertemuan yang tak terduga, di mana takdir diam-diam sedang bekerja...</p></div>
+          </div>
+          <div class="story-row anim-r d2">
+            <div class="story-dot"></div>
+            <div class="story-card"><p class="story-card-date">Mengenal Lebih Dekat</p><p class="story-card-text">Hari demi hari, tawa demi tawa — cinta tumbuh perlahan seperti akar yang menjalar diam-diam menuju cahaya...</p></div>
+          </div>
+          <div class="story-row anim-l d3">
+            <div class="story-dot"></div>
+            <div class="story-card"><p class="story-card-date">Sebuah Janji</p><p class="story-card-text">Dan kini, di bawah langit senja yang menjadi saksi, kami berjanji untuk bersama selamanya, dalam suka maupun duka...</p></div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <!-- Root decoration -->
+      <svg class="roots-base" style="bottom:0;height:110px;opacity:.18" viewBox="0 0 1200 110" preserveAspectRatio="xMidYMax meet">
+        <path d="M600,110 Q480,88 350,62 Q220,36 100,10 Q50,0 0,0" stroke="#8a5c38" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M600,110 Q720,88 850,62 Q980,36 1100,10 Q1150,0 1200,0" stroke="#8a5c38" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M350,62 Q342,42 340,22" stroke="#8a5c38" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M850,62 Q858,42 860,22" stroke="#8a5c38" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 4 — AKAD NIKAH
+    ══════════════════════════════════ -->
+    <section class="section event-sec" id="s-akad" data-idx="4">
+      <div style="background:linear-gradient(158deg,#e8d8f8 0%,#fde8d4 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="top:-7%;left:-4%;width:48%;opacity:.18" viewBox="0 0 600 350">
+        <ellipse cx="300" cy="175" rx="285" ry="162" fill="white"/>
+        <ellipse cx="110" cy="100" rx="155" ry="95"  fill="white"/>
+      </svg>
+      <p class="event-badge anim-d d1">Prosesi Suci</p>
+      <h2 class="event-h anim-u d2">Akad Nikah</h2>
+      <div class="event-card anim-u d3">
+        <p class="event-date">{{ inv.akad_date | format_date }}</p>
+        <p class="event-time">{{ inv.akad_time }}</p>
+        <hr class="event-rule">
+        <p class="event-venue">{{ inv.akad_venue }}</p>
+        <p class="event-address">{{ inv.akad_address }}</p>
+      </div>
+      <!-- Root deco bottom -->
+      <svg class="roots-base" style="bottom:0;height:90px;opacity:.16" viewBox="0 0 1200 90" preserveAspectRatio="xMidYMax meet">
+        <path d="M600,90 Q500,70 385,50 Q270,30 155,10 Q80,0 0,0" stroke="#8a5c38" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M600,90 Q700,70 815,50 Q930,30 1045,10 Q1120,0 1200,0" stroke="#8a5c38" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M385,50 Q378,34 376,16" stroke="#8a5c38" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M815,50 Q822,34 824,16" stroke="#8a5c38" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 5 — RESEPSI
+    ══════════════════════════════════ -->
+    <section class="section event-sec" id="s-resepsi" data-idx="5">
+      <div style="background:linear-gradient(202deg,#fde8d4 0%,#e8d8f8 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="bottom:-5%;right:-4%;width:44%;opacity:.18" viewBox="0 0 500 300">
+        <ellipse cx="250" cy="150" rx="230" ry="132" fill="white"/>
+        <ellipse cx="380" cy="80"  rx="135" ry="85"  fill="white"/>
+      </svg>
+      <p class="event-badge anim-d d1">Perayaan Cinta</p>
+      <h2 class="event-h anim-u d2">Resepsi</h2>
+      <div class="event-card anim-u d3">
+        <p class="event-date">{{ inv.resepsi_date | format_date }}</p>
+        <p class="event-time">{{ inv.resepsi_time }}</p>
+        <hr class="event-rule">
+        <p class="event-venue">{{ inv.resepsi_venue }}</p>
+        <p class="event-address">{{ inv.resepsi_address }}</p>
+      </div>
+      <!-- Root deco top (flipped) -->
+      <svg style="position:absolute;top:0;left:0;width:100%;height:90px;pointer-events:none;opacity:.16;transform:scaleY(-1)" viewBox="0 0 1200 90" preserveAspectRatio="xMidYMax meet">
+        <path d="M600,90 Q500,70 385,50 Q270,30 155,10 Q80,0 0,0" stroke="#8a5c38" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M600,90 Q700,70 815,50 Q930,30 1045,10 Q1120,0 1200,0" stroke="#8a5c38" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 6 — COUNTDOWN
+    ══════════════════════════════════ -->
+    <section class="section" id="s-countdown" data-idx="6">
+      <canvas id="count-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%">
+        <p class="cd-label anim-d d1">Menuju Hari Istimewa</p>
+        <div class="cd-row">
+          <div class="cd-unit anim-u d2"><span class="cd-num" id="cd-d">00</span><span class="cd-lbl">Hari</span></div>
+          <span class="cd-sep anim-u d2">:</span>
+          <div class="cd-unit anim-u d3"><span class="cd-num" id="cd-h">00</span><span class="cd-lbl">Jam</span></div>
+          <span class="cd-sep anim-u d3">:</span>
+          <div class="cd-unit anim-u d4"><span class="cd-num" id="cd-m">00</span><span class="cd-lbl">Menit</span></div>
+          <span class="cd-sep anim-u d4">:</span>
+          <div class="cd-unit anim-u d5"><span class="cd-num" id="cd-s">00</span><span class="cd-lbl">Detik</span></div>
+        </div>
+        <p class="cd-eventdate anim-u d6">{{ inv.resepsi_date | format_date }}</p>
+      </div>
+      <div class="sec-footer lt">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 7 — GALLERY
+    ══════════════════════════════════ -->
+    <section class="section" id="s-gallery" data-idx="7">
+      <div style="background:linear-gradient(158deg,#f8f0ff 0%,#fff0e8 100%);position:absolute;inset:0"></div>
+      <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(22px,4.5vw,56px)">
+        <h2 class="section-title-script anim-u" style="margin-bottom:clamp(14px,3vh,32px)">Momen Kita</h2>
+        {% if photos and photos|length > 0 %}
+        <div class="gallery-grid">
+          {% for p in photos %}{% if loop.index <= 6 %}
+          <div class="g-item {% if loop.index is odd %}anim-l{% else %}anim-r{% endif %} d{{ [loop.index,7]|min }}">
+            <img src="{{ photo_src(p) }}" alt="Momen {{ loop.index }}" loading="lazy">
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+        {% else %}
+        <div style="opacity:.42;text-align:center">
+          <div style="display:grid;grid-template-columns:repeat(3,80px);gap:10px;margin:0 auto">
+            {% for i in range(6) %}
+            <div class="g-item anim-u d{{ i+1 }}" style="width:80px;height:80px">
+              <div class="g-empty">📷</div>
+            </div>
+            {% endfor %}
+          </div>
+          <p style="margin-top:14px;font-style:italic;color:var(--text-m);font-size:clamp(12px,2.5vw,15px)">Foto akan muncul di sini</p>
+        </div>
+        {% endif %}
+      </div>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 8 — MAPS
+    ══════════════════════════════════ -->
+    <section class="section" id="s-maps" data-idx="8">
+      <div style="background:linear-gradient(158deg,#e8d8f8 0%,#fde8d4 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="top:-5%;left:-4%;width:32%;opacity:.18" viewBox="0 0 400 240">
+        <ellipse cx="200" cy="120" rx="185" ry="110" fill="white"/>
+      </svg>
+      <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(24px,5vw,60px)">
+        <h2 class="section-title-script anim-u" style="margin-bottom:clamp(12px,3vh,26px)">Lokasi</h2>
+        {% if inv.maps_embed_html %}
+        <div class="maps-frame anim-u d2">{{ inv.maps_embed_html | safe }}</div>
+        {% endif %}
+        <a href="{{ inv.maps_url }}" target="_blank" rel="noopener" class="btn-maps anim-u d3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Buka di Google Maps
+        </a>
+      </div>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 9 — RSVP
+    ══════════════════════════════════ -->
+    <section class="section" id="s-rsvp" data-idx="9">
+      <div style="background:linear-gradient(158deg,#fff0e8 0%,#f0e4ff 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="bottom:-5%;right:-4%;width:32%;opacity:.15" viewBox="0 0 400 240">
+        <ellipse cx="200" cy="120" rx="185" ry="108" fill="white"/>
+      </svg>
+      <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(22px,5vw,60px);overflow-y:auto">
+        <h2 class="section-title-script anim-u" style="margin-bottom:6px">Konfirmasi Kehadiran</h2>
+        <p class="rsvp-sub anim-u d1">Kehadiran Anda adalah kebahagiaan kami</p>
+        <div class="rsvp-form anim-u d2">
+          <input type="text" id="rsvp-name" class="rsvp-input" placeholder="Nama Anda">
+          <select id="rsvp-attend" class="rsvp-sel">
+            <option value="">Konfirmasi Kehadiran</option>
+            <option value="hadir">Insya Allah hadir ✓</option>
+            <option value="tidak">Mohon maaf, tidak bisa hadir</option>
+          </select>
+          <input type="number" id="rsvp-count" class="rsvp-input" placeholder="Jumlah tamu" min="1">
+          <textarea id="rsvp-msg" class="rsvp-ta" placeholder="Ucapan & doa untuk mempelai..."></textarea>
+          <button class="btn-rsvp" onclick="submitRsvp()">Kirim Konfirmasi ✦</button>
+          <p id="rsvp-fb"></p>
+        </div>
+      </div>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 10 — GIFT
+    ══════════════════════════════════ -->
+    <section class="section" id="s-gift" data-idx="10">
+      <div style="background:linear-gradient(158deg,#f8f0ff 0%,#fde8d4 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="top:-5%;right:-4%;width:36%;opacity:.16" viewBox="0 0 450 270">
+        <ellipse cx="225" cy="135" rx="212" ry="122" fill="white"/>
+        <ellipse cx="80"  cy="80"  rx="135" ry="82"  fill="white"/>
+      </svg>
+      <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(24px,5vw,60px)">
+        <h2 class="section-title-script anim-u" style="margin-bottom:6px">Wedding Gift</h2>
+        <p class="anim-u d1" style="font-style:italic;color:var(--text-m);font-size:clamp(12px,2.5vw,16px);text-align:center;margin-bottom:clamp(14px,3vh,28px)">
+          Doa restu Anda adalah hadiah terbaik bagi kami.<br>Namun jika berkenan memberikan tanda kasih:
+        </p>
+        <div class="gift-grid">
+          {% for gift in gifts %}
+            {% if gift.bank_name %}
+            <div class="gift-card anim-l d{{ [loop.index,6]|min }}">
+              <p class="gift-bank">🏦 {{ gift.bank_name }}</p>
+              <p class="gift-num">{{ gift.account_number }}</p>
+              <p class="gift-holder">a.n. {{ gift.account_name }}</p>
+              <button class="btn-copy" onclick="copyGift('{{ gift.account_number }}', this)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Salin Nomor
+              </button>
+            </div>
+            {% endif %}
+            {% if gift.ewallet_type %}
+            <div class="gift-card anim-r d{{ [loop.index,6]|min }}">
+              <p class="gift-bank">📱 {{ gift.ewallet_type }}</p>
+              <p class="gift-num">{{ gift.ewallet_number }}</p>
+              <p class="gift-holder">a.n. {{ gift.ewallet_name }}</p>
+              <button class="btn-copy" onclick="copyGift('{{ gift.ewallet_number }}', this)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Salin Nomor
+              </button>
+            </div>
+            {% endif %}
+          {% else %}
+          <div class="gift-card anim-u d1" style="opacity:.5">
+            <p style="font-style:italic;color:var(--text-m)">Info rekening akan tampil di sini</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 11 — GUESTBOOK
+    ══════════════════════════════════ -->
+    <section class="section" id="s-guestbook" data-idx="11">
+      <div style="background:linear-gradient(158deg,#e8d8f8 0%,#fff0e8 100%);position:absolute;inset:0"></div>
+      <svg class="cdeco" style="top:-5%;left:-4%;width:32%;opacity:.16" viewBox="0 0 400 240">
+        <ellipse cx="200" cy="120" rx="188" ry="110" fill="white"/>
+      </svg>
+      <div style="position:relative;z-index:2;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(24px,5vw,60px)">
+        <h2 class="section-title-script anim-u" style="margin-bottom:clamp(14px,3vh,30px)">Ucapan &amp; Doa</h2>
+        <div class="gb-list" id="gb-list">
+          {% if rsvp_list %}
+            {% for r in rsvp_list %}
+            <div class="gb-item {% if loop.index is odd %}anim-l{% else %}anim-r{% endif %} d{{ [loop.index,6]|min }}">
+              <p class="gb-name">{{ r.guest_name }}</p>
+              {% if r.message %}<p class="gb-msg">{{ r.message }}</p>{% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="gb-item anim-u d1" style="text-align:center;opacity:.55">
+            <p class="gb-name">Jadilah yang pertama memberikan doa 💜</p>
+            <p class="gb-msg">Ucapan Anda akan muncul di sini setelah konfirmasi kehadiran...</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="sec-footer">Dibuat dengan ❤ oleh habarkita.com</div>
+    </section>
+
+
+    <!-- ══════════════════════════════════
+         SECTION 12 — CLOSING
+    ══════════════════════════════════ -->
+    <section class="section" id="s-closing" data-idx="12">
+
+      <!-- Full root/tree illustration -->
+      <svg style="position:absolute;bottom:0;left:0;width:100%;height:55%;pointer-events:none;z-index:1;overflow:visible" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax meet">
+        <!-- Main trunk -->
+        <path d="M600,420 Q598,370 596,318 Q592,264 585,210 Q578,156 572,102 Q566,52 560,10" stroke="rgba(194,168,226,.32)" fill="none" stroke-width="4.5" stroke-linecap="round"/>
+        <!-- Left branches -->
+        <path d="M588,310 Q548,284 505,254 Q462,224 428,183 Q402,152 386,110 Q375,76 368,38" stroke="rgba(194,168,226,.28)" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <path d="M505,254 Q484,230 462,218 Q440,206 422,184" stroke="rgba(194,168,226,.2)" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M580,240 Q540,210 496,180 Q452,150 418,108 Q390,72 380,32" stroke="rgba(194,168,226,.22)" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M418,108 Q400,82 396,56" stroke="rgba(194,168,226,.18)" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Right branches -->
+        <path d="M594,298 Q636,272 678,242 Q720,212 754,171 Q779,140 795,98 Q806,64 812,26" stroke="rgba(194,168,226,.28)" fill="none" stroke-width="3" stroke-linecap="round"/>
+        <path d="M678,242 Q700,218 722,206 Q744,194 762,172" stroke="rgba(194,168,226,.2)" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M582,232 Q624,202 666,172 Q708,142 742,100 Q770,64 780,26" stroke="rgba(194,168,226,.22)" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M742,100 Q758,74 764,46" stroke="rgba(194,168,226,.18)" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Far-spreading roots left -->
+        <path d="M600,400 Q514,384 424,360 Q334,336 248,305 Q172,275 106,236 Q52,200 10,158" stroke="rgba(194,168,226,.2)" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M424,360 Q410,336 408,310" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M248,305 Q234,278 232,252" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- Far-spreading roots right -->
+        <path d="M600,400 Q686,384 776,360 Q866,336 952,305 Q1028,275 1094,236 Q1148,200 1190,158" stroke="rgba(194,168,226,.2)" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path d="M776,360 Q790,336 792,310" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M952,305 Q966,278 968,252" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- Tiny leaf-like twigs -->
+        <path d="M368,38 Q355,18 348,0" stroke="rgba(194,168,226,.16)" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M386,110 Q368,90 362,68" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1" stroke-linecap="round"/>
+        <path d="M812,26 Q825,8 830,-6" stroke="rgba(194,168,226,.16)" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M795,98 Q812,78 818,56" stroke="rgba(194,168,226,.15)" fill="none" stroke-width="1" stroke-linecap="round"/>
+        <!-- Earth-brown roots at base (grounding) -->
+        <path d="M600,420 Q540,412 470,400 Q395,388 318,368 Q248,348 186,320 Q128,292 80,256 Q40,224 10,186" stroke="rgba(138,92,58,.15)" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M600,420 Q660,412 730,400 Q805,388 882,368 Q952,348 1014,320 Q1072,292 1120,256 Q1160,224 1190,186" stroke="rgba(138,92,58,.15)" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:clamp(24px,5vw,60px)">
+        <p class="cl-thanks anim-d d1">Dengan penuh cinta dan rasa syukur,</p>
+        <div class="cl-names">
+          <span class="cn-b anim-l d2">{{ inv.bride_name }}</span>
+          <span class="cn-a anim-u d3">&amp;</span>
+          <span class="cn-g anim-r d4">{{ inv.groom_name }}</span>
+        </div>
+        <p class="cl-date anim-u d5">{{ inv.resepsi_date | format_date }}</p>
+        <p class="cl-dua anim-u d6">Semoga Allah memberkahi dan menyatukan kami dalam kebaikan dunia dan akhirat. Jazākumullāhu khairan atas doa dan kehadiran Anda.</p>
+      </div>
+
+      <div class="footer-brand">
+        Dibuat dengan ❤ oleh <a href="https://habarkita.com" target="_blank" rel="noopener">habarkita.com</a>
+        &nbsp;—&nbsp; Pesan undangan digital sekarang
+      </div>
+    </section>
+
+
+  </div><!-- /track -->
+
+  <!-- Navigation dots -->
+  <div id="dots"></div>
+  <button class="nav-btn" id="btn-up"   onclick="goTo(current-1)" aria-label="Sebelumnya">&#9650;</button>
+  <button class="nav-btn" id="btn-down" onclick="goTo(current+1)" aria-label="Selanjutnya">&#9660;</button>
+
+  <!-- Music -->
+  {% if inv.music_url %}
+  <audio id="bg-music" src="{{ inv.music_url }}" loop preload="none"></audio>
+  {% endif %}
+  <div id="music-player" onclick="toggleMusic()" role="button" aria-label="Toggle musik">
+    <span id="music-note">♪</span>
+    <span id="music-label">Musik</span>
+  </div>
+
+</div><!-- /app -->
+
+
+<!-- ████████████████████████████████████████
+     SCRIPT
+████████████████████████████████████████ -->
+<script>
+/* ═══════════════════════════════════════════
+   SENJA JANI — Main Script
+   ═══════════════════════════════════════════ */
+
+const env   = document.getElementById('envelope');
+const app   = document.getElementById('app');
+const audio = document.getElementById('bg-music');
+
+// ── OPEN ENVELOPE ────────────────────────────────
+function openEnvelope() {
+  env.classList.add('opening');
+  setTimeout(() => {
+    env.classList.add('gone');
+    app.classList.add('visible');
+    if (audio) {
+      audio.volume = 0.32;
+      audio.play().catch(() => {});
+      musicPlaying = true;
+      document.getElementById('music-label').textContent = 'Pause';
+    }
+    initCloudParticles();
+    initCountCanvas();
+    triggerSection(0);
+  }, 680);
+}
+
+// ── SCROLL SYSTEM ─────────────────────────────────
+let current = 0;
+const sections = document.querySelectorAll('.section');
+const total    = sections.length;
+
+// Build dot navigation
+const dotsEl = document.getElementById('dots');
+sections.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.setAttribute('aria-label', 'Section ' + (i+1));
+  d.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(d);
+});
+
+function goTo(idx) {
+  if (idx < 0 || idx >= total) return;
+  current = idx;
+  document.getElementById('track').style.transform = 'translateY(-' + (current * 100) + 'vh)';
+  updateDots();
+  triggerSection(idx);
+}
+
+function updateDots() {
+  document.querySelectorAll('.dot').forEach((d, i) =>
+    d.classList.toggle('active', i === current));
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(current + 1);
+  if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(current - 1);
+});
+
+// Touch / swipe
+let startY = 0;
+document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+document.addEventListener('touchend', e => {
+  const dy = startY - e.changedTouches[0].clientY;
+  if (Math.abs(dy) > 44) goTo(dy > 0 ? current + 1 : current - 1);
+});
+
+// Wheel
+let wLock = false;
+document.addEventListener('wheel', e => {
+  if (wLock) return;
+  wLock = true;
+  goTo(e.deltaY > 0 ? current + 1 : current - 1);
+  setTimeout(() => { wLock = false; }, 760);
+}, { passive: true });
+
+// ── SECTION ENTRY ANIMATIONS ──────────────────────
+const animated = new Set();
+function triggerSection(idx) {
+  if (animated.has(idx)) return;
+  animated.add(idx);
+  const sec  = sections[idx];
+  if (!sec) return;
+  const elems = sec.querySelectorAll('.anim-l,.anim-r,.anim-u,.anim-d');
+  elems.forEach(el => requestAnimationFrame(() => el.classList.add('in')));
+}
+
+// ── COUNTDOWN ─────────────────────────────────────
+const cdTarget = new Date('{{ inv.resepsi_date }}');
+function updateCountdown() {
+  let diff = cdTarget - new Date();
+  if (diff < 0) diff = 0;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000)  / 60000);
+  const s = Math.floor((diff % 60000)    / 1000);
+  const p = n => String(n).padStart(2, '0');
+  document.getElementById('cd-d').textContent = p(d);
+  document.getElementById('cd-h').textContent = p(h);
+  document.getElementById('cd-m').textContent = p(m);
+  document.getElementById('cd-s').textContent = p(s);
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ── RSVP ──────────────────────────────────────────
+async function submitRsvp() {
+  const name   = document.getElementById('rsvp-name').value.trim();
+  const attend = document.getElementById('rsvp-attend').value;
+  const count  = parseInt(document.getElementById('rsvp-count').value) || 1;
+  const msg    = document.getElementById('rsvp-msg').value.trim();
+  const fb     = document.getElementById('rsvp-fb');
+
+  if (!name)   { fb.textContent = '✦ Mohon isi nama Anda'; return; }
+  if (!attend) { fb.textContent = '✦ Mohon pilih konfirmasi kehadiran'; return; }
+
+  fb.textContent = 'Mengirim...';
+  try {
+    const res = await fetch('/rsvp/{{ inv.id }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, attendance: attend, count, message: msg })
+    });
+    if (res.ok) {
+      fb.textContent = '✦ Terima kasih! Konfirmasi Anda telah kami terima.';
+      ['rsvp-name','rsvp-count','rsvp-msg'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('rsvp-attend').value = '';
+      if (msg) appendGuestbook(name, msg);
+    } else {
+      fb.textContent = 'Terjadi kesalahan, silakan coba lagi.';
+    }
+  } catch {
+    fb.textContent = 'Gagal terhubung, periksa koneksi Anda.';
+  }
+}
+
+function appendGuestbook(name, msg) {
+  const list = document.getElementById('gb-list');
+  const item = document.createElement('div');
+  item.className = 'gb-item';
+  item.innerHTML = '<p class="gb-name">' + name + '</p><p class="gb-msg">' + msg + '</p>';
+  list.prepend(item);
+}
+
+// ── COPY GIFT ─────────────────────────────────────
+function copyGift(num, btn) {
+  const origHTML = btn.innerHTML;
+  navigator.clipboard.writeText(num).then(() => {
+    btn.textContent = '✓ Tersalin!';
+    setTimeout(() => { btn.innerHTML = origHTML; }, 2200);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = num; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(_) {}
+    ta.remove();
+    btn.textContent = '✓ Tersalin!';
+    setTimeout(() => { btn.innerHTML = origHTML; }, 2200);
+  });
+}
+
+// ── MUSIC ─────────────────────────────────────────
+let musicPlaying = false;
+function toggleMusic() {
+  if (!audio) return;
+  if (musicPlaying) {
+    audio.pause();
+    document.getElementById('music-note').style.animationPlayState = 'paused';
+    document.getElementById('music-label').textContent = 'Musik';
+    musicPlaying = false;
+  } else {
+    audio.play().catch(() => {});
+    document.getElementById('music-note').style.animationPlayState = 'running';
+    document.getElementById('music-label').textContent = 'Pause';
+    musicPlaying = true;
+  }
+}
+
+// ── CLOUD PARTICLE SYSTEM ─────────────────────────
+function initCloudParticles() {
+  const cv  = document.getElementById('particles');
+  const ctx = cv.getContext('2d');
+  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const colors = [
+    'rgba(255,255,255,',
+    'rgba(194,168,226,',
+    'rgba(224,168,197,',
+    'rgba(239,191,150,'
+  ];
+  const puffs = Array.from({ length: 28 }, () => createPuff(cv, colors, true));
+
+  function createPuff(cv, cols, init) {
+    return {
+      x:     Math.random() * cv.width,
+      y:     init ? Math.random() * cv.height : cv.height + 70,
+      rx:    Math.random() * 45 + 14,
+      ry:    Math.random() * 28 + 10,
+      speed: Math.random() * 0.22 + 0.07,
+      drift: (Math.random() - 0.5) * 0.14,
+      alpha: Math.random() * 0.1 + 0.03,
+      col:   cols[Math.floor(Math.random() * cols.length)],
+    };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    puffs.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle   = p.col + '1)';
+      // Main puff
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, p.rx, p.ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Secondary bump
+      ctx.beginPath();
+      ctx.ellipse(p.x + p.rx * 0.55, p.y - p.ry * 0.35, p.rx * 0.62, p.ry * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      p.y -= p.speed;
+      p.x += p.drift;
+      if (p.y < -70) { Object.assign(p, createPuff(cv, colors, false)); }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ── COUNTDOWN SECTION — TWINKLING PARTICLES ───────
+function initCountCanvas() {
+  const cv  = document.getElementById('count-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({ length: 68 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 2 + 0.5,
+    a: Math.random(), spd: Math.random() * 0.006 + 0.002
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    stars.forEach(s => {
+      ctx.save();
+      ctx.globalAlpha = Math.abs(Math.sin(s.a)) * 0.45;
+      ctx.fillStyle   = 'rgba(255,255,255,1)';
+      ctx.beginPath();
+      ctx.arc(s.x * cv.width, s.y * cv.height, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      s.a += s.spd;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+
+</body>
+</html>
