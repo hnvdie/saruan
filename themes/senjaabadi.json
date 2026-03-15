@@ -1,6 +1,4 @@
 {
-  "id": "senjaabadi",
-  "skeleton": "senjaabadi",
   "name": "Senja Abadi",
   "description": "Seperti senja yang tak pernah benar-benar pergi — tema luxury cinematic dengan estetika gelap yang hangat, perpaduan emas tua, dusty rose, dan bayangan cokelat dalam yang memancarkan keanggunan abadi.",
   "preview_color": "#C9A96E",
@@ -14,7 +12,9 @@
     "Elegant",
     "Modern"
   ],
-  "demo_photos": [],
+  "demo_photos": [
+    "/static/themes/senjaabadi/demo_474e6d46.webp"
+  ],
   "features": [
     "Cinematic Envelope Opening Reveal — animasi buka undangan penuh ekspresi",
     "Three.js 3D Particle System — ratusan partikel emas & dusty rose mengambang",
@@ -29,10 +29,10 @@
     "Grain Film Overlay — tekstur sinematik untuk kedalaman visual",
     "Fully Responsive — optimal di semua ukuran layar"
   ],
-  "price": 45000,
-  "price_label": "Rp. 45.000",
-  "price_original": 75000,
-  "price_note": "Harga spesial peluncuran",
+  "price": 20000,
+  "price_label": "Rp. 20.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "Dusk_Gold": "#C9A96E",
     "Gold_Light": "#E8C99A",
@@ -50,6 +50,8 @@
     "serif": "EB Garamond",
     "sans": "Jost"
   },
+  "id": "senjaabadi",
+  "skeleton": "senjaabadi",
   "assets": {
     "cover_webp": "static/themes/senjaabadi/cover.webp",
     "cover_webp_recommended_size": "1080x1920px, maks 300KB (portrait). Format WebP kualitas 80. Gunakan foto prewedding dengan pencahayaan senja atau studio hangat untuk hasil terbaik.",

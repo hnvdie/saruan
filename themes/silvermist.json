@@ -10,7 +10,9 @@
     "Forest",
     "Elegant"
   ],
-  "demo_photos": [],
+  "demo_photos": [
+    "/static/themes/silvermist/demo_27480b55.webp"
+  ],
   "features": [
     "Layered Parallax Scene dengan depth 5 lapis saat scroll",
     "Animated Fireflies & Floating Mist Particles",
@@ -23,10 +25,10 @@
     "Hadiah Digital dengan flip card silver-foil effect",
     "Floating Music Player minimalis"
   ],
-  "price": 45000,
-  "price_label": "Rp. 45.000",
-  "price_original": 75000,
-  "price_note": "Early bird discount",
+  "price": 20000,
+  "price_label": "Rp. 20.000",
+  "price_original": 50000,
+  "price_note": "",
   "palette": {
     "Midnight_Forest": "#0D1B14",
     "Deep_Pine": "#1A2E23",
