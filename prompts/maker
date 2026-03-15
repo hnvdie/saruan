@@ -1,0 +1,288 @@
+# MASTER PROMPT — Generate Tema Undangan Pernikahan Baru
+
+Paste prompt ini ke AI (Claude/GPT) untuk generate tema baru.
+Isi bagian [DALAM KURUNG] sesuai kebutuhan tema.
+
+---
+
+## KONTEKS PROYEK
+
+Gue punya Flask wedding invitation app. Struktur file:
+
+```
+static/
+├── js/
+│   ├── scroll-animate.js        ← ENGINE PARALLAX, JANGAN DIUBAH, shared semua tema
+│
+└── themes/
+    └── [nama-tema]/
+        ├── scenes.js            ← KEYFRAME parallax khusus tema ini
+        └── images/              ← aset gambar tema ini
+
+templates/themes/
+    └── [nama-tema].html         ← Jinja2 template (CSS inline di sini)
+
+themes/
+    └── [nama-tema].json         ← metadata tema
+```
+
+---
+
+## VARIABEL JINJA2 YANG TERSEDIA
+
+```
+inv.id                  → string (untuk POST /rsvp/<id>)
+inv.slug                → string
+inv.groom_name          → string
+inv.bride_name          → string
+inv.groom_full          → string|None
+inv.bride_full          → string|None
+inv.groom_parents       → string|None  "Ayah & Ibu"
+inv.bride_parents       → string|None
+inv.show_parents        → int 0/1
+inv.groom_photo_url     → string|None  "/uploads/..."
+inv.bride_photo_url     → string|None
+inv.cover_photo         → string|None  filename saja
+inv.akad_date           → "YYYY-MM-DD"|None
+inv.akad_time           → "HH:MM"|None
+inv.akad_venue          → string|None
+inv.akad_address        → string|None
+inv.resepsi_date        → "YYYY-MM-DD"|None
+inv.resepsi_time        → "HH:MM"|None
+inv.resepsi_venue       → string|None
+inv.resepsi_address     → string|None
+inv.maps_url            → string|None
+inv.maps_embed          → string|None  (embed src URL langsung)
+inv.love_story          → string|None
+inv.music_url           → string|None
+inv.is_preview          → bool
+
+photos                  → list, akses URL via photo_src(p)
+gifts                   → list, fields: bank_name, account_number, account_name,
+                                        ewallet_type, ewallet_number, ewallet_name
+rsvp_list               → list, fields: guest_name, attendance, message, created_at
+photo_src               → fungsi, photo_src(p) → URL string
+site_name               → string
+```
+
+**Filter Jinja2:**
+```
+{{ inv.akad_date | format_date }}  → "Sabtu, 20 Desember 2025"
+{{ value | tojson }}               → JSON safe
+```
+
+**RSVP endpoint:**
+```
+POST /rsvp/{{ inv.id }}
+Body JSON: { name, attendance, message, count }
+Response: { success: true } | { error: string }
+```
+
+---
+
+## CARA KERJA PARALLAX
+
+### scroll-animate.js — engine, TIDAK PERNAH DIUBAH
+- Baca `window.scenes` dari `scenes.js`
+- Tiap scene = satu halaman scroll (100vh)
+- Lookup elemen by `id`, apply transform berdasarkan scroll progress
+- Otomatis append `#lastContainer` ke scene terakhir
+
+### scenes.js — BUAT BARU TIAP TEMA
+```javascript
+window.scenes = [
+  {
+    smoothingFactor: 0.015, // 0.01 = lambat dreamy, 0.025 = dramatis
+    [element_id]: {
+      speed: 1,             // >1 = lebih cepat dari scroll
+      keyframes: [
+        { progress: 0,   x: 0,   y: 0,   scale: 1,   rotate: 0, opacity: 1 },
+        { progress: 0.5, x: 100, y: 50,  scale: 1.5, rotate: 0, opacity: 0.5 },
+        { progress: 1,   x: 200, y: 200, scale: 2,   rotate: 0, opacity: 0 },
+      ]
+    },
+  },
+  // ... total 6 scene
+];
+```
+
+**Aturan:**
+- `progress` 0.0–1.0 per scene
+- `x`, `y` = pixel offset dari posisi CSS awal elemen
+- scenes.js harus punya **tepat 6 scene** (index 0–5)
+- Scene 0 = cover, Scene 1–4 = parallax tengah, Scene 5 = transisi ke lastContainer
+
+### ID elemen WAJIB ada di HTML
+```
+#mobileContainer, #stage, #scrollContainer, #scrollContent, #lastContainer
+
+Layer parallax (class="animated-element"):
+#bg, #arch, #floor, #couple, #tree1, #tree3, #butterfly
+
+Cover (class="animated-element cover"):
+#coverOverlay, #coverFlower1, #coverLogo, #coverText, #guest
+
+Dalam cover:
+#coverInitialPria, #coverSeparator, #coverInitialWanita
+#coverTitle, #coverNames, #coverDate
+#coverSalam, #guestGreeting, #guestName
+#arrowDown, #coverButton, #coverButtonText
+
+Text scene tengah:
+#quotes, #quotesText
+#bride: #brideNickname, #brideFullName, #brideProfile
+#groom: #groomNickname, #groomFullName, #groomProfile
+#events: #eventsSectionTitle, #eventsContainer
+#verse: #verseText, #verseSource
+
+Lain:
+#mp3-player, #music-button
+```
+
+### Posisi layer diatur di CSS (bukan scenes.js)
+```css
+#bg     { inset: -10% 0; width: 100%; height: 120%; object-fit: cover; }
+#arch   { bottom: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+#floor  { bottom: 0; left: 0; width: 100%; }
+#couple { bottom: 55px; left: 50%; margin-left: -35%; width: 70%; }
+#tree1  { width: 130px; bottom: 240px; right: -15px; }
+#tree3  { width: 200px; bottom: 240px; left: -20px; }
+```
+scenes.js hanya tambah transform di atas posisi CSS ini.
+
+---
+
+## STRUKTUR HTML WAJIB
+
+```html
+{% if inv.music_url %}
+<audio id="mp3-player" src="{{ inv.music_url }}" loop preload="none"></audio>
+{% endif %}
+
+<button id="music-button" style="display:none"><!-- SVG ikon --></button>
+
+<div class="mobile-container" id="mobileContainer">
+  <div class="stage" id="stage">
+    <img class="animated-element" id="bg"     src="/static/themes/[nama]/images/bg.webp" alt="">
+    <img class="animated-element" id="arch"   src="..." alt="">
+    <img class="animated-element" id="floor"  src="..." alt="">
+    <img class="animated-element" id="tree3"  src="..." alt="">
+    <img class="animated-element" id="tree1"  src="..." alt="">
+    <img class="animated-element" id="couple" src="" style="display:none" alt="">
+    <div class="animated-element" id="coverOverlay"></div>
+    <img class="animated-element cover" id="coverFlower1" src="..." alt="">
+    <div class="animated-element cover" id="coverLogo">
+      <p id="coverInitialPria"></p>
+      <span id="coverSeparator"></span>
+      <p id="coverInitialWanita"></p>
+    </div>
+    <div class="animated-element cover" id="coverText">
+      <p id="coverTitle"></p><p id="coverNames"></p><p id="coverDate"></p>
+    </div>
+    <div class="animated-element cover" id="guest">
+      <p id="coverSalam"></p>
+      <h2 id="guestGreeting"></h2>
+      <h2 id="guestName"></h2>
+      <div id="arrowDown"></div>
+      <a id="coverButton" role="button"><span id="coverButtonText">Buka Undangan</span></a>
+    </div>
+    <div class="animated-element text-container1" id="quotes"><p id="quotesText"></p></div>
+    <div class="animated-element text-container1" id="bride">
+      <p id="brideNickname"></p><p id="brideFullName"></p><p id="brideProfile"></p>
+    </div>
+    <div class="animated-element text-container1" id="groom">
+      <p id="groomNickname"></p><p id="groomFullName"></p><p id="groomProfile"></p>
+    </div>
+    <div class="animated-element text-container2" id="events">
+      <h2 id="eventsSectionTitle"></h2><div id="eventsContainer"></div>
+    </div>
+    <div class="animated-element text-container3" id="verse">
+      <p id="verseText"></p><p id="verseSource"></p>
+    </div>
+    <div class="animated-element" id="butterfly" style="width:1px;height:1px"></div>
+  </div>
+  <div class="scroll-container" id="scrollContainer">
+    <div class="scroll-content" id="scrollContent"></div>
+  </div>
+</div>
+
+<div id="lastContainer">
+  <!-- countdown, couple, acara, gallery, gift, rsvp, footer -->
+</div>
+
+<!-- URUTAN SCRIPT WAJIB -->
+<script src="/static/themes/[nama-tema]/scenes.js"></script>
+<script src="/static/js/scroll-animate.js"></script>
+<script src="/static/js/music-player.js"></script>
+<script src="/static/js/guest-name.js"></script>
+<script src="/static/js/lazyload-observer.js"></script>
+<script src="/static/js/reanimate-replay.js"></script>
+<script>
+  // Isi semua elemen teks dari Jinja2
+  // Expose window.playMusicV2
+  // Countdown, lightbox gallery, RSVP fetch, copy gift
+</script>
+```
+
+---
+
+## TUGAS SEKARANG
+
+Buatkan tema undangan dengan spesifikasi:
+
+**Nama tema:** [NAMA_TEMA]
+**ID tema:** [nama-tema]
+
+**Visual:**
+- Warna primer: [hex]
+- Warna aksen: [hex]
+- Background page: [hex]
+- Mood: [contoh: dark luxury / fresh botanical / minimalis / vintage]
+
+**Font (Google Fonts):**
+- Display: [nama font]
+- Body: [nama font]
+
+**Layer parallax:**
+- `#bg`: [deskripsi aset]
+- `#arch`: [deskripsi]
+- `#floor`: [deskripsi]
+- `#couple`: [posisi — contoh: center bawah, ukuran 70%]
+- `#tree1` / `#tree3`: [deskripsi atau "tidak dipakai"]
+- `#coverFlower1`: [ornamen cover atas]
+
+**Gaya gerakan:**
+- smoothingFactor: [0.01 / 0.015 / 0.02 / 0.025]
+- Karakter gerakan: [lambat dreamy / dramatis zoom / geser horizontal / campuran]
+
+**Posisi CSS layer (opsional, jelaskan jika mau beda dari default):**
+- [isi jika perlu]
+
+**Sections di lastContainer:**
+- [x] Countdown
+- [x] Profil mempelai
+- [x] Acara akad + resepsi + maps
+- [ ] Love story
+- [x] Gallery
+- [x] Hadiah
+- [x] RSVP & ucapan
+- [x] Footer
+
+---
+
+## RULES WAJIB
+
+1. Output: `[nama].html` + `static/themes/[nama]/scenes.js` + `[nama].json`
+2. `scenes.js` load dari `/static/themes/[nama]/scenes.js` — SEBELUM scroll-animate.js
+3. `scroll-animate.js` selalu dari `/static/js/scroll-animate.js` — jangan copy/ubah
+4. Semua JS shared dari `/static/js/`
+5. CSS tulis sendiri inline di HTML — **jangan pakai arch.bundle.min.css**
+6. Semua ID elemen wajib harus ada persis seperti daftar di atas
+7. Data semua dari Jinja2 — tidak ada hardcode nama/tanggal
+8. RSVP fetch ke `/rsvp/{{ inv.id }}`
+9. Expose `window.playMusicV2` di inline script
+10. CSS variables di `:root` untuk warna & font
+11. Mobile-first, max-width `min(430px, 100vw)`
+12. Countdown pakai `data-target="{{ inv.resepsi_date or inv.akad_date }}"` + hitung via JS
+13. scenes.js tepat 6 scene
+14. Semua class CSS pakai prefix nama tema (contoh: `sr-` untuk senja-raya) — hindari clash dengan Elementor

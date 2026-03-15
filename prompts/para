@@ -1,0 +1,114 @@
+Create a modern interactive website with advanced 3D parallax effects. for my theme in flask project wedding digital invitation. intergate wuth my flask jinja, and also give on footer "Dibuat dengan ❤️ oleh habarkita.com"
+
+Requirements:
+
+Build everything in a single HTML file using:
+
+HTML
+
+CSS
+
+JavaScript
+
+
+Libraries to include:
+
+three.js for 3D scenes and depth effects
+
+GSAP + ScrollTrigger for smooth scroll animations
+
+parallax.js for mouse-based parallax movement
+
+
+Features to implement:
+
+1. HERO SECTION
+
+
+
+A fullscreen hero section with layered elements.
+
+Mouse movement creates parallax depth effect.
+
+Background layers move at different speeds.
+
+
+1. 3D BACKGROUND
+
+
+
+Use three.js to render a subtle 3D scene (particles, floating shapes, or stars).
+
+The scene should react slightly to mouse movement.
+
+
+1. SCROLL-BASED PARALLAX
+
+
+
+Implement scroll-based 3D animation using GSAP ScrollTrigger.
+
+Different layers move at different speeds to create depth.
+
+
+1. DEPTH LAYERS
+
+
+
+At least 4–6 visual layers (background, midground, foreground).
+
+Each layer should have different movement speeds.
+
+
+1. SMOOTH ANIMATIONS
+
+
+
+Use GSAP for smooth transitions.
+
+Add fade, scale, and slide animations when scrolling.
+
+
+1. INTERACTIVE ELEMENTS
+
+
+
+Hover effects on buttons or cards.
+
+Subtle motion effects when moving the mouse.
+
+
+1. DESIGN STYLE
+
+
+
+Modern futuristic design.
+
+Dark theme with gradients or glassmorphism.
+
+Clean typography.
+
+
+1. RESPONSIVE DESIGN
+
+
+
+Must work on desktop and mobile.
+
+Reduce heavy animations on small screens if necessary.
+
+
+1. CODE STRUCTURE
+
+
+
+Everything must be inside one HTML file.
+
+Use CDN links for three.js, GSAP, ScrollTrigger, and parallax.js.
+
+Include clear comments explaining each part of the code.
+
+
+Output: Return only the full working HTML code that can be saved and opened directly in a browser.
+
+contoh cahatapudar.json tu contoh file json fw nya gw mau parallax 3D scroll
