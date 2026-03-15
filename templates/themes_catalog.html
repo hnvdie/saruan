@@ -345,10 +345,66 @@ footer{
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+  FOOTER SNIPPET — ganti <footer>...</footer> yang lama di index.html
+  CSS tambahan: paste ke dalam <style> yang sudah ada
+  ═══════════════════════════════════════ -->
+
+<!-- ── CSS (tambahkan ke dalam <style> yang sudah ada) ── -->
+<style>
+/* FOOTER — ganti style footer yang lama */
+footer{
+  border-top:1px solid var(--border);
+  background:var(--off);
+  padding:1.6rem 1.4rem .9rem;
+}
+.footer-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1.2rem;
+  padding-bottom:1.1rem;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:.85rem;
+}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--ink);}
+.footer-logo span{color:var(--accent);}
+.footer-tagline{font-size:.62rem;color:var(--faint);margin-top:.2rem;letter-spacing:.03em;}
+.footer-links{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;}
+.footer-links a{
+  font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.footer-links a:hover{color:var(--accent);}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.footer-copy{font-size:.6rem;color:var(--faint);letter-spacing:.04em;}
+.footer-wa{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.6rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;
+}
+.footer-wa:hover{color:var(--green);}
+.footer-wa svg{width:13px;height:13px;fill:var(--green);}
+</style>
+
+<!-- ── HTML (ganti <footer>...</footer> yang lama) ── -->
 <footer>
-  <div class="footer-logo no-select">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></div>
-  <div class="footer-copy no-select">&copy; {{ now.year }} {{ site_name }}</div>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">habar<span>kita</span>.com</div>
+      <div class="footer-tagline">Undangan Pernikahan Digital</div>
+    </div>
+    <div class="footer-links">
+      <a href="/legal">Syarat &amp; Ketentuan</a>
+      <a href="/legal?p=privacy">Kebijakan Privasi</a>
+      <a href="/legal?p=refund">Refund</a>
+      <a href="/legal?p=about">Tentang Kami</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
+  </div>
 </footer>
+
 
 <script>
 document.querySelectorAll('img').forEach(img=>{

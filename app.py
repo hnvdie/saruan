@@ -940,6 +940,14 @@ def favicon():
     return send_from_directory('static', 'favicon.ico')
 
 
+@app.route('/legal')
+def legal():
+    return render_template('legal.html', 
+        site_name=SITE_NAME, 
+        wa_number=WA_NUMBER,
+        now=datetime.now()
+    )
+
 # ─── MAIN ────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     init_db()

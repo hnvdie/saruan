@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Legal — habarkita.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#ffffff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;
+  --muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--accent-light:#d6c8be;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.nav-tabs{display:flex;gap:.15rem;flex-wrap:wrap;}
+.nav-tab{padding:.3rem .75rem;border-radius:2px;border:1px solid transparent;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);cursor:pointer;background:none;font-family:var(--sans);transition:all .2s;}
+.nav-tab:hover{color:var(--ink);border-color:var(--border);}
+.nav-tab.active{color:var(--accent);border-color:var(--accent-light);background:var(--off);}
+
+/* HERO */
+.hero{padding:2.8rem 1.4rem 2.2rem;border-bottom:1px solid var(--border);background:var(--off);}
+.hero-label{font-size:.52rem;letter-spacing:.45em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:block;}
+.hero-title{font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.8rem);font-weight:300;line-height:1.1;color:var(--ink);margin-bottom:.5rem;}
+.hero-title em{font-style:italic;color:var(--accent);}
+.hero-meta{font-size:.65rem;color:var(--muted);letter-spacing:.04em;}
+
+/* LAYOUT */
+.legal-wrap{max-width:720px;margin:0 auto;padding:2.8rem 1.4rem 5rem;}
+.page-content{display:none;}
+.page-content.active{display:block;}
+
+/* TOC */
+.toc{border:1px solid var(--border);background:var(--off);padding:1.4rem 1.6rem;margin-bottom:2.5rem;}
+.toc-label{font-size:.52rem;letter-spacing:.4em;text-transform:uppercase;color:var(--faint);margin-bottom:.9rem;display:block;}
+.toc ol{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:.35rem 2rem;}
+.toc li a{font-size:.72rem;color:var(--muted);letter-spacing:.02em;display:flex;align-items:center;gap:.5rem;transition:color .2s;}
+.toc li a:hover{color:var(--accent);}
+.toc li a::before{content:attr(data-num);font-family:var(--serif);font-style:italic;font-size:.85rem;color:var(--faint);min-width:20px;}
+.toc {
+  position: static;  /* tambah ini */
+  /* ... sisanya tetap sama */
+}
+
+/* NOTE */
+.note{border-left:2px solid var(--accent-light);padding:.9rem 1.1rem;background:var(--off);margin-bottom:2rem;font-size:.73rem;color:var(--muted);line-height:1.8;}
+.note strong{display:block;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem;font-weight:500;}
+
+/* SECTION */
+.section{margin-bottom:2.4rem;scroll-margin-top:70px;}
+.section-head{display:flex;align-items:baseline;gap:.8rem;border-bottom:1px solid var(--border2);padding-bottom:.7rem;margin-bottom:1rem;}
+.section-num{font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--faint);min-width:26px;}
+.section-title{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);font-weight:400;}
+.section p,.section li{font-size:.8rem;color:var(--muted);line-height:1.9;margin-bottom:.7rem;}
+.section p:last-child{margin-bottom:0;}
+.section ul,.section ol{padding-left:1.1rem;margin-bottom:.7rem;}
+.section li{margin-bottom:.3rem;}
+.section strong{color:var(--ink2);font-weight:400;}
+.callout{border:1px solid var(--border2);padding:.85rem 1.1rem;font-size:.75rem;color:var(--ink2);line-height:1.8;margin:.9rem 0;font-family:var(--serif);font-style:italic;}
+
+/* TABLE */
+.info-table{width:100%;border-collapse:collapse;margin:.6rem 0;}
+.info-table td{padding:.65rem .5rem;border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--muted);vertical-align:top;}
+.info-table td:first-child{color:var(--ink2);font-weight:400;width:40%;padding-left:0;}
+.info-table tr:last-child td{border-bottom:none;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:1.6rem 1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;background:var(--off);}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--ink);}
+.footer-logo span{color:var(--accent);}
+.footer-links{display:flex;gap:1.2rem;flex-wrap:wrap;}
+.footer-links a{font-size:.62rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;transition:color .2s;}
+.footer-links a:hover{color:var(--accent);}
+.footer-copy{font-size:.62rem;color:var(--faint);letter-spacing:.03em;width:100%;}
+
+@media(max-width:520px){
+  .toc ol{grid-template-columns:1fr;}
+  .nav-tab{padding:.28rem .55rem;font-size:.56rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">habar<span>kita</span>.com</a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="show('tnc',this)">Syarat &amp; Ketentuan</button>
+    <button class="nav-tab" onclick="show('privacy',this)">Kebijakan Privasi</button>
+    <button class="nav-tab" onclick="show('refund',this)">Refund &amp; Bayar</button>
+    <button class="nav-tab" onclick="show('about',this)">Tentang Kami</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <span class="hero-label" id="h-label">Legal</span>
+  <h1 class="hero-title" id="h-title">Syarat &amp; <em>Ketentuan</em></h1>
+  <p class="hero-meta" id="h-meta">Berlaku sejak 1 Januari 2025 · habarkita.com</p>
+</div>
+
+<div class="legal-wrap">
+
+<!-- SYARAT & KETENTUAN -->
+<div class="page-content active" id="page-tnc">
+  <div class="toc">
+    <span class="toc-label">Daftar Isi</span>
+    <ol>
+      <li><a href="#t1" data-num="01">Definisi</a></li>
+      <li><a href="#t2" data-num="02">Penggunaan Layanan</a></li>
+      <li><a href="#t3" data-num="03">Pemesanan &amp; Akun</a></li>
+      <li><a href="#t4" data-num="04">Pembayaran &amp; Harga</a></li>
+      <li><a href="#t5" data-num="05">Konten Pengguna</a></li>
+      <li><a href="#t6" data-num="06">Masa Aktif</a></li>
+      <li><a href="#t7" data-num="07">Hak Kekayaan Intelektual</a></li>
+      <li><a href="#t8" data-num="08">Larangan Penggunaan</a></li>
+      <li><a href="#t9" data-num="09">Batasan Tanggung Jawab</a></li>
+      <li><a href="#t10" data-num="10">Perubahan Layanan</a></li>
+      <li><a href="#t11" data-num="11">Hukum yang Berlaku</a></li>
+      <li><a href="#t12" data-num="12">Kontak</a></li>
+    </ol>
+  </div>
+  <div class="note"><strong>Penting</strong>Dengan menggunakan layanan habarkita.com, Anda dianggap telah membaca, memahami, dan menyetujui seluruh Syarat &amp; Ketentuan ini.</div>
+  <div class="section" id="t1"><div class="section-head"><span class="section-num">01</span><h2 class="section-title">Definisi</h2></div><ul><li><strong>"habarkita.com"</strong> atau <strong>"Kami"</strong> — platform undangan pernikahan digital yang beroperasi di habarkita.com.</li><li><strong>"Pengguna"</strong> atau <strong>"Anda"</strong> — individu yang mengakses atau menggunakan layanan habarkita.com.</li><li><strong>"Layanan"</strong> — seluruh fitur pembuatan, pengelolaan, dan distribusi undangan pernikahan digital di platform kami.</li><li><strong>"Undangan"</strong> — halaman undangan pernikahan digital yang dibuat melalui platform kami.</li><li><strong>"Konten"</strong> — teks, foto, gambar, musik, dan data lain yang diunggah atau dimasukkan Pengguna ke platform kami.</li></ul></div>
+  <div class="section" id="t2"><div class="section-head"><span class="section-num">02</span><h2 class="section-title">Penggunaan Layanan</h2></div><p>habarkita.com menyediakan platform berbasis web untuk membuat undangan pernikahan digital. Layanan ditawarkan dengan syarat penerimaan penuh terhadap seluruh ketentuan dalam dokumen ini. Jika tidak setuju, hentikan penggunaan Layanan kami segera.</p><div class="callout">Layanan habarkita.com diperuntukkan bagi pengguna berusia 17 tahun ke atas, atau yang telah mendapat persetujuan orang tua/wali yang sah.</div></div>
+  <div class="section" id="t3"><div class="section-head"><span class="section-num">03</span><h2 class="section-title">Pemesanan &amp; Akun</h2></div><p>Pembuatan undangan dilakukan melalui admin kami berdasarkan pesanan. Anda bertanggung jawab atas keakuratan seluruh informasi yang diberikan saat memesan — nama pengantin, tanggal, lokasi, dan detail acara. habarkita.com berhak menolak pesanan apabila informasi terbukti tidak benar atau melanggar ketentuan.</p></div>
+  <div class="section" id="t4"><div class="section-head"><span class="section-num">04</span><h2 class="section-title">Pembayaran &amp; Harga</h2></div><p>Harga ditampilkan di halaman paket kami dan dapat berubah sewaktu-waktu. Pembayaran harus dilakukan penuh sebelum undangan aktif. habarkita.com berhak menolak pesanan apabila terjadi kesalahan harga yang tidak disengaja.</p></div>
+  <div class="section" id="t5"><div class="section-head"><span class="section-num">05</span><h2 class="section-title">Konten Pengguna</h2></div><p>Anda menyatakan bahwa seluruh Konten yang diunggah adalah milik Anda atau Anda memiliki izin yang diperlukan. habarkita.com tidak mengklaim kepemilikan atas Konten Anda. Dilarang mengunggah Konten yang melanggar HKI pihak lain, bersifat ilegal, mengandung SARA/pornografi, atau memuat virus dan kode berbahaya.</p></div>
+  <div class="section" id="t6"><div class="section-head"><span class="section-num">06</span><h2 class="section-title">Masa Aktif</h2></div><p>Setiap undangan memiliki masa aktif berdasarkan paket yang dipilih, terhitung sejak tanggal aktivasi. Undangan yang melewati masa aktif dinonaktifkan otomatis. Perpanjangan dapat dilakukan dengan menghubungi tim kami.</p><div class="callout">habarkita.com tidak bertanggung jawab atas hilangnya akses yang disebabkan berakhirnya masa aktif tanpa perpanjangan.</div></div>
+  <div class="section" id="t7"><div class="section-head"><span class="section-num">07</span><h2 class="section-title">Hak Kekayaan Intelektual</h2></div><p>Platform habarkita.com — termasuk desain tema, kode, antarmuka, logo, dan merek dagang — dilindungi hukum hak cipta Indonesia. Anda tidak diperkenankan menyalin, memodifikasi, mendistribusikan, atau mengeksploitasi bagian manapun dari platform tanpa izin tertulis.</p></div>
+  <div class="section" id="t8"><div class="section-head"><span class="section-num">08</span><h2 class="section-title">Larangan Penggunaan</h2></div><p>Dilarang keras menggunakan Layanan untuk menyebarkan informasi palsu; melanggar hukum Indonesia; merusak server kami; mengumpulkan data pengguna lain; menggunakan bot atau scraper; serta membuat undangan berisi konten ilegal atau melanggar norma kesusilaan. Pelanggaran dapat mengakibatkan penghentian Layanan tanpa pengembalian dana.</p></div>
+  <div class="section" id="t9"><div class="section-head"><span class="section-num">09</span><h2 class="section-title">Batasan Tanggung Jawab</h2></div><p>habarkita.com tidak bertanggung jawab atas kerugian tidak langsung atau konsekuensial; gangguan akses akibat faktor di luar kendali kami; kehilangan data akibat kesalahan Pengguna; serta Konten Pengguna yang melanggar hak pihak ketiga. Tanggung jawab maksimal kami tidak melebihi jumlah pembayaran Anda dalam 30 hari terakhir.</p></div>
+  <div class="section" id="t10"><div class="section-head"><span class="section-num">10</span><h2 class="section-title">Perubahan Layanan</h2></div><p>habarkita.com berhak mengubah, memperbarui, atau menghentikan Layanan kapan saja. Syarat &amp; Ketentuan dapat diperbarui; perubahan berlaku sejak tanggal publikasi. Penggunaan Anda setelah perubahan diterbitkan merupakan persetujuan terhadap ketentuan yang diperbarui.</p></div>
+  <div class="section" id="t11"><div class="section-head"><span class="section-num">11</span><h2 class="section-title">Hukum yang Berlaku</h2></div><p>Syarat &amp; Ketentuan ini tunduk pada hukum Republik Indonesia. Sengketa diselesaikan melalui musyawarah; jika tidak tercapai kesepakatan, melalui pengadilan yang berwenang di Indonesia.</p></div>
+  <div class="section" id="t12"><div class="section-head"><span class="section-num">12</span><h2 class="section-title">Kontak</h2></div><table class="info-table"><tr><td>WhatsApp</td><td><a href="https://wa.me/{{ wa_number }}" style="color:var(--accent)">{{ wa_number }}</a></td></tr><tr><td>Email</td><td>habarkita.organizer@gmail.com</td></tr><tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr></table></div>
+</div>
+
+<!-- KEBIJAKAN PRIVASI -->
+<div class="page-content" id="page-privacy">
+  <nav class="toc">
+    <span class="toc-label">Daftar Isi</span>
+    <ol>
+      <li><a href="#p1" data-num="01">Data yang Dikumpulkan</a></li>
+      <li><a href="#p2" data-num="02">Cara Penggunaan Data</a></li>
+      <li><a href="#p3" data-num="03">Penyimpanan Data</a></li>
+      <li><a href="#p4" data-num="04">Pembagian Data</a></li>
+      <li><a href="#p5" data-num="05">Hak Pengguna</a></li>
+      <li><a href="#p6" data-num="06">Keamanan</a></li>
+      <li><a href="#p7" data-num="07">Cookie</a></li>
+      <li><a href="#p8" data-num="08">Perubahan Kebijakan</a></li>
+    </ol>
+  </nav>
+  <div class="note"><strong>Komitmen Kami</strong>habarkita.com berkomitmen melindungi privasi Anda. Kami tidak menjual, menyewakan, atau memperjualbelikan data pribadi Anda kepada pihak ketiga manapun.</div>
+  <div class="section" id="p1"><div class="section-head"><span class="section-num">01</span><h2 class="section-title">Data yang Dikumpulkan</h2></div><p><strong>Data yang Anda berikan langsung:</strong> nama pengantin, tanggal &amp; lokasi acara, foto yang diunggah, info rekening/e-wallet untuk amplop digital, dan nomor WhatsApp untuk komunikasi.</p><p><strong>Data yang dikumpulkan otomatis:</strong> alamat IP pengunjung (untuk pembatasan spam RSVP), data RSVP tamu (nama, kehadiran, jumlah tamu, pesan), dan log akses standar server.</p></div>
+  <div class="section" id="p2"><div class="section-head"><span class="section-num">02</span><h2 class="section-title">Cara Penggunaan Data</h2></div><p>Data digunakan semata-mata untuk mengoperasikan undangan digital Anda; memproses pesanan dan pembayaran; menampilkan informasi undangan kepada tamu; mencegah penyalahgunaan; memberikan dukungan teknis; serta meningkatkan kualitas layanan.</p><div class="callout">Kami tidak menjual, menyewakan, atau memperjualbelikan data pribadi Anda kepada pihak ketiga untuk tujuan komersial apapun.</div></div>
+  <div class="section" id="p3"><div class="section-head"><span class="section-num">03</span><h2 class="section-title">Penyimpanan Data</h2></div><p>Data undangan disimpan selama masa aktif ditambah retensi maksimal 90 hari, setelah itu dapat dihapus permanen. habarkita.com tidak menyimpan data kartu kredit atau informasi sensitif pembayaran — semua diproses oleh payment gateway.</p></div>
+  <div class="section" id="p4"><div class="section-head"><span class="section-num">04</span><h2 class="section-title">Pembagian Data</h2></div><p>habarkita.com tidak membagikan data pribadi Anda kecuali kepada penyedia layanan operasional (Midtrans, hosting) dengan kewajiban kerahasiaan; atas kewajiban hukum atau perintah pengadilan; serta untuk perlindungan hak habarkita.com. Data RSVP tamu dapat diakses pemilik undangan melalui panel admin.</p></div>
+  <div class="section" id="p5"><div class="section-head"><span class="section-num">05</span><h2 class="section-title">Hak Pengguna</h2></div><p>Anda memiliki hak <strong>akses</strong>, <strong>koreksi</strong>, <strong>penghapusan</strong>, dan <strong>portabilitas</strong> atas data pribadi Anda. Hubungi kami melalui WhatsApp atau email untuk menggunakan hak-hak ini.</p></div>
+  <div class="section" id="p6"><div class="section-head"><span class="section-num">06</span><h2 class="section-title">Keamanan</h2></div><p>Langkah keamanan yang kami terapkan: enkripsi transmisi data HTTPS/TLS; autentikasi admin yang aman; rate limiting untuk mencegah brute force dan spam; validasi &amp; sanitasi input untuk mencegah injeksi. Segera hubungi kami jika Anda mencurigai pelanggaran keamanan data Anda.</p></div>
+  <div class="section" id="p7"><div class="section-head"><span class="section-num">07</span><h2 class="section-title">Cookie</h2></div><p>Platform kami menggunakan session cookie untuk operasional panel admin — bersifat sementara, dihapus saat sesi berakhir. Kami tidak menggunakan cookie pelacakan pihak ketiga untuk iklan. Integrasi layanan seperti Google reCAPTCHA menggunakan cookie mereka sendiri sesuai kebijakan privasi masing-masing.</p></div>
+  <div class="section" id="p8"><div class="section-head"><span class="section-num">08</span><h2 class="section-title">Perubahan Kebijakan</h2></div><p>Kebijakan Privasi dapat diperbarui sewaktu-waktu. Perubahan signifikan akan diinformasikan melalui platform kami. Penggunaan Layanan setelah perubahan diterbitkan merupakan persetujuan terhadap kebijakan yang diperbarui.</p></div>
+</div>
+
+<!-- REFUND & PEMBAYARAN -->
+<div class="page-content" id="page-refund">
+  <div class="note"><strong>Catatan</strong>Kebijakan ini dirancang transparan untuk melindungi kepentingan Anda. Harap baca sebelum melakukan pemesanan.</div>
+  <div class="section"><div class="section-head"><span class="section-num">01</span><h2 class="section-title">Metode Pembayaran</h2></div><p>habarkita.com menerima pembayaran melalui Midtrans: transfer bank (BCA, BNI, BRI, Mandiri), Virtual Account, dompet digital (GoPay, OVO, DANA, ShopeePay), kartu kredit/debit Visa &amp; Mastercard, QRIS, dan gerai retail (Alfamart, Indomaret). Seluruh transaksi diproses aman dengan enkripsi SSL/TLS.</p></div>
+  <div class="section"><div class="section-head"><span class="section-num">02</span><h2 class="section-title">Kebijakan Pengembalian Dana</h2></div>
+    <div class="callout">Layanan digital habarkita.com bersifat non-refundable setelah undangan aktif dan dapat diakses. Namun kami menyediakan pengecualian yang wajar.</div>
+    <p><strong>Dapat direfund apabila:</strong></p><ul><li>Undangan belum diaktifkan dalam 3×24 jam setelah pembayaran dan Anda mengajukan pembatalan.</li><li>Terjadi kesalahan teknis pada sistem kami yang tidak dapat diperbaiki dalam 7 hari kerja.</li><li>Terjadi double payment untuk pesanan yang sama.</li></ul>
+    <p><strong>Tidak dapat direfund apabila:</strong></p><ul><li>Undangan sudah aktif dan dapat diakses, meskipun belum digunakan.</li><li>Pengguna berubah pikiran atau tidak jadi menggunakan layanan.</li><li>Kesalahan informasi yang disebabkan Pengguna — tersedia revisi sesuai paket.</li><li>Permintaan diajukan lebih dari 7 hari kalender sejak pembayaran.</li></ul>
+  </div>
+  <div class="section"><div class="section-head"><span class="section-num">03</span><h2 class="section-title">Prosedur Pengajuan Refund</h2></div><ol><li>Hubungi kami via WhatsApp dalam 7 hari kalender sejak pembayaran.</li><li>Sertakan nomor pesanan/bukti bayar, alasan refund, dan info rekening tujuan.</li><li>Tim kami verifikasi dalam 1–3 hari kerja.</li><li>Jika disetujui, dana dikembalikan dalam 5–14 hari kerja.</li></ol></div>
+  <div class="section"><div class="section-head"><span class="section-num">04</span><h2 class="section-title">Revisi Undangan</h2></div><p>Sebagai pengganti refund, kami menyediakan layanan revisi. Perubahan teks dan foto dapat dilakukan sesuai batas revisi paket. Perubahan tema dikenakan biaya tambahan. Revisi diproses dalam 1×24 jam hari kerja.</p></div>
+  <div class="section"><div class="section-head"><span class="section-num">05</span><h2 class="section-title">Keamanan Transaksi</h2></div><p>habarkita.com menggunakan Midtrans (bersertifikasi PCI-DSS, enkripsi 256-bit SSL). Kami tidak pernah meminta informasi sensitif (nomor kartu, PIN, OTP) melalui WhatsApp atau email.</p><div class="callout">Waspada penipuan yang mengatasnamakan habarkita.com. Transaksi resmi hanya melalui link pembayaran dari platform kami.</div></div>
+</div>
+
+<!-- TENTANG KAMI -->
+<div class="page-content" id="page-about">
+  <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Tentang habarkita.com</h2></div><p>habarkita.com adalah platform undangan pernikahan digital yang memungkinkan pasangan membuat dan berbagi undangan elegan secara online. Hadir dengan misi menjadikan momen pernikahan semakin berkesan melalui teknologi digital yang mudah digunakan.</p><p>Dengan beragam tema eksklusif dan fitur interaktif — RSVP digital, amplop digital, galeri foto, countdown timer, dan love story — habarkita.com membantu Anda menyampaikan kabar bahagia kepada keluarga dan sahabat dengan cara yang modern dan berkesan.</p></div>
+  <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Identitas Platform</h2></div><table class="info-table"><tr><td>Nama Platform</td><td>habarkita.com</td></tr><tr><td>Jenis Layanan</td><td>Undangan Pernikahan Digital (SaaS)</td></tr><tr><td>Wilayah Operasional</td><td>Indonesia</td></tr><tr><td>Mata Uang</td><td>Rupiah (IDR)</td></tr><tr><td>Hukum yang Berlaku</td><td>Hukum Republik Indonesia</td></tr></table></div>
+  <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Hubungi Kami</h2></div><table class="info-table"><tr><td>WhatsApp</td><td><a href="https://wa.me/{{ wa_number }}" style="color:var(--accent)">{{ wa_number }}</a></td></tr><tr><td>Email</td><td>habarkita.organizer@gmail.com</td></tr><tr><td>Jam Operasional</td><td>Senin – Sabtu, 08.00 – 20.00 WIB</td></tr><tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr></table></div>
+</div>
+
+</div><!-- /legal-wrap -->
+
+<footer>
+  <div class="footer-logo">habar<span>kita</span>.com</div>
+  <div class="footer-links">
+    <a href="/legal">Syarat &amp; Ketentuan</a>
+    <a href="/legal">Kebijakan Privasi</a>
+    <a href="/legal">Refund</a>
+    <a href="/legal">Tentang Kami</a>
+  </div>
+  <div class="footer-copy">&copy; 2025 habarkita.com — Undangan Pernikahan Digital</div>
+</footer>
+
+<script>
+const hero={
+  tnc:{l:'Legal',t:'Syarat &amp; <em>Ketentuan</em>',m:'Berlaku sejak 1 Januari 2025 · habarkita.com'},
+  privacy:{l:'Legal',t:'Kebijakan <em>Privasi</em>',m:'Berlaku sejak 1 Januari 2025 · habarkita.com'},
+  refund:{l:'Legal',t:'Refund &amp; <em>Pembayaran</em>',m:'Berlaku sejak 1 Januari 2025 · habarkita.com'},
+  about:{l:'Tentang',t:'Tentang <em>Kami</em>',m:'habarkita.com — Undangan Pernikahan Digital'}
+};
+function show(id,btn){
+  document.querySelectorAll('.page-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  const h=hero[id];
+  document.getElementById('h-label').textContent=h.l;
+  document.getElementById('h-title').innerHTML=h.t;
+  document.getElementById('h-meta').textContent=h.m.replace(/&amp;/g,'&');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+</script>
+</body>
+</html>
