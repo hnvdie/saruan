@@ -45,10 +45,10 @@
   "id": "cahayapudar",
   "skeleton": "cahayapudar",
   "assets": {
-    "cover_webp": "static/themes/cahayaputar/cover.webp",
+    "cover_webp": "static/themes/cahayapudar/cover.webp",
     "cover_webp_recommended_size": "1080x1920px, maks 300KB (landscape: 1920x1080px). Format WebP dengan kualitas 80. Gunakan foto prewedding portrait untuk hasil terbaik.",
-    "gsap": "static/themes/cahayaputar/gsap.min.js",
-    "gsap_scroll": "static/themes/cahayaputar/ScrollTrigger.min.js",
+    "gsap": "static/themes/cahayapudar/gsap.min.js",
+    "gsap_scroll": "static/themes/cahayapudar/ScrollTrigger.min.js",
     "gsap_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
     "gsap_scroll_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
   }
