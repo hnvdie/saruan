@@ -360,3 +360,28 @@ cover.jpg = TIDAK DIPERLUKAN — background envelope otomatis pakai photos[0] da
 - Setiap section bisa berdiri sendiri sebagai scene yang indah
 - Test mental: "Kalau gw terima undangan ini, apakah gw terharu dan excited?"
   Kalau jawabannya tidak — desain ulang.
+
+ assets cover.jpg. kalo memerlukan assets-assets floral tl, tr, di bbrpa sisi misalnya dmna dmna gitu. taruh ke static/themes/namatema/here. kasih guidenya nanti itemnya. gw mau animasi untuk assets2 tersebut seperti masuk geser dari kiri ke kanan setiap kali scroll masuk, jdi misalnya tr-floral akan masuk dari kiri ke kanan, sebaliknya. jadi kaya ada animasi tiap assets masuk tiap arahnya. tapi jangan itu terus dimix gaya daun bergoyang santai atas bawah kaya ditiup angin paham? terus juga di bbrpa section misalnya nih assets bunga yang bl, br itu mereka dari tengah lalu terbuka melebar seakan2 dari tengah ketarik jdi terbuka lebar. nah paham ga?
+
+masukan semua animasi untuk assets assetsnya seperti ini nanti
+Animasi yang ada di undangan itu:
+Goyang bunga 1 – rotate kecil kiri kanan
+Goyang bunga 2 – rotate + scale dikit
+Goyang bunga 3 – goyang lebih halus
+Fade in – elemen muncul perlahan
+Muncul dari atas
+Muncul dari bawah
+Muncul dari kiri
+Muncul dari kanan
+Rotate masuk – elemen muncul sambil muter
+Flip horizontal
+Flip vertical
+Zoom in – membesar saat muncul
+Zoom out – mengecil saat muncul
+Parallax scroll – background bergerak saat scroll
+Background zoom pelan – efek zoom slideshow
+Icon spin – ikon musik muter
+Hover scale – tombol sedikit membesar saat disentuh
+difooter juga jangan kasih pesan undangan atau direct wa ,cukup footer dibuat dengan ❤️ oleh habarkita.com
+
+buat setiap tema selalu beda-beda layout nya dan ga monoton harus kreatif, idealis, design yang profesional yang setiap tema dibikin rasanya beda dan selalu menarik buat calon pelanggan. undangan tidak terbuka kalo ga diteken buka undangan jadi gada sistem otomatis terbuka sendiri. sama kalo teks atau button atau gambar dihold gabisa dan ga berwarna biru
