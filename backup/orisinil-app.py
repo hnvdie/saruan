@@ -63,64 +63,6 @@ RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET', '')
 DEMO_PHOTOS_EXTS = {'.jpg','.jpeg','.png','.webp'}
 
 # ─── PASSWORD ────────────────────────────────────────────────────────────────
-# ─── INPUT SANITIZATION ──────────────────────────────────────────────────────
-_TAG_RE = re.compile(r'<[^>]+>')
-_CTRL_RE = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')  # control chars except \t\n\r
-
-def sanitize_text(value: str, maxlen: int = 500) -> str:
-    """Strip semua HTML tags dan control chars dari input teks bebas.
-    Dipakai untuk nama, alamat, venue, love_story, dll."""
-    if not value:
-        return ''
-    v = _TAG_RE.sub('', value)       # buang semua <tag>
-    v = _CTRL_RE.sub('', v)          # buang control chars
-    return v.strip()[:maxlen]
-
-def sanitize_name(value: str, maxlen: int = 100) -> str:
-    """Nama orang/tempat — boleh huruf, angka, spasi, tanda baca umum."""
-    v = sanitize_text(value, maxlen)
-    # Buang karakter yang tidak lazim di nama tapi bisa dipakai untuk injeksi
-    v = re.sub(r'[<>"\'`]', '', v)
-    return v.strip()[:maxlen]
-
-def sanitize_url(value: str, maxlen: int = 500) -> str:
-    """URL — hanya izinkan http/https, buang apapun yang lain."""
-    v = (value or '').strip()[:maxlen]
-    if v and not re.match(r'^https?://', v):
-        return ''
-    return v
-
-def html_escape(value: str) -> str:
-    """Escape untuk inject ke HTML string (bukan Jinja2 context)."""
-    return (value
-        .replace('&', '&amp;')
-        .replace('<', '&lt;')
-        .replace('>', '&gt;')
-        .replace('"', '&quot;')
-        .replace("'", '&#x27;'))
-
-def _clean_inv_form(f) -> dict:
-    """Sanitize semua field teks dari form invitation — return dict siap pakai."""
-    return {
-        'groom_name':      sanitize_name(f.get('groom_name',''), 100),
-        'bride_name':      sanitize_name(f.get('bride_name',''), 100),
-        'groom_full':      sanitize_name(f.get('groom_full',''), 200),
-        'bride_full':      sanitize_name(f.get('bride_full',''), 200),
-        'groom_parents':   sanitize_text(f.get('groom_parents',''), 300),
-        'bride_parents':   sanitize_text(f.get('bride_parents',''), 300),
-        'akad_venue':      sanitize_name(f.get('akad_venue',''), 200),
-        'akad_address':    sanitize_text(f.get('akad_address',''), 500),
-        'resepsi_venue':   sanitize_name(f.get('resepsi_venue',''), 200),
-        'resepsi_address': sanitize_text(f.get('resepsi_address',''), 500),
-        'maps_url':        sanitize_url(f.get('maps_url',''), 500),
-        'love_story':      sanitize_text(f.get('love_story',''), 2000),
-        'music_url':       sanitize_url(f.get('music_url',''), 500),
-        'akad_date':       re.sub(r'[^0-9-]','', f.get('akad_date',''))[:10],
-        'akad_time':       re.sub(r'[^0-9:]','', f.get('akad_time',''))[:5],
-        'resepsi_date':    re.sub(r'[^0-9-]','', f.get('resepsi_date',''))[:10],
-        'resepsi_time':    re.sub(r'[^0-9:]','', f.get('resepsi_time',''))[:5],
-    }
-
 def hash_pw(password: str, salt: str = _SALT) -> str:
     dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 260000)
     return f'pbkdf2:sha256:260000${salt}${dk.hex()}'
@@ -474,16 +416,16 @@ def theme_preview(theme_id):
 # ─── OG TAGS INJECTOR ───────────────────────────────────────────────────────
 def _build_og_tags(inv: dict, theme: dict, photos: list, site_name: str) -> str:
     """Build OG/Twitter meta tags dinamis dari data undangan — disuntik ke <head> tiap tema."""
-    groom = html_escape(inv.get('groom_name', ''))
-    bride = html_escape(inv.get('bride_name', ''))
-    slug  = re.sub(r'[^a-z0-9-]', '', inv.get('slug', ''))
-    url   = f'https://{html_escape(site_name)}/i/{slug}'
+    groom = inv.get('groom_name', '')
+    bride = inv.get('bride_name', '')
+    slug  = inv.get('slug', '')
+    url   = f'https://{site_name}/i/{slug}'
 
     # ── Title natural — tanpa nama tema ──────────────────────────
     # Format: "Undangan Pernikahan Rizky & Alya — 12 April 2026"
     resepsi_date = inv.get('resepsi_date', '')
     akad_date    = inv.get('akad_date', '')
-    venue        = html_escape(inv.get('resepsi_venue', '') or inv.get('akad_venue', ''))
+    venue        = inv.get('resepsi_venue', '') or inv.get('akad_venue', '')
     tgl = ''
     tgl_pendek = ''
     try:
@@ -727,8 +669,7 @@ def admin_create():
             exp = (rd + timedelta(days=365)).strftime('%Y-%m-%d')
         except:
             exp = f.get('expires_at') or (datetime.now()+timedelta(days=365)).strftime('%Y-%m-%d')
-        maps_embed = extract_maps_embed_src(sanitize_url(f.get('maps_url','')))
-        c = _clean_inv_form(f)
+        maps_embed = f.get('maps_embed','').strip() or extract_maps_embed_src(f.get('maps_url',''))
         conn = get_db()
         try:
             conn.execute('''INSERT INTO invitations
@@ -738,14 +679,13 @@ def admin_create():
                  resepsi_date,resepsi_time,resepsi_venue,resepsi_address,
                  maps_url,maps_embed,love_story,music_url,expires_at)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                (iid, slug, re.sub(r'[^a-z0-9_-]','',f.get('theme_id','').lower())[:50],
-                 c['groom_name'], c['bride_name'],
-                 c['groom_full'], c['bride_full'],
-                 c['groom_parents'], c['bride_parents'],
+                (iid,slug,f['theme_id'],f['groom_name'],f['bride_name'],
+                 f.get('groom_full'),f.get('bride_full'),
+                 f.get('groom_parents'),f.get('bride_parents'),
                  1 if f.get('show_parents') else 0,
-                 c['akad_date'], c['akad_time'], c['akad_venue'], c['akad_address'],
-                 c['resepsi_date'], c['resepsi_time'], c['resepsi_venue'], c['resepsi_address'],
-                 c['maps_url'], maps_embed, c['love_story'], c['music_url'], exp))
+                 f.get('akad_date'),f.get('akad_time'),f.get('akad_venue'),f.get('akad_address'),
+                 f.get('resepsi_date'),f.get('resepsi_time'),f.get('resepsi_venue'),f.get('resepsi_address'),
+                 f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),exp))
             conn.commit()
             _save_photos(conn, iid, request.files, f)
             _save_gifts(conn, iid, f)
@@ -773,8 +713,7 @@ def admin_edit(inv_id):
     photos = get_inv_photos(conn, inv_id)
     if request.method == 'POST':
         f = request.form
-        c = _clean_inv_form(f)
-        maps_embed = extract_maps_embed_src(c['maps_url'])
+        maps_embed = f.get('maps_embed','').strip() or extract_maps_embed_src(f.get('maps_url',''))
         try:
             conn.execute('''UPDATE invitations SET
                 theme_id=?,groom_name=?,bride_name=?,groom_full=?,bride_full=?,
@@ -783,15 +722,14 @@ def admin_edit(inv_id):
                 resepsi_date=?,resepsi_time=?,resepsi_venue=?,resepsi_address=?,
                 maps_url=?,maps_embed=?,love_story=?,music_url=?,expires_at=?,
                 updated_at=CURRENT_TIMESTAMP WHERE id=?''',
-                (re.sub(r'[^a-z0-9_-]','',f.get('theme_id','').lower())[:50],
-                 c['groom_name'], c['bride_name'],
-                 c['groom_full'], c['bride_full'],
-                 c['groom_parents'], c['bride_parents'],
+                (f['theme_id'],f['groom_name'],f['bride_name'],
+                 f.get('groom_full'),f.get('bride_full'),
+                 f.get('groom_parents'),f.get('bride_parents'),
                  1 if f.get('show_parents') else 0,
-                 c['akad_date'], c['akad_time'], c['akad_venue'], c['akad_address'],
-                 c['resepsi_date'], c['resepsi_time'], c['resepsi_venue'], c['resepsi_address'],
-                 c['maps_url'], maps_embed, c['love_story'], c['music_url'],
-                 re.sub(r'[^0-9-]','',f.get('expires_at',''))[:10], inv_id))
+                 f.get('akad_date'),f.get('akad_time'),f.get('akad_venue'),f.get('akad_address'),
+                 f.get('resepsi_date'),f.get('resepsi_time'),f.get('resepsi_venue'),f.get('resepsi_address'),
+                 f.get('maps_url'),maps_embed,f.get('love_story'),f.get('music_url'),
+                 f.get('expires_at'),inv_id))
             conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
             _save_gifts(conn, inv_id, f)
             conn.commit()
@@ -953,17 +891,17 @@ def _save_gifts(conn, inv_id: str, form):
     for i in range(MAX_GIFTS):
         gtype = form.get(f'gift_{i}_type', 'bank')
         if gtype == 'ewallet':
-            ewallet_type   = sanitize_name(form.get(f'gift_{i}_ewallet_type') or '', 30)
-            ewallet_number = re.sub(r'[^0-9+\-]', '', form.get(f'gift_{i}_ewallet_number') or '')[:30]
-            ewallet_name   = sanitize_name(form.get(f'gift_{i}_ewallet_name') or '', 100)
+            ewallet_type   = (form.get(f'gift_{i}_ewallet_type') or '').strip()
+            ewallet_number = (form.get(f'gift_{i}_ewallet_number') or '').strip()
+            ewallet_name   = (form.get(f'gift_{i}_ewallet_name') or '').strip()
             if ewallet_type and ewallet_number:
                 conn.execute(
                     'INSERT INTO gifts(invitation_id,ewallet_type,ewallet_number,ewallet_name) VALUES(?,?,?,?)',
                     (inv_id, ewallet_type, ewallet_number, ewallet_name))
         else:
-            bank_name      = sanitize_name(form.get(f'gift_{i}_bank_name') or '', 50)
-            account_number = re.sub(r'[^0-9\-]', '', form.get(f'gift_{i}_account_number') or '')[:30]
-            account_name   = sanitize_name(form.get(f'gift_{i}_account_name') or '', 100)
+            bank_name      = (form.get(f'gift_{i}_bank_name') or '').strip()
+            account_number = (form.get(f'gift_{i}_account_number') or '').strip()
+            account_name   = (form.get(f'gift_{i}_account_name') or '').strip()
             if bank_name and account_number:
                 conn.execute(
                     'INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
@@ -997,567 +935,10 @@ def _save_photos(conn, inv_id, files, form):
         saved += 1
 
 #other
-
-# ─── USER SELF-SERVICE ROUTES (v4 addition) ──────────────────────────────────
-EXPIRY_DAYS_AFTER_EVENT = 3
-MAX_EVENT_YEARS_AHEAD   = 1
-
-def _ensure_user_columns():
-    """Add user-facing columns to invitations table if not exist."""
-    conn = get_db()
-    new_cols = [
-        'user_username TEXT',
-        'user_pw_hash TEXT',
-        'payment_status TEXT DEFAULT paid',
-        'payment_order_id TEXT',
-        'payment_amount INTEGER DEFAULT 0',
-        'event_date_locked INTEGER DEFAULT 0',
-    ]
-    for col in new_cols:
-        try: conn.execute(f'ALTER TABLE invitations ADD COLUMN {col}')
-        except: pass
-    # orders table
-    conn.execute('''CREATE TABLE IF NOT EXISTS orders (
-        id TEXT PRIMARY KEY,
-        invitation_id TEXT,
-        theme_id TEXT,
-        groom_name TEXT, bride_name TEXT, resepsi_date TEXT,
-        amount INTEGER DEFAULT 0,
-        status TEXT DEFAULT pending,
-        snap_token TEXT,
-        customer_name TEXT, customer_email TEXT, customer_phone TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        paid_at TEXT,
-        FOREIGN KEY (invitation_id) REFERENCES invitations(id)
-    )''')
-    conn.commit(); conn.close()
-
-_ensure_user_columns()
-
-def hash_user_pw(password: str) -> str:
-    salt = secrets.token_hex(16)
-    dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 260000)
-    return f'pbkdf2:sha256:260000${salt}${dk.hex()}'
-
-def check_user_pw(password: str, stored: str) -> bool:
-    try:
-        _, _, rest = stored.split(':', 2)
-        salt = rest.split('$')[1]
-        dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 260000)
-        candidate = f'pbkdf2:sha256:260000${salt}${dk.hex()}'
-        return hmac.compare_digest(candidate, stored)
-    except: return False
-
-def calc_expiry(event_date_str: str) -> str:
-    try:
-        ed = datetime.strptime(event_date_str, '%Y-%m-%d')
-        exp = ed + timedelta(days=EXPIRY_DAYS_AFTER_EVENT)
-        max_exp = datetime.now() + timedelta(days=MAX_EVENT_YEARS_AHEAD * 365 + EXPIRY_DAYS_AFTER_EVENT)
-        if exp > max_exp: exp = max_exp
-        if exp < datetime.now() + timedelta(days=1): exp = datetime.now() + timedelta(days=1)
-        return exp.strftime('%Y-%m-%d')
-    except:
-        return (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
-
-def user_login_required(f):
-    @wraps(f)
-    def dec(*a, **kw):
-        if not session.get('user_inv_id'):
-            return redirect(url_for('user_login'))
-        return f(*a, **kw)
-    return dec
-
-# ── /order ────────────────────────────────────────────────────────────────────
-@app.route('/order', methods=['GET', 'POST'])
-def create_order():
-    themes = get_all_themes()
-    theme_id = request.args.get('theme', '') or ''
-    selected_theme = get_theme(theme_id) if theme_id else None
-
-    if request.method == 'GET':
-        return render_template('order.html',
-            themes=themes, selected_theme=selected_theme,
-            theme_id=theme_id, form=None, errors=None)
-
-    # POST — validate
-    f = request.form
-    ip = request.remote_addr
-    if is_rate_limited(ip):
-        return render_template('order.html', themes=themes, selected_theme=selected_theme,
-            theme_id=theme_id, form=f, errors=['Terlalu banyak percobaan. Tunggu beberapa menit.'])
-    record_attempt(ip)
-
-    cust_name  = (f.get('customer_name','') or '').strip()[:100]
-    cust_email = (f.get('customer_email','') or '').strip()[:200]
-    cust_phone = re.sub(r'[^0-9+]', '', f.get('customer_phone','') or '')[:20]
-    groom_name = sanitize_name(f.get('groom_name',''), 100)
-    bride_name = sanitize_name(f.get('bride_name',''), 100)
-    tid        = re.sub(r'[^a-z0-9_-]', '', (f.get('theme_id','') or '').lower())[:50]
-    resepsi_date = f.get('resepsi_date','').strip()
-    username   = re.sub(r'[^a-z0-9]', '', (f.get('username','') or '').lower())[:30]
-    password   = f.get('password','') or ''
-    password2  = f.get('password2','') or ''
-
-    errors = []
-    if not groom_name:  errors.append('Nama mempelai pria wajib diisi.')
-    if not bride_name:  errors.append('Nama mempelai wanita wajib diisi.')
-    if not tid:         errors.append('Pilih tema terlebih dahulu.')
-    if not resepsi_date: errors.append('Tanggal acara wajib diisi.')
-    if not username or len(username) < 3: errors.append('Username minimal 3 karakter (huruf kecil & angka).')
-    if len(password) < 8: errors.append('Password minimal 8 karakter.')
-    if password != password2: errors.append('Konfirmasi password tidak cocok.')
-
-    # Cek username sudah dipakai
-    if not errors and username:
-        conn = get_db()
-        existing = conn.execute('SELECT id FROM invitations WHERE user_username=?', (username,)).fetchone()
-        conn.close()
-        if existing:
-            errors.append(f'Username "{username}" sudah dipakai. Pilih username lain.')
-
-    # Validasi tanggal
-    if not errors and resepsi_date:
-        try:
-            rd = datetime.strptime(resepsi_date, '%Y-%m-%d')
-            max_d = datetime.now() + timedelta(days=MAX_EVENT_YEARS_AHEAD * 365)
-            if rd < datetime.now():
-                errors.append('Tanggal acara tidak boleh di masa lalu.')
-            elif rd > max_d:
-                errors.append(f'Tanggal acara maksimal 1 tahun ke depan ({max_d.strftime("%d/%m/%Y")}).')
-        except:
-            errors.append('Format tanggal acara tidak valid.')
-
-    if errors:
-        tid2 = tid or ''
-        return render_template('order.html', themes=themes,
-            selected_theme=get_theme(tid2) if tid2 else None,
-            theme_id=tid2, errors=errors, form=f)
-
-    theme = get_theme(tid)
-    if not theme:
-        return render_template('order.html', themes=themes, selected_theme=None,
-            theme_id=tid, errors=['Tema tidak ditemukan.'], form=f)
-
-    amount = int(theme.get('price', 0) or 0)
-    inv_id   = uuid.uuid4().hex[:10]
-    order_id = f'INV-{inv_id.upper()}-{int(time.time())}'
-    raw_slug = f'{groom_name.lower()}-{bride_name.lower()}-{uuid.uuid4().hex[:4]}'
-    slug = re.sub(r'[^a-z0-9-]', '-', raw_slug.replace(' ','-'))[:80].strip('-')
-    expires = calc_expiry(resepsi_date)
-    pw_hash = hash_user_pw(password)
-
-    conn = get_db()
-    try:
-        # Untuk order berbayar: simpan di orders dulu, invitations BELUM dibuat.
-        # Invitations baru dibuat setelah payment confirmed (di /order/setup atau webhook).
-        # Untuk gratis: langsung buat invitations + orders sekaligus.
-        if amount > 0:
-            # Pastikan kolom ada (safe migration, jalankan sekali)
-            for col in ('user_username TEXT', 'user_pw_hash TEXT', 'slug TEXT'):
-                try: conn.execute(f'ALTER TABLE orders ADD COLUMN {col}')
-                except: pass
-            conn.execute('''INSERT INTO orders
-                (id, invitation_id, theme_id, groom_name, bride_name, resepsi_date,
-                 amount, status, customer_name, customer_email, customer_phone,
-                 snap_token, user_username, user_pw_hash, slug)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                (order_id, None, tid, groom_name, bride_name, resepsi_date,
-                 amount, 'pending',
-                 '', '', cust_phone, '',
-                 username, pw_hash, slug))
-        else:
-            # Gratis — langsung buat invitation + order
-            conn.execute('''INSERT INTO invitations
-                (id, slug, theme_id, groom_name, bride_name, resepsi_date, expires_at,
-                 is_active, payment_status, payment_order_id, payment_amount,
-                 user_username, user_pw_hash)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                (inv_id, slug, tid, groom_name, bride_name, resepsi_date, expires,
-                 1, 'paid', order_id, 0, username, pw_hash))
-            conn.execute('''INSERT INTO orders
-                (id, invitation_id, theme_id, groom_name, bride_name, resepsi_date,
-                 amount, status, customer_name, customer_email, customer_phone)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
-                (order_id, inv_id, tid, groom_name, bride_name, resepsi_date,
-                 0, 'paid', '', '', cust_phone))
-        conn.commit()
-    except Exception as e:
-        conn.close()
-        return render_template('order.html', themes=themes, selected_theme=theme,
-            theme_id=tid, errors=[f'Terjadi kesalahan: {e}'], form=f)
-    conn.close()
-
-    # Jika gratis — langsung aktif, redirect ke dashboard
-    if amount == 0:
-        session['user_inv_id'] = inv_id
-        return redirect(url_for('user_dashboard'))
-
-    # Midtrans
-    MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY', '')
-    if not MIDTRANS_SERVER_KEY:
-        # Dev mode — auto-activate tanpa payment
-        conn = get_db()
-        real_inv_id = _create_invitation_from_order(conn, order_id)
-        conn.commit(); conn.close()
-        if real_inv_id:
-            session['user_inv_id'] = real_inv_id
-            return redirect(url_for('order_setup', order_id=order_id))
-        return redirect(url_for('user_login'))
-
-    # Buat Snap token
-    import urllib.request as _ureq
-    import json as _json
-    import base64 as _b64
-    MIDTRANS_IS_PROD = os.environ.get('MIDTRANS_IS_PROD','false').lower() == 'true'
-    base_url = 'https://app.midtrans.com' if MIDTRANS_IS_PROD else 'https://app.sandbox.midtrans.com'
-    auth = _b64.b64encode(f'{MIDTRANS_SERVER_KEY}:'.encode()).decode()
-    payload = {
-        'transaction_details': {'order_id': order_id, 'gross_amount': amount},
-        'item_details': [{'id': tid, 'price': amount, 'quantity': 1, 'name': f'Undangan {theme["name"]}'[:50]}],
-        'customer_details': {'first_name': f'{groom_name} & {bride_name}'[:50], 'phone': cust_phone or ''},
-        'enabled_payments': ['gopay','shopeepay','qris','other_qris','bank_transfer','bca_va','bni_va','bri_va','permata_va','cimb_va'],
-    }
-    try:
-        req = _ureq.Request(f'{base_url}/snap/v1/transactions',
-            data=_json.dumps(payload).encode(),
-            headers={'Content-Type':'application/json','Authorization':f'Basic {auth}'},
-            method='POST')
-        resp = _ureq.urlopen(req, timeout=15)
-        snap_data = _json.loads(resp.read())
-        snap_token = snap_data.get('token','')
-        conn = get_db()
-        conn.execute('UPDATE orders SET snap_token=? WHERE id=?', (snap_token, order_id))
-        conn.commit(); conn.close()
-    except Exception as e:
-        snap_token = ''
-
-    MIDTRANS_CLIENT_KEY = os.environ.get('MIDTRANS_CLIENT_KEY','')
-    return render_template('payment.html',
-        order_id=order_id, inv_id=inv_id, snap_token=snap_token,
-        amount=amount, theme=theme,
-        groom_name=groom_name, bride_name=bride_name,
-        midtrans_client_key=MIDTRANS_CLIENT_KEY,
-        midtrans_is_prod=MIDTRANS_IS_PROD)
-
-# ── Helper: create invitation setelah payment confirmed ───────────────────────
-def _create_invitation_from_order(conn, order_id: str):
-    """Buat invitation dari data order — dipanggil saat payment sukses. Idempotent."""
-    order = conn.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
-    if not order: return None
-    order = dict(order)
-
-    # Idempotent: kalau invitation_id sudah ada dan invitation sudah ada di DB, skip
-    existing_inv_id = order.get('invitation_id')
-    if existing_inv_id:
-        already = conn.execute('SELECT id FROM invitations WHERE id=?', (existing_inv_id,)).fetchone()
-        if already: return existing_inv_id
-
-    inv_id   = existing_inv_id or uuid.uuid4().hex[:10]
-    slug     = order.get('slug') or re.sub(r'[^a-z0-9-]', '-',
-        f'{(order["groom_name"] or "").lower()}-{(order["bride_name"] or "").lower()}-{uuid.uuid4().hex[:4]}'.replace(' ','-'))[:80].strip('-')
-    expires  = calc_expiry(order.get('resepsi_date',''))
-
-    conn.execute('''INSERT OR IGNORE INTO invitations
-        (id, slug, theme_id, groom_name, bride_name, resepsi_date, expires_at,
-         is_active, payment_status, payment_order_id, payment_amount,
-         user_username, user_pw_hash)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-        (inv_id, slug, order['theme_id'],
-         order['groom_name'], order['bride_name'], order.get('resepsi_date',''), expires,
-         1, 'paid', order_id, order['amount'],
-         order.get('user_username'), order.get('user_pw_hash')))
-    conn.execute('UPDATE orders SET invitation_id=?, status="paid", paid_at=COALESCE(paid_at, CURRENT_TIMESTAMP) WHERE id=?',
-        (inv_id, order_id))
-    return inv_id
-
-# ── /payment/notification ─────────────────────────────────────────────────────
-@app.route('/payment/notification', methods=['POST'])
-def payment_notification():
-    import json as _json, hashlib as _hash
-    data = request.get_json(silent=True) or {}
-    order_id = data.get('order_id','')
-    status   = data.get('transaction_status','')
-    fraud    = data.get('fraud_status','')
-    MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY','')
-    # Signature check
-    sig_input = data.get('order_id','') + data.get('status_code','') + data.get('gross_amount','') + MIDTRANS_SERVER_KEY
-    expected = _hash.sha512(sig_input.encode()).hexdigest()
-    if not hmac.compare_digest(expected, data.get('signature_key','')):
-        return jsonify({'error':'invalid signature'}), 403
-    if status in ('capture','settlement') and fraud in ('accept',''):
-        conn = get_db()
-        _create_invitation_from_order(conn, order_id)
-        conn.commit()
-        conn.close()
-    return jsonify({'status':'ok'})
-
-# ── /payment/check ────────────────────────────────────────────────────────────
-@app.route('/payment/check/<order_id>')
-def payment_check(order_id):
-    conn = get_db()
-    order = conn.execute('SELECT status, invitation_id FROM orders WHERE id=?', (order_id,)).fetchone()
-    conn.close()
-    if not order: return jsonify({'status':'not_found'})
-    return jsonify({'status': order['status'], 'inv_id': order['invitation_id']})
-
-# ── /payment/activate (setelah Snap callback) ─────────────────────────────────
-@app.route('/payment/activate/<order_id>')
-def payment_activate(order_id):
-    conn = get_db()
-    order = conn.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
-    if order and order['status'] == 'paid':
-        inv_id = order['invitation_id']
-        conn.close()
-        session['user_inv_id'] = inv_id
-        return redirect(url_for('order_setup', order_id=order_id))
-    conn.close()
-    return redirect(url_for('user_login'))
-
-# ── /order/setup (setelah payment berhasil) ───────────────────────────────────
-@app.route('/order/setup/<order_id>')
-def order_setup(order_id):
-    conn = get_db()
-    order = conn.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
-    if not order:
-        conn.close()
-        return redirect(url_for('user_login'))
-    order = dict(order)
-
-    # Kalau status belum paid, coba buat invitation dulu (mungkin webhook sudah masuk
-    # tapi order_setup dibuka sebelum status di-update — atau Snap onSuccess lebih cepat)
-    if order['status'] != 'paid':
-        # Cek sekali lagi langsung ke Midtrans jika ada server key (sandbox delay)
-        MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY', '')
-        paid_via_midtrans = False
-        if MIDTRANS_SERVER_KEY:
-            try:
-                import urllib.request as _ureq, base64 as _b64, json as _json
-                MIDTRANS_IS_PROD = os.environ.get('MIDTRANS_IS_PROD','false').lower()=='true'
-                base_url = 'https://api.midtrans.com' if MIDTRANS_IS_PROD else 'https://api.sandbox.midtrans.com'
-                auth = _b64.b64encode(f'{MIDTRANS_SERVER_KEY}:'.encode()).decode()
-                req = _ureq.Request(f'{base_url}/v2/{order_id}/status',
-                    headers={'Authorization': f'Basic {auth}'})
-                resp = _json.loads(_ureq.urlopen(req, timeout=8).read())
-                tx_status = resp.get('transaction_status','')
-                fraud = resp.get('fraud_status','')
-                if tx_status in ('capture','settlement') and fraud in ('accept',''):
-                    paid_via_midtrans = True
-            except:
-                pass
-
-        if not paid_via_midtrans:
-            conn.close()
-            # Tampilkan halaman tunggu dengan auto-poll
-            return render_template('order_setup.html', order=order, status='pending')
-
-    # Buat invitation (idempotent)
-    inv_id = _create_invitation_from_order(conn, order_id)
-    conn.commit()
-    conn.close()
-
-    if inv_id:
-        session['user_inv_id'] = inv_id
-        return redirect(url_for('user_dashboard'))
-
-    return redirect(url_for('user_login'))
-
-# ── /login (user) ─────────────────────────────────────────────────────────────
-@app.route('/login', methods=['GET', 'POST'])
-def user_login():
-    if session.get('user_inv_id'):
-        return redirect(url_for('user_dashboard'))
-    error = None
-    if request.method == 'POST':
-        ip = request.remote_addr
-        if is_rate_limited(ip):
-            error = 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.'
-            return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
-        record_attempt(ip)
-
-        # reCAPTCHA verify (if enabled)
-        if RECAPTCHA_SECRET and RECAPTCHA_KEY:
-            token = request.form.get('g-recaptcha-response', '')
-            if not _verify_recaptcha(token):
-                error = 'Verifikasi reCAPTCHA gagal.'
-                return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
-
-        uname = re.sub(r'[^a-z0-9]', '', (request.form.get('username','') or '').lower())
-        pw    = request.form.get('password','') or ''
-        conn  = get_db()
-        row   = conn.execute('SELECT id, user_pw_hash, payment_status FROM invitations WHERE user_username=?', (uname,)).fetchone()
-        conn.close()
-        if row and row['user_pw_hash'] and check_user_pw(pw, row['user_pw_hash']):
-            if row['payment_status'] != 'paid':
-                error = 'Pembayaran belum dikonfirmasi. Hubungi admin jika sudah bayar.'
-            else:
-                session['user_inv_id'] = row['id']
-                return redirect(url_for('user_dashboard'))
-        else:
-            error = 'Username atau password salah.'
-    return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
-
-@app.route('/logout')
-def user_logout():
-    session.pop('user_inv_id', None)
-    return redirect(url_for('user_login'))
-
-# ── /dashboard ────────────────────────────────────────────────────────────────
-@app.route('/dashboard')
-@user_login_required
-def user_dashboard():
-    inv_id = session['user_inv_id']
-    conn = get_db()
-    inv = conn.execute('SELECT * FROM invitations WHERE id=?', (inv_id,)).fetchone()
-    rsvp_count = conn.execute('SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?', (inv_id,)).fetchone()['c']
-    conn.close()
-    if not inv: session.pop('user_inv_id',None); return redirect(url_for('user_login'))
-    theme = get_theme(inv['theme_id']) or {'name': inv['theme_id']}
-    expired = is_expired(inv)
-    return render_template('user_dashboard.html', inv=inv, theme=theme,
-                           rsvp_count=rsvp_count, expired=expired)
-
-# ── /dashboard/edit ───────────────────────────────────────────────────────────
-@app.route('/dashboard/edit', methods=['GET', 'POST'])
-@user_login_required
-def user_edit():
-    inv_id = session['user_inv_id']
-    conn = get_db()
-    inv  = conn.execute('SELECT * FROM invitations WHERE id=?', (inv_id,)).fetchone()
-    photos = get_inv_photos(conn, inv_id)
-    gifts  = conn.execute('SELECT * FROM gifts WHERE invitation_id=?', (inv_id,)).fetchall()
-    conn.close()
-    if not inv: return redirect(url_for('user_login'))
-    themes  = get_all_themes()
-    expired = is_expired(inv)
-    errors  = []
-
-    if request.method == 'POST':
-        f = request.form
-        c = _clean_inv_form(f)
-        tid = inv['theme_id']  # tema dikunci
-        groom_name = c['groom_name']
-        bride_name = c['bride_name']
-        if not groom_name: errors.append('Nama mempelai pria wajib diisi.')
-        if not bride_name: errors.append('Nama mempelai wanita wajib diisi.')
-
-        resepsi_date = inv['resepsi_date']
-        if not expired:
-            rd = c['resepsi_date']
-            if rd:
-                try:
-                    rdt = datetime.strptime(rd, '%Y-%m-%d')
-                    max_d = datetime.now() + timedelta(days=MAX_EVENT_YEARS_AHEAD * 365)
-                    if rdt < datetime.now():
-                        errors.append('Tanggal acara tidak boleh di masa lalu.')
-                    elif rdt > max_d:
-                        errors.append('Tanggal acara maksimal 1 tahun ke depan.')
-                    else:
-                        resepsi_date = rd
-                except:
-                    errors.append('Format tanggal tidak valid.')
-
-        if not errors:
-            conn = get_db()
-            conn.execute('''UPDATE invitations SET
-                theme_id=?, groom_name=?, bride_name=?,
-                groom_full=?, bride_full=?, groom_parents=?, bride_parents=?,
-                show_parents=?,
-                akad_date=?, akad_time=?, akad_venue=?, akad_address=?,
-                resepsi_date=?, resepsi_time=?, resepsi_venue=?, resepsi_address=?,
-                maps_url=?, maps_embed=?, love_story=?, music_url=?,
-                expires_at=?, updated_at=CURRENT_TIMESTAMP
-                WHERE id=?''', (
-                tid,
-                groom_name, bride_name,
-                c['groom_full'], c['bride_full'],
-                c['groom_parents'], c['bride_parents'],
-                1 if f.get('show_parents') else 0,
-                c['akad_date'], c['akad_time'],
-                c['akad_venue'], c['akad_address'],
-                resepsi_date, c['resepsi_time'],
-                c['resepsi_venue'], c['resepsi_address'],
-                c['maps_url'],
-                extract_maps_embed_src(c['maps_url']),
-                c['love_story'],
-                c['music_url'],
-                calc_expiry(resepsi_date),
-                inv_id))
-            # Gifts
-            conn.execute('DELETE FROM gifts WHERE invitation_id=?', (inv_id,))
-            for i in range(4):
-                gtype = f.get(f'gift_{i}_type','bank')
-                if gtype == 'ewallet':
-                    ew_type = f.get(f'gift_{i}_ewallet_type','')
-                    ew_num  = f.get(f'gift_{i}_ewallet_number','')[:50]
-                    ew_name = f.get(f'gift_{i}_ewallet_name','')[:100]
-                    if ew_num:
-                        conn.execute('INSERT INTO gifts(invitation_id,ewallet_type,ewallet_number,ewallet_name) VALUES(?,?,?,?)',
-                            (inv_id, ew_type, ew_num, ew_name))
-                else:
-                    bank = f.get(f'gift_{i}_bank_name','')[:50]
-                    acc  = f.get(f'gift_{i}_account_number','')[:50]
-                    name = f.get(f'gift_{i}_account_name','')[:100]
-                    if acc:
-                        conn.execute('INSERT INTO gifts(invitation_id,bank_name,account_number,account_name) VALUES(?,?,?,?)',
-                            (inv_id, bank, acc, name))
-            _save_photos(conn, inv_id, request.files, f)
-            # Portrait
-            for key in ('groom_photo','bride_photo'):
-                ff = request.files.get(key)
-                if ff and ff.filename:
-                    _save_portrait(conn, inv_id, key, ff)
-                elif f.get(f'clear_{key}'):
-                    conn.execute(f'UPDATE invitations SET {key}=NULL WHERE id=?', (inv_id,))
-            conn.commit(); conn.close()
-            return redirect(url_for('user_dashboard') + '?saved=1')
-
-    inv2 = dict(inv) if not errors else {**dict(inv), **dict(request.form)}
-    return render_template('user_edit.html', inv=inv, photos=photos, gifts=gifts,
-                           themes=themes, expired=expired, errors=errors, form=request.form if errors else {})
-
-# ── /dashboard/photo/delete ───────────────────────────────────────────────────
-@app.route('/dashboard/photo/delete/<int:pid>', methods=['POST'])
-@user_login_required
-def user_delete_photo(pid):
-    inv_id = session['user_inv_id']
-    conn = get_db()
-    photo = conn.execute('SELECT * FROM invitation_photos WHERE id=? AND invitation_id=?', (pid, inv_id)).fetchone()
-    if photo:
-        delete_photo_file(photo)
-        conn.execute('DELETE FROM invitation_photos WHERE id=?', (pid,))
-        conn.commit()
-    conn.close()
-    return jsonify({'success': True})
-
-# ── /dashboard/change-password ────────────────────────────────────────────────
-@app.route('/dashboard/change-password', methods=['POST'])
-@user_login_required
-def user_change_password():
-    inv_id = session['user_inv_id']
-    old_pw = request.form.get('old_password','')
-    new_pw = request.form.get('new_password','')
-    new_pw2= request.form.get('new_password2','')
-    conn = get_db()
-    inv = conn.execute('SELECT user_pw_hash FROM invitations WHERE id=?', (inv_id,)).fetchone()
-    error = None
-    if not inv or not inv['user_pw_hash']:
-        error = 'Data tidak ditemukan.'
-    elif not check_user_pw(old_pw, inv['user_pw_hash']):
-        error = 'Password lama salah.'
-    elif len(new_pw) < 6:
-        error = 'Password baru minimal 6 karakter.'
-    elif new_pw != new_pw2:
-        error = 'Konfirmasi password tidak cocok.'
-    if error:
-        conn.close()
-        return redirect(url_for('user_dashboard') + '?pw_error=' + error)
-    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE id=?', (hash_user_pw(new_pw), inv_id))
-    conn.commit(); conn.close()
-    return redirect(url_for('user_dashboard') + '?pw_ok=1')
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory('static', 'favicon.ico')
+
 
 @app.route('/legal')
 def legal():
@@ -1566,7 +947,6 @@ def legal():
         wa_number=WA_NUMBER,
         now=datetime.now()
     )
-
 
 # ─── MAIN ────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':

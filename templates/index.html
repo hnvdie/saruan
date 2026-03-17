@@ -6,7 +6,7 @@
 
 {# ── SEO ── #}
 <title>{{ site_name }} — Bikin Undangan Digital Pernikahan Cepat &amp; Mudah</title>
-<meta name="description" content="Bikin Undangan digital pernikahan kamu  elegan dengan {{ themes|length }}+ tema eksklusif dari habarkita, animasi unik, RSVP otomatis, galeri foto, dan countdown timer. Siap dalam 24 jam. Mulai dari Rp 25.000.">
+<meta name="description" content="Bikin Undangan digital pernikahan kamu  elegan dengan {{ themes|length }}+ tema eksklusif dari habarkita, animasi unik, RSVP otomatis, galeri foto, dan countdown timer. Siap dalam hitungan menit. Mulai dari Rp 25.000.">
 <meta name="keywords" content="undangan digital pernikahan, undangan online nikah, undangan pernikahan online, undangan digital murah, undangan nikah digital, undangan web pernikahan, {{ site_name }}">
 <meta name="author" content="{{ site_name }}">
 <meta name="robots" content="index, follow">
@@ -17,7 +17,7 @@
 <meta property="og:url"         content="https://{{ site_name }}/">
 <meta property="og:site_name"   content="{{ site_name }}">
 <meta property="og:title"       content="{{ site_name }} — Undangan Digital Pernikahan Elegan">
-<meta property="og:description" content="{{ themes|length }}+ tema eksklusif dengan animasi unik. RSVP otomatis, galeri foto, countdown timer. Siap 24 jam. Mulai Rp 25.000.">
+<meta property="og:description" content="{{ themes|length }}+ tema eksklusif dengan animasi unik. RSVP otomatis, galeri foto, countdown timer. Siap dalam hitungan menit. Mulai Rp 25.000.">
 <meta property="og:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
 <meta property="og:image:width"  content="1200">
 <meta property="og:image:height" content="630">
@@ -41,7 +41,7 @@
   "@type": "LocalBusiness",
   "name": "{{ site_name }}",
   "url": "https://{{ site_name }}",
-  "description": "Undangan digital pernikahan elegan dengan {{ themes|length }}+ tema eksklusif, animasi unik, RSVP otomatis, dan galeri foto. Siap dalam 24 jam.",
+  "description": "Undangan digital pernikahan elegan dengan {{ themes|length }}+ tema eksklusif, animasi unik, RSVP otomatis, dan galeri foto. Siap dalam hitungan menit.",
   "image": "https://{{ site_name }}/static/themes/banner.jpg",
   "priceRange": "Rp 25.000 - Rp 100.000",
   "contactPoint": {
@@ -274,8 +274,9 @@ footer{
 <nav>
   <a href="/" class="nav-logo">habar<span>kita</span>.com</a>
   <div class="nav-right">
-    <a href="/themes" class="nav-link">Katalog Tema</a>
-    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo, saya mau tanya tentang undangan digital' | urlencode }}" target="_blank" class="nav-cta">Hubungi Kami</a>
+        <a href="/themes" class="nav-link">Katalog Tema</a>
+    <a href="/login" class="nav-cta">Login Dashboard</a>
+
   </div>
 </nav>
 
@@ -284,30 +285,31 @@ footer{
   <img src="/static/themes/banner.jpg" alt="{{ site_name }} — Undangan Digital Pernikahan Elegan" loading="eager" fetchpriority="high">
 </div>
 -->
+
 <section id="hero">
   <span class="hero-label no-select">Digital Wedding Invitation</span>
   <h1 class="hero-title no-select">Undangan Pernikahan yang<br><em>Selalu Dikenang</em></h1>
-  <p class="hero-sub no-select">Ceritakan kisah cinta kalian dengan undangan digital elegan. Animasi unik, RSVP otomatis, galeri foto — siap dalam 24 jam.</p>
-  <div class="hero-actions">
-    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo! Saya mau pesan undangan digital. Boleh tanya-tanya dulu?' | urlencode }}" target="_blank" class="btn-primary">Buat Undangan Sekarang</a>
+  <p class="hero-sub no-select">Ceritakan kisah cinta kalian dengan undangan digital elegan. Animasi unik, RSVP otomatis, galeri foto — siap dalam hitungan menit.</p>
+  <div class="hero-actions">                                                                                                                                                    <a href="/order" class="btn-primary">Buat Undangan Sekarang</a>
     <a href="/themes" class="btn-secondary">Lihat Semua Tema &rarr;</a>
   </div>
 </section>
 
+
 <div class="stats">
   <div class="stat no-select"><div class="stat-num">{{ themes|length }}+</div><div class="stat-lbl">Tema Eksklusif</div></div>
-  <div class="stat no-select"><div class="stat-num">24h</div><div class="stat-lbl">Pengerjaan</div></div>
+  <div class="stat no-select"><div class="stat-num">1 Mnt</div><div class="stat-lbl">Pengerjaan</div></div>
   <div class="stat no-select"><div class="stat-num">1 Thn</div><div class="stat-lbl">Masa Aktif</div></div>
   <div class="stat no-select"><div class="stat-num">&infin;</div><div class="stat-lbl">Tamu Undangan</div></div>
 </div>
+
 
 
 {# ═══════════════════════════════════════════════════════════════
    FEATURED THEMES — Edit list `featured_ids`
    e.g: ['abadi', 'abyssal-tide', 'bersahaja', 'blue-sky']
    ═══════════════════════════════════════════════════════════════ #}
-{%- set featured_ids = [
-  'cahayapudar',
+{%- set featured_ids = [                                                                                                                                                      'cahayapudar',
   'splashroman',
   'bloompetal',
   'memory',
@@ -322,8 +324,7 @@ footer{
 {# Build lookup map: id -> theme dict #}
 {%- set theme_map = namespace(d={}) -%}
 {%- for t in themes -%}
-  {%- set tid = t.get('id','') -%}
-  {%- if tid -%}
+  {%- set tid = t.get('id','') -%}                                                                                                                                            {%- if tid -%}
     {%- set _ = theme_map.d.update({tid: t}) -%}
   {%- endif -%}
 {%- endfor -%}
@@ -381,7 +382,7 @@ footer{
         {%- endif -%}
         <div class="tc-btns">
           <a href="/preview/{{ tid }}" target="_blank" class="tc-btn-demo">Demo</a>
-          <a href="https://wa.me/{{ wa_number }}?text={{ ('Halo! Saya tertarik tema *' + tname + '*. Info harga & cara pesan?') | urlencode }}" target="_blank" class="tc-btn-order">Pesan</a>
+          <a href="/order?theme={{ tid }}" class="tc-btn-order">Pesan</a>
         </div>
       </div>
     </div>
@@ -417,17 +418,18 @@ footer{
   <div class="steps">
     <div class="step reveal"><div class="step-num no-select">01</div><h4>Pilih Tema</h4><p>Browse katalog, lihat demo langsung, pilih yang paling pas.</p></div>
     <div class="step reveal"><div class="step-num no-select">02</div><h4>Kirim Data</h4><p>Kirim data pernikahan dan foto prewed via WhatsApp.</p></div>
-    <div class="step reveal"><div class="step-num no-select">03</div><h4>Selesai 24 Jam</h4><p>Undangan siap. Link langsung bisa disebar ke semua tamu.</p></div>
+    <div class="step reveal"><div class="step-num no-select">03</div><h4>Selesai hitungan menit</h4><p>Undangan siap. Link langsung bisa disebar ke semua tamu.</p></div>
     <div class="step reveal"><div class="step-num no-select">04</div><h4>Pantau RSVP</h4><p>Tamu konfirmasi kehadiran — bisa dipantau real-time.</p></div>
   </div>
 </section>
 
+
+
 <section id="cta">
   <h2 class="reveal no-select">Siap Bikin Undangan<br><em>Impianmu?</em></h2>
   <p class="reveal">Konsultasi gratis — kami bantu pilih tema yang paling cocok.</p>
-  <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo! Saya mau konsultasi dan pesan undangan digital' | urlencode }}" target="_blank" class="btn-primary reveal">Chat WhatsApp Sekarang</a>
+  <a href="/order" class="btn-primary reveal">Buat Undangan Sekarang</a>
 </section>
-
 
 <style>
 /* FOOTER — ganti style footer yang lama */

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Pembayaran — {{ site_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--border:#e5e2db;--ink:#181818;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--green:#25d366;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.content{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1.4rem;}
+.pay-card{max-width:420px;width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.pay-head{padding:1.3rem 1.4rem;background:var(--off);border-bottom:1px solid var(--border);}
+.pay-label{font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem;}
+.pay-title{font-family:var(--serif);font-size:1.4rem;font-weight:300;}
+.pay-title em{font-style:italic;color:var(--accent);}
+.pay-body{padding:1.3rem 1.4rem;}
+.pay-summary{margin-bottom:1.2rem;}
+.ps-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.72rem;}
+.ps-row:last-child{border-bottom:none;}
+.ps-label{color:var(--muted);}
+.ps-val{font-weight:400;}
+.ps-total .ps-label{color:var(--ink);font-weight:400;}
+.ps-total .ps-val{font-family:var(--serif);font-size:1.1rem;color:var(--accent);}
+.btn-pay{width:100%;padding:.72rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-bottom:.7rem;}
+.btn-pay:hover{opacity:.82;}
+.pay-methods{display:flex;align-items:center;gap:.32rem;flex-wrap:wrap;justify-content:center;margin-bottom:.75rem;}
+.pm-tag{padding:.18rem .42rem;border:1px solid var(--border);border-radius:2px;font-size:.52rem;color:var(--muted);}
+.status-area{text-align:center;padding:.65rem;background:var(--off);border-radius:2px;font-size:.7rem;color:var(--muted);display:none;}
+.status-area.visible{display:block;}
+.status-area.paid{color:#2d8a4e;background:#f0faf4;}
+.status-spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--faint);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:.4rem;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+</nav>
+<div class="content">
+  <div class="pay-card">
+    <div class="pay-head">
+      <span class="pay-label">Langkah Terakhir</span>
+      <div class="pay-title">Selesaikan <em>Pembayaran</em></div>
+    </div>
+    <div class="pay-body">
+      <div class="pay-summary">
+        <div class="ps-row"><span class="ps-label">Tema</span><span class="ps-val">{{ theme.name }}</span></div>
+        <div class="ps-row"><span class="ps-label">Mempelai</span><span class="ps-val">{{ groom_name }} &amp; {{ bride_name }}</span></div>
+        <div class="ps-row ps-total"><span class="ps-label">Total</span><span class="ps-val">Rp {{ '{:,}'.format(amount).replace(',','.') }}</span></div>
+      </div>
+      <div class="pay-methods">
+        <span class="pm-tag">GoPay</span>
+        <span class="pm-tag">QRIS</span>
+        <span class="pm-tag">ShopeePay</span>
+        <span class="pm-tag">Transfer Bank</span>
+      </div>
+      <button class="btn-pay" id="btnPay" onclick="openSnap()">Bayar Sekarang</button>
+      <div class="status-area" id="statusArea">
+        <span class="status-spinner" id="statusSpinner"></span>
+        <span id="statusText">Menunggu pembayaran...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'https://app.midtrans.com/snap/snap.js' if midtrans_is_prod else 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+  data-client-key="{{ midtrans_client_key }}"></script>
+<script>
+const SNAP_TOKEN = '{{ snap_token }}';
+const ORDER_ID   = '{{ order_id }}';
+const SETUP_URL  = '/order/setup/{{ order_id }}';
+let pollInterval = null;
+let redirecting  = false;
+
+function goToSetup(){
+  if(redirecting) return;
+  redirecting = true;
+  clearPoll();
+  const sa = document.getElementById('statusArea');
+  sa.classList.add('visible','paid');
+  document.getElementById('statusSpinner').style.display='none';
+  document.getElementById('statusText').textContent='✓ Pembayaran berhasil! Mengalihkan...';
+  setTimeout(()=>{ window.location.href = SETUP_URL; }, 1200);
+}
+
+function openSnap(){
+  if(!SNAP_TOKEN){ goToSetup(); return; }
+  document.getElementById('statusArea').classList.add('visible');
+  document.getElementById('statusText').textContent='Menunggu pembayaran...';
+  window.snap.pay(SNAP_TOKEN, {
+    onSuccess: function(){ goToSetup(); },
+    onPending: function(){ startPolling(); },
+    onError:   function(){ document.getElementById('statusText').textContent='Pembayaran gagal. Coba lagi.'; },
+    onClose:   function(){ startPolling(); },
+  });
+}
+
+function startPolling(){
+  if(pollInterval) return;
+  document.getElementById('statusArea').classList.add('visible');
+  pollInterval = setInterval(checkStatus, 3000);
+}
+function clearPoll(){ if(pollInterval){ clearInterval(pollInterval); pollInterval=null; } }
+
+function checkStatus(){
+  fetch('/payment/check/'+ORDER_ID)
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.status==='paid'){ goToSetup(); }
+      else if(['deny','expire','cancel'].includes(data.status)){
+        clearPoll();
+        document.getElementById('statusSpinner').style.display='none';
+        document.getElementById('statusText').textContent='Pembayaran tidak berhasil. Silakan ulangi.';
+      }
+    }).catch(()=>{});
+}
+
+// Auto-open Snap saat halaman load + cek status dulu
+window.addEventListener('load',()=>{
+  checkStatus();
+  if(SNAP_TOKEN){ setTimeout(openSnap, 800); }
+});
+</script>
+</body>
+</html>

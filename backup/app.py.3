@@ -1215,7 +1215,7 @@ def create_order():
         'transaction_details': {'order_id': order_id, 'gross_amount': amount},
         'item_details': [{'id': tid, 'price': amount, 'quantity': 1, 'name': f'Undangan {theme["name"]}'[:50]}],
         'customer_details': {'first_name': f'{groom_name} & {bride_name}'[:50], 'phone': cust_phone or ''},
-        'enabled_payments': ['gopay','shopeepay','qris','other_qris','bank_transfer','bca_va','bni_va','bri_va','permata_va','cimb_va'],
+        'enabled_payments': ['gopay','shopeepay','qris','bank_transfer','bca_va','bni_va','bri_va','permata_va','cimb_va'],
     }
     try:
         req = _ureq.Request(f'{base_url}/snap/v1/transactions',
@@ -1368,19 +1368,6 @@ def user_login():
         return redirect(url_for('user_dashboard'))
     error = None
     if request.method == 'POST':
-        ip = request.remote_addr
-        if is_rate_limited(ip):
-            error = 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.'
-            return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
-        record_attempt(ip)
-
-        # reCAPTCHA verify (if enabled)
-        if RECAPTCHA_SECRET and RECAPTCHA_KEY:
-            token = request.form.get('g-recaptcha-response', '')
-            if not _verify_recaptcha(token):
-                error = 'Verifikasi reCAPTCHA gagal.'
-                return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
-
         uname = re.sub(r'[^a-z0-9]', '', (request.form.get('username','') or '').lower())
         pw    = request.form.get('password','') or ''
         conn  = get_db()
@@ -1394,7 +1381,7 @@ def user_login():
                 return redirect(url_for('user_dashboard'))
         else:
             error = 'Username atau password salah.'
-    return render_template('user_login.html', error=error, recaptcha_key=RECAPTCHA_KEY)
+    return render_template('user_login.html', error=error)
 
 @app.route('/logout')
 def user_logout():

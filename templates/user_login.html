@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Login Dashboard — {{ site_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--off2:#f2f0ec;--border:#e5e2db;--ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--red:#c0392b;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.nav-home{font-size:.67rem;color:var(--muted);transition:color .2s;}
+.nav-home:hover{color:var(--ink);}
+.content{flex:1;display:flex;align-items:center;justify-content:center;padding:2.5rem 1.4rem;}
+.login-card{width:100%;max-width:360px;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.card-head{padding:1.4rem 1.5rem 1rem;background:var(--off);border-bottom:1px solid var(--border);}
+.card-label{font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem;}
+.card-title{font-family:var(--serif);font-size:1.45rem;font-weight:300;}
+.card-title em{font-style:italic;color:var(--accent);}
+.card-body{padding:1.3rem 1.5rem 1.5rem;}
+.error-msg{background:#fff5f5;border:1px solid #f5c6c6;border-radius:2px;padding:.6rem .85rem;margin-bottom:.85rem;font-size:.7rem;color:var(--red);line-height:1.6;}
+.form-group{margin-bottom:.75rem;}
+label{display:block;font-size:.65rem;color:var(--ink2);letter-spacing:.03em;margin-bottom:.25rem;}
+input[type=text],input[type=password]{
+  width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:2px;
+  font-family:var(--sans);font-size:.8rem;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;
+}
+input:focus{border-color:var(--accent);}
+input::placeholder{color:var(--faint);}
+.btn{width:100%;padding:.65rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-top:.35rem;}
+.btn:hover{opacity:.82;}
+.card-footer{padding:.75rem 1.5rem;border-top:1px solid var(--border);font-size:.63rem;color:var(--muted);text-align:center;line-height:1.7;}
+.card-footer a{color:var(--accent);transition:opacity .2s;}
+.card-footer a:hover{opacity:.75;}
+</style>
+{% if recaptcha_key %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+  <a href="/" class="nav-home">&larr; Beranda</a>
+</nav>
+<div class="content">
+  <div class="login-card">
+    <div class="card-head">
+      <span class="card-label">Akses Dashboard</span>
+      <div class="card-title">Login <em>Undanganmu</em></div>
+    </div>
+    <div class="card-body">
+      {% if error %}
+      <div class="error-msg">{{ error }}</div>
+      {% endif %}
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="username kamu" required autocomplete="username" autofocus>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        {% if recaptcha_key %}
+        <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}" style="margin-bottom:.6rem;transform:scale(.88);transform-origin:0 0;"></div>
+        {% endif %}
+        <button type="submit" class="btn">Masuk Dashboard</button>
+      </form>
+    </div>
+    <div class="card-footer">
+      Belum punya undangan? <a href="/themes">Pilih tema &amp; pesan</a><br>
+      Lupa password? Hubungi admin untuk reset.
+    </div>
+  </div>
+</div>
+</body>
+</html>

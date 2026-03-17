@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Memproses Pembayaran — {{ site_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--border:#e5e2db;--ink:#181818;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--green:#2d8a4e;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.content{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 1.4rem;}
+.card{max-width:420px;width:100%;text-align:center;}
+.icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1.3rem;}
+.icon.waiting{background:var(--off);border:1px solid var(--border);animation:pulse 1.8s ease-in-out infinite;}
+.icon.ok{background:#f0faf4;border:1px solid #b9dfc8;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--faint);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.label{font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.5rem;}
+.title{font-family:var(--serif);font-size:clamp(1.4rem,4vw,1.9rem);font-weight:300;margin-bottom:.4rem;}
+.title em{font-style:italic;color:var(--accent);}
+.sub{font-size:.72rem;color:var(--muted);line-height:1.8;margin-bottom:1.3rem;}
+.info-box{background:var(--off);border:1px solid var(--border);border-radius:3px;padding:.8rem 1rem;margin-bottom:1.1rem;text-align:left;}
+.info-row{display:flex;gap:.5rem;padding:.18rem 0;font-size:.7rem;}
+.info-row .lbl{color:var(--muted);min-width:80px;}
+.status-msg{font-size:.7rem;color:var(--muted);margin-bottom:.6rem;min-height:1.4em;}
+.btn{display:block;width:100%;padding:.72rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;text-decoration:none;text-align:center;}
+.btn:hover{opacity:.82;}
+.note{font-size:.61rem;color:var(--muted);margin-top:.6rem;line-height:1.6;}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+</nav>
+<div class="content">
+  <div class="card">
+    {% if status == 'pending' %}
+    <div class="icon waiting">⏳</div>
+    <span class="label">Mohon Tunggu</span>
+    <h1 class="title">Mengkonfirmasi <em>Pembayaran</em></h1>
+    <p class="sub">Sistem sedang memverifikasi pembayaranmu. Biasanya selesai dalam beberapa detik.</p>
+    <div class="info-box">
+      <div class="info-row"><span class="lbl">Order ID</span><span>{{ order.get('id','') }}</span></div>
+      <div class="info-row"><span class="lbl">Mempelai</span><span>{{ order.get('groom_name','') }} &amp; {{ order.get('bride_name','') }}</span></div>
+    </div>
+    <p class="status-msg" id="statusMsg"><span class="spinner"></span>Menunggu konfirmasi...</p>
+    <script>
+    const ORDER_ID = '{{ order.get("id","") }}';
+    let attempts = 0;
+    function poll(){
+      attempts++;
+      fetch('/payment/check/'+ORDER_ID)
+        .then(r=>r.json())
+        .then(d=>{
+          if(d.status==='paid'){
+            document.getElementById('statusMsg').textContent='✓ Terkonfirmasi! Mengalihkan...';
+            setTimeout(()=>window.location.reload(),800);
+          } else if(attempts>40){
+            document.getElementById('statusMsg').innerHTML='Belum terkonfirmasi. <a href="/login" style="color:var(--accent)">Login manual</a> atau hubungi admin.';
+          }
+        }).catch(()=>{});
+    }
+    setInterval(poll,3000);
+    poll();
+    </script>
+    {% else %}
+    <div class="icon ok">✓</div>
+    <span class="label">Pesanan Dikonfirmasi</span>
+    <h1 class="title">Pembayaran <em>Berhasil!</em></h1>
+    <p class="sub">Undangan untuk {{ order.get('groom_name','') }} &amp; {{ order.get('bride_name','') }} sudah aktif.</p>
+    <div class="info-box">
+      <div class="info-row"><span class="lbl">Order ID</span><span>{{ order.get('id','') }}</span></div>
+      <div class="info-row"><span class="lbl">Status</span><span style="color:var(--green);">✓ Lunas</span></div>
+    </div>
+    <a href="/dashboard" class="btn">Masuk Dashboard &rarr;</a>
+    <p class="note">Login kembali kapan saja di <strong>/login</strong> pakai username &amp; password yang kamu buat tadi.</p>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

@@ -54,6 +54,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
+
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.68rem 1.5rem;background:var(--green);color:#fff;
+  border-radius:2px;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;transition:opacity .2s;
+}
+.btn-primary:hover{opacity:.88;} 
+
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
 .no-select{-webkit-user-select:none;user-select:none;}
@@ -226,12 +234,22 @@ nav{
 .cta-strip h3{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2rem);font-weight:300;margin-bottom:.5rem;}
 .cta-strip h3 em{font-style:italic;color:var(--accent);}
 .cta-strip p{font-size:.74rem;color:var(--muted);max-width:280px;margin:0 auto 1.3rem;line-height:1.85;}
+
+
+/* CTA */
+#cta{padding:3rem 1.4rem;text-align:center;background:var(--off);border-bottom:1px solid var(--border);}
+#cta h2{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2.2rem);font-weight:300;margin-bottom:.45rem;}
+#cta h2 em{font-style:italic;color:var(--accent);}
+#cta p{font-size:.75rem;color:var(--muted);max-width:290px;margin:0 auto 1.4rem;line-height:1.9;}
+
+
 .btn-wa{
   display:inline-flex;align-items:center;gap:.4rem;
   padding:.7rem 1.6rem;background:var(--green);color:#fff;
   border-radius:2px;font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;transition:opacity .2s;
 }
 .btn-wa:hover{opacity:.88;}
+
 
 /* FOOTER */
 footer{
@@ -241,6 +259,9 @@ footer{
 .footer-logo{font-family:var(--serif);font-style:italic;font-size:.88rem;}
 .footer-logo span{color:var(--accent);}
 .footer-copy{font-size:.58rem;color:var(--faint);letter-spacing:.04em;}
+
+
+
 
 /* RESPONSIVE */
 @media(max-width:800px){.themes-grid{grid-template-columns:repeat(3,1fr);}}
@@ -257,7 +278,7 @@ footer{
   <a href="/" class="nav-logo no-select">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
   <div class="nav-right">
     <a href="/" class="nav-link">&larr; Beranda</a>
-    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo, mau tanya tentang undangan digital' | urlencode }}" target="_blank" class="nav-cta">Hubungi Kami</a>
+    <a href="/login" class="nav-cta">Login Dashboard</a>
   </div>
 </nav>
 
@@ -322,7 +343,7 @@ footer{
         <div class="tc-tags no-select">{% for t in theme.get('tags',['tema'])[:4] %}<span class="tc-tag">{{ t }}</span>{% endfor %}</div>
         <div class="tc-btns">
           <a href="/preview/{{ tid }}" target="_blank" class="tc-demo">Demo</a>
-          <a href="https://wa.me/{{ wa_number }}?text={{ ('Halo! Saya tertarik tema *' + tname + '*. Info harga & cara pesan?') | urlencode }}" target="_blank" class="tc-order">Pesan</a>
+          <a href="/order?theme={{ tid }}" class="tc-order">Pesan</a>
         </div>
       </div>
     </div>
@@ -334,23 +355,28 @@ footer{
     </div>
   </div>
 
-  <!-- PAGINATION -->
-  <div class="pg-info" id="pgInfo"></div>
-  <div class="pagination" id="pagination"></div>
+</div> <!-- themes-grid -->
 
-  <div class="cta-strip">
-    <h3>Ada Tema <em>Favorit?</em></h3>
-    <p>Hubungi kami via WhatsApp. Undangan siap dalam 24 jam.</p>
-    <a href="https://wa.me/{{ wa_number }}?text={{ 'Halo! Saya mau pesan undangan digital.' | urlencode }}" target="_blank" class="btn-wa">Pesan Sekarang</a>
-  </div>
+<!-- PAGINATION -->
+<div class="pg-info" id="pgInfo"></div>
+<div class="pagination" id="pagination"></div>
+
 </div>
+<br>
 
-<!-- ═══════════════════════════════════════
-  FOOTER SNIPPET — ganti <footer>...</footer> yang lama di index.html
-  CSS tambahan: paste ke dalam <style> yang sudah ada
-  ═══════════════════════════════════════ -->
+<section id="cta">
+  <h2 class="reveal no-select">
+    Siap Bikin Undangan<br><em>Impianmu?</em>
+  </h2>
+  <p class="reveal">
+    Konsultasi gratis — kami bantu pilih tema yang paling cocok.
+  </p>
+  <a href="/order" class="btn-primary reveal">
+    Buat Undangan Sekarang
+  </a>
+</section>
 
-<!-- ── CSS (tambahkan ke dalam <style> yang sudah ada) ── -->
+
 <style>
 /* FOOTER — ganti style footer yang lama */
 footer{
@@ -358,10 +384,8 @@ footer{
   background:var(--off);
   padding:1.6rem 1.4rem .9rem;
 }
-.footer-top{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  flex-wrap:wrap;gap:1.2rem;
-  padding-bottom:1.1rem;
+.footer-top{                                                                                                                                            display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1.2rem;                                                                                                                            padding-bottom:1.1rem;
   border-bottom:1px solid var(--border2);
   margin-bottom:.85rem;
 }
@@ -371,12 +395,10 @@ footer{
 .footer-links{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;}
 .footer-links a{
   font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--muted);transition:color .2s;
-}
+  color:var(--muted);transition:color .2s;                                                                                                            }
 .footer-links a:hover{color:var(--accent);}
 .footer-bottom{
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
-}
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;                                                             }
 .footer-copy{font-size:.6rem;color:var(--faint);letter-spacing:.04em;}
 .footer-wa{
   display:inline-flex;align-items:center;gap:.35rem;
@@ -386,7 +408,6 @@ footer{
 .footer-wa svg{width:13px;height:13px;fill:var(--green);}
 </style>
 
-<!-- ── HTML (ganti <footer>...</footer> yang lama) ── -->
 <footer>
   <div class="footer-top">
     <div>
@@ -400,10 +421,13 @@ footer{
       <a href="/legal?p=about">Tentang Kami</a>
     </div>
   </div>
+
   <div class="footer-bottom">
     <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
   </div>
-</footer>
+</footer> <!-- ✅ INI YANG KURANG -->
+
+
 
 
 <script>
