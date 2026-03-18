@@ -1384,45 +1384,9 @@ def payment_page(order_id):
 @app.route('/payment/check/<order_id>')
 def payment_check(order_id):
     conn = get_db()
-    order = conn.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
-    if not order:
-        conn.close()
-        return jsonify({'status': 'not_found'})
-    order = dict(order)
-
-    # Sudah paid di DB — langsung return
-    if order['status'] == 'paid':
-        conn.close()
-        return jsonify({'status': 'paid', 'inv_id': order['invitation_id']})
-
-    # Masih pending — tanya langsung ke Midtrans API
-    MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY', '')
-    if MIDTRANS_SERVER_KEY:
-        try:
-            import urllib.request as _ureq, base64 as _b64, json as _json
-            MIDTRANS_IS_PROD = os.environ.get('MIDTRANS_IS_PROD', 'false').lower() == 'true'
-            base_url = 'https://api.midtrans.com' if MIDTRANS_IS_PROD else 'https://api.sandbox.midtrans.com'
-            auth = _b64.b64encode(f'{MIDTRANS_SERVER_KEY}:'.encode()).decode()
-            req  = _ureq.Request(f'{base_url}/v2/{order_id}/status',
-                headers={'Authorization': f'Basic {auth}'})
-            resp = _json.loads(_ureq.urlopen(req, timeout=8).read())
-            tx_status = resp.get('transaction_status', '')
-            fraud     = resp.get('fraud_status', '')
-            if tx_status in ('capture', 'settlement') and fraud in ('accept', ''):
-                # Midtrans confirmed paid — buat invitation sekarang
-                inv_id = _create_invitation_from_order(conn, order_id)
-                conn.commit()
-                conn.close()
-                return jsonify({'status': 'paid', 'inv_id': inv_id})
-            elif tx_status in ('deny', 'expire', 'cancel'):
-                conn.execute('UPDATE orders SET status=? WHERE id=?', (tx_status, order_id))
-                conn.commit()
-                conn.close()
-                return jsonify({'status': tx_status})
-        except Exception:
-            pass
-
+    order = conn.execute('SELECT status, invitation_id FROM orders WHERE id=?', (order_id,)).fetchone()
     conn.close()
+    if not order: return jsonify({'status':'not_found'})
     return jsonify({'status': order['status'], 'inv_id': order['invitation_id']})
 
 # ── /payment/activate (setelah Snap callback) ─────────────────────────────────

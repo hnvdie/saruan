@@ -5,7 +5,7 @@ Config via environment variables (see README).
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory, make_response)
-import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, threading, sys, threading, sys
+import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, threading, sys
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -35,8 +35,8 @@ ALLOWED_EXT     = {'jpg','jpeg','png','webp'}
 MAX_PHOTOS      = 10
 SESSION_HOURS   = 8
 
-CLEANUP_GRACE_DAYS   = 7
-CLEANUP_INTERVAL_SEC = 86400
+CLEANUP_GRACE_DAYS   = 7      # hari setelah expired baru dihapus permanen
+CLEANUP_INTERVAL_SEC = 86400  # cek otomatis tiap 24 jam
 
 # Simple rate limit — no owner IP concept, just use reCAPTCHA for protection
 RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
@@ -95,7 +95,7 @@ def sanitize_url(value: str, maxlen: int = 500) -> str:
 
 def html_escape(value: str) -> str:
     """Escape untuk inject ke HTML string (bukan Jinja2 context)."""
-    return (str(value or '')
+    return (value
         .replace('&', '&amp;')
         .replace('<', '&lt;')
         .replace('>', '&gt;')
@@ -868,26 +868,29 @@ def admin_delete(inv_id):
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
 
-# ─── AUTO CLEANUP ─────────────────────────────────────────────────────────────
+# ─── AUTO CLEANUP (berjalan otomatis di background setiap 24 jam) ─────────────
 def _do_cleanup():
     cutoff = (datetime.now() - timedelta(days=CLEANUP_GRACE_DAYS)).strftime('%Y-%m-%d')
     try:
         conn = get_db()
         rows = conn.execute(
-            'SELECT id, groom_name, bride_name, expires_at, groom_photo, bride_photo '
+            'SELECT id, groom_name, bride_name, slug, expires_at, groom_photo, bride_photo '
             'FROM invitations WHERE expires_at IS NOT NULL AND expires_at < ?', (cutoff,)
         ).fetchall()
         deleted = 0
         for inv in rows:
             inv_id = inv['id']
             try:
+                # Hapus file gallery
                 for p in conn.execute('SELECT * FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchall():
                     try: delete_photo_file(dict(p))
                     except: pass
+                # Hapus file portrait
                 for col in ('groom_photo','bride_photo'):
                     if inv[col]:
                         try: (UPLOAD_DIR / inv[col]).unlink(missing_ok=True)
                         except: pass
+                # Hapus semua data di DB
                 conn.execute('DELETE FROM rsvp              WHERE invitation_id=?',(inv_id,))
                 conn.execute('DELETE FROM gifts             WHERE invitation_id=?',(inv_id,))
                 conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
@@ -897,17 +900,19 @@ def _do_cleanup():
                 deleted += 1
                 print(f'[CLEANUP] Dihapus: {inv["groom_name"]} & {inv["bride_name"]} (expired: {inv["expires_at"]})')
             except Exception as e:
-                conn.rollback(); print(f'[CLEANUP][ERROR] {inv_id}: {e}')
+                conn.rollback()
+                print(f'[CLEANUP][ERROR] {inv_id}: {e}')
         conn.close()
         if deleted > 0:
-            try: c2 = get_db(); c2.execute('VACUUM'); c2.close()
+            try:
+                c2 = get_db(); c2.execute('VACUUM'); c2.close()
             except: pass
-            print(f'[CLEANUP] Selesai — {deleted} dihapus.')
+            print(f'[CLEANUP] Selesai — {deleted} undangan dihapus.')
     except Exception as e:
         print(f'[CLEANUP][FATAL] {e}')
 
 def _cleanup_loop():
-    time.sleep(60)
+    time.sleep(60)  # tunggu 60 detik setelah server start
     while True:
         try: _do_cleanup()
         except Exception as e: print(f'[CLEANUP][THREAD] {e}')
@@ -1106,17 +1111,6 @@ def calc_expiry(event_date_str: str) -> str:
         return exp.strftime('%Y-%m-%d')
     except:
         return (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
-
-def _calc_expiry_capped(event_date_str: str, created_at_str: str) -> str:
-    """Sama seperti calc_expiry tapi dibatasi max 1 tahun dari created_at.
-    Mencegah user spam ganti tanggal acara untuk memperpanjang masa aktif terus-menerus."""
-    new_exp = calc_expiry(event_date_str)
-    try:
-        created = datetime.strptime(created_at_str[:10], '%Y-%m-%d')
-        hard_cap = (created + timedelta(days=MAX_EVENT_YEARS_AHEAD * 365 + EXPIRY_DAYS_AFTER_EVENT)).strftime('%Y-%m-%d')
-        return min(new_exp, hard_cap)
-    except:
-        return new_exp
 
 def user_login_required(f):
     @wraps(f)
@@ -1384,45 +1378,9 @@ def payment_page(order_id):
 @app.route('/payment/check/<order_id>')
 def payment_check(order_id):
     conn = get_db()
-    order = conn.execute('SELECT * FROM orders WHERE id=?', (order_id,)).fetchone()
-    if not order:
-        conn.close()
-        return jsonify({'status': 'not_found'})
-    order = dict(order)
-
-    # Sudah paid di DB — langsung return
-    if order['status'] == 'paid':
-        conn.close()
-        return jsonify({'status': 'paid', 'inv_id': order['invitation_id']})
-
-    # Masih pending — tanya langsung ke Midtrans API
-    MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY', '')
-    if MIDTRANS_SERVER_KEY:
-        try:
-            import urllib.request as _ureq, base64 as _b64, json as _json
-            MIDTRANS_IS_PROD = os.environ.get('MIDTRANS_IS_PROD', 'false').lower() == 'true'
-            base_url = 'https://api.midtrans.com' if MIDTRANS_IS_PROD else 'https://api.sandbox.midtrans.com'
-            auth = _b64.b64encode(f'{MIDTRANS_SERVER_KEY}:'.encode()).decode()
-            req  = _ureq.Request(f'{base_url}/v2/{order_id}/status',
-                headers={'Authorization': f'Basic {auth}'})
-            resp = _json.loads(_ureq.urlopen(req, timeout=8).read())
-            tx_status = resp.get('transaction_status', '')
-            fraud     = resp.get('fraud_status', '')
-            if tx_status in ('capture', 'settlement') and fraud in ('accept', ''):
-                # Midtrans confirmed paid — buat invitation sekarang
-                inv_id = _create_invitation_from_order(conn, order_id)
-                conn.commit()
-                conn.close()
-                return jsonify({'status': 'paid', 'inv_id': inv_id})
-            elif tx_status in ('deny', 'expire', 'cancel'):
-                conn.execute('UPDATE orders SET status=? WHERE id=?', (tx_status, order_id))
-                conn.commit()
-                conn.close()
-                return jsonify({'status': tx_status})
-        except Exception:
-            pass
-
+    order = conn.execute('SELECT status, invitation_id FROM orders WHERE id=?', (order_id,)).fetchone()
     conn.close()
+    if not order: return jsonify({'status':'not_found'})
     return jsonify({'status': order['status'], 'inv_id': order['invitation_id']})
 
 # ── /payment/activate (setelah Snap callback) ─────────────────────────────────
@@ -1605,7 +1563,7 @@ def user_edit():
                 extract_maps_embed_src(c['maps_url']),
                 c['love_story'],
                 c['music_url'],
-                _calc_expiry_capped(resepsi_date, inv['created_at']),
+                calc_expiry(resepsi_date),
                 inv_id))
             # Gifts
             conn.execute('DELETE FROM gifts WHERE invitation_id=?', (inv_id,))
@@ -1710,29 +1668,29 @@ def _cli_list_users():
 def _cli_reset_password(username):
     import getpass
     conn = get_db()
-    row = conn.execute('SELECT id FROM invitations WHERE user_username=?', (username,)).fetchone()
+    row = conn.execute('SELECT id FROM invitations WHERE user_username=?',(username,)).fetchone()
     if not row: print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
     print(f'Reset password untuk: {username}')
     while True:
-        pw  = getpass.getpass('Password baru (min 8 karakter): ')
+        pw = getpass.getpass('Password baru (min 8 karakter): ')
         pw2 = getpass.getpass('Konfirmasi: ')
         if len(pw) < 8: print('[ERROR] Min 8 karakter.'); continue
         if pw != pw2:   print('[ERROR] Tidak cocok.'); continue
         break
-    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?', (hash_user_pw(pw), username))
+    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?',(hash_user_pw(pw), username))
     conn.commit(); conn.close()
     print(f'[OK] Password "{username}" berhasil direset.')
 
 def _cli_edit_slug(username, new_slug):
-    clean = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ', '-')).strip('-')
+    clean = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ','-')).strip('-')
     if len(clean) < 3: print('[ERROR] Slug tidak valid (min 3 karakter, huruf kecil/angka/strip).'); return
     conn = get_db()
-    row = conn.execute('SELECT slug FROM invitations WHERE user_username=?', (username,)).fetchone()
+    row = conn.execute('SELECT slug FROM invitations WHERE user_username=?',(username,)).fetchone()
     if not row: print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
-    conflict = conn.execute('SELECT user_username FROM invitations WHERE slug=? AND user_username!=?', (clean, username)).fetchone()
+    conflict = conn.execute('SELECT user_username FROM invitations WHERE slug=? AND user_username!=?',(clean, username)).fetchone()
     if conflict: print(f'[ERROR] Slug "{clean}" sudah dipakai oleh "{conflict["user_username"]}".'); conn.close(); return
     old = row['slug']
-    conn.execute('UPDATE invitations SET slug=? WHERE user_username=?', (clean, username))
+    conn.execute('UPDATE invitations SET slug=? WHERE user_username=?',(clean, username))
     conn.commit(); conn.close()
     print(f'[OK] Slug "{username}": "{old}" -> "{clean}"  |  URL: /i/{clean}')
 
@@ -1740,6 +1698,7 @@ if __name__ == '__main__':
     init_db()
     _ensure_user_columns()
 
+    # CLI mode — cek argumen dulu sebelum start Flask
     _CLI = {'list-users', 'reset-password', 'edit-slug'}
     if len(sys.argv) > 1 and sys.argv[1] in _CLI:
         cmd = sys.argv[1]
@@ -1749,12 +1708,14 @@ if __name__ == '__main__':
             if len(sys.argv) < 3: print('Usage: python app.py reset-password <username>')
             else: _cli_reset_password(sys.argv[2])
         elif cmd == 'edit-slug':
-            if len(sys.argv) < 4: print('Usage: python app.py edit-slug <username> <slug_baru>')
+            if len(sys.argv) < 4: print('Usage: python app.py edit-slug <username> <new_slug>')
             else: _cli_edit_slug(sys.argv[2], sys.argv[3])
         sys.exit(0)
 
-    # Server mode
-    threading.Thread(target=_cleanup_loop, daemon=True, name='auto-cleanup').start()
+    # Server mode — start cleanup thread lalu jalankan Flask
+    t = threading.Thread(target=_cleanup_loop, daemon=True, name='auto-cleanup')
+    t.start()
+
     print('─' * 50)
     print(f'  UndanganKita — Admin: {ADMIN_USERNAME} / admin123')
     print(f'  Site: {SITE_NAME}  |  WA: {WA_NUMBER}')
@@ -1767,5 +1728,4 @@ if __name__ == '__main__':
     print('             python app.py edit-slug <username> <slug_baru>')
     print('─' * 50)
     app.run(debug=False, port=5000)
-
 

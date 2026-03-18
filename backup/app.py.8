@@ -5,7 +5,7 @@ Config via environment variables (see README).
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory, make_response)
-import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, threading, sys, threading, sys
+import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, threading, sys
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -35,8 +35,8 @@ ALLOWED_EXT     = {'jpg','jpeg','png','webp'}
 MAX_PHOTOS      = 10
 SESSION_HOURS   = 8
 
-CLEANUP_GRACE_DAYS   = 7
-CLEANUP_INTERVAL_SEC = 86400
+CLEANUP_GRACE_DAYS   = 7      # hari setelah expired baru dihapus permanen
+CLEANUP_INTERVAL_SEC = 86400  # cek otomatis tiap 24 jam
 
 # Simple rate limit — no owner IP concept, just use reCAPTCHA for protection
 RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
@@ -95,7 +95,7 @@ def sanitize_url(value: str, maxlen: int = 500) -> str:
 
 def html_escape(value: str) -> str:
     """Escape untuk inject ke HTML string (bukan Jinja2 context)."""
-    return (str(value or '')
+    return (value
         .replace('&', '&amp;')
         .replace('<', '&lt;')
         .replace('>', '&gt;')
@@ -868,13 +868,13 @@ def admin_delete(inv_id):
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
 
-# ─── AUTO CLEANUP ─────────────────────────────────────────────────────────────
+# ─── AUTO CLEANUP (otomatis tiap 24 jam di background) ───────────────────────
 def _do_cleanup():
     cutoff = (datetime.now() - timedelta(days=CLEANUP_GRACE_DAYS)).strftime('%Y-%m-%d')
     try:
         conn = get_db()
         rows = conn.execute(
-            'SELECT id, groom_name, bride_name, expires_at, groom_photo, bride_photo '
+            'SELECT id, groom_name, bride_name, slug, expires_at, groom_photo, bride_photo '
             'FROM invitations WHERE expires_at IS NOT NULL AND expires_at < ?', (cutoff,)
         ).fetchall()
         deleted = 0
@@ -897,12 +897,13 @@ def _do_cleanup():
                 deleted += 1
                 print(f'[CLEANUP] Dihapus: {inv["groom_name"]} & {inv["bride_name"]} (expired: {inv["expires_at"]})')
             except Exception as e:
-                conn.rollback(); print(f'[CLEANUP][ERROR] {inv_id}: {e}')
+                conn.rollback()
+                print(f'[CLEANUP][ERROR] {inv_id}: {e}')
         conn.close()
         if deleted > 0:
             try: c2 = get_db(); c2.execute('VACUUM'); c2.close()
             except: pass
-            print(f'[CLEANUP] Selesai — {deleted} dihapus.')
+            print(f'[CLEANUP] Selesai — {deleted} undangan dihapus.')
     except Exception as e:
         print(f'[CLEANUP][FATAL] {e}')
 
@@ -1106,17 +1107,6 @@ def calc_expiry(event_date_str: str) -> str:
         return exp.strftime('%Y-%m-%d')
     except:
         return (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
-
-def _calc_expiry_capped(event_date_str: str, created_at_str: str) -> str:
-    """Sama seperti calc_expiry tapi dibatasi max 1 tahun dari created_at.
-    Mencegah user spam ganti tanggal acara untuk memperpanjang masa aktif terus-menerus."""
-    new_exp = calc_expiry(event_date_str)
-    try:
-        created = datetime.strptime(created_at_str[:10], '%Y-%m-%d')
-        hard_cap = (created + timedelta(days=MAX_EVENT_YEARS_AHEAD * 365 + EXPIRY_DAYS_AFTER_EVENT)).strftime('%Y-%m-%d')
-        return min(new_exp, hard_cap)
-    except:
-        return new_exp
 
 def user_login_required(f):
     @wraps(f)
@@ -1390,12 +1380,12 @@ def payment_check(order_id):
         return jsonify({'status': 'not_found'})
     order = dict(order)
 
-    # Sudah paid di DB — langsung return
+    # Kalau DB sudah paid, langsung return
     if order['status'] == 'paid':
         conn.close()
         return jsonify({'status': 'paid', 'inv_id': order['invitation_id']})
 
-    # Masih pending — tanya langsung ke Midtrans API
+    # DB masih pending — cek langsung ke Midtrans API
     MIDTRANS_SERVER_KEY = os.environ.get('MIDTRANS_SERVER_KEY', '')
     if MIDTRANS_SERVER_KEY:
         try:
@@ -1409,7 +1399,7 @@ def payment_check(order_id):
             tx_status = resp.get('transaction_status', '')
             fraud     = resp.get('fraud_status', '')
             if tx_status in ('capture', 'settlement') and fraud in ('accept', ''):
-                # Midtrans confirmed paid — buat invitation sekarang
+                # Midtrans sudah paid — buat invitation dan update DB
                 inv_id = _create_invitation_from_order(conn, order_id)
                 conn.commit()
                 conn.close()
@@ -1605,7 +1595,7 @@ def user_edit():
                 extract_maps_embed_src(c['maps_url']),
                 c['love_story'],
                 c['music_url'],
-                _calc_expiry_capped(resepsi_date, inv['created_at']),
+                calc_expiry(resepsi_date),
                 inv_id))
             # Gifts
             conn.execute('DELETE FROM gifts WHERE invitation_id=?', (inv_id,))
@@ -1710,29 +1700,29 @@ def _cli_list_users():
 def _cli_reset_password(username):
     import getpass
     conn = get_db()
-    row = conn.execute('SELECT id FROM invitations WHERE user_username=?', (username,)).fetchone()
+    row = conn.execute('SELECT id FROM invitations WHERE user_username=?',(username,)).fetchone()
     if not row: print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
     print(f'Reset password untuk: {username}')
     while True:
-        pw  = getpass.getpass('Password baru (min 8 karakter): ')
+        pw = getpass.getpass('Password baru (min 8 karakter): ')
         pw2 = getpass.getpass('Konfirmasi: ')
         if len(pw) < 8: print('[ERROR] Min 8 karakter.'); continue
         if pw != pw2:   print('[ERROR] Tidak cocok.'); continue
         break
-    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?', (hash_user_pw(pw), username))
+    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?',(hash_user_pw(pw), username))
     conn.commit(); conn.close()
     print(f'[OK] Password "{username}" berhasil direset.')
 
 def _cli_edit_slug(username, new_slug):
-    clean = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ', '-')).strip('-')
-    if len(clean) < 3: print('[ERROR] Slug tidak valid (min 3 karakter, huruf kecil/angka/strip).'); return
+    clean = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ','-')).strip('-')
+    if len(clean) < 3: print('[ERROR] Slug tidak valid.'); return
     conn = get_db()
-    row = conn.execute('SELECT slug FROM invitations WHERE user_username=?', (username,)).fetchone()
+    row = conn.execute('SELECT slug FROM invitations WHERE user_username=?',(username,)).fetchone()
     if not row: print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
-    conflict = conn.execute('SELECT user_username FROM invitations WHERE slug=? AND user_username!=?', (clean, username)).fetchone()
+    conflict = conn.execute('SELECT user_username FROM invitations WHERE slug=? AND user_username!=?',(clean, username)).fetchone()
     if conflict: print(f'[ERROR] Slug "{clean}" sudah dipakai oleh "{conflict["user_username"]}".'); conn.close(); return
     old = row['slug']
-    conn.execute('UPDATE invitations SET slug=? WHERE user_username=?', (clean, username))
+    conn.execute('UPDATE invitations SET slug=? WHERE user_username=?',(clean, username))
     conn.commit(); conn.close()
     print(f'[OK] Slug "{username}": "{old}" -> "{clean}"  |  URL: /i/{clean}')
 
@@ -1761,11 +1751,9 @@ if __name__ == '__main__':
     print(f'  reCAPTCHA: {"AKTIF" if RECAPTCHA_KEY else "nonaktif (set RECAPTCHA_SITE_KEY)"}')
     print(f'  Auto-cleanup: aktif (grace {CLEANUP_GRACE_DAYS} hari, tiap 24 jam)')
     print('─' * 50)
-    print('  Admin pw : python -c "from app import hash_pw; print(hash_pw(\'pw\'))"')
-    print('  CLI      : python app.py list-users')
-    print('             python app.py reset-password <username>')
-    print('             python app.py edit-slug <username> <slug_baru>')
+    print('  CLI: python app.py list-users')
+    print('       python app.py reset-password <username>')
+    print('       python app.py edit-slug <username> <slug_baru>')
     print('─' * 50)
     app.run(debug=False, port=5000)
-
 
