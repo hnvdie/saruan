@@ -249,30 +249,26 @@ window.addEventListener('load',()=>{
   const sel=document.querySelector('.tl-item.selected');
   if(sel) setTimeout(()=>sel.scrollIntoView({block:'nearest'}),150);
 
-  // Recovery: kalau user baru balik dari GoPay/ShopeePay app,
-  // sessionStorage masih nyimpen pending order_id → redirect balik ke halaman payment
-  const pendingOrder = sessionStorage.getItem('pending_order_id');
-  if(pendingOrder){
-    // Cek dulu ke server apakah order ini memang masih pending/valid
-    fetch('/payment/check/' + pendingOrder)
+  // Recovery: user balik dari GoPay app → sessionStorage masih ada pending_order_id
+  // Redirect balik ke /payment/<order_id> supaya polling jalan
+  const pendingId = sessionStorage.getItem('pending_order_id');
+  if(pendingId){
+    fetch('/payment/check/' + pendingId)
       .then(r => r.json())
       .then(data => {
         if(data.status === 'paid'){
-          // Sudah dibayar tapi belum redirect — langsung ke setup
           sessionStorage.removeItem('pending_order_id');
-          window.location.href = '/order/setup/' + pendingOrder;
-        } else if(data.status === 'pending' || data.status === 'not_found'){
-          // Masih pending atau belum ada — redirect balik ke halaman payment
-          if(data.status === 'pending'){
-            window.location.href = '/payment/' + pendingOrder;
-          }
+          window.location.href = '/order/setup/' + pendingId;
+        } else if(data.status === 'pending'){
+          window.location.href = '/payment/' + pendingId;
         } else {
-          // deny/expire/cancel — bersihkan saja
+          // deny/expire/cancel — bersihkan
           sessionStorage.removeItem('pending_order_id');
         }
       })
       .catch(() => {
-        // Kalau gagal fetch, abaikan — jangan ganggu user
+        // Gagal fetch — redirect ke payment page saja
+        window.location.href = '/payment/' + pendingId;
       });
   }
 });

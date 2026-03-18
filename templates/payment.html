@@ -95,7 +95,8 @@ function goToSetup(){
 
 function openSnap(){
   if(!SNAP_TOKEN){ goToSetup(); return; }
-  // Simpan order_id supaya /order bisa detect user balik dari GoPay app
+  // Simpan order_id — kalau user diarahkan ke GoPay app lalu balik,
+  // order.html akan detect ini dan redirect ke /payment/<order_id>
   sessionStorage.setItem(SK_KEY, ORDER_ID);
   document.getElementById('statusArea').classList.add('visible');
   document.getElementById('statusText').textContent='Menunggu pembayaran...';
@@ -106,7 +107,7 @@ function openSnap(){
       sessionStorage.removeItem(SK_KEY);
       document.getElementById('statusText').textContent='Pembayaran gagal. Coba lagi.';
     },
-    onClose: function(){ startPolling(); },
+    onClose:   function(){ startPolling(); },
   });
 }
 
@@ -132,16 +133,15 @@ function checkStatus(){
 }
 
 window.addEventListener('load',()=>{
-  // Deteksi user balik dari GoPay: sessionStorage ada tapi halaman baru diload
   const savedId = sessionStorage.getItem(SK_KEY);
   if(savedId && savedId === ORDER_ID){
-    // Langsung poll tanpa buka Snap lagi
+    // User balik dari GoPay — langsung polling tanpa buka Snap lagi
     document.getElementById('statusArea').classList.add('visible');
     document.getElementById('statusText').textContent='Mengecek status pembayaran...';
     checkStatus();
     startPolling();
   } else {
-    // Load normal — cek dulu, lalu auto-open Snap
+    // Load normal
     checkStatus();
     if(SNAP_TOKEN){ setTimeout(openSnap, 800); }
   }

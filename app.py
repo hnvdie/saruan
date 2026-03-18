@@ -1276,7 +1276,7 @@ def create_order():
         'customer_details': {'first_name': f'{groom_name} & {bride_name}'[:50], 'phone': cust_phone or ''},
         'enabled_payments': ['gopay','shopeepay','qris','other_qris','bank_transfer','bca_va','bni_va','bri_va','permata_va','cimb_va'],
         'callbacks': {
-            'finish': f'https://{SITE_NAME}/payment/{order_id}'
+            'finish': f'https://{SITE_NAME}/order/setup/{order_id}'
         },
     }
     try:
