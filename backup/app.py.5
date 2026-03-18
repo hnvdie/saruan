@@ -5,7 +5,7 @@ Config via environment variables (see README).
 
 from flask import (Flask, render_template, request, redirect, url_for,
                    jsonify, abort, session, flash, send_from_directory, make_response)
-import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time, threading
+import json, os, uuid, hashlib, hmac, secrets, sqlite3, re, time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -34,10 +34,6 @@ MAX_UPLOAD_MB   = 5
 ALLOWED_EXT     = {'jpg','jpeg','png','webp'}
 MAX_PHOTOS      = 10
 SESSION_HOURS   = 8
-
-# Auto-cleanup config — hapus undangan expired setelah grace period
-CLEANUP_GRACE_DAYS    = 7    # berapa hari setelah expired baru dihapus permanen
-CLEANUP_INTERVAL_SEC  = 60 * 60 * 24  # jalankan cleanup tiap 24 jam
 
 # Simple rate limit — no owner IP concept, just use reCAPTCHA for protection
 RATE_WINDOW_SEC   = 60 * 10   # 10 menit window
@@ -869,129 +865,7 @@ def admin_delete(inv_id):
     flash('Undangan dihapus.','info')
     return redirect(url_for('admin_dashboard'))
 
-# ─── AUTO CLEANUP ─────────────────────────────────────────────────────────────
-def _do_cleanup(dry_run: bool = False) -> dict:
-    """Hapus permanen semua undangan yang sudah melewati grace period setelah expired.
-    
-    Grace period = CLEANUP_GRACE_DAYS hari setelah expires_at.
-    Menghapus: file foto gallery, file portrait (groom/bride), data RSVP, gifts,
-               invitation_photos, orders, dan row invitations itu sendiri.
-    
-    dry_run=True → hanya print, tidak benar-benar hapus (untuk preview).
-    Return dict ringkasan { 'deleted': int, 'files_removed': int, 'errors': list }.
-    """
-    cutoff = (datetime.now() - timedelta(days=CLEANUP_GRACE_DAYS)).strftime('%Y-%m-%d')
-    summary = {'deleted': 0, 'files_removed': 0, 'errors': []}
-
-    try:
-        conn = get_db()
-        # Ambil semua undangan yang expires_at sudah melewati cutoff
-        rows = conn.execute(
-            "SELECT id, groom_name, bride_name, slug, expires_at, groom_photo, bride_photo "
-            "FROM invitations WHERE expires_at IS NOT NULL AND expires_at < ?",
-            (cutoff,)
-        ).fetchall()
-
-        for inv in rows:
-            inv_id = inv['id']
-            label  = f'{inv["groom_name"]} & {inv["bride_name"]} (slug: {inv["slug"]}, expired: {inv["expires_at"]})'
-
-            if dry_run:
-                print(f'  [DRY-RUN] Akan dihapus: {label}')
-                summary['deleted'] += 1
-                continue
-
-            try:
-                # 1. Hapus file gallery
-                photos = conn.execute(
-                    'SELECT * FROM invitation_photos WHERE invitation_id=?', (inv_id,)
-                ).fetchall()
-                for p in photos:
-                    try:
-                        delete_photo_file(dict(p))
-                        summary['files_removed'] += 1
-                    except Exception as e:
-                        summary['errors'].append(f'File gallery {p["filename"]}: {e}')
-
-                # 2. Hapus file portrait groom & bride
-                for col in ('groom_photo', 'bride_photo'):
-                    fname = inv[col]
-                    if fname:
-                        try:
-                            (UPLOAD_DIR / fname).unlink(missing_ok=True)
-                            summary['files_removed'] += 1
-                        except Exception as e:
-                            summary['errors'].append(f'Portrait {fname}: {e}')
-
-                # 3. Hapus data DB (cascade)
-                conn.execute('DELETE FROM rsvp               WHERE invitation_id=?', (inv_id,))
-                conn.execute('DELETE FROM gifts              WHERE invitation_id=?', (inv_id,))
-                conn.execute('DELETE FROM invitation_photos  WHERE invitation_id=?', (inv_id,))
-                conn.execute('DELETE FROM orders             WHERE invitation_id=?', (inv_id,))
-                conn.execute('DELETE FROM invitations        WHERE id=?',            (inv_id,))
-                conn.commit()
-
-                summary['deleted'] += 1
-                print(f'[CLEANUP] Dihapus: {label}')
-
-            except Exception as e:
-                conn.rollback()
-                summary['errors'].append(f'Gagal hapus {inv_id}: {e}')
-                print(f'[CLEANUP][ERROR] {inv_id}: {e}')
-
-        conn.close()
-
-        # VACUUM supaya ukuran file DB menyusut setelah banyak delete
-        if not dry_run and summary['deleted'] > 0:
-            try:
-                conn2 = get_db()
-                conn2.execute('VACUUM')
-                conn2.close()
-                print(f'[CLEANUP] VACUUM selesai — DB dipadatkan.')
-            except Exception as e:
-                summary['errors'].append(f'VACUUM gagal: {e}')
-
-    except Exception as e:
-        summary['errors'].append(f'Cleanup aborted: {e}')
-        print(f'[CLEANUP][FATAL] {e}')
-
-    if not dry_run:
-        print(f'[CLEANUP] Selesai — {summary["deleted"]} undangan dihapus, '
-              f'{summary["files_removed"]} file dihapus, '
-              f'{len(summary["errors"])} error.')
-    return summary
-
-
-def _cleanup_loop():
-    """Background thread — jalankan cleanup tiap CLEANUP_INTERVAL_SEC."""
-    # Tunda pertama kali 60 detik setelah startup supaya server sempat siap
-    time.sleep(60)
-    while True:
-        try:
-            _do_cleanup()
-        except Exception as e:
-            print(f'[CLEANUP][THREAD ERROR] {e}')
-        time.sleep(CLEANUP_INTERVAL_SEC)
-
-
-def _start_cleanup_thread():
-    t = threading.Thread(target=_cleanup_loop, daemon=True, name='auto-cleanup')
-    t.start()
-    print('[CLEANUP] Background cleanup thread aktif '
-          f'(grace period: {CLEANUP_GRACE_DAYS} hari, interval: setiap 24 jam)')
-
-@app.route('/admin/cleanup', methods=['POST'])
-@login_required
-def admin_cleanup():
-    dry = request.form.get('dry_run') == '1'
-    summary = _do_cleanup(dry_run=dry)
-    msg = (f'{"[DRY-RUN] " if dry else ""}Cleanup selesai — '
-           f'{summary["deleted"]} undangan {"akan " if dry else ""}dihapus, '
-           f'{summary["files_removed"]} file dihapus.')
-    if summary['errors']:
-        msg += f' ({len(summary["errors"])} error — cek log server.)'
-    flash(msg, 'info' if dry else 'success')
-    return redirect(url_for('admin_dashboard'))
+# Theme demo photo management
 @app.route('/admin/theme-demo/<theme_id>', methods=['POST'])
 @login_required
 def upload_theme_demo(theme_id):
@@ -1694,10 +1568,14 @@ def legal():
     )
 
 
-# ─── MAIN ────────────────────────────────────────────────────────────────────
+# ─── CLI MANAGEMENT TOOLS ────────────────────────────────────────────────────
+# Jalankan langsung: python app.py reset-password <username>
+#                   python app.py edit-slug <username> <new_slug>
+#                   python app.py list-users
 import sys as _sys
 
 def _cli_list_users():
+    _ensure_user_columns()
     conn = get_db()
     rows = conn.execute(
         'SELECT user_username, groom_name, bride_name, slug, payment_status, expires_at '
@@ -1705,7 +1583,8 @@ def _cli_list_users():
     ).fetchall()
     conn.close()
     if not rows:
-        print('Tidak ada user ditemukan.'); return
+        print('Tidak ada user ditemukan.')
+        return
     print(f'{"USERNAME":<20} {"MEMPELAI":<35} {"SLUG":<30} {"STATUS":<10} {"EXPIRES"}')
     print('-' * 110)
     for r in rows:
@@ -1714,77 +1593,94 @@ def _cli_list_users():
 
 def _cli_reset_password(username: str):
     import getpass
+    _ensure_user_columns()
     conn = get_db()
     row = conn.execute('SELECT id FROM invitations WHERE user_username=?', (username,)).fetchone()
     if not row:
-        print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
+        print(f'[ERROR] User "{username}" tidak ditemukan.')
+        conn.close(); return
     print(f'Reset password untuk user: {username}')
     while True:
         pw  = getpass.getpass('Password baru (min 8 karakter): ')
         pw2 = getpass.getpass('Konfirmasi password baru: ')
-        if len(pw) < 8:   print('[ERROR] Password minimal 8 karakter.'); continue
-        if pw != pw2:     print('[ERROR] Password tidak cocok.'); continue
+        if len(pw) < 8:
+            print('[ERROR] Password minimal 8 karakter.')
+            continue
+        if pw != pw2:
+            print('[ERROR] Password tidak cocok.')
+            continue
         break
-    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?', (hash_user_pw(pw), username))
+    new_hash = hash_user_pw(pw)
+    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?', (new_hash, username))
     conn.commit(); conn.close()
     print(f'[OK] Password untuk "{username}" berhasil direset.')
 
 def _cli_edit_slug(username: str, new_slug: str):
+    _ensure_user_columns()
+    # Validasi slug
     clean_slug = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ', '-')).strip('-')
     if len(clean_slug) < 3:
-        print(f'[ERROR] Slug tidak valid: "{new_slug}".'); return
+        print(f'[ERROR] Slug tidak valid: "{new_slug}". Gunakan huruf kecil, angka, dan tanda hubung.')
+        return
     conn = get_db()
     row = conn.execute('SELECT id, slug FROM invitations WHERE user_username=?', (username,)).fetchone()
     if not row:
-        print(f'[ERROR] User "{username}" tidak ditemukan.'); conn.close(); return
+        print(f'[ERROR] User "{username}" tidak ditemukan.')
+        conn.close(); return
+    # Cek slug sudah dipakai user lain
     conflict = conn.execute(
-        'SELECT user_username FROM invitations WHERE slug=? AND user_username!=?', (clean_slug, username)
+        'SELECT user_username FROM invitations WHERE slug=? AND user_username!=?',
+        (clean_slug, username)
     ).fetchone()
     if conflict:
-        print(f'[ERROR] Slug "{clean_slug}" sudah dipakai oleh "{conflict["user_username"]}".'); conn.close(); return
+        print(f'[ERROR] Slug "{clean_slug}" sudah dipakai oleh user "{conflict["user_username"]}".')
+        conn.close(); return
     old_slug = row['slug']
     conn.execute('UPDATE invitations SET slug=? WHERE user_username=?', (clean_slug, username))
     conn.commit(); conn.close()
-    print(f'[OK] Slug "{username}": "{old_slug}" -> "{clean_slug}"')
-    print(f'     URL baru: /i/{clean_slug}')
+    print(f'[OK] Slug untuk "{username}" berhasil diubah: "{old_slug}" → "{clean_slug}"')
+    print(f'     URL undangan baru: /i/{clean_slug}')
 
+if __name__ == '__main__' and len(_sys.argv) > 1:
+    cmd = _sys.argv[1]
+    if cmd == 'list-users':
+        _cli_list_users()
+    elif cmd == 'reset-password':
+        if len(_sys.argv) < 3:
+            print('Usage: python app.py reset-password <username>')
+        else:
+            _cli_reset_password(_sys.argv[2])
+    elif cmd == 'edit-slug':
+        if len(_sys.argv) < 4:
+            print('Usage: python app.py edit-slug <username> <new_slug>')
+        else:
+            _cli_edit_slug(_sys.argv[2], _sys.argv[3])
+    elif cmd == 'run':
+        pass  # lanjut ke block run di bawah
+    else:
+        print(f'[ERROR] Perintah tidak dikenal: {cmd}')
+        print('Perintah yang tersedia:')
+        print('  python app.py list-users')
+        print('  python app.py reset-password <username>')
+        print('  python app.py edit-slug <username> <new_slug>')
+    _sys.exit(0)
+
+# ─── MAIN ────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     init_db()
-    _ensure_user_columns()
-
-    # ── CLI mode: python app.py <command> ──
-    _CLI_CMDS = {'list-users', 'reset-password', 'edit-slug', 'cleanup'}
-    if len(_sys.argv) > 1 and _sys.argv[1] in _CLI_CMDS:
-        cmd = _sys.argv[1]
-        if cmd == 'list-users':
-            _cli_list_users()
-        elif cmd == 'reset-password':
-            if len(_sys.argv) < 3: print('Usage: python app.py reset-password <username>')
-            else: _cli_reset_password(_sys.argv[2])
-        elif cmd == 'edit-slug':
-            if len(_sys.argv) < 4: print('Usage: python app.py edit-slug <username> <new_slug>')
-            else: _cli_edit_slug(_sys.argv[2], _sys.argv[3])
-        elif cmd == 'cleanup':
-            dry = '--dry-run' in _sys.argv
-            print(f'Cleanup{"  [DRY-RUN — tidak ada yang dihapus]" if dry else ""} — grace period: {CLEANUP_GRACE_DAYS} hari setelah expired...')
-            _do_cleanup(dry_run=dry)
-        _sys.exit(0)
-
-    # ── Server mode: python app.py ──
-    _start_cleanup_thread()
     print('─' * 50)
     print(f'  UndanganKita — Admin: {ADMIN_USERNAME} / admin123')
     print(f'  Site: {SITE_NAME}  |  WA: {WA_NUMBER}')
     print(f'  reCAPTCHA: {"AKTIF" if RECAPTCHA_KEY else "nonaktif (set RECAPTCHA_SITE_KEY)"}')
-    print(f'  Auto-cleanup: aktif (hapus {CLEANUP_GRACE_DAYS} hari setelah expired, cek tiap 24 jam)')
     print('─' * 50)
     print('  Admin password:')
     print('  python -c "from app import hash_pw; print(hash_pw(\'newpass\'))"')
     print('  lalu set env: ADMIN_PW_HASH=<hash>')
     print('─' * 50)
-    print('  CLI:  python app.py list-users')
-    print('        python app.py reset-password <username>')
-    print('        python app.py edit-slug <username> <new_slug>')
-    print('        python app.py cleanup [--dry-run]')
+    print('  CLI User Management:')
+    print('  python app.py list-users')
+    print('  python app.py reset-password <username>')
+    print('  python app.py edit-slug <username> <new_slug>')
     print('─' * 50)
     app.run(debug=False, port=5000)
+
