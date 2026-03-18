@@ -248,33 +248,6 @@ function pickTheme(tid){
 window.addEventListener('load',()=>{
   const sel=document.querySelector('.tl-item.selected');
   if(sel) setTimeout(()=>sel.scrollIntoView({block:'nearest'}),150);
-
-  // Recovery: kalau user baru balik dari GoPay/ShopeePay app,
-  // sessionStorage masih nyimpen pending order_id → redirect balik ke halaman payment
-  const pendingOrder = sessionStorage.getItem('pending_order_id');
-  if(pendingOrder){
-    // Cek dulu ke server apakah order ini memang masih pending/valid
-    fetch('/payment/check/' + pendingOrder)
-      .then(r => r.json())
-      .then(data => {
-        if(data.status === 'paid'){
-          // Sudah dibayar tapi belum redirect — langsung ke setup
-          sessionStorage.removeItem('pending_order_id');
-          window.location.href = '/order/setup/' + pendingOrder;
-        } else if(data.status === 'pending' || data.status === 'not_found'){
-          // Masih pending atau belum ada — redirect balik ke halaman payment
-          if(data.status === 'pending'){
-            window.location.href = '/payment/' + pendingOrder;
-          }
-        } else {
-          // deny/expire/cancel — bersihkan saja
-          sessionStorage.removeItem('pending_order_id');
-        }
-      })
-      .catch(() => {
-        // Kalau gagal fetch, abaikan — jangan ganggu user
-      });
-  }
 });
 </script>
 </body>

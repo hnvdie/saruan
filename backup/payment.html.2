@@ -38,6 +38,10 @@ nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);paddi
 .status-area.paid{color:#2d8a4e;background:#f0faf4;}
 .status-spinner{display:inline-block;width:10px;height:10px;border:1.5px solid var(--faint);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:.4rem;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg)}}
+.btn-check{width:100%;padding:.6rem;background:transparent;color:var(--ink);border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.72rem;letter-spacing:.06em;cursor:pointer;transition:background .2s;margin-top:.5rem;}
+.btn-check:hover{background:var(--off);}
+.return-note{font-size:.65rem;color:var(--muted);text-align:center;margin-top:.85rem;padding:.6rem;background:#fffbf0;border:1px solid #f0e6c0;border-radius:2px;display:none;}
+.return-note.visible{display:block;}
 </style>
 </head>
 <body>
@@ -67,6 +71,10 @@ nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);paddi
         <span class="status-spinner" id="statusSpinner"></span>
         <span id="statusText">Menunggu pembayaran...</span>
       </div>
+      <button class="btn-check" id="btnCheck" onclick="manualCheck()" style="display:none;">✓ Saya Sudah Bayar — Cek Status</button>
+      <div class="return-note" id="returnNote">
+        ⚠️ Kamu baru kembali dari GoPay/ShopeePay. Klik tombol di atas untuk cek status pembayaran.
+      </div>
     </div>
   </div>
 </div>
@@ -77,7 +85,7 @@ nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);paddi
 const SNAP_TOKEN = '{{ snap_token }}';
 const ORDER_ID   = '{{ order_id }}';
 const SETUP_URL  = '/order/setup/{{ order_id }}';
-const SK_KEY     = 'pending_order_id';
+const SK_KEY     = 'pending_order_id';  // sessionStorage key
 let pollInterval = null;
 let redirecting  = false;
 
@@ -95,19 +103,28 @@ function goToSetup(){
 
 function openSnap(){
   if(!SNAP_TOKEN){ goToSetup(); return; }
-  // Simpan order_id supaya /order bisa detect user balik dari GoPay app
+  // Simpan order_id ke sessionStorage supaya bisa direcovery saat balik dari GoPay app
   sessionStorage.setItem(SK_KEY, ORDER_ID);
   document.getElementById('statusArea').classList.add('visible');
   document.getElementById('statusText').textContent='Menunggu pembayaran...';
   window.snap.pay(SNAP_TOKEN, {
     onSuccess: function(){ goToSetup(); },
-    onPending: function(){ startPolling(); },
-    onError:   function(){
-      sessionStorage.removeItem(SK_KEY);
-      document.getElementById('statusText').textContent='Pembayaran gagal. Coba lagi.';
-    },
-    onClose: function(){ startPolling(); },
+    onPending: function(){ showCheckButton(); startPolling(); },
+    onError:   function(){ document.getElementById('statusText').textContent='Pembayaran gagal. Coba lagi.'; sessionStorage.removeItem(SK_KEY); },
+    onClose:   function(){ showCheckButton(); startPolling(); },
   });
+}
+
+function showCheckButton(){
+  document.getElementById('btnCheck').style.display = 'block';
+}
+
+function manualCheck(){
+  document.getElementById('statusArea').classList.add('visible');
+  document.getElementById('statusSpinner').style.display = 'inline-block';
+  document.getElementById('statusText').textContent = 'Mengecek status pembayaran...';
+  document.getElementById('returnNote').classList.remove('visible');
+  checkStatus();
 }
 
 function startPolling(){
@@ -127,21 +144,30 @@ function checkStatus(){
         sessionStorage.removeItem(SK_KEY);
         document.getElementById('statusSpinner').style.display='none';
         document.getElementById('statusText').textContent='Pembayaran tidak berhasil. Silakan ulangi.';
+        document.getElementById('btnCheck').style.display='none';
+      } else {
+        // Masih pending — pastikan tombol check tetap muncul
+        showCheckButton();
       }
     }).catch(()=>{});
 }
 
+// Deteksi apakah user baru balik dari GoPay/ShopeePay app
 window.addEventListener('load',()=>{
-  // Deteksi user balik dari GoPay: sessionStorage ada tapi halaman baru diload
-  const savedId = sessionStorage.getItem(SK_KEY);
-  if(savedId && savedId === ORDER_ID){
-    // Langsung poll tanpa buka Snap lagi
-    document.getElementById('statusArea').classList.add('visible');
-    document.getElementById('statusText').textContent='Mengecek status pembayaran...';
-    checkStatus();
-    startPolling();
+  const savedOrderId = sessionStorage.getItem(SK_KEY);
+
+  if(savedOrderId && savedOrderId === ORDER_ID){
+    // User balik dari GoPay — tampilkan UI recovery
+    document.getElementById('btnPay').style.display = 'none';
+    showCheckButton();
+    document.getElementById('returnNote').classList.add('visible');
+    // Langsung auto-cek sekali
+    setTimeout(()=>{
+      checkStatus();
+      startPolling();
+    }, 1500);
   } else {
-    // Load normal — cek dulu, lalu auto-open Snap
+    // Load normal — cek status dulu, lalu auto-open Snap
     checkStatus();
     if(SNAP_TOKEN){ setTimeout(openSnap, 800); }
   }
