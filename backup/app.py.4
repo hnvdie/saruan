@@ -1568,103 +1568,6 @@ def legal():
     )
 
 
-# ─── CLI MANAGEMENT TOOLS ────────────────────────────────────────────────────
-# Jalankan langsung: python app.py reset-password <username>
-#                   python app.py edit-slug <username> <new_slug>
-#                   python app.py list-users
-import sys as _sys
-
-def _cli_list_users():
-    _ensure_user_columns()
-    conn = get_db()
-    rows = conn.execute(
-        'SELECT user_username, groom_name, bride_name, slug, payment_status, expires_at '
-        'FROM invitations WHERE user_username IS NOT NULL ORDER BY created_at DESC'
-    ).fetchall()
-    conn.close()
-    if not rows:
-        print('Tidak ada user ditemukan.')
-        return
-    print(f'{"USERNAME":<20} {"MEMPELAI":<35} {"SLUG":<30} {"STATUS":<10} {"EXPIRES"}')
-    print('-' * 110)
-    for r in rows:
-        mempelai = f'{r["groom_name"]} & {r["bride_name"]}'
-        print(f'{r["user_username"]:<20} {mempelai:<35} {r["slug"] or "-":<30} {r["payment_status"] or "-":<10} {r["expires_at"] or "-"}')
-
-def _cli_reset_password(username: str):
-    import getpass
-    _ensure_user_columns()
-    conn = get_db()
-    row = conn.execute('SELECT id FROM invitations WHERE user_username=?', (username,)).fetchone()
-    if not row:
-        print(f'[ERROR] User "{username}" tidak ditemukan.')
-        conn.close(); return
-    print(f'Reset password untuk user: {username}')
-    while True:
-        pw  = getpass.getpass('Password baru (min 8 karakter): ')
-        pw2 = getpass.getpass('Konfirmasi password baru: ')
-        if len(pw) < 8:
-            print('[ERROR] Password minimal 8 karakter.')
-            continue
-        if pw != pw2:
-            print('[ERROR] Password tidak cocok.')
-            continue
-        break
-    new_hash = hash_user_pw(pw)
-    conn.execute('UPDATE invitations SET user_pw_hash=? WHERE user_username=?', (new_hash, username))
-    conn.commit(); conn.close()
-    print(f'[OK] Password untuk "{username}" berhasil direset.')
-
-def _cli_edit_slug(username: str, new_slug: str):
-    _ensure_user_columns()
-    # Validasi slug
-    clean_slug = re.sub(r'[^a-z0-9-]', '-', new_slug.lower().replace(' ', '-')).strip('-')
-    if len(clean_slug) < 3:
-        print(f'[ERROR] Slug tidak valid: "{new_slug}". Gunakan huruf kecil, angka, dan tanda hubung.')
-        return
-    conn = get_db()
-    row = conn.execute('SELECT id, slug FROM invitations WHERE user_username=?', (username,)).fetchone()
-    if not row:
-        print(f'[ERROR] User "{username}" tidak ditemukan.')
-        conn.close(); return
-    # Cek slug sudah dipakai user lain
-    conflict = conn.execute(
-        'SELECT user_username FROM invitations WHERE slug=? AND user_username!=?',
-        (clean_slug, username)
-    ).fetchone()
-    if conflict:
-        print(f'[ERROR] Slug "{clean_slug}" sudah dipakai oleh user "{conflict["user_username"]}".')
-        conn.close(); return
-    old_slug = row['slug']
-    conn.execute('UPDATE invitations SET slug=? WHERE user_username=?', (clean_slug, username))
-    conn.commit(); conn.close()
-    print(f'[OK] Slug untuk "{username}" berhasil diubah: "{old_slug}" → "{clean_slug}"')
-    print(f'     URL undangan baru: /i/{clean_slug}')
-
-if __name__ == '__main__' and len(_sys.argv) > 1:
-    cmd = _sys.argv[1]
-    if cmd == 'list-users':
-        _cli_list_users()
-    elif cmd == 'reset-password':
-        if len(_sys.argv) < 3:
-            print('Usage: python app.py reset-password <username>')
-        else:
-            _cli_reset_password(_sys.argv[2])
-    elif cmd == 'edit-slug':
-        if len(_sys.argv) < 4:
-            print('Usage: python app.py edit-slug <username> <new_slug>')
-        else:
-            _cli_edit_slug(_sys.argv[2], _sys.argv[3])
-    elif cmd == 'run':
-        pass  # lanjut ke block run di bawah
-    else:
-        print(f'[ERROR] Perintah tidak dikenal: {cmd}')
-        print('Perintah yang tersedia:')
-        print('  python app.py list-users')
-        print('  python app.py reset-password <username>')
-        print('  python app.py edit-slug <username> <new_slug>')
-    _sys.exit(0)
-
 # ─── MAIN ────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     init_db()
@@ -1673,14 +1576,9 @@ if __name__ == '__main__':
     print(f'  Site: {SITE_NAME}  |  WA: {WA_NUMBER}')
     print(f'  reCAPTCHA: {"AKTIF" if RECAPTCHA_KEY else "nonaktif (set RECAPTCHA_SITE_KEY)"}')
     print('─' * 50)
-    print('  Admin password:')
+    print('  Ganti password:')
     print('  python -c "from app import hash_pw; print(hash_pw(\'newpass\'))"')
     print('  lalu set env: ADMIN_PW_HASH=<hash>')
-    print('─' * 50)
-    print('  CLI User Management:')
-    print('  python app.py list-users')
-    print('  python app.py reset-password <username>')
-    print('  python app.py edit-slug <username> <new_slug>')
     print('─' * 50)
     app.run(debug=False, port=5000)
 

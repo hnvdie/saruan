@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🌿 Theme Generator — habarkita.com</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; }
+  input[type=range] { accent-color: #C4973A; }
+  input[type=color] { border: none; padding: 0; cursor: pointer; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  select option { background: #1a1a1a; color: #ddd; }
+  .tab-btn { flex:1; padding:"9px 0"; background:none; border:none; cursor:pointer; font-size:11px; letter-spacing:.8px; text-transform:uppercase; font-weight:600; }
+  textarea { resize: vertical; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback, useMemo } = React;
+
+const CANVAS_W = 390;
+const CANVAS_H = 844;
+
+const ANIMATIONS = [
+  { id:"none",label:"— Tidak ada —" },
+  { id:"fade-in",label:"Fade In" },
+  { id:"slide-from-left",label:"Slide dari Kiri" },
+  { id:"slide-from-right",label:"Slide dari Kanan" },
+  { id:"slide-from-top",label:"Slide dari Atas" },
+  { id:"slide-from-bottom",label:"Slide dari Bawah" },
+  { id:"zoom-in",label:"Zoom In" },
+  { id:"rotate-in",label:"Rotate In" },
+  { id:"sway",label:"Sway (goyang terus)" },
+  { id:"float",label:"Float (naik turun)" },
+  { id:"pulse",label:"Pulse (denyut)" },
+  { id:"shimmer",label:"Shimmer (kilap)" },
+  { id:"bounce",label:"Bounce" },
+];
+
+const FONTS = [
+  "Playfair Display","DM Sans","Georgia","Times New Roman",
+  "Palatino","Garamond","Cormorant Garamond","EB Garamond",
+  "Libre Baskerville","Crimson Text","Lora","Merriweather",
+  "Montserrat","Raleway","Josefin Sans","Cinzel","Great Vibes",
+  "Dancing Script","Sacramento","Parisienne","Alex Brush",
+  "Allura","Pinyon Script","Tangerine","Italianno",
+];
+
+const SECTION_PRESETS = [
+  { type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08",hasOpenInvite:true },
+  { type:"hero",name:"Hero",bg:"#2A1A0E" },
+  { type:"quran",name:"Ayat Quran",bg:"#FAF6EE" },
+  { type:"couple",name:"Profil Mempelai",bg:"#1A100A" },
+  { type:"lovestory",name:"Love Story",bg:"#F7EFE0" },
+  { type:"countdown",name:"Countdown Timer",bg:"#2A1A0E" },
+  { type:"event",name:"Detail Acara",bg:"#FAF6EE" },
+  { type:"maps",name:"Peta Lokasi",bg:"#1a1a1a" },
+  { type:"gallery",name:"Gallery Foto",bg:"#0D0705" },
+  { type:"rsvp",name:"RSVP",bg:"#FAF6EE" },
+  { type:"gift",name:"Gift / Amplop Digital",bg:"#2A1A0E" },
+  { type:"guestbook",name:"Guestbook",bg:"#F7EFE0" },
+  { type:"closing",name:"Closing",bg:"#1A100A" },
+  { type:"custom",name:"✦ Custom",bg:"#1e1e1e" },
+];
+
+// Template data variables
+const DATA_VARS = [
+  { key:"inv.groom_name",label:"Nama Mempelai Pria",example:"Ahmad Rizky" },
+  { key:"inv.bride_name",label:"Nama Mempelai Wanita",example:"Siti Rahayu" },
+  { key:"inv.groom_father",label:"Nama Ayah Pria",example:"Bapak Hasan" },
+  { key:"inv.groom_mother",label:"Nama Ibu Pria",example:"Ibu Aminah" },
+  { key:"inv.bride_father",label:"Nama Ayah Wanita",example:"Bapak Yusuf" },
+  { key:"inv.bride_mother",label:"Nama Ibu Wanita",example:"Ibu Fatimah" },
+  { key:"inv.akad_date",label:"Tanggal Akad",example:"Sabtu, 12 Juli 2025" },
+  { key:"inv.akad_time",label:"Waktu Akad",example:"08.00 – 10.00 WIB" },
+  { key:"inv.akad_venue",label:"Tempat Akad",example:"Masjid Al-Ikhlas" },
+  { key:"inv.akad_address",label:"Alamat Akad",example:"Jl. Mawar No. 12, Jakarta" },
+  { key:"inv.resepsi_date",label:"Tanggal Resepsi",example:"Sabtu, 12 Juli 2025" },
+  { key:"inv.resepsi_time",label:"Waktu Resepsi",example:"11.00 – 14.00 WIB" },
+  { key:"inv.resepsi_venue",label:"Tempat Resepsi",example:"Gedung Serbaguna Barokah" },
+  { key:"inv.resepsi_address",label:"Alamat Resepsi",example:"Jl. Melati No. 45, Jakarta" },
+  { key:"inv.groom_photo_url",label:"Foto Mempelai Pria",example:"static/demo-photos/individual/groom.jpg" },
+  { key:"inv.bride_photo_url",label:"Foto Mempelai Wanita",example:"static/demo-photos/individual/bride.jpg" },
+  { key:"inv.maps_url",label:"Link Google Maps",example:"https://maps.google.com/?q=..." },
+  { key:"inv.countdown_date",label:"Target Countdown",example:"2025-07-12T08:00:00" },
+  { key:"inv.music_url",label:"URL File Musik",example:"music/lagu.mp3" },
+  { key:"inv.love_story",label:"Cerita Love Story",example:"Kami pertama bertemu di kampus pada 2019..." },
+  { key:"inv.bank_name",label:"Nama Bank",example:"BCA" },
+  { key:"inv.account_number",label:"Nomor Rekening",example:"1234567890" },
+  { key:"inv.account_name",label:"Nama Pemilik Rekening",example:"Ahmad Rizky" },
+];
+
+let _id = 200;
+const uid = () => ++_id;
+
+// ─── LocalStorage persistence helpers ────────────────────────────────────────
+const STORAGE_KEY = "hk_theme_generator_v1";
+const STORAGE_INV = "hk_inv_data_v1";
+function saveDraft(sections, invData) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
+    localStorage.setItem(STORAGE_INV, JSON.stringify(invData));
+  } catch(e) {}
+}
+function loadDraft() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    const d = localStorage.getItem(STORAGE_INV);
+    return { sections: s ? JSON.parse(s) : null, invData: d ? JSON.parse(d) : null };
+  } catch(e) { return { sections: null, invData: null }; }
+}
+function clearDraft() {
+  try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_INV); } catch(e) {}
+}
+
+// Default text element
+const makeTextEl = (text="Teks Baru", x=80, y=200) => ({
+  id:uid(), type:"text", name:text.slice(0,20),
+  text, x, y,
+  fontSize:24, fontFamily:"Playfair Display",
+  color:"#ffffff", align:"center",
+  fontStyle:"normal", fontWeight:"400",
+  letterSpacing:0, lineHeight:1.4,
+  opacity:1, zIndex:10,
+  animation:"none", animDelay:0, animDuration:4,
+  rotation:0, width:250,
+  shadow:false, shadowColor:"rgba(0,0,0,0.5)", shadowBlur:8,
+  isVar:false, varKey:"",
+});
+
+const makeImgEl = (src, name) => ({
+  id:uid(), type:"image", name,
+  src, x:20+Math.floor(Math.random()*40),
+  y:20+Math.floor(Math.random()*40),
+  width:150, rotation:0, opacity:1,
+  zIndex:10, animation:"none",
+  animDelay:0, animDuration:4,
+  flipH:false, flipV:false,
+});
+
+const initSections = [
+  { id:1,type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08",elements:[],openInviteText:"Buka Undangan",openInviteStyle:{fontSize:16,color:"#C4973A",fontFamily:"Playfair Display"} },
+  { id:2,type:"quran",name:"Ayat Quran",bg:"#FAF6EE",elements:[] },
+  { id:3,type:"couple",name:"Profil Mempelai",bg:"#1A100A",elements:[] },
+  { id:4,type:"event",name:"Detail Acara",bg:"#FAF6EE",elements:[] },
+  { id:5,type:"closing",name:"Closing",bg:"#1A100A",elements:[] },
+];
+
+// ─── Build exported HTML ──────────────────────────────────────────────────────
+function buildHTML(sections, invData) {
+  const inv = invData || {};
+  const animCSS = `
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes slide-from-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
+@keyframes slide-from-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes slide-from-top{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}
+@keyframes slide-from-bottom{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
+@keyframes zoom-in{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes rotate-in{from{opacity:0;transform:rotate(-14deg) scale(.88)}to{opacity:1;transform:none}}
+@keyframes sway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(6deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`;
+
+  const elToHTML = (el) => {
+    const baseAnim = (anim, dur, delay) => {
+      if(!anim || anim==="none") return "";
+      const inf = ["sway","float","pulse","shimmer","bounce"].includes(anim);
+      return inf ? `animation:${anim} ${dur||4}s ease-in-out infinite;`
+                 : `animation:${anim} .8s cubic-bezier(.16,1,.3,1) ${delay||0}s both;`;
+    };
+    if(el.type==="image") {
+      const animS = baseAnim(el.animation, el.animDuration, el.animDelay);
+      const flipS = `${el.flipH?"scaleX(-1)":""}${el.flipV?" scaleY(-1)":""}`.trim();
+      const transformVal = [`rotate(${el.rotation||0}deg)`, flipS].filter(Boolean).join(" ");
+      return `  <img src="${el.src}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;transform:${transformVal};opacity:${el.opacity};z-index:${el.zIndex};${animS}pointer-events:none;" />`;
+    }
+    if(el.type==="text") {
+      const animS = baseAnim(el.animation, el.animDuration, el.animDelay);
+      const shadowS = el.shadow ? `text-shadow:0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,0.5)"};` : "";
+      const rawText = el.isVar && el.varKey ? `{{${el.varKey}}}` : el.text;
+      return `  <div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width||200}px;font-size:${el.fontSize||24}px;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);${shadowS}${animS}">${rawText}</div>`;
+    }
+    return "";
+  };
+
+  const buildSecHTML = (s, i) => {
+    const fitMap = {contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"};
+    const bgSize = fitMap[s.bgFit||"cover"]||"cover";
+    const bgStyle = s.bgImage
+      ? `background-image:url('${s.bgImage}');background-size:${bgSize};background-position:center;background-repeat:no-repeat;`
+      : `background:${s.bg};`;
+    const elsHTML = s.elements.map(elToHTML).filter(Boolean).join("\n");
+    let ex = "";
+    if(s.type==="countdown") {
+      const acc = s.cdAccent||"#C4973A";
+      const design = s.cdDesign||"cards";
+      const showDate = s.cdShowDate!==false;
+      let cdInner = "";
+      if(design==="cards") {
+        cdInner = `<div style="display:flex;gap:12px;justify-content:center;">${["days","hours","mins","secs"].map((k,i)=>`<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:${s.cdRadius||8}px;padding:14px 12px;min-width:64px;text-align:center;backdrop-filter:blur(8px);"><span id="cd-${k}" style="font-size:42px;font-family:'Playfair Display',serif;color:${acc};display:block;line-height:1;">00</span><span style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;">${["Hari","Jam","Menit","Detik"][i]}</span></div>`).join("")}</div>`;
+      } else if(design==="minimal") {
+        cdInner = `<div style="display:flex;gap:4px;align-items:center;justify-content:center;">${["days","hours","mins","secs"].map((k,i)=>`${i>0?`<span style="font-size:32px;color:${acc};opacity:.4;margin:0 2px;">:</span>`:"" }<div style="text-align:center;"><span id="cd-${k}" style="font-size:52px;font-family:'Playfair Display',serif;color:${acc};font-style:italic;display:block;line-height:1;">00</span><span style="font-size:9px;letter-spacing:2.5px;color:#666;text-transform:uppercase;display:block;">${["Hari","Jam","Menit","Detik"][i]}</span></div>`).join("")}</div>`;
+      } else if(design==="glass") {
+        cdInner = `<div style="display:flex;gap:10px;justify-content:center;">${["days","hours","mins","secs"].map((k,i)=>`<div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:${s.cdRadius||50}px;padding:18px 10px;min-width:68px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.1);"><span id="cd-${k}" style="font-size:38px;font-family:'DM Sans',sans-serif;font-weight:300;color:#fff;display:block;line-height:1;">${acc!=='#C4973A'?`<span style="color:${acc};">0</span>0`:"00"}</span><span style="font-size:10px;letter-spacing:1.5px;color:#777;text-transform:uppercase;">${["Hari","Jam","Menit","Detik"][i]}</span></div>`).join("")}</div>`;
+      } else if(design==="line") {
+        cdInner = `<div style="display:flex;gap:24px;justify-content:center;align-items:flex-end;">${["days","hours","mins","secs"].map((k,i)=>`<div style="text-align:center;"><span id="cd-${k}" style="font-size:56px;font-family:'Playfair Display',serif;color:${acc};display:block;line-height:1;">00</span><div style="width:100%;height:1px;background:${acc};opacity:.3;margin:6px 0;"></div><span style="font-size:9px;letter-spacing:3px;color:#666;text-transform:uppercase;">${["Hari","Jam","Menit","Detik"][i]}</span></div>`).join("")}</div>`;
+      }
+      const dateText = showDate ? `<div style="margin-top:18px;font-size:12px;letter-spacing:2px;color:#666;text-transform:uppercase;font-family:'DM Sans',sans-serif;">{{inv.akad_date|format_date}}</div>` : "";
+      ex = `\n  <div id="countdown-display" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;"><div style="text-align:center;">${cdInner}${dateText}</div></div>`;
+    }
+    if(s.type==="rsvp") {
+      const acc    = s.rsvpAccent||"#C4973A";
+      const radius = s.rsvpRadius!==undefined?s.rsvpRadius:2;
+      const style  = s.rsvpStyle||"dark";
+      const title  = s.rsvpTitle||"Konfirmasi Kehadiran";
+      const inputBg= style==="light"?"rgba(0,0,0,0.05)":style==="glass"?"rgba(255,255,255,0.1)":"rgba(255,255,255,0.08)";
+      const inputColor= style==="light"?"#333":"#fff";
+      const selectBg= style==="light"?"rgba(0,0,0,0.05)":"#1a1a1a";
+      const titleColor= style==="light"?"#333":`${acc}`;
+      const noteColor= style==="light"?"#666":"#888";
+      ex = `\n  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;padding:32px 24px;overflow-y:auto;">
+  <div style="width:100%;max-width:340px;">
+    <div style="text-align:center;margin-bottom:20px;"><div style="font-family:'Playfair Display',serif;font-size:22px;color:${titleColor};">${title}</div><div style="width:40px;height:1px;background:${acc};opacity:.5;margin:10px auto 0;"></div></div>
+    <div id="rsvp-form" style="display:flex;flex-direction:column;gap:10px;">
+      <input id="rsvp-name" placeholder="Nama Anda" style="padding:12px 16px;background:${inputBg};border:1px solid ${acc}44;color:${inputColor};font-family:'DM Sans',sans-serif;font-size:14px;border-radius:${radius}px;outline:none;width:100%;"/>
+      <select id="rsvp-attend" style="padding:12px 16px;background:${selectBg};border:1px solid ${acc}44;color:#aaa;font-family:'DM Sans',sans-serif;font-size:14px;border-radius:${radius}px;outline:none;width:100%;">
+        <option value="">Konfirmasi Kehadiran</option>
+        <option value="hadir">Insya Allah Hadir ✓</option>
+        <option value="tidak">Mohon Maaf Tidak Hadir</option>
+        <option value="ragu">Masih Belum Pasti</option>
+      </select>
+      <input id="rsvp-guests" type="number" min="1" max="10" placeholder="Jumlah Tamu" style="padding:12px 16px;background:${inputBg};border:1px solid ${acc}44;color:${inputColor};font-family:'DM Sans',sans-serif;font-size:14px;border-radius:${radius}px;outline:none;width:100%;"/>
+      <textarea id="rsvp-message" placeholder="Ucapan &amp; Doa (opsional)" rows="3" style="padding:12px 16px;background:${inputBg};border:1px solid ${acc}44;color:${inputColor};font-family:'DM Sans',sans-serif;font-size:14px;border-radius:${radius}px;outline:none;resize:none;width:100%;"></textarea>
+      <button onclick="submitRSVP()" style="padding:14px;background:${acc};border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;border-radius:${radius}px;cursor:pointer;letter-spacing:.5px;width:100%;">Kirim Konfirmasi</button>
+    </div>
+    <div id="rsvp-success" style="display:none;text-align:center;padding:30px 0;">
+      <div style="font-size:32px;">💌</div>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:${acc};margin-top:10px;">Terima Kasih!</div>
+      <div style="font-size:13px;color:${noteColor};margin-top:6px;">Konfirmasi kehadiran Anda telah kami terima.</div>
+    </div>
+  </div>
+  </div>`;
+    }
+    if(s.type==="maps") {
+      const layout = s.mapsLayout||"fullscreen";
+      const radius = s.mapsRadius!==undefined?s.mapsRadius:0;
+      const btnColor= s.mapsBtnColor||"#C4973A";
+      const btnText = s.mapsBtnText||"Buka di Google Maps";
+      if(layout==="fullscreen") {
+        ex = `\n  <div style="position:absolute;inset:0;z-index:20;">
+  <iframe src="{{inv.maps_embed}}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe>
+  <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:24px;text-align:center;">
+    <a href="{{inv.maps_url}}" target="_blank" style="display:inline-block;padding:11px 28px;background:${btnColor};color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:${radius}px;text-decoration:none;letter-spacing:.5px;">${btnText}</a>
+  </div>
+  </div>`;
+      } else if(layout==="half") {
+        ex = `\n  <div style="position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;">
+  <div style="flex:1;overflow:hidden;border-radius:0 0 ${radius}px ${radius}px;">
+    <iframe src="{{inv.maps_embed}}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+  <div style="flex-shrink:0;padding:20px 24px;text-align:center;background:inherit;">
+    <div style="font-family:'Playfair Display',serif;font-size:16px;color:#C4973A;margin-bottom:6px;">{{inv.resepsi_venue}}</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px;font-family:'DM Sans',sans-serif;">{{inv.resepsi_address}}</div>
+    <a href="{{inv.maps_url}}" target="_blank" style="display:inline-block;padding:10px 28px;background:${btnColor};color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:${radius}px;text-decoration:none;letter-spacing:.5px;">${btnText}</a>
+  </div>
+  </div>`;
+      } else if(layout==="box") {
+        ex = `\n  <div style="position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:100%;border-radius:${radius||16}px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);">
+    <iframe src="{{inv.maps_embed}}" width="100%" height="260" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe>
+    <div style="padding:16px 20px;text-align:center;background:rgba(255,255,255,0.05);">
+      <div style="font-family:'Playfair Display',serif;font-size:15px;color:#C4973A;margin-bottom:4px;">{{inv.resepsi_venue}}</div>
+      <div style="font-size:11px;color:#777;margin-bottom:12px;font-family:'DM Sans',sans-serif;">{{inv.resepsi_address}}</div>
+      <a href="{{inv.maps_url}}" target="_blank" style="display:inline-block;padding:9px 24px;background:${btnColor};color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border-radius:${radius||16}px;text-decoration:none;">${btnText}</a>
+    </div>
+  </div>
+  </div>`;
+      }
+    }
+    if(s.type==="gallery") {
+      const imgEls=s.galleryImages||[], shape=s.galleryShape||"kotak", layout=s.galleryLayout||"2", gap=s.galleryGap!==undefined?s.galleryGap:8;
+      const gridCols=layout==="1"?"1fr":layout==="3"?"1fr 1fr 1fr":"1fr 1fr";
+      const br=shape==="circle"?"50%":shape==="rounded"?"12px":"2px";
+      const imgH=layout==="1"||shape==="portrait"?"220px":"150px";
+      const aspR=shape==="circle"?"aspect-ratio:1/1;":"";
+      const SM=`<svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:48px;height:64px;"><circle cx="30" cy="22" r="14" fill="#2a2018"/><path d="M4 80 Q4 48 30 48 Q56 48 56 80Z" fill="#2a2018"/></svg>`;
+      const SF=`<svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:48px;height:64px;"><circle cx="30" cy="22" r="14" fill="#182028"/><path d="M4 80 Q4 48 30 48 Q56 48 56 80Z" fill="#182028"/></svg>`;
+      // Use Jinja photos loop for real data; fallback to any manually-added images in editor
+      const jinaImgs = `{%- for photo in photos %}<div style="overflow:hidden;border-radius:${br};${aspR}"><img src="{{ photo_src(photo) }}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('{{ photo_src(photo) }}')" loading="lazy"/></div>{%- endfor %}`;
+      const fallbackImgs = imgEls.length
+        ? imgEls.map((src,gi)=>`<div style="overflow:hidden;border-radius:${br};${aspR}"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}')" /></div>`).join("")
+        : Array.from({length:4},(_,gi)=>`<div style="background:${gi%2===0?"#1a1412":"#12181a"};height:${imgH};border-radius:${br};${aspR}display:flex;align-items:center;justify-content:center;">${gi%2===0?SM:SF}</div>`).join("");
+      // Jinja conditional: if photos exist use them, else fallback
+      const imgs = `{%- if photos %}${jinaImgs}{%- else %}${fallbackImgs}{%- endif %}`;
+      ex=`\n  <div style="position:absolute;inset:0;overflow-y:auto;z-index:20;padding:${gap}px;"><div style="display:grid;grid-template-columns:${gridCols};gap:${gap}px;">${imgs}</div></div><div id="lightbox" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;"><img id="lightbox-img" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;
+    }
+    if(s.type==="guestbook") {
+      const acc    = s.gbAccent||"#C4973A";
+      const radius = s.gbRadius!==undefined?s.gbRadius:2;
+      const style  = s.gbStyle||"dark";
+      const title  = s.gbTitle||"Buku Tamu";
+      const inputBg= style==="light"?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.08)";
+      const inputColor= style==="light"?"#333":"#ddd";
+      const cardBg = style==="light"?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.04)";
+      const cardBorder= style==="light"?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.06)";
+      const titleColor= style==="light"?"#333":acc;
+      ex=`\n  <div style="position:absolute;inset:0;overflow-y:auto;z-index:20;padding:20px;">
+  <div style="text-align:center;margin-bottom:16px;padding-top:4px;">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;color:${titleColor};">${title}</div>
+    <div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div>
+  </div>
+  <div id="guestbook-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
+  <div style="position:sticky;bottom:0;background:${s.bg||"inherit"};padding:12px 0 0;">
+    <input id="gb-name" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${inputBg};border:1px solid ${acc}44;color:${inputColor};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${radius}px;outline:none;margin-bottom:8px;display:block;"/>
+    <textarea id="gb-msg" placeholder="Tulis ucapan &amp; doa..." rows="2" style="width:100%;padding:10px 14px;background:${inputBg};border:1px solid ${acc}44;color:${inputColor};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${radius}px;outline:none;resize:none;display:block;margin-bottom:8px;"></textarea>
+    <button onclick="submitGuestbook()" style="width:100%;padding:11px;background:${acc};border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:${radius}px;cursor:pointer;">Kirim Ucapan 💌</button>
+  </div>
+  </div>`;
+    }
+    if(s.type==="gift") {
+      const acc     = s.giftAccent||"#C4973A";
+      const radius  = s.giftRadius!==undefined?s.giftRadius:4;
+      const gstyle  = s.giftStyle||"cards";
+      const title   = s.giftTitle||"Amplop Digital";
+      const subtitle= s.giftSubtitle||"Doa tulus Anda adalah hadiah terindah. Jika ingin memberi, silakan transfer ke:";
+      const cardStyle= gstyle==="glass"
+        ? `background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);`
+        : `background:rgba(255,255,255,0.04);border:1px solid ${acc}33;`;
+      ex=`\n  <div style="position:absolute;inset:0;overflow-y:auto;z-index:20;display:flex;align-items:center;justify-content:center;padding:24px;">
+  <div style="width:100%;max-width:360px;text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:22px;color:${acc};margin-bottom:8px;">${title}</div>
+    <div style="font-size:12px;color:#888;line-height:1.7;margin-bottom:20px;font-family:'DM Sans',sans-serif;">${subtitle}</div>
+    {%- for gift in gifts %}
+    <div style="${cardStyle}border-radius:${radius}px;padding:20px 24px;margin-bottom:12px;">
+      {%- if gift.bank_name %}
+      <div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Transfer via</div>
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:${acc};margin-bottom:4px;">{{ gift.bank_name }}</div>
+      <div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:#fff;letter-spacing:3px;margin:6px 0;">{{ gift.account_number }}</div>
+      <div style="font-size:12px;color:#888;">a/n {{ gift.account_name }}</div>
+      <button onclick="(function(btn){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());btn.textContent='Disalin ✓';setTimeout(()=>btn.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${radius}px;cursor:pointer;letter-spacing:.5px;">Salin Nomor</button>
+      {%- elif gift.ewallet_type %}
+      <div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">{{ gift.ewallet_type }}</div>
+      <div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:#fff;letter-spacing:2px;margin:6px 0;">{{ gift.ewallet_number }}</div>
+      <div style="font-size:12px;color:#888;">a/n {{ gift.ewallet_name }}</div>
+      <button onclick="(function(btn){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());btn.textContent='Disalin ✓';setTimeout(()=>btn.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${radius}px;cursor:pointer;letter-spacing:.5px;">Salin Nomor</button>
+      {%- endif %}
+    </div>
+    {%- endfor %}
+  </div>
+  </div>`;
+    }
+    return `\n<section class="section" id="section-${i}" data-type="${s.type}" style="${bgStyle}">\n${elsHTML}${ex}\n</section>`;
+  };
+
+  const coverSec = sections.find(s=>s.type==="cover");
+  const nonCoverSecs = sections.filter(s=>s.type!=="cover");
+  const hasBGM = inv["music_url"] && inv["music_url"].trim();
+  const groomName = inv["groom_name"] || "Mempelai Pria";
+  const brideName = inv["bride_name"] || "Mempelai Wanita";
+
+  let coverHTML = "";
+  if(coverSec) {
+    const cs = coverSec;
+    const fitMap = {contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"};
+    const bgSize = fitMap[cs.bgFit||"cover"]||"cover";
+    const bg = cs.bgImage
+      ? `background-image:url('${cs.bgImage}');background-size:${bgSize};background-position:center;background-repeat:no-repeat;`
+      : `background:${cs.bg};`;
+    const els = cs.elements.map(elToHTML).filter(Boolean).join("\n");
+    const ois = cs.openInviteStyle || {};
+    const posBottom = ois.posBottom !== undefined ? ois.posBottom : 80;
+    const posLeft = ois.posLeft;
+    const btnWrapStyle = posLeft != null && posLeft !== undefined
+      ? `position:absolute;bottom:${posBottom}px;left:${posLeft}px;z-index:50;`
+      : `position:absolute;bottom:${posBottom}px;left:0;right:0;text-align:center;z-index:50;`;
+    const btnS = `display:inline-block;padding:${ois.paddingV||12}px ${ois.paddingH||30}px;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${ois.fontSize||16}px;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;`;
+    coverHTML = `<div id="cover-screen" style="position:absolute;inset:0;z-index:9000;transition:opacity .7s ease;${bg}">\n${els}\n  <div style="${btnWrapStyle}">\n    <button id="openInviteBtn" style="${btnS}" onclick="openInvitation()">${cs.openInviteText||"Buka Undangan"}</button>\n  </div>\n</div>`;
+  }
+
+  const bgmHTML = hasBGM ? `<audio id="bgm" loop preload="none"><source src="{{inv.music_url}}" type="audio/mpeg"></audio>\n<button id="bgm-btn" onclick="toggleBGM()" style="position:fixed;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">&#9834;</button>` : "";
+
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Undangan ${groomName} &amp; ${brideName}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
+#app{position:fixed;inset:0;overflow:hidden;}
+#track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .7s cubic-bezier(.77,0,.175,1);}
+.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
+.dot.active{background:#C4973A;transform:scale(1.8);}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+${animCSS}
+</style>
+</head>
+<body>
+<div id="app">
+${coverHTML}
+<div id="dots"></div>
+<div id="track">
+${nonCoverSecs.map((s,i)=>buildSecHTML(s,i)).join("\n")}
+</div>
+</div>
+${bgmHTML}
+<script>
+const inv={groom_name:"{{inv.groom_name}}",bride_name:"{{inv.bride_name}}",groom_father:"{{inv.groom_father}}",groom_mother:"{{inv.groom_mother}}",bride_father:"{{inv.bride_father}}",bride_mother:"{{inv.bride_mother}}",akad_date:"{{inv.akad_date}}",akad_time:"{{inv.akad_time}}",akad_venue:"{{inv.akad_venue}}",akad_address:"{{inv.akad_address}}",resepsi_date:"{{inv.resepsi_date}}",resepsi_time:"{{inv.resepsi_time}}",resepsi_venue:"{{inv.resepsi_venue}}",resepsi_address:"{{inv.resepsi_address}}",maps_url:"{{inv.maps_url}}",countdown_date:"{{inv.countdown_date}}",music_url:"{{inv.music_url}}",love_story:"{{inv.love_story}}",bank_name:"{{inv.bank_name}}",account_number:"{{inv.account_number}}",account_name:"{{inv.account_name}}"};
+let cur=0;
+const secs=document.querySelectorAll('.section'),total=secs.length;
+const dotsEl=document.getElementById('dots');
+secs.forEach((_,i)=>{const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);});
+function goTo(i){if(i<0||i>=total)return;cur=i;document.getElementById('track').style.transform='translateY(-'+cur*100+'%)';document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===cur));}
+function coverVisible(){const c=document.getElementById('cover-screen');return c&&c.style.display!=='none';}
+let sy=0;
+document.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{if(coverVisible())return;const dy=sy-e.changedTouches[0].clientY;if(Math.abs(dy)>40)goTo(dy>0?cur+1:cur-1);});
+let wl=false;
+document.addEventListener('wheel',e=>{if(coverVisible())return;if(wl)return;wl=true;goTo(e.deltaY>0?cur+1:cur-1);setTimeout(()=>wl=false,750);},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='PageDown')goTo(cur+1);if(e.key==='ArrowUp'||e.key==='PageUp')goTo(cur-1);});
+function openInvitation(){const c=document.getElementById('cover-screen');if(!c)return;c.style.opacity='0';c.style.pointerEvents='none';setTimeout(()=>{c.style.display='none';dotsEl.style.display='flex';goTo(0);},700);}
+function updateCountdown(){const t=new Date(inv.countdown_date)-new Date();if(isNaN(t)||t<=0){['days','hours','mins','secs'].forEach(k=>{const e=document.getElementById('cd-'+k);if(e)e.textContent='00';});return;}const d=Math.floor(t/86400000),h=Math.floor((t%86400000)/3600000),m=Math.floor((t%3600000)/60000),s=Math.floor((t%60000)/1000);const pad=n=>String(n).padStart(2,'0');['days','hours','mins','secs'].forEach((k,i)=>{const e=document.getElementById('cd-'+k);if(e)e.textContent=pad([d,h,m,s][i]);});}
+if(document.getElementById('cd-days')){updateCountdown();setInterval(updateCountdown,1000);}
+let bgmPlaying=false;
+function toggleBGM(){const a=document.getElementById('bgm');if(!a)return;if(bgmPlaying){a.pause();document.getElementById('bgm-btn').innerHTML='&#9834;';bgmPlaying=false;}else{a.play();document.getElementById('bgm-btn').innerHTML='&#9646;&#9646;';bgmPlaying=true;}}
+function submitRSVP(){const name=document.getElementById('rsvp-name')?.value;const attend=document.getElementById('rsvp-attend')?.value;if(!name||!attend){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}document.getElementById('rsvp-form').style.display='none';document.getElementById('rsvp-success').style.display='block';}
+const gbData=[];
+function renderGuestbook(){const list=document.getElementById('guestbook-list');if(!list)return;list.innerHTML=gbData.map(g=>'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:3px;padding:14px;"><div style="font-weight:600;font-size:13px;color:#C4973A;">'+g.name+'</div><div style="font-size:12px;color:#888;margin-top:4px;">'+g.msg+'</div></div>').join('')||'<div style="color:#444;text-align:center;font-size:12px;padding:20px;">Belum ada ucapan</div>';}
+function submitGuestbook(){const name=document.getElementById('gb-name')?.value;const msg=document.getElementById('gb-msg')?.value;if(!name||!msg)return;gbData.unshift({name,msg});document.getElementById('gb-name').value='';document.getElementById('gb-msg').value='';renderGuestbook();}
+renderGuestbook();
+function openLightbox(src){const lb=document.getElementById('lightbox');const img=document.getElementById('lightbox-img');if(!lb||!img)return;img.src=src;lb.style.display='flex';}
+<\/script>
+</body>
+</html>`;
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
+// Compute initial state from draft or defaults
+const _draft = loadDraft();
+// Sync _id counter if draft loaded
+if (_draft.sections) {
+  _draft.sections.forEach(s => s.elements?.forEach(el => { if(el.id > _id) _id = el.id; }));
+}
+
+function App() {
+  const [sections, setSections]         = useState(() => _draft.sections || initSections);
+  const [activeId, setActiveId]         = useState(() => (_draft.sections?.[0]?.id) || 1);
+  const [selectedElId, setSelEl]        = useState(null);
+  const [drag, setDrag]                 = useState(null);
+  const [canvasScale, setCanvasScale]   = useState(0.68);
+  const [showAddMenu, setShowAddMenu]   = useState(false);
+  const [exportDone, setExportDone]     = useState(false);
+  const [tab, setTab]                   = useState("sections");
+  const [toast, setToast]               = useState(null);
+  const [previewMode, setPreviewMode]   = useState(false);
+  const [showDataPanel, setShowDataPanel] = useState(false);
+  const [invData, setInvData]           = useState(() => _draft.invData || {});
+  const [showFontPicker, setShowFontPicker] = useState(false);
+  const [fontSearch, setFontSearch]     = useState("");
+  const [rightTab, setRightTab]         = useState("element"); // element | section | data
+  const canvasWrapRef = useRef(null);
+  const fileInputRef  = useRef(null);
+  const bgImgRef      = useRef(null);
+  const galleryRef    = useRef(null);
+
+  const activeSection = sections.find(s => s.id === activeId);
+  const selectedEl    = activeSection?.elements.find(e => e.id === selectedElId);
+
+  // Auto-save draft to localStorage
+  useEffect(() => { saveDraft(sections, invData); }, [sections, invData]);
+
+  const showToast = (msg, type="success") => {
+    setToast({msg,type});
+    setTimeout(() => setToast(null), 2400);
+  };
+
+  useEffect(() => {
+    const el = canvasWrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const { width: w, height: h } = el.getBoundingClientRect();
+      setCanvasScale(Math.min((w - 80) / CANVAS_W, (h - 80) / CANVAS_H, 1));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [previewMode]);
+
+  // Auto-switch to Sec tab when cover section active & no element selected
+  useEffect(() => {
+    if (activeSection?.type === "cover" && !selectedElId) {
+      setRightTab("section");
+    }
+  }, [activeSection?.id, selectedElId]);
+
+  // Load Google Fonts for chosen fonts
+  useEffect(() => {
+    const gFonts = FONTS.filter(f => !["Georgia","Times New Roman","Palatino","Garamond"].includes(f));
+    const href = "https://fonts.googleapis.com/css2?"+gFonts.map(f=>`family=${f.replace(/ /g,"+")}:ital,wght@0,400;0,700;1,400`).join("&")+"&display=swap";
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = href;
+    document.head.appendChild(link);
+  }, []);
+
+  // ── Sections ──────────────────────────────────────────────────────────────
+  const addSection = (preset) => {
+    const s = { id:uid(), ...preset, elements:[], openInviteText:"Buka Undangan", openInviteStyle:{fontSize:16,color:"#C4973A",fontFamily:"Playfair Display"} };
+    setSections(p => [...p, s]);
+    setActiveId(s.id);
+    setSelEl(null);
+    setShowAddMenu(false);
+    showToast("Section ditambahkan ✦");
+  };
+
+  const deleteSection = (id) => {
+    setSections(p => {
+      const next = p.filter(s => s.id !== id);
+      if (activeId === id && next.length) setActiveId(next[0].id);
+      return next;
+    });
+    setSelEl(null);
+  };
+
+  const moveSection = (id, dir) => {
+    setSections(p => {
+      const arr = [...p], idx = arr.findIndex(s => s.id === id);
+      const to = idx + dir;
+      if (to < 0 || to >= arr.length) return p;
+      [arr[idx], arr[to]] = [arr[to], arr[idx]];
+      return arr;
+    });
+  };
+
+  const updateSection = (id, patch) =>
+    setSections(p => p.map(s => s.id === id ? { ...s, ...patch } : s));
+
+  // ── Elements ──────────────────────────────────────────────────────────────
+  const addElement = (el) => {
+    setSections(p => p.map(s => s.id === activeId ? { ...s, elements: [...s.elements, el] } : s));
+    setSelEl(el.id);
+  };
+
+  const updateEl = (id, patch) =>
+    setSections(p => p.map(s => s.id === activeId
+      ? { ...s, elements: s.elements.map(e => e.id === id ? { ...e, ...patch } : e) } : s));
+
+  const deleteEl = (id) => {
+    setSections(p => p.map(s => s.id === activeId
+      ? { ...s, elements: s.elements.filter(e => e.id !== id) } : s));
+    setSelEl(null);
+  };
+
+  const duplicateEl = (id) => {
+    const el = activeSection?.elements.find(e => e.id === id);
+    if (!el) return;
+    const copy = { ...el, id: uid(), x: el.x + 16, y: el.y + 16 };
+    setSections(p => p.map(s => s.id === activeId
+      ? { ...s, elements: [...s.elements, copy] } : s));
+    setSelEl(copy.id);
+    showToast("Elemen diduplikat");
+  };
+
+  const bringForward = (id) => { const el=activeSection?.elements.find(e=>e.id===id); if(el) updateEl(id,{zIndex:el.zIndex+1}); };
+  const sendBackward = (id) => { const el=activeSection?.elements.find(e=>e.id===id); if(el) updateEl(id,{zIndex:Math.max(1,el.zIndex-1)}); };
+
+  // Move element up/down in array order (visual stacking)
+  const moveElInLayer = (id, dir) => {
+    setSections(p => p.map(s => {
+      if(s.id !== activeId) return s;
+      const arr = [...s.elements];
+      const idx = arr.findIndex(e => e.id === id);
+      const to  = idx + dir;
+      if(to < 0 || to >= arr.length) return s;
+      [arr[idx], arr[to]] = [arr[to], arr[idx]];
+      // keep zIndex in sync with array order
+      return { ...s, elements: arr.map((e,i) => ({ ...e, zIndex: i + 1 })) };
+    }));
+  };
+
+  // ── Upload ────────────────────────────────────────────────────────────────
+  const handleUpload = (e) => {
+    const files = [...(e.target.files || [])];
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => addElement(makeImgEl(ev.target.result, file.name));
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+    showToast(`${files.length} aset diupload`);
+  };
+
+  const handleBgImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => updateSection(activeId, { bgImage: ev.target.result });
+    reader.readAsDataURL(file);
+    e.target.value = "";
+    showToast("Background foto diset");
+  };
+
+  const handleGalleryAdd = (e) => {
+    const files = [...(e.target.files || [])];
+    const curGallery = activeSection?.galleryImages || [];
+    Promise.all(files.map(f => new Promise(res => {
+      const r = new FileReader();
+      r.onload = ev => res(ev.target.result);
+      r.readAsDataURL(f);
+    }))).then(imgs => {
+      updateSection(activeId, { galleryImages: [...curGallery, ...imgs] });
+      showToast(`${files.length} foto gallery ditambahkan`);
+    });
+    e.target.value = "";
+  };
+
+  // ── Canvas Drag ───────────────────────────────────────────────────────────
+  const onElDown = (e, elId) => {
+    e.stopPropagation();
+    setSelEl(elId);
+    const el = activeSection.elements.find(x => x.id === elId);
+    setDrag({ id:elId, sx:e.clientX, sy:e.clientY, ox:el.x, oy:el.y });
+  };
+
+  useEffect(() => {
+    if (!drag) return;
+    const onMove = (e) => updateEl(drag.id, {
+      x: Math.round(drag.ox + (e.clientX - drag.sx) / canvasScale),
+      y: Math.round(drag.oy + (e.clientY - drag.sy) / canvasScale),
+    });
+    const onUp = () => setDrag(null);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove",onMove); window.removeEventListener("mouseup",onUp); };
+  }, [drag, canvasScale]);
+
+  // Keyboard
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!selectedElId) return;
+      if (["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
+      const el = activeSection?.elements.find(x => x.id === selectedElId);
+      if (!el) return;
+      const step = e.shiftKey ? 10 : 1;
+      if (e.key==="ArrowLeft")  { e.preventDefault(); updateEl(selectedElId,{x:el.x-step}); }
+      if (e.key==="ArrowRight") { e.preventDefault(); updateEl(selectedElId,{x:el.x+step}); }
+      if (e.key==="ArrowUp")    { e.preventDefault(); updateEl(selectedElId,{y:el.y-step}); }
+      if (e.key==="ArrowDown")  { e.preventDefault(); updateEl(selectedElId,{y:el.y+step}); }
+      if (e.key==="Delete"||e.key==="Backspace") { e.preventDefault(); deleteEl(selectedElId); }
+      if ((e.ctrlKey||e.metaKey)&&e.key==="d") { e.preventDefault(); duplicateEl(selectedElId); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedElId, activeSection, canvasScale]);
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  const exportHTML = () => {
+    const html = buildHTML(sections, invData);
+    const blob = new Blob([html], { type:"text/html" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = "undangan-export.html"; a.click();
+    URL.revokeObjectURL(url);
+    setExportDone(true);
+    setTimeout(() => setExportDone(false), 2500);
+    showToast("Export berhasil! 🎉");
+  };
+
+  // ── Render Element on Canvas ──────────────────────────────────────────────
+  const renderElOnCanvas = (el) => {
+    const isSelected = selectedElId === el.id;
+    const flipStyle = {
+      ...(el.flipH ? {transform:`rotate(${el.rotation||0}deg) scaleX(-1)`} : {}),
+      ...(el.flipV ? {transform:`rotate(${el.rotation||0}deg) scaleY(-1)`} : {}),
+      ...(!el.flipH && !el.flipV ? {transform:`rotate(${el.rotation||0}deg)`} : {}),
+    };
+
+    const animStyle = (() => {
+      if (!el.animation || el.animation === "none") return {};
+      const inf = ["sway","float","pulse","shimmer","bounce"].includes(el.animation);
+      if (inf) return { animation: `${el.animation} ${el.animDuration||4}s ease-in-out infinite` };
+      return { animation: `${el.animation} .8s cubic-bezier(.16,1,.3,1) ${el.animDelay||0}s both` };
+    })();
+
+    const containerStyle = {
+      position:"absolute", left:el.x, top:el.y,
+      width: el.width || (el.type==="text" ? 200 : 150),
+      ...flipStyle,
+      opacity:el.opacity, zIndex:el.zIndex,
+      cursor:"move", userSelect:"none",
+      outline: isSelected ? "1.5px solid #C4973A" : "1px solid transparent",
+      outlineOffset:2,
+      ...animStyle,
+    };
+
+    return (
+      <div key={el.id}
+        onMouseDown={e => onElDown(e, el.id)}
+        onClick={e => { e.stopPropagation(); setSelEl(el.id); }}
+        style={containerStyle}>
+
+        {el.type === "image" && (
+          <img src={el.src} style={{width:"100%",display:"block",pointerEvents:"none",draggable:false}} alt="" />
+        )}
+        {el.type === "text" && (() => {
+          const PHOTO_VARS = new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
+          const isPhotoVar = el.isVar && el.varKey && PHOTO_VARS.has(el.varKey);
+          if (isPhotoVar) {
+            const liveVal = invData[el.varKey.replace("inv.","")];
+            const varDef  = DATA_VARS.find(v => v.key === el.varKey);
+            const src     = liveVal || varDef?.example || "";
+            const imgH    = el.width || 150;
+            return src ? (
+              <img src={src} alt="" style={{
+                width:"100%", height:imgH, objectFit:"cover", display:"block",
+                borderRadius: el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`, pointerEvents:"none",
+              }} onError={e=>{e.target.style.opacity=0.3;}} />
+            ) : (
+              <div style={{
+                width:"100%", height:imgH, background:"#1a1412", display:"flex",
+                alignItems:"center", justifyContent:"center", borderRadius:el.borderRadius||0,
+                fontSize:10, color:"#555", fontFamily:"DM Sans,sans-serif", textAlign:"center", padding:8,
+              }}>
+                <span>🖼 {el.varKey}<br/><span style={{opacity:.5,fontSize:9}}>set path di Data panel</span></span>
+              </div>
+            );
+          }
+          return (
+            <div style={{
+              fontSize:el.fontSize||24, fontFamily:`'${el.fontFamily||"Playfair Display"}',serif`,
+              color: el.color||"#fff", textAlign:el.align||"center",
+              fontStyle:el.fontStyle||"normal", fontWeight:el.fontWeight||400,
+              letterSpacing:el.letterSpacing||0, lineHeight:el.lineHeight||1.4,
+              whiteSpace:"pre-wrap", wordBreak:"break-word",
+              textShadow: el.shadow ? `0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,0.5)"}` : "none",
+              pointerEvents:"none",
+            }}>
+              {el.isVar && el.varKey
+                ? (() => {
+                    const varDef = DATA_VARS.find(v => v.key === el.varKey);
+                    const liveVal = invData[el.varKey.replace("inv.","")];
+                    return liveVal
+                      ? <span>{liveVal}</span>
+                      : <span style={{opacity:.75}}>{varDef?.example || el.varKey}</span>;
+                  })()
+                : el.text}
+            </div>
+          );
+        })()}
+
+        {/* Handles */}
+        {isSelected && (
+          <>
+            {/* Resize handle — orange bottom-right */}
+            <div title="Resize" onMouseDown={e => {
+              e.stopPropagation();
+              const startX=e.clientX, startW=el.width||150;
+              const onM=ev=>updateEl(el.id,{width:Math.max(20,Math.round(startW+(ev.clientX-startX)/canvasScale))});
+              const onU=()=>{window.removeEventListener("mousemove",onM);window.removeEventListener("mouseup",onU);};
+              window.addEventListener("mousemove",onM); window.addEventListener("mouseup",onU);
+            }} style={{position:"absolute",right:-5,bottom:-5,width:12,height:12,background:"#C4973A",borderRadius:2,cursor:"se-resize",zIndex:1001}} />
+
+            {/* Rotation handle — green top-center */}
+            <div title="Rotasi" onMouseDown={e => {
+              e.stopPropagation();
+              const rect=e.currentTarget.parentElement.getBoundingClientRect();
+              const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+              const startAngle=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;
+              const startRot=el.rotation||0;
+              const onM=ev=>{const a=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI;updateEl(el.id,{rotation:Math.round(startRot+(a-startAngle))});};
+              const onU=()=>{window.removeEventListener("mousemove",onM);window.removeEventListener("mouseup",onU);};
+              window.addEventListener("mousemove",onM); window.addEventListener("mouseup",onU);
+            }} style={{position:"absolute",top:-18,left:"50%",transform:"translateX(-50%)",width:10,height:10,background:"#7D9470",borderRadius:"50%",cursor:"grab",zIndex:1001}} />
+
+            {/* Flip-H handle — blue top-left */}
+            <div title="Flip Horizontal" onClick={e=>{e.stopPropagation();updateEl(el.id,{flipH:!el.flipH});}}
+              style={{position:"absolute",top:-18,left:-5,width:10,height:10,background:"#4A90D9",borderRadius:2,cursor:"pointer",zIndex:1001,fontSize:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>↔</div>
+
+            {/* Flip-V handle — purple top-right */}
+            <div title="Flip Vertikal" onClick={e=>{e.stopPropagation();updateEl(el.id,{flipV:!el.flipV});}}
+              style={{position:"absolute",top:-18,right:-5,width:10,height:10,background:"#9B59B6",borderRadius:2,cursor:"pointer",zIndex:1001,fontSize:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>↕</div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  if (previewMode) {
+    const html = buildHTML(sections, invData);
+    return (
+      <div style={{position:"fixed",inset:0,zIndex:9999,background:"#050505",display:"flex",flexDirection:"column"}}>
+        <div style={{height:40,background:"#111",display:"flex",alignItems:"center",padding:"0 16px",gap:12,flexShrink:0,borderBottom:"1px solid #1a1a1a"}}>
+          <span style={{color:"#C4973A",fontWeight:700,fontSize:13,fontFamily:"DM Sans,sans-serif"}}>👁 Preview — tampilan HP</span>
+          <div style={{flex:1}}/>
+          <button onClick={exportHTML} style={{padding:"5px 14px",background:"#C4973A",border:"none",color:"#000",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>⬇ Export</button>
+          <button onClick={()=>setPreviewMode(false)} style={{padding:"5px 14px",background:"#1e1e1e",border:"1px solid #333",color:"#aaa",borderRadius:3,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif"}}>✕ Tutup</button>
+        </div>
+        <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:"#080808"}}>
+          {/* Phone shell */}
+          <div style={{
+            width:390,height:"calc(100vh - 100px)",maxHeight:844,
+            borderRadius:36,
+            boxShadow:"0 0 0 8px #1a1a1a,0 0 0 10px #111,0 32px 80px rgba(0,0,0,.9)",
+            overflow:"hidden",flexShrink:0,position:"relative"
+          }}>
+            {/* notch */}
+            <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:28,background:"#1a1a1a",borderRadius:"0 0 16px 16px",zIndex:10}}/>
+            <iframe srcDoc={html} style={{width:"100%",height:"100%",border:"none"}} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={S.root}>
+      {/* Toast */}
+      {toast && (
+        <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",
+          background: toast.type==="error" ? "#2a0e0e" : "#1e2a1e",
+          border:`1px solid ${toast.type==="error" ? "#c55" : "#7D9470"}`,
+          color: toast.type==="error" ? "#f88" : "#aed6a0",
+          padding:"8px 20px",borderRadius:6,fontSize:12,zIndex:9999,
+          animation:"toast-in .2s ease",whiteSpace:"nowrap",fontFamily:"DM Sans,sans-serif"}}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* TOP BAR */}
+      <div style={S.topbar}>
+        <span style={S.logo}>🌿 Theme Generator</span>
+        <span style={{color:"#333",fontSize:11,marginLeft:4}}>habarkita.com</span>
+        <div style={{flex:1}}/>
+        <div style={{fontSize:11,color:"#333",marginRight:8,fontFamily:"DM Sans,sans-serif"}}>
+          {sections.length} sections · {sections.reduce((a,s)=>a+s.elements.length,0)} el
+        </div>
+        <button onClick={()=>setShowDataPanel(v=>!v)}
+          style={{...S.btnSecondary,marginRight:4,background:showDataPanel?"#1a2010":"#181818",border:showDataPanel?"1px solid #7D9470":"1px solid #252525",color:showDataPanel?"#9CD889":"#666"}}>
+          📋 Data
+        </button>
+        <button onClick={()=>setPreviewMode(true)} style={{...S.btnSecondary,marginRight:4}}>👁 Preview</button>
+        <button onClick={() => fileInputRef.current?.click()} style={{...S.btnSecondary,marginRight:4}}>↑ Upload</button>
+        <input ref={fileInputRef} type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleUpload} />
+        <button onClick={()=>{if(window.confirm("Hapus semua draft? Data akan kembali ke default.")){clearDraft();window.location.reload();}}}
+          style={{...S.btnSecondary,marginRight:4,color:"#733",borderColor:"#2a1515"}} title="Reset ke default">
+          🗑 Reset
+        </button>
+        <button onClick={exportHTML}
+          style={{...S.btnPrimary,...(exportDone?{background:"#7D9470"}:{})}}>
+          {exportDone ? "✓ Berhasil!" : "⬇ Export HTML"}
+        </button>
+      </div>
+
+      {/* DATA PANEL */}
+      {showDataPanel && (
+        <div style={{position:"absolute",top:46,right:0,width:320,background:"#111",borderLeft:"1px solid #1e1e1e",borderBottom:"1px solid #1e1e1e",zIndex:500,maxHeight:"calc(100vh - 100px)",overflowY:"auto",padding:16}}>
+          <div style={{fontSize:11,letterSpacing:1.2,textTransform:"uppercase",color:"#555",fontWeight:700,marginBottom:14,fontFamily:"DM Sans,sans-serif"}}>📋 Data Undangan</div>
+          <div style={{fontSize:11,color:"#444",marginBottom:10,lineHeight:1.6,fontFamily:"DM Sans,sans-serif"}}>
+            Isi data di sini untuk preview. Pada hasil export, nilai ini akan menjadi template variable <code style={{color:"#7D9470"}}>{"{{inv.key}}"}</code>
+          </div>
+          {DATA_VARS.map(v => (
+            <div key={v.key} style={{marginBottom:10}}>
+              <div style={{fontSize:10,color:"#444",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>{v.label}</div>
+              <input
+                value={invData[v.key.replace("inv.","")] || ""}
+                onChange={e => setInvData(p=>({...p,[v.key.replace("inv.","")]:e.target.value}))}
+                placeholder={v.example}
+                style={{...S.input,fontSize:11}}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={S.body}>
+        {/* LEFT PANEL */}
+        <div style={S.leftPanel}>
+          <div style={{display:"flex",borderBottom:"1px solid #1a1a1a",flexShrink:0}}>
+            {["sections","layers"].map(t => (
+              <button key={t} onClick={()=>setTab(t)}
+                style={{flex:1,padding:"9px 0",background:"none",border:"none",
+                  color:tab===t?"#C4973A":"#444",
+                  borderBottom:`2px solid ${tab===t?"#C4973A":"transparent"}`,
+                  cursor:"pointer",fontSize:11,letterSpacing:.8,textTransform:"uppercase",fontWeight:600,fontFamily:"DM Sans,sans-serif"}}>
+                {t==="sections"?"Sections":"Layers"}
+              </button>
+            ))}
+          </div>
+
+          {tab==="sections" && (
+            <>
+              <div style={{flex:1,overflowY:"auto"}}>
+                {sections.map((s,idx) => (
+                  <div key={s.id} onClick={()=>{setActiveId(s.id);setSelEl(null);}}
+                    style={{display:"flex",alignItems:"center",gap:6,padding:"7px 8px",
+                      cursor:"pointer",transition:"background .12s",
+                      background:s.id===activeId?"#191919":"transparent",
+                      borderLeft:`3px solid ${s.id===activeId?"#C4973A":"transparent"}`}}>
+                    <div style={{width:12,height:12,borderRadius:2,flexShrink:0,
+                      background:s.bgImage?"transparent":s.bg,
+                      border:"1px solid #2a2a2a",
+                      backgroundImage:s.bgImage?`url(${s.bgImage})`:"none",
+                      backgroundSize:"cover"}} />
+                    <span style={{flex:1,fontSize:11,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",
+                      color:s.id===activeId?"#ddd":"#555",fontFamily:"DM Sans,sans-serif"}}>
+                      {idx+1}. {s.name}
+                    </span>
+                    <IBtn onClick={e=>{e.stopPropagation();moveSection(s.id,-1);}}>↑</IBtn>
+                    <IBtn onClick={e=>{e.stopPropagation();moveSection(s.id,1);}}>↓</IBtn>
+                    <IBtn danger onClick={e=>{e.stopPropagation();deleteSection(s.id);}}>×</IBtn>
+                  </div>
+                ))}
+              </div>
+              <div style={{borderTop:"1px solid #1a1a1a",padding:8,flexShrink:0}}>
+                <button onClick={()=>setShowAddMenu(m=>!m)}
+                  style={{width:"100%",padding:"7px 0",background:"#151515",border:"1px dashed #252525",color:"#C4973A",borderRadius:4,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif"}}>
+                  {showAddMenu?"— Tutup":"+ Tambah Section"}
+                </button>
+                {showAddMenu && (
+                  <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:3}}>
+                    {SECTION_PRESETS.map(p => (
+                      <button key={p.type} onClick={()=>addSection(p)}
+                        style={{padding:"3px 8px",background:"#181818",border:"1px solid #252525",color:"#777",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {/* Quick add text button */}
+                <button onClick={()=>{addElement(makeTextEl("Teks Baru",80,200));}}
+                  style={{width:"100%",marginTop:6,padding:"6px 0",background:"#151515",border:"1px solid #1e2a1e",color:"#7D9470",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+                  + Teks / Judul
+                </button>
+                {/* Add var text */}
+                <button onClick={()=>{
+                  const el=makeTextEl("{{inv.groom_name}}",80,300);
+                  el.isVar=true; el.varKey="inv.groom_name"; el.text="{{inv.groom_name}}";
+                  addElement(el);
+                }}
+                  style={{width:"100%",marginTop:4,padding:"6px 0",background:"#151515",border:"1px solid #222a1e",color:"#6aaa60",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+                  + Data Variable
+                </button>
+              </div>
+            </>
+          )}
+
+          {tab==="layers" && (
+            <div style={{flex:1,overflowY:"auto"}}>
+              {(!activeSection?.elements.length) ? (
+                <div style={{padding:20,color:"#333",fontSize:12,textAlign:"center",lineHeight:1.8,fontFamily:"DM Sans,sans-serif"}}>
+                  Belum ada elemen.<br/>
+                  <span style={{color:"#444"}}>Upload asset atau tambah teks.</span>
+                </div>
+              ) : (
+                <>
+                  <div style={{padding:"5px 8px 3px",fontSize:9,color:"#2a2a2a",letterSpacing:1,textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>
+                    atas → bawah (urutan render)
+                  </div>
+                  {activeSection.elements.slice().reverse().map((el, ri) => {
+                    const totalLen = activeSection.elements.length;
+                    const origIdx = totalLen - 1 - ri; // actual index in array
+                    const isTop    = origIdx === totalLen - 1;
+                    const isBottom = origIdx === 0;
+                    return (
+                      <div key={el.id} onClick={()=>setSelEl(el.id)}
+                        style={{display:"flex",alignItems:"center",gap:5,padding:"5px 6px 5px 8px",cursor:"pointer",
+                          background:el.id===selectedElId?"#191919":"transparent",
+                          borderLeft:`3px solid ${el.id===selectedElId?"#7D9470":"transparent"}`,
+                          borderBottom:"1px solid #111"}}>
+                        {/* thumbnail */}
+                        {el.type==="image"
+                          ? <img src={el.src} style={{width:20,height:20,objectFit:"cover",borderRadius:2,flexShrink:0,border:"1px solid #222"}}/>
+                          : <span style={{width:20,height:20,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",color:"#555",flexShrink:0,background:"#161616",borderRadius:2}}>T</span>
+                        }
+                        {/* name */}
+                        <span style={{flex:1,fontSize:11,color:el.id===selectedElId?"#bbb":"#555",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontFamily:"DM Sans,sans-serif"}}>
+                          {el.name||el.text||"Element"}
+                        </span>
+                        {/* layer up/down */}
+                        <div style={{display:"flex",flexDirection:"column",gap:1,flexShrink:0}}>
+                          <button
+                            onClick={e=>{e.stopPropagation(); moveElInLayer(el.id, 1);}}
+                            disabled={isTop}
+                            title="Naikkan layer"
+                            style={{padding:"1px 5px",background:"transparent",border:"none",
+                              color:isTop?"#252525":"#444",cursor:isTop?"default":"pointer",
+                              fontSize:10,lineHeight:1,borderRadius:2}}
+                            onMouseEnter={e=>{ if(!isTop) e.target.style.color="#C4973A"; }}
+                            onMouseLeave={e=>{ e.target.style.color=isTop?"#252525":"#444"; }}>
+                            ▲
+                          </button>
+                          <button
+                            onClick={e=>{e.stopPropagation(); moveElInLayer(el.id, -1);}}
+                            disabled={isBottom}
+                            title="Turunkan layer"
+                            style={{padding:"1px 5px",background:"transparent",border:"none",
+                              color:isBottom?"#252525":"#444",cursor:isBottom?"default":"pointer",
+                              fontSize:10,lineHeight:1,borderRadius:2}}
+                            onMouseEnter={e=>{ if(!isBottom) e.target.style.color="#C4973A"; }}
+                            onMouseLeave={e=>{ e.target.style.color=isBottom?"#252525":"#444"; }}>
+                            ▼
+                          </button>
+                        </div>
+                        <IBtn danger onClick={e=>{e.stopPropagation();deleteEl(el.id);}}>×</IBtn>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* CANVAS */}
+        <div ref={canvasWrapRef} style={S.canvasWrap} onClick={()=>setSelEl(null)}>
+          {/* Section dots nav */}
+          <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",gap:5,zIndex:10}}>
+            {sections.map((s,i) => (
+              <div key={s.id} onClick={()=>{setActiveId(s.id);setSelEl(null);}} title={s.name}
+                style={{width:5,height:5,borderRadius:"50%",background:s.id===activeId?"#C4973A":"#222",cursor:"pointer",transition:"all .2s",transform:s.id===activeId?"scale(1.8)":"scale(1)"}}/>
+            ))}
+          </div>
+
+          {activeSection ? (
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
+              <div style={{fontSize:11,color:"#333",letterSpacing:.5,fontFamily:"DM Sans,sans-serif"}}>
+                {sections.findIndex(s=>s.id===activeId)+1}/{sections.length} — {activeSection.name}
+              </div>
+              <div style={{
+                width:CANVAS_W, height:CANVAS_H,
+                background:activeSection.bgImage?undefined:activeSection.bg,
+                backgroundImage:activeSection.bgImage?`url(${activeSection.bgImage})`:"none",
+                backgroundSize: activeSection.bgImage
+                  ? (activeSection.bgFit==="contain"?"contain"
+                    :activeSection.bgFit==="fill"?"100% 100%"
+                    :activeSection.bgFit==="center"?"auto"
+                    :"cover")
+                  : undefined,
+                backgroundPosition:"center",
+                backgroundRepeat:"no-repeat",
+                position:"relative", overflow:"hidden",
+                boxShadow:"0 0 0 1px #1e1e1e, 0 24px 80px rgba(0,0,0,.9)",
+                transform:`scale(${canvasScale})`,
+                transformOrigin:"top center",
+                flexShrink:0,
+              }}>
+                {/* Grid */}
+                <div style={{position:"absolute",inset:0,zIndex:998,pointerEvents:"none",
+                  backgroundImage:"linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)",
+                  backgroundSize:"20px 20px"}}/>
+
+                {/* Section type label */}
+                <div style={{position:"absolute",top:8,left:8,fontSize:9,letterSpacing:1.5,textTransform:"uppercase",color:"rgba(255,255,255,0.15)",zIndex:999,fontFamily:"DM Sans,sans-serif"}}>
+                  {activeSection.type}
+                </div>
+
+                {/* Elements */}
+                {activeSection.elements.map(renderElOnCanvas)}
+
+                {/* Cover open-invite button — draggable */}
+                {activeSection.type==="cover" && (() => {
+                  const ois = activeSection.openInviteStyle || {};
+                  const posBottom = ois.posBottom !== undefined ? ois.posBottom : 80;
+                  const posLeft   = ois.posLeft   !== undefined ? ois.posLeft   : null;
+                  const centered  = posLeft === null;
+                  return (
+                    <div
+                      style={{
+                        position:"absolute",
+                        ...(centered
+                          ? {bottom:posBottom, left:0, right:0, textAlign:"center"}
+                          : {bottom:posBottom, left:posLeft}
+                        ),
+                        zIndex:50, cursor:"move",
+                      }}
+                      title="Drag untuk pindah · Edit style di panel Sec →"
+                      onMouseDown={e=>{
+                        e.stopPropagation();
+                        const startY=e.clientY, startX=e.clientX;
+                        const startBottom=posBottom;
+                        const startLeft=posLeft !== null ? posLeft : CANVAS_W/2 - 60;
+                        const onM=ev=>{
+                          const dy=(ev.clientY-startY)/canvasScale;
+                          const dx=(ev.clientX-startX)/canvasScale;
+                          const nb=Math.round(Math.max(0,Math.min(CANVAS_H-40, startBottom-dy)));
+                          const nl=Math.round(startLeft+dx);
+                          updateSection(activeSection.id,{openInviteStyle:{...ois,posBottom:nb,posLeft:nl}});
+                        };
+                        const onU=()=>{window.removeEventListener("mousemove",onM);window.removeEventListener("mouseup",onU);};
+                        window.addEventListener("mousemove",onM);
+                        window.addEventListener("mouseup",onU);
+                      }}
+                    >
+                      <div style={{
+                        display:"inline-block",
+                        padding:`${ois.paddingV||12}px ${ois.paddingH||30}px`,
+                        border:`${ois.borderWidth||1}px solid ${ois.color||"#C4973A"}`,
+                        color:ois.color||"#C4973A",
+                        background:ois.bgColor||"transparent",
+                        fontFamily:`'${ois.fontFamily||"Playfair Display"}',serif`,
+                        fontSize:ois.fontSize||16,
+                        borderRadius:ois.borderRadius||2,
+                        letterSpacing:1.5,textTransform:"uppercase",
+                        userSelect:"none",
+                        position:"relative",
+                      }}>
+                        {activeSection.openInviteText||"Buka Undangan"}
+                        <span style={{position:"absolute",top:-16,right:0,fontSize:8,background:"rgba(196,151,58,0.2)",color:"#C4973A",padding:"1px 5px",borderRadius:3,letterSpacing:.5,textTransform:"none",whiteSpace:"nowrap",border:"1px solid rgba(196,151,58,0.3)"}}>⚙ edit di tab Sec →</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Gallery section preview */}
+                {activeSection.type==="gallery" && (() => {
+                  const shape = activeSection.galleryShape||"kotak";
+                  const layout = activeSection.galleryLayout||"2";
+                  const gap = activeSection.galleryGap !== undefined ? activeSection.galleryGap : 8;
+                  const cols = layout==="1"?"1fr":layout==="3"?"1fr 1fr 1fr":"1fr 1fr";
+                  const imgH = layout==="1"||shape==="portrait" ? 180 : 120;
+                  const br = shape==="circle"?"50%":shape==="rounded"?"10px":"2px";
+                  // Use uploaded gallery images, else demo photos from Flask static, else SVG silhouettes
+                  const DEMO_PHOTOS = [
+                    "static/demo-photos/1772883688859.jpg",
+                    "static/demo-photos/1772883766870.jpg",
+                    "static/demo-photos/1772883848858.jpg",
+                    "static/demo-photos/1772883916643.jpg",
+                    "static/demo-photos/1772979323367~2.jpg",
+                    "static/demo-photos/1772979530086~2.jpg",
+                    "static/demo-photos/demo-282882.jpg",
+                  ];
+                  const photos = (activeSection.galleryImages||[]).length > 0
+                    ? activeSection.galleryImages
+                    : DEMO_PHOTOS;
+                  return (
+                    <div style={{position:"absolute",inset:0,overflow:"auto",zIndex:20,padding:gap}}>
+                      <div style={{display:"grid",gridTemplateColumns:cols,gap}}>
+                        {photos.map((src,i)=>(
+                          <div key={i} style={{
+                            overflow:"hidden",
+                            borderRadius:br,
+                            aspectRatio:shape==="circle"?"1/1":undefined,
+                            background:"#1a1412",
+                          }}>
+                            <img src={src} style={{width:"100%",height:imgH,objectFit:"cover",display:"block"}}
+                              onError={e=>{e.target.style.display="none";}}/>
+                          </div>
+                        ))}
+                      </div>
+                      {(activeSection.galleryImages||[]).length===0 && (
+                        <div style={{textAlign:"center",marginTop:6,fontSize:9,color:"#333",fontFamily:"DM Sans,sans-serif",letterSpacing:.3}}>
+                          demo · foto asli dari DB saat export
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* RSVP preview */}
+                {activeSection.type==="rsvp" && (() => {
+                  const acc = activeSection.rsvpAccent||"#C4973A";
+                  const r   = activeSection.rsvpRadius!==undefined?activeSection.rsvpRadius:2;
+                  const sty = activeSection.rsvpStyle||"dark";
+                  const ib  = sty==="light"?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.08)";
+                  const ic  = sty==="light"?"#333":"#aaa";
+                  const title = activeSection.rsvpTitle||"Konfirmasi Kehadiran";
+                  const tc = sty==="light"?"#333":acc;
+                  return (
+                    <div style={{position:"absolute",inset:0,overflowY:"auto",zIndex:20,display:"flex",alignItems:"center",justifyContent:"center",padding:"32px 20px"}}>
+                      <div style={{width:"100%",maxWidth:300}}>
+                        <div style={{textAlign:"center",marginBottom:16}}>
+                          <div style={{fontFamily:"Playfair Display,serif",fontSize:18,color:tc}}>{title}</div>
+                          <div style={{width:32,height:1,background:acc,opacity:.5,margin:"8px auto 0"}}/>
+                        </div>
+                        {["Nama Anda","Jumlah Tamu"].map((ph,i)=>(
+                          <div key={i} style={{padding:"10px 14px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:13,marginBottom:8}}>{ph}</div>
+                        ))}
+                        <div style={{padding:"10px 14px",background:sty==="light"?"rgba(0,0,0,0.06)":"#1a1a1a",border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:13,marginBottom:8}}>Konfirmasi Kehadiran ▾</div>
+                        <div style={{padding:"22px 14px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:13,marginBottom:8}}>Ucapan & Doa...</div>
+                        <div style={{padding:"12px 14px",background:acc,borderRadius:r,color:"#fff",fontFamily:"DM Sans,sans-serif",fontSize:13,fontWeight:600,textAlign:"center"}}>Kirim Konfirmasi</div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Maps preview */}
+                {activeSection.type==="maps" && (() => {
+                  const layout = activeSection.mapsLayout||"fullscreen";
+                  const r = activeSection.mapsRadius!==undefined?activeSection.mapsRadius:0;
+                  const btnColor = activeSection.mapsBtnColor||"#C4973A";
+                  const btnText  = activeSection.mapsBtnText||"Buka di Google Maps";
+                  const MapPlaceholder = ({h,br}) => (
+                    <div style={{width:"100%",height:h||"100%",background:"#1a2a1a",borderRadius:br||0,position:"relative",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)",backgroundSize:"30px 30px"}}/>
+                      <div style={{textAlign:"center",color:"#3a5a3a",fontSize:11,fontFamily:"DM Sans,sans-serif",zIndex:1}}>🗺<br/>Google Maps</div>
+                    </div>
+                  );
+                  if(layout==="fullscreen") return (
+                    <div style={{position:"absolute",inset:0,zIndex:20}}>
+                      <MapPlaceholder/>
+                      <div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(transparent,rgba(0,0,0,.8))",padding:18,textAlign:"center"}}>
+                        <div style={{display:"inline-block",padding:"9px 22px",background:btnColor,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:12,fontWeight:600,borderRadius:r,letterSpacing:.5}}>{btnText}</div>
+                      </div>
+                    </div>
+                  );
+                  if(layout==="half") return (
+                    <div style={{position:"absolute",inset:0,zIndex:20,display:"flex",flexDirection:"column"}}>
+                      <div style={{flex:1,overflow:"hidden"}}><MapPlaceholder h="100%" br={`0 0 ${r}px ${r}px`}/></div>
+                      <div style={{padding:"14px 18px",textAlign:"center"}}>
+                        <div style={{fontFamily:"Playfair Display,serif",fontSize:14,color:btnColor,marginBottom:3}}>Gedung Serbaguna Barokah</div>
+                        <div style={{fontSize:11,color:"#666",marginBottom:10,fontFamily:"DM Sans,sans-serif"}}>Jl. Melati No. 45, Jakarta</div>
+                        <div style={{display:"inline-block",padding:"8px 20px",background:btnColor,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:600,borderRadius:r,letterSpacing:.5}}>{btnText}</div>
+                      </div>
+                    </div>
+                  );
+                  if(layout==="box") return (
+                    <div style={{position:"absolute",inset:0,zIndex:20,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+                      <div style={{width:"100%",borderRadius:r||16,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,.5)"}}>
+                        <MapPlaceholder h={200} br={0}/>
+                        <div style={{padding:"14px 18px",textAlign:"center",background:"rgba(255,255,255,0.04)"}}>
+                          <div style={{fontFamily:"Playfair Display,serif",fontSize:13,color:btnColor,marginBottom:4}}>Gedung Serbaguna Barokah</div>
+                          <div style={{display:"inline-block",padding:"7px 18px",background:btnColor,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:600,borderRadius:r||16,marginTop:8}}>{btnText}</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                  return null;
+                })()}
+
+                {/* Countdown preview */}
+                {activeSection.type==="countdown" && (() => {
+                  const cdDate  = invData["countdown_date"];
+                  const acc     = activeSection.cdAccent||"#C4973A";
+                  const design  = activeSection.cdDesign||"cards";
+                  const r       = activeSection.cdRadius!==undefined?activeSection.cdRadius:8;
+                  let vals = ["42","08","35","12"];
+                  if(cdDate) {
+                    const t = new Date(cdDate) - new Date();
+                    if(t>0) {
+                      const d=Math.floor(t/86400000),h=Math.floor((t%86400000)/3600000),m=Math.floor((t%3600000)/60000),s=Math.floor((t%60000)/1000);
+                      vals=[d,h,m,s].map(n=>String(n).padStart(2,'0'));
+                    }
+                  }
+                  const labels=["Hari","Jam","Menit","Detik"];
+                  return (
+                    <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:20,pointerEvents:"none"}}>
+                      <div style={{textAlign:"center"}}>
+                        {design==="cards" && (
+                          <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                            {vals.map((n,i)=>(
+                              <div key={i} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:r,padding:"12px 10px",minWidth:60,textAlign:"center"}}>
+                                <div style={{fontSize:38,fontFamily:"Playfair Display,serif",color:acc,lineHeight:1}}>{n}</div>
+                                <div style={{fontSize:9,letterSpacing:2,color:"#666",textTransform:"uppercase",marginTop:4,fontFamily:"DM Sans,sans-serif"}}>{labels[i]}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {design==="minimal" && (
+                          <div style={{display:"flex",gap:4,alignItems:"center",justifyContent:"center"}}>
+                            {vals.map((n,i)=>(
+                              <React.Fragment key={i}>
+                                {i>0&&<span style={{fontSize:28,color:acc,opacity:.4,margin:"0 2px"}}>:</span>}
+                                <div style={{textAlign:"center"}}>
+                                  <div style={{fontSize:48,fontFamily:"Playfair Display,serif",color:acc,fontStyle:"italic",lineHeight:1}}>{n}</div>
+                                  <div style={{fontSize:8,letterSpacing:2.5,color:"#555",textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>{labels[i]}</div>
+                                </div>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        )}
+                        {design==="glass" && (
+                          <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+                            {vals.map((n,i)=>(
+                              <div key={i} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:r||50,padding:"16px 8px",minWidth:64,textAlign:"center",boxShadow:"inset 0 1px 0 rgba(255,255,255,.1)"}}>
+                                <div style={{fontSize:34,fontFamily:"DM Sans,sans-serif",fontWeight:300,color:"#fff",lineHeight:1}}>{n}</div>
+                                <div style={{fontSize:9,letterSpacing:1.5,color:"#666",textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>{labels[i]}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {design==="line" && (
+                          <div style={{display:"flex",gap:20,justifyContent:"center",alignItems:"flex-end"}}>
+                            {vals.map((n,i)=>(
+                              <div key={i} style={{textAlign:"center"}}>
+                                <div style={{fontSize:52,fontFamily:"Playfair Display,serif",color:acc,lineHeight:1}}>{n}</div>
+                                <div style={{width:"100%",height:1,background:acc,opacity:.3,margin:"6px 0"}}/>
+                                <div style={{fontSize:8,letterSpacing:3,color:"#555",textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>{labels[i]}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {activeSection.cdShowDate!==false && (
+                          <div style={{marginTop:14,fontSize:11,letterSpacing:2,color:"#555",textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>
+                            {cdDate ? new Date(cdDate).toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "set tanggal di tab Data"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Guestbook preview */}
+                {activeSection.type==="guestbook" && (() => {
+                  const acc = activeSection.gbAccent||"#C4973A";
+                  const r   = activeSection.gbRadius!==undefined?activeSection.gbRadius:2;
+                  const sty = activeSection.gbStyle||"dark";
+                  const ib  = sty==="light"?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.07)";
+                  const ic  = sty==="light"?"#333":"#bbb";
+                  const cb  = sty==="light"?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.04)";
+                  const title = activeSection.gbTitle||"Buku Tamu";
+                  const tc = sty==="light"?"#333":acc;
+                  const DEMO_ENTRIES = [{name:"Hafidz Pratama",msg:"Semoga menjadi keluarga yang sakinah mawaddah warahmah 🤲"},{name:"Putri Rahmatia",msg:"Barakallah, semoga langgeng dan bahagia selalu!"},{name:"Dimas Fauzan",msg:"Jazakumullahu khairan atas undangannya 💌"}];
+                  return (
+                    <div style={{position:"absolute",inset:0,overflowY:"auto",zIndex:20,padding:"16px 14px"}}>
+                      <div style={{textAlign:"center",marginBottom:12}}>
+                        <div style={{fontFamily:"Playfair Display,serif",fontSize:17,color:tc}}>{title}</div>
+                        <div style={{width:28,height:1,background:acc,opacity:.4,margin:"6px auto 0"}}/>
+                      </div>
+                      {DEMO_ENTRIES.map((e,i)=>(
+                        <div key={i} style={{background:cb,border:`1px solid ${sty==="light"?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.05)"}`,borderRadius:r,padding:"10px 12px",marginBottom:8}}>
+                          <div style={{fontWeight:600,fontSize:12,color:acc,fontFamily:"DM Sans,sans-serif"}}>{e.name}</div>
+                          <div style={{fontSize:11,color:ic,marginTop:3,fontFamily:"DM Sans,sans-serif",lineHeight:1.5}}>{e.msg}</div>
+                        </div>
+                      ))}
+                      <div style={{marginTop:4}}>
+                        <div style={{padding:"9px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:6}}>Nama Anda</div>
+                        <div style={{padding:"18px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:6}}>Tulis ucapan...</div>
+                        <div style={{padding:"10px 12px",background:acc,borderRadius:r,color:"#fff",fontFamily:"DM Sans,sans-serif",fontSize:12,fontWeight:600,textAlign:"center"}}>Kirim Ucapan 💌</div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Gift preview */}
+                {activeSection.type==="gift" && (() => {
+                  const acc    = activeSection.giftAccent||"#C4973A";
+                  const r      = activeSection.giftRadius!==undefined?activeSection.giftRadius:4;
+                  const gstyle = activeSection.giftStyle||"cards";
+                  const title  = activeSection.giftTitle||"Amplop Digital";
+                  const cardBg = gstyle==="glass"?"rgba(255,255,255,0.08)":"rgba(255,255,255,0.04)";
+                  const cardBorder = gstyle==="glass"?"rgba(255,255,255,0.15)":`${acc}44`;
+                  const DEMO_ACCOUNTS = [
+                    {type:"bank",bank:"BCA",number:"1234 5678 90",name:"Ahmad Rizky"},
+                    {type:"ewallet",bank:"GoPay",number:"0812 3456 7890",name:"Siti Rahayu"},
+                  ];
+                  return (
+                    <div style={{position:"absolute",inset:0,overflowY:"auto",zIndex:20,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px 16px"}}>
+                      <div style={{width:"100%",textAlign:"center"}}>
+                        <div style={{fontFamily:"Playfair Display,serif",fontSize:20,color:acc,marginBottom:6}}>{title}</div>
+                        <div style={{fontSize:11,color:"#666",lineHeight:1.7,marginBottom:16,fontFamily:"DM Sans,sans-serif"}}>
+                          {activeSection.giftSubtitle||"Doa tulus Anda adalah hadiah terindah."}
+                        </div>
+                        {DEMO_ACCOUNTS.map((a,i)=>(
+                          <div key={i} style={{background:cardBg,border:`1px solid ${cardBorder}`,borderRadius:r,padding:"18px 20px",marginBottom:10,backdropFilter:gstyle==="glass"?"blur(12px)":"none"}}>
+                            <div style={{fontSize:10,letterSpacing:2,color:"#777",textTransform:"uppercase",marginBottom:6}}>{a.type==="ewallet"?a.bank:"Transfer via"}</div>
+                            {a.type==="bank"&&<div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:acc,marginBottom:4}}>{a.bank}</div>}
+                            <div style={{fontSize:20,fontFamily:"DM Sans,sans-serif",color:"#fff",letterSpacing:3,margin:"4px 0"}}>{a.number}</div>
+                            <div style={{fontSize:11,color:"#777"}}>a/n {a.name}</div>
+                            <div style={{marginTop:10,padding:"5px 16px",background:"transparent",border:`1px solid ${acc}66`,color:acc,fontFamily:"DM Sans,sans-serif",fontSize:10,borderRadius:r,display:"inline-block",letterSpacing:.5}}>Salin Nomor</div>
+                          </div>
+                        ))}
+                        <div style={{fontSize:10,color:"#333",fontFamily:"DM Sans,sans-serif",marginTop:4}}>demo · data asli dari DB saat export</div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Hint */}
+              <div style={{fontSize:10,color:"#222",letterSpacing:.3,fontFamily:"DM Sans,sans-serif"}}>
+                {selectedEl
+                  ? "↑↓←→ geser · Shift+arrow ×10 · Del hapus · Ctrl+D duplikat · 🔵flip-H 🟣flip-V 🟢rotasi 🟠resize"
+                  : "Klik elemen untuk pilih · Drag untuk pindah"}
+              </div>
+            </div>
+          ) : (
+            <div style={{color:"#222",fontSize:13,fontFamily:"DM Sans,sans-serif"}}>Pilih section untuk mulai edit</div>
+          )}
+        </div>
+
+        {/* RIGHT PANEL */}
+        <div style={S.rightPanel}>
+          {/* Right panel tabs */}
+          <div style={{display:"flex",borderBottom:"1px solid #1a1a1a",marginBottom:8,flexShrink:0}}>
+            {[["element","El"],["section","Sec"],["data","Data"]].map(([k,l]) => (
+              <button key={k} onClick={()=>setRightTab(k)}
+                style={{flex:1,padding:"7px 0",background:"none",border:"none",
+                  color:rightTab===k?"#C4973A":"#333",
+                  borderBottom:`2px solid ${rightTab===k?"#C4973A":"transparent"}`,
+                  cursor:"pointer",fontSize:10,letterSpacing:.8,textTransform:"uppercase",fontWeight:600,fontFamily:"DM Sans,sans-serif"}}>
+                {l}
+              </button>
+            ))}
+          </div>
+
+          {rightTab==="element" && (
+            selectedEl ? (
+              <ElProps
+                el={selectedEl}
+                update={p=>updateEl(selectedEl.id,p)}
+                onDelete={()=>deleteEl(selectedEl.id)}
+                onDuplicate={()=>duplicateEl(selectedEl.id)}
+                onForward={()=>bringForward(selectedEl.id)}
+                onBackward={()=>sendBackward(selectedEl.id)}
+              />
+            ) : (
+              <div style={{padding:"20px 0",color:"#333",fontSize:12,textAlign:"center",lineHeight:1.8,fontFamily:"DM Sans,sans-serif"}}>
+                Pilih elemen di canvas<br/>atau tambah elemen baru.
+              </div>
+            )
+          )}
+
+          {rightTab==="section" && activeSection && (
+            <SecProps
+              section={activeSection}
+              update={p=>updateSection(activeSection.id,p)}
+              onBgImage={()=>bgImgRef.current?.click()}
+              onClearBgImage={()=>updateSection(activeSection.id,{bgImage:undefined})}
+              onGalleryAdd={()=>galleryRef.current?.click()}
+              onGalleryRemove={(idx)=>{
+                const imgs=[...(activeSection.galleryImages||[])];
+                imgs.splice(idx,1);
+                updateSection(activeSection.id,{galleryImages:imgs});
+              }}
+            />
+          )}
+
+          {rightTab==="data" && (
+            <div style={{display:"flex",flexDirection:"column",gap:10,paddingTop:4}}>
+              <div style={{fontSize:10,letterSpacing:1.5,textTransform:"uppercase",color:"#444",fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>📋 Data Undangan</div>
+              <div style={{fontSize:11,color:"#333",lineHeight:1.7,fontFamily:"DM Sans,sans-serif"}}>
+                Data ini dirender di preview & export HTML.
+              </div>
+              {DATA_VARS.slice(0,8).map(v => (
+                <div key={v.key}>
+                  <div style={{fontSize:10,color:"#3a3a3a",marginBottom:2,fontFamily:"DM Sans,sans-serif"}}>{v.label}</div>
+                  <input
+                    value={invData[v.key.replace("inv.","")] || ""}
+                    onChange={e=>setInvData(p=>({...p,[v.key.replace("inv.","")]:e.target.value}))}
+                    placeholder={v.example}
+                    style={{...S.input,fontSize:11}}
+                  />
+                </div>
+              ))}
+              <button onClick={()=>setShowDataPanel(true)} style={{...S.btnSecondary,fontSize:11,padding:"6px 0"}}>
+                Lihat Semua Data →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hidden file inputs */}
+      <input ref={bgImgRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleBgImage}/>
+      <input ref={galleryRef} type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleGalleryAdd}/>
+
+      <style>{`
+        @keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        @keyframes sway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(6deg)}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+        @keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.5)}100%{filter:brightness(1)}}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        @keyframes fade-in{from{opacity:0}to{opacity:1}}
+        @keyframes slide-from-left{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+        @keyframes slide-from-right{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+        @keyframes zoom-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+        @keyframes rotate-in{from{opacity:0;transform:rotate(-12deg) scale(.9)}to{opacity:1;transform:none}}       `}</style>
+    </div>
+  );
+}
+
+// ─── Section Props ────────────────────────────────────────────────────────────
+function SecProps({ section, update, onBgImage, onClearBgImage, onGalleryAdd, onGalleryRemove }) {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:4}}>
+      <PLabel>⬛ Section: {section.type}</PLabel>
+
+      <Field label="Nama Section">
+        <input value={section.name} onChange={e=>update({name:e.target.value})} style={S.input}/>
+      </Field>
+
+      <Divider label="Background"/>
+      <Field label="Warna Background">
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input type="color" value={section.bg?.startsWith("#")?section.bg:"#000000"}
+            onChange={e=>update({bg:e.target.value})}
+            style={{width:36,height:28,border:"none",background:"none",cursor:"pointer",padding:0,borderRadius:4}}/>
+          <input value={section.bg} onChange={e=>update({bg:e.target.value})}
+            style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}} placeholder="#000000"/>
+        </div>
+      </Field>
+
+      <Field label="Background Foto">
+        {section.bgImage ? (
+          <div style={{position:"relative"}}>
+            <img src={section.bgImage} style={{width:"100%",height:60,objectFit:"cover",borderRadius:3,border:"1px solid #222"}}/>
+            <button onClick={onClearBgImage} style={{position:"absolute",top:3,right:3,width:18,height:18,background:"#c55",border:"none",borderRadius:"50%",color:"#fff",fontSize:10,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+          </div>
+        ) : (
+          <button onClick={onBgImage} style={{...S.btnSecondary,width:"100%",fontSize:11}}>
+            📷 Set Background Foto
+          </button>
+        )}
+        {section.bgImage && (
+          <>
+            <div style={{marginTop:6}}>
+              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:4,fontFamily:"DM Sans,sans-serif"}}>Fit Mode</div>
+              <div style={{display:"flex",gap:3}}>
+                {[["cover","⬛ Cover"],["contain","⬜ Contain"],["fill","⇲ Stretch"],["center","✦ Center"]].map(([v,l])=>(
+                  <button key={v} onClick={()=>update({bgFit:v})}
+                    style={{flex:1,padding:"4px 2px",background:(section.bgFit||"cover")===v?"#1a2a1a":"#181818",
+                      border:`1px solid ${(section.bgFit||"cover")===v?"#7D9470":"#252525"}`,
+                      color:(section.bgFit||"cover")===v?"#9CD889":"#555",
+                      borderRadius:3,cursor:"pointer",fontSize:8,fontFamily:"DM Sans,sans-serif"}}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{marginTop:6,padding:"7px 9px",background:"#111",borderRadius:3,fontSize:10,color:"#444",fontFamily:"DM Sans,sans-serif",lineHeight:1.7}}>
+              💡 <span style={{color:"#555"}}>Rekomendasi ukuran:</span><br/>
+              <span style={{color:"#3a7a3a"}}>390 × 844 px</span> — pas 1:1<br/>
+              <span style={{color:"#3a5a7a"}}>1080 × 1920 px</span> — kualitas tinggi<br/>
+              <span style={{color:"#555"}}>Ratio ideal: <b style={{color:"#4a4a4a"}}>9:19.5</b></span>
+            </div>
+          </>
+        )}
+      </Field>
+
+      {/* Cover section special */}
+      {section.type==="cover" && (
+        <>
+          <Divider label="Tombol Buka Undangan"/>
+          <Field label="Teks Tombol">
+            <input value={section.openInviteText||"Buka Undangan"}
+              onChange={e=>update({openInviteText:e.target.value})}
+              style={S.input}/>
+          </Field>
+          <Field label="Warna Teks / Border">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color"
+                value={(section.openInviteStyle?.color)||"#C4973A"}
+                onChange={e=>update({openInviteStyle:{...section.openInviteStyle,color:e.target.value}})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/>
+              <input value={section.openInviteStyle?.color||"#C4973A"}
+                onChange={e=>update({openInviteStyle:{...section.openInviteStyle,color:e.target.value}})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label="Warna Background Tombol">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color"
+                value={(section.openInviteStyle?.bgColor)||"#00000000"}
+                onChange={e=>update({openInviteStyle:{...section.openInviteStyle,bgColor:e.target.value}})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/>
+              <input value={section.openInviteStyle?.bgColor||"transparent"}
+                onChange={e=>update({openInviteStyle:{...section.openInviteStyle,bgColor:e.target.value}})}
+                placeholder="transparent / #hex / rgba(...)"
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label={`Tebal Border — ${section.openInviteStyle?.borderWidth||1}px`}>
+            <Slider value={section.openInviteStyle?.borderWidth||1} min={0} max={4}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,borderWidth:v}})}/>
+          </Field>
+          <Field label={`Border Radius — ${section.openInviteStyle?.borderRadius||2}px`}>
+            <Slider value={section.openInviteStyle?.borderRadius||2} min={0} max={50}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,borderRadius:v}})}/>
+          </Field>
+          <Field label="Font Tombol">
+            <select value={section.openInviteStyle?.fontFamily||"Playfair Display"}
+              onChange={e=>update({openInviteStyle:{...section.openInviteStyle,fontFamily:e.target.value}})}
+              style={{...S.input,cursor:"pointer",fontSize:11}}>
+              {["Playfair Display","DM Sans","Great Vibes","Dancing Script","Sacramento","Cinzel","Cormorant Garamond","Lora","Montserrat","Raleway","Josefin Sans"].map(f=>(
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label={`Font Size — ${section.openInviteStyle?.fontSize||16}px`}>
+            <Slider value={section.openInviteStyle?.fontSize||16} min={11} max={28}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,fontSize:v}})}/>
+          </Field>
+          <Field label={`Padding V — ${section.openInviteStyle?.paddingV||12}px`}>
+            <Slider value={section.openInviteStyle?.paddingV||12} min={4} max={30}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,paddingV:v}})}/>
+          </Field>
+          <Field label={`Padding H — ${section.openInviteStyle?.paddingH||30}px`}>
+            <Slider value={section.openInviteStyle?.paddingH||30} min={8} max={80}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,paddingH:v}})}/>
+          </Field>
+          <Divider label="Posisi Tombol"/>
+          <Field label="Mode Posisi">
+            <div style={{display:"flex",gap:4}}>
+              <button onClick={()=>update({openInviteStyle:{...section.openInviteStyle,posLeft:null}})}
+                style={{flex:1,padding:"5px 0",background:section.openInviteStyle?.posLeft===null||section.openInviteStyle?.posLeft===undefined?"#1a2a1a":"#181818",border:`1px solid ${section.openInviteStyle?.posLeft===null||section.openInviteStyle?.posLeft===undefined?"#7D9470":"#252525"}`,color:section.openInviteStyle?.posLeft===null||section.openInviteStyle?.posLeft===undefined?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>
+                ⬛ Tengah
+              </button>
+              <button onClick={()=>update({openInviteStyle:{...section.openInviteStyle,posLeft:section.openInviteStyle?.posLeft||60}})}
+                style={{flex:1,padding:"5px 0",background:section.openInviteStyle?.posLeft!=null&&section.openInviteStyle?.posLeft!==undefined?"#1a2a1a":"#181818",border:`1px solid ${section.openInviteStyle?.posLeft!=null&&section.openInviteStyle?.posLeft!==undefined?"#7D9470":"#252525"}`,color:section.openInviteStyle?.posLeft!=null&&section.openInviteStyle?.posLeft!==undefined?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>
+                ✦ Manual
+              </button>
+            </div>
+          </Field>
+          <Field label={`Dari Bawah — ${section.openInviteStyle?.posBottom||80}px`}>
+            <Slider value={section.openInviteStyle?.posBottom||80} min={20} max={700}
+              onChange={v=>update({openInviteStyle:{...section.openInviteStyle,posBottom:v}})}/>
+          </Field>
+          {section.openInviteStyle?.posLeft != null && section.openInviteStyle?.posLeft !== undefined && (
+            <Field label={`Dari Kiri — ${section.openInviteStyle.posLeft}px`}>
+              <Slider value={section.openInviteStyle.posLeft} min={-50} max={300}
+                onChange={v=>update({openInviteStyle:{...section.openInviteStyle,posLeft:v}})}/>
+            </Field>
+          )}
+          <div style={{fontSize:10,color:"#444",fontFamily:"DM Sans,sans-serif",lineHeight:1.6,padding:"4px 0"}}>
+            💡 Atau drag langsung tombol di canvas
+          </div>
+        </>
+      )}
+
+      {/* Countdown section */}
+      {section.type==="countdown" && (
+        <>
+          <Divider label="Design Countdown"/>
+          <Field label="Gaya Tampilan">
+            <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
+              {[["cards","⬛ Cards"],["minimal","∶ Minimal"],["glass","◎ Glass"],["line","— Line"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({cdDesign:v})}
+                  style={{padding:"5px 8px",background:(section.cdDesign||"cards")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.cdDesign||"cards")===v?"#7D9470":"#252525"}`,color:(section.cdDesign||"cards")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Warna Angka">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={section.cdAccent||"#C4973A"} onChange={e=>update({cdAccent:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",borderRadius:4}}/>
+              <input value={section.cdAccent||"#C4973A"} onChange={e=>update({cdAccent:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          {(section.cdDesign==="cards"||section.cdDesign==="glass"||!section.cdDesign) && (
+            <Field label={`Border Radius Box — ${section.cdRadius!==undefined?section.cdRadius:8}px`}>
+              <Slider value={section.cdRadius!==undefined?section.cdRadius:8} min={0} max={50}
+                onChange={v=>update({cdRadius:v})}/>
+            </Field>
+          )}
+          <Field label="Tampilkan Tanggal">
+            <div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <input type="checkbox" checked={section.cdShowDate!==false} onChange={e=>update({cdShowDate:e.target.checked})} style={{accentColor:"#C4973A",cursor:"pointer"}}/>
+              <span style={{fontSize:11,color:"#555",fontFamily:"DM Sans,sans-serif"}}>Tampilkan tanggal di bawah</span>
+            </div>
+          </Field>
+        </>
+      )}
+
+      {/* RSVP section */}
+      {section.type==="rsvp" && (
+        <>
+          <Divider label="Form RSVP"/>
+          <Field label="Judul Section">
+            <input value={section.rsvpTitle||"Konfirmasi Kehadiran"} onChange={e=>update({rsvpTitle:e.target.value})} style={S.input}/>
+          </Field>
+          <Field label="Gaya Form">
+            <div style={{display:"flex",gap:4}}>
+              {[["dark","🌑 Dark"],["light","☀ Light"],["glass","◎ Glass"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({rsvpStyle:v})}
+                  style={{flex:1,padding:"5px 4px",background:(section.rsvpStyle||"dark")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.rsvpStyle||"dark")===v?"#7D9470":"#252525"}`,color:(section.rsvpStyle||"dark")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Warna Aksen">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={section.rsvpAccent||"#C4973A"} onChange={e=>update({rsvpAccent:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",borderRadius:4}}/>
+              <input value={section.rsvpAccent||"#C4973A"} onChange={e=>update({rsvpAccent:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label={`Border Radius Input — ${section.rsvpRadius!==undefined?section.rsvpRadius:2}px`}>
+            <Slider value={section.rsvpRadius!==undefined?section.rsvpRadius:2} min={0} max={32}
+              onChange={v=>update({rsvpRadius:v})}/>
+          </Field>
+        </>
+      )}
+
+      {/* Maps section */}
+      {section.type==="maps" && (
+        <>
+          <Divider label="Layout Peta"/>
+          <Field label="Tipe Layout">
+            <div style={{display:"flex",gap:4}}>
+              {[["fullscreen","⬛ Full"],["half","⬒ Half"],["box","▣ Box"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({mapsLayout:v})}
+                  style={{flex:1,padding:"5px 4px",background:(section.mapsLayout||"fullscreen")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.mapsLayout||"fullscreen")===v?"#7D9470":"#252525"}`,color:(section.mapsLayout||"fullscreen")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Teks Tombol">
+            <input value={section.mapsBtnText||"Buka di Google Maps"} onChange={e=>update({mapsBtnText:e.target.value})} style={{...S.input,fontSize:11}}/>
+          </Field>
+          <Field label="Warna Tombol">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={section.mapsBtnColor||"#C4973A"} onChange={e=>update({mapsBtnColor:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",borderRadius:4}}/>
+              <input value={section.mapsBtnColor||"#C4973A"} onChange={e=>update({mapsBtnColor:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label={`Border Radius — ${section.mapsRadius!==undefined?section.mapsRadius:0}px`}>
+            <Slider value={section.mapsRadius!==undefined?section.mapsRadius:0} min={0} max={40}
+              onChange={v=>update({mapsRadius:v})}/>
+          </Field>
+        </>
+      )}
+
+      {/* Gift section */}
+      {section.type==="gift" && (
+        <>
+          <Divider label="Amplop Digital"/>
+          <Field label="Judul Section">
+            <input value={section.giftTitle||"Amplop Digital"} onChange={e=>update({giftTitle:e.target.value})} style={S.input}/>
+          </Field>
+          <Field label="Subjudul">
+            <textarea rows={2} value={section.giftSubtitle||"Doa tulus Anda adalah hadiah terindah. Jika ingin memberi, silakan transfer ke:"} onChange={e=>update({giftSubtitle:e.target.value})} style={{...S.input,resize:"vertical",fontSize:11}}/>
+          </Field>
+          <Field label="Gaya Kartu">
+            <div style={{display:"flex",gap:4}}>
+              {[["cards","⬛ Cards"],["glass","◎ Glass"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({giftStyle:v})}
+                  style={{flex:1,padding:"5px 4px",background:(section.giftStyle||"cards")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.giftStyle||"cards")===v?"#7D9470":"#252525"}`,color:(section.giftStyle||"cards")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Warna Aksen">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={section.giftAccent||"#C4973A"} onChange={e=>update({giftAccent:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",borderRadius:4}}/>
+              <input value={section.giftAccent||"#C4973A"} onChange={e=>update({giftAccent:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label={`Border Radius Kartu — ${section.giftRadius!==undefined?section.giftRadius:4}px`}>
+            <Slider value={section.giftRadius!==undefined?section.giftRadius:4} min={0} max={32}
+              onChange={v=>update({giftRadius:v})}/>
+          </Field>
+          <div style={{fontSize:10,color:"#444",fontFamily:"DM Sans,sans-serif",lineHeight:1.6,padding:"4px 0"}}>
+            💡 Data rekening diisi di admin Flask saat buat undangan
+          </div>
+        </>
+      )}
+
+      {/* Guestbook section */}
+      {section.type==="guestbook" && (
+        <>
+          <Divider label="Buku Tamu"/>
+          <Field label="Judul Section">
+            <input value={section.gbTitle||"Buku Tamu"} onChange={e=>update({gbTitle:e.target.value})} style={S.input}/>
+          </Field>
+          <Field label="Gaya Form">
+            <div style={{display:"flex",gap:4}}>
+              {[["dark","🌑 Dark"],["light","☀ Light"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({gbStyle:v})}
+                  style={{flex:1,padding:"5px 4px",background:(section.gbStyle||"dark")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.gbStyle||"dark")===v?"#7D9470":"#252525"}`,color:(section.gbStyle||"dark")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Warna Aksen">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={section.gbAccent||"#C4973A"} onChange={e=>update({gbAccent:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",borderRadius:4}}/>
+              <input value={section.gbAccent||"#C4973A"} onChange={e=>update({gbAccent:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label={`Border Radius — ${section.gbRadius!==undefined?section.gbRadius:2}px`}>
+            <Slider value={section.gbRadius!==undefined?section.gbRadius:2} min={0} max={32}
+              onChange={v=>update({gbRadius:v})}/>
+          </Field>
+        </>
+      )}
+        <>
+          <Divider label="Foto Gallery (maks 10)"/>
+          <Field label="Layout Grid">
+            <div style={{display:"flex",gap:4}}>
+              {[["2","2 kolom"],["3","3 kolom"],["1","1 kolom"],["masonry","Masonry"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({galleryLayout:v})}
+                  style={{flex:1,padding:"5px 2px",background:(section.galleryLayout||"2")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.galleryLayout||"2")===v?"#7D9470":"#252525"}`,color:(section.galleryLayout||"2")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Bentuk Foto">
+            <div style={{display:"flex",gap:4}}>
+              {[["kotak","⬛ Kotak"],["rounded","▣ Rounded"],["circle","⬤ Bulat"],["portrait","▯ Portrait"]].map(([v,l])=>(
+                <button key={v} onClick={()=>update({galleryShape:v})}
+                  style={{flex:1,padding:"5px 2px",background:(section.galleryShape||"kotak")===v?"#1a2a1a":"#181818",border:`1px solid ${(section.galleryShape||"kotak")===v?"#7D9470":"#252525"}`,color:(section.galleryShape||"kotak")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label={`Gap Antar Foto — ${section.galleryGap||8}px`}>
+            <Slider value={section.galleryGap||8} min={0} max={24}
+              onChange={v=>update({galleryGap:v})}/>
+          </Field>
+          <button onClick={onGalleryAdd} style={{...S.btnSecondary,width:"100%",fontSize:11}}>
+            + Tambah Foto Gallery
+          </button>
+          <div style={{fontSize:10,color:"#383838",fontFamily:"DM Sans,sans-serif"}}>{(section.galleryImages||[]).length}/10 foto</div>
+          {(section.galleryImages||[]).length > 0 && (
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>
+              {(section.galleryImages||[]).map((src,i)=>(
+                <div key={i} style={{position:"relative"}}>
+                  <img src={src} style={{width:"100%",height:45,objectFit:"cover",borderRadius:2,border:"1px solid #222"}}/>
+                  <button onClick={()=>onGalleryRemove(i)}
+                    style={{position:"absolute",top:1,right:1,width:14,height:14,background:"#c55",border:"none",borderRadius:"50%",color:"#fff",fontSize:8,cursor:"pointer",lineHeight:1}}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      <div style={{marginTop:4,padding:"10px 12px",background:"#111",borderRadius:4,fontSize:11,color:"#383838",lineHeight:1.9,fontFamily:"DM Sans,sans-serif"}}>
+        💡 <b style={{color:"#444"}}>Tips:</b><br/>
+        • Handle 🔵 = flip horizontal<br/>
+        • Handle 🟣 = flip vertikal<br/>
+        • Handle 🟢 = rotasi<br/>
+        • Handle 🟠 = resize
+      </div>
+    </div>                                                                                                     );
+}
+
+// ─── Element Props ────────────────────────────────────────────────────────────
+function ElProps({ el, update, onDelete, onDuplicate, onForward, onBackward }) {
+  const [fontSearch, setFontSearch] = useState("");
+  const filteredFonts = FONTS.filter(f => f.toLowerCase().includes(fontSearch.toLowerCase()));
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:10,paddingTop:4}}>
+      <PLabel>{el.type==="text"?"🔤 Teks":"🖼 Gambar"}</PLabel>
+
+      {el.type==="image" && (
+        <div style={{background:"#111",borderRadius:4,overflow:"hidden",maxHeight:80,display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid #1e1e1e"}}>
+          <img src={el.src} style={{maxWidth:"100%",maxHeight:80,objectFit:"contain"}} alt=""/>
+        </div>
+      )}
+
+      {/* Text specific */}
+      {el.type==="text" && (
+        <>
+          <Field label="Konten Teks">
+            <textarea value={el.text} onChange={e=>update({text:e.target.value,name:e.target.value.slice(0,20)})}
+              rows={3} style={{...S.input,resize:"vertical",fontFamily:"DM Sans,sans-serif"}}/>
+          </Field>
+
+          <Field label="Gunakan Variable Data">
+            <div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <input type="checkbox" checked={el.isVar||false} onChange={e=>update({isVar:e.target.checked})}
+                style={{accentColor:"#C4973A",cursor:"pointer"}}/>
+              <span style={{fontSize:11,color:"#555",fontFamily:"DM Sans,sans-serif"}}>Aktifkan</span>
+            </div>
+          </Field>
+          {el.isVar && (
+            <Field label="Pilih Variable">
+              <select value={el.varKey||""} onChange={e=>update({varKey:e.target.value,text:`{{${e.target.value}}}`})}
+                style={{...S.input,cursor:"pointer"}}>
+                <option value="">— Pilih variable —</option>
+                {DATA_VARS.map(v=><option key={v.key} value={v.key}>{v.label}</option>)}
+              </select>
+            </Field>
+          )}
+
+          {/* Photo var — shape controls */}
+          {el.isVar && ["inv.groom_photo_url","inv.bride_photo_url"].includes(el.varKey) && (
+            <>
+              <Divider label="Foto Shape"/>
+              <Field label="Bentuk">
+                <div style={{display:"flex",gap:4}}>
+                  {[["0","⬛ Kotak"],["12","▣ Rounded"],["50%","⬤ Bulat"]].map(([v,l])=>{
+                    const cur = el.borderRadius!==undefined?String(el.borderRadius):"0";
+                    const active = cur===v;
+                    return (
+                      <button key={v} onClick={()=>update({borderRadius:v==="50%"?"50%":parseInt(v)})}
+                        style={{flex:1,padding:"5px 2px",background:active?"#1a2a1a":"#181818",border:`1px solid ${active?"#7D9470":"#252525"}`,color:active?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:9,fontFamily:"DM Sans,sans-serif"}}>
+                        {l}
+                      </button>
+                    );
+                  })}
+                </div>
+              </Field>
+              {(el.borderRadius!=="50%") && (
+                <Field label={`Radius Custom — ${el.borderRadius||0}px`}>
+                  <Slider value={typeof el.borderRadius==="number"?el.borderRadius:0} min={0} max={100}
+                    onChange={v=>update({borderRadius:v})}/>
+                </Field>
+              )}
+              <Field label={`Tinggi Foto — ${el.width||150}px`}>
+                <Slider value={el.width||150} min={60} max={500} onChange={v=>update({width:v})}/>
+              </Field>
+            </>
+          )}
+
+          {/* Skip typography for photo vars */}
+          {el.isVar && ["inv.groom_photo_url","inv.bride_photo_url"].includes(el.varKey) ? null : (
+          <><Divider label="Tipografi"/>
+          <Field label="Font">
+            <input value={fontSearch} onChange={e=>setFontSearch(e.target.value)} placeholder="Cari font..."
+              style={{...S.input,marginBottom:4,fontSize:11}}/>
+            <select value={el.fontFamily||"Playfair Display"} onChange={e=>update({fontFamily:e.target.value})}
+              style={{...S.input,cursor:"pointer",fontFamily:`'${el.fontFamily||"Playfair Display"}',serif`}}>
+              {filteredFonts.map(f=><option key={f} value={f} style={{fontFamily:`'${f}',serif`}}>{f}</option>)}
+            </select>
+          </Field>
+          <Field label={`Ukuran — ${el.fontSize||24}px`}>
+            <Slider value={el.fontSize||24} min={8} max={120} onChange={v=>update({fontSize:v})}/>
+          </Field>
+          <Field label="Warna Teks">
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <input type="color" value={el.color||"#ffffff"} onChange={e=>update({color:e.target.value})}
+                style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/>
+              <input value={el.color||"#ffffff"} onChange={e=>update({color:e.target.value})}
+                style={{...S.input,flex:1,fontFamily:"monospace",fontSize:11}}/>
+            </div>
+          </Field>
+          <Field label="Perataan">
+            <div style={{display:"flex",gap:4}}>
+              {["left","center","right"].map(a=>(
+                <button key={a} onClick={()=>update({align:a})}
+                  style={{flex:1,padding:"5px 0",background:el.align===a?"#222":"#181818",border:`1px solid ${el.align===a?"#C4973A":"#252525"}`,color:el.align===a?"#C4973A":"#666",borderRadius:3,cursor:"pointer",fontSize:12}}>
+                  {a==="left"?"⬅":a==="center"?"⬆":"➡"}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Gaya">
+            <div style={{display:"flex",gap:4}}>
+              <button onClick={()=>update({fontStyle:el.fontStyle==="italic"?"normal":"italic"})}
+                style={{flex:1,padding:"5px 0",background:el.fontStyle==="italic"?"#222":"#181818",border:`1px solid ${el.fontStyle==="italic"?"#C4973A":"#252525"}`,color:el.fontStyle==="italic"?"#C4973A":"#666",borderRadius:3,cursor:"pointer",fontSize:12,fontStyle:"italic"}}>I</button>
+              <button onClick={()=>update({fontWeight:el.fontWeight==="700"||el.fontWeight===700?"400":"700"})}
+                style={{flex:1,padding:"5px 0",background:(el.fontWeight==="700"||el.fontWeight===700)?"#222":"#181818",border:`1px solid ${(el.fontWeight==="700"||el.fontWeight===700)?"#C4973A":"#252525"}`,color:(el.fontWeight==="700"||el.fontWeight===700)?"#C4973A":"#666",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:"700"}}>B</button>
+            </div>
+          </Field>
+          <Field label={`Letter Spacing — ${el.letterSpacing||0}px`}>
+            <Slider value={el.letterSpacing||0} min={-2} max={20} step={0.5} onChange={v=>update({letterSpacing:v})}/>
+          </Field>
+          <Field label={`Line Height — ${el.lineHeight||1.4}`}>
+            <Slider value={el.lineHeight||1.4} min={0.8} max={3} step={0.1} onChange={v=>update({lineHeight:v})}/>
+          </Field>
+          <Field label="Text Shadow">
+            <div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <input type="checkbox" checked={el.shadow||false} onChange={e=>update({shadow:e.target.checked})}
+                style={{accentColor:"#C4973A",cursor:"pointer"}}/>
+              <span style={{fontSize:11,color:"#555",fontFamily:"DM Sans,sans-serif"}}>Aktifkan shadow</span>
+            </div>
+          </Field>
+          {el.shadow && (
+            <Field label={`Shadow Blur — ${el.shadowBlur||8}px`}>
+              <Slider value={el.shadowBlur||8} min={0} max={40} onChange={v=>update({shadowBlur:v})}/>
+            </Field>
+          )}
+          <Field label={`Lebar Teks — ${el.width||200}px`}>
+            <Slider value={el.width||200} min={40} max={CANVAS_W} onChange={v=>update({width:v})}/>
+          </Field>
+        </>
+      )}
+        </>
+      )}
+
+      <Divider label="Posisi & Transform"/>
+      <Field label={`X — ${el.x}px`}>
+        <Slider value={el.x} min={-CANVAS_W} max={CANVAS_W*1.5} onChange={v=>update({x:v})}/>
+      </Field>
+      <Field label={`Y — ${el.y}px`}>
+        <Slider value={el.y} min={-CANVAS_H} max={CANVAS_H*1.5} onChange={v=>update({y:v})}/>                      </Field>
+      {el.type==="image" && (
+        <Field label={`Lebar — ${el.width}px`}>
+          <Slider value={el.width} min={10} max={CANVAS_W*1.4} onChange={v=>update({width:v})}/>
+        </Field>
+      )}
+      <Field label={`Rotasi — ${el.rotation||0}°`}>
+        <Slider value={el.rotation||0} min={-180} max={180} onChange={v=>update({rotation:v})}/>
+      </Field>
+
+      {/* Flip buttons */}
+      {el.type==="image" && (
+        <Field label="Flip">
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={()=>update({flipH:!el.flipH})}
+              style={{flex:1,padding:"5px 0",background:el.flipH?"#1a1a2a":"#181818",border:`1px solid ${el.flipH?"#4A90D9":"#252525"}`,color:el.flipH?"#4A90D9":"#666",borderRadius:3,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+              ↔ Horizontal
+            </button>
+            <button onClick={()=>update({flipV:!el.flipV})}
+              style={{flex:1,padding:"5px 0",background:el.flipV?"#1e1a2a":"#181818",border:`1px solid ${el.flipV?"#9B59B6":"#252525"}`,color:el.flipV?"#9B59B6":"#666",borderRadius:3,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+              ↕ Vertikal
+            </button>
+          </div>
+        </Field>
+      )}
+
+      <Divider label="Tampilan"/>
+      <Field label={`Opacity — ${Math.round((el.opacity||1)*100)}%`}>
+        <Slider value={el.opacity||1} min={0} max={1} step={0.01} onChange={v=>update({opacity:v})}/>
+      </Field>
+      <Field label={`Z-Index — ${el.zIndex||10}`}>
+        <div style={{display:"flex",gap:6,alignItems:"center"}}>
+          <Slider value={el.zIndex||10} min={1} max={50} onChange={v=>update({zIndex:v})}/>
+          <div style={{display:"flex",gap:3,flexShrink:0}}>
+            <button onClick={onForward} style={S.microBtn}>↑</button>
+            <button onClick={onBackward} style={S.microBtn}>↓</button>
+          </div>
+        </div>
+      </Field>
+
+      <Divider label="Animasi"/>
+      <Field label="Jenis Animasi">
+        <select value={el.animation||"none"} onChange={e=>update({animation:e.target.value})}
+          style={{...S.input,cursor:"pointer"}}>
+          {ANIMATIONS.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}
+        </select>
+      </Field>
+      {(el.animation&&el.animation!=="none") && (
+        ["sway","float","pulse","shimmer","bounce"].includes(el.animation) ? (
+          <Field label={`Durasi — ${el.animDuration||4}s`}>
+            <Slider value={el.animDuration||4} min={0.5} max={12} step={0.5} onChange={v=>update({animDuration:v})}/>
+          </Field>
+        ) : (
+          <Field label={`Delay — ${el.animDelay||0}s`}>
+            <Slider value={el.animDelay||0} min={0} max={6} step={0.1} onChange={v=>update({animDelay:v})}/>
+          </Field>
+        )
+      )}
+
+      <div style={{display:"flex",gap:6,marginTop:4}}>                                                               <button onClick={onDuplicate}                                                                                  style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+          Duplikat
+        </button>
+        <button onClick={onDelete}
+          style={{flex:1,padding:"7px 0",background:"#1a0a0a",border:"1px solid #3a1515",color:"#c55",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+          Hapus
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── UI Primitives ────────────────────────────────────────────────────────────
+function PLabel({ children }) {
+  return <div style={{fontSize:10,letterSpacing:1.5,textTransform:"uppercase",color:"#444",fontWeight:700,fontFamily:"DM Sans,sans-serif",marginBottom:4}}>{children}</div>;
+}
+function Divider({ label }) {
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:8,margin:"4px 0"}}>
+      <div style={{fontSize:10,color:"#2e2e2e",letterSpacing:.8,textTransform:"uppercase",whiteSpace:"nowrap",fontFamily:"DM Sans,sans-serif"}}>{label}</div>
+      <div style={{flex:1,height:1,background:"#1a1a1a"}}/>
+    </div>
+  );
+}
+function Field({ label, children }) {
+  return (
+    <div>
+      <div style={{fontSize:11,color:"#3a3a3a",marginBottom:3,letterSpacing:.2,fontFamily:"DM Sans,sans-serif"}}>{label}</div>
+      {children}
+    </div>
+  );
+}
+function Slider({ value, min, max, step=1, onChange }) {
+  return (
+    <input type="range" value={value} min={min} max={max} step={step}
+      onChange={e=>onChange(step<1?parseFloat(e.target.value):parseInt(e.target.value))}
+      style={{width:"100%",cursor:"pointer",accentColor:"#C4973A"}}/>
+  );
+}
+function IBtn({ children, onClick, title, danger }) {                                                          return (
+    <button onClick={onClick} title={title}
+      style={{padding:"2px 5px",background:"transparent",border:"none",
+        color:danger?"#522":"#333",cursor:"pointer",fontSize:13,lineHeight:1,
+        borderRadius:3,fontFamily:"DM Sans,sans-serif"}}
+      onMouseEnter={e=>e.target.style.color=danger?"#f55":"#aaa"}
+      onMouseLeave={e=>e.target.style.color=danger?"#522":"#333"}>
+      {children}
+    </button>
+  );
+}
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const S = {
+  root:{display:"flex",flexDirection:"column",height:"100vh",background:"#0a0a0a",color:"#ccc",fontFamily:"'DM Sans',system-ui,sans-serif",fontSize:13,overflow:"hidden"},
+  topbar:{display:"flex",alignItems:"center",gap:8,padding:"0 14px",height:44,background:"#0e0e0e",borderBottom:"1px solid #161616",flexShrink:0},
+  logo:{fontWeight:700,fontSize:14,color:"#C4973A",letterSpacing:.5,fontFamily:"DM Sans,sans-serif"},
+  body:{display:"flex",flex:1,overflow:"hidden",minHeight:0},
+  leftPanel:{width:200,background:"#0e0e0e",borderRight:"1px solid #161616",display:"flex",flexDirection:"column",overflow:"hidden",flexShrink:0},
+  canvasWrap:{flex:1,display:"flex",alignItems:"flex-start",justifyContent:"center",background:"#080808",overflow:"auto",position:"relative",padding:"20px 40px"},
+  rightPanel:{width:230,background:"#0e0e0e",borderLeft:"1px solid #161616",overflowY:"auto",padding:"0 12px 24px",flexShrink:0,display:"flex",flexDirection:"column"},
+  input:{width:"100%",padding:"6px 8px",background:"#141414",border:"1px solid #222",color:"#bbb",borderRadius:4,fontSize:12,outline:"none",fontFamily:"'DM Sans',sans-serif",transition:"border-color .15s"},
+  btnPrimary:{padding:"7px 14px",background:"#C4973A",border:"none",color:"#0a0a0a",borderRadius:4,cursor:"pointer",fontWeight:700,fontSize:12,fontFamily:"'DM Sans',sans-serif"},
+  btnSecondary:{padding:"6px 12px",background:"#141414",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:12,fontFamily:"'DM Sans',sans-serif"},
+  microBtn:{padding:"3px 6px",background:"#161616",border:"1px solid #222",color:"#555",borderRadius:3,cursor:"pointer",fontSize:12,fontFamily:"'DM Sans',sans-serif",flexShrink:0},
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);                                        </script>
+</body>
+</html>
