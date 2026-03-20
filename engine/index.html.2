@@ -18,7 +18,6 @@ select option{background:#1a1a1a;color:#ddd;}textarea{resize:vertical;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script type="text/babel">
 const { useState, useRef, useEffect } = React;
 const CANVAS_W=390,CANVAS_H=844;
@@ -49,23 +48,7 @@ const makeWidgetEl=(widgetType)=>{const def=WIDGET_DEFS.find(w=>w.id===widgetTyp
 const initSections=[{id:1,type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08",elements:[],openInviteText:"Buka Undangan",openInviteStyle:{fontSize:16,color:"#C4973A",fontFamily:"Playfair Display"}},{id:2,type:"quran",name:"Ayat Quran",bg:"#FAF6EE",elements:[]},{id:3,type:"couple",name:"Profil Mempelai",bg:"#1A100A",elements:[]},{id:4,type:"event",name:"Detail Acara",bg:"#FAF6EE",elements:[]},{id:5,type:"closing",name:"Closing",bg:"#1A100A",elements:[]}];
 
 // ─── Build Exported HTML ──────────────────────────────────────────────────────
-// ─── Image extractor ─────────────────────────────────────────────────────────
-function collectImages(sections){
-  // Returns array of {key, base64, ext, filename} for every base64 image found
-  const map=[];let idx=0;
-  const mimeToExt=m=>{if(m.includes("png"))return"png";if(m.includes("webp"))return"webp";if(m.includes("gif"))return"gif";return"jpg";};
-  const reg=(src,hint)=>{if(!src||!src.startsWith("data:"))return null;const existing=map.find(x=>x.base64===src);if(existing)return existing.filename;const mime=src.split(";")[0].replace("data:",""),ext=mimeToExt(mime),filename=`${hint}_${idx++}.${ext}`;map.push({base64:src,mime,ext,filename,key:src});return filename;};
-  sections.forEach((s,si)=>{
-    if(s.bgImage)reg(s.bgImage,`bg_sec${si}`);
-    s.elements.forEach(el=>{
-      if(el.type==="image")reg(el.src,`el_${el.id}`);
-      if(el.type==="widget"&&el.widgetType==="gallery")(el.galleryImages||[]).forEach((src,gi)=>reg(src,`gallery_${el.id}_${gi}`));
-    });
-  });
-  return map;
-}
-
-function buildHTML(sections,invData,imagePathMap){
+function buildHTML(sections,invData){
   const inv=invData||{};
   const rv=k=>inv[k.replace("inv.","")]||"";
   const animCSS=`@keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes slide-from-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}@keyframes slide-from-top{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-bottom{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}@keyframes zoom-in{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes rotate-in{from{opacity:0;transform:rotate(-14deg) scale(.88)}to{opacity:1;transform:none}}@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}@keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`;
@@ -73,7 +56,7 @@ function buildHTML(sections,invData,imagePathMap){
   const PHOTO_VARS=new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
 
   const elToHTML=el=>{
-    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" "),imgSrc=(imagePathMap&&imagePathMap[el.src])||el.src;return `<img src="${imgSrc}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};${animS}pointer-events:none;"/>`;}
+    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");return `<img src="${el.src}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};${animS}pointer-events:none;"/>`;}
     if(el.type==="text"){
       const animS=ba(el.animation,el.animDuration,el.animDelay),shd=el.shadow?`text-shadow:0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,.5)"};`:"";
       if(el.isVar&&el.varKey&&PHOTO_VARS.has(el.varKey)){const br=el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,h=el.height||el.width||150;return `<img src="{{${el.varKey}}}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width||150}px;height:${h}px;object-fit:cover;border-radius:${br};z-index:${el.zIndex};opacity:${el.opacity};pointer-events:none;"/>`;}
@@ -87,81 +70,15 @@ function buildHTML(sections,invData,imagePathMap){
   const widgetToHTML=(el,inv)=>{
     const acc=el.accent||"#C4973A",r=el.radius||4,dk=(el.wStyle||"dark")==="dark",ib=dk?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.06)",ic=dk?"#aaa":"#333",tc=dk?acc:"#333",ws=`position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;height:${el.height}px;z-index:${el.zIndex};opacity:${el.opacity};overflow-y:auto;`,wid=el.id;
     if(el.widgetType==="countdown"){const ca=el.cdAccent||acc,tit=el.title?`<div style="font-family:'Playfair Display',serif;font-size:18px;color:${ca};margin-bottom:16px;text-align:center;">${el.title}</div>`:"";return `<div style="${ws}padding:20px 0;">${tit}<div style="display:flex;gap:10px;justify-content:center;padding:0 8px;">${[["cd-days","Hari"],["cd-hours","Jam"],["cd-mins","Mnt"],["cd-secs","Det"]].map(([cid,lbl])=>`<div style="flex:1;background:${dk?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"};border-radius:8px;padding:14px 4px;text-align:center;"><div id="${cid}" style="font-family:'Playfair Display',serif;font-size:30px;color:${ca};line-height:1;">00</div><div style="font-size:9px;color:${dk?"#666":"#999"};text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;font-family:'DM Sans',sans-serif;">${lbl}</div></div>`).join("")}</div></div>`;}
-    if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return `<div style="${ws}">
-<div id="rsvp-form-${wid}" style="padding:20px 4px;">
-  <div style="text-align:center;margin-bottom:20px;">
-    <div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div>
-    <div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div>
-  </div>
-  <input id="rn-${wid}" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/>
-  <input id="rg-${wid}" type="number" min="1" placeholder="Jumlah Tamu" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/>
-  <select id="ra-${wid}" style="width:100%;padding:10px 14px;background:${dk?"#1a1a1a":ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;">
-    <option value="">Konfirmasi Kehadiran ▾</option>
-    <option value="hadir">Insya Allah Hadir 🤍</option>
-    <option value="tidak">Tidak Dapat Hadir</option>
-  </select>
-  <textarea id="rm-${wid}" placeholder="Ucapan &amp; Doa..." rows="3" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:12px;"></textarea>
-  <button onclick="submitRSVP_${wid}()" style="width:100%;padding:12px;background:${acc};border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border-radius:${r}px;cursor:pointer;">Kirim Konfirmasi 💌</button>
-</div>
-<div id="rsvp-ok-${wid}" style="display:none;padding:60px 20px;text-align:center;">
-  <div style="font-family:'Playfair Display',serif;font-size:40px;color:${acc};">✦</div>
-  <div style="font-family:'Playfair Display',serif;font-size:22px;color:${dk?"#fff":"#333"};margin-top:12px;">Terima Kasih</div>
-  <div style="font-size:13px;color:#888;margin-top:8px;font-family:'DM Sans',sans-serif;line-height:1.7;">Konfirmasi Anda telah kami terima.<br>Kami sangat menantikan kehadiran Anda.</div>
-</div>
-</div>
-<script>
-function submitRSVP_${wid}(){
-  var name=document.getElementById('rn-${wid}').value.trim();
-  var count=document.getElementById('rg-${wid}').value||'1';
-  var attend=document.getElementById('ra-${wid}').value;
-  var msg=document.getElementById('rm-${wid}').value.trim();
-  if(!name||!attend){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}
-  var btn=document.querySelector('#rsvp-form-${wid} button');
-  btn.textContent='Mengirim...';btn.disabled=true;
-  fetch('{{url_for("user_rsvp",inv_id=inv.id)}}',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
-    body:JSON.stringify({name:name,count:count,attend:attend,message:msg})
-  }).then(r=>r.json()).then(d=>{
-    document.getElementById('rsvp-form-${wid}').style.display='none';
-    document.getElementById('rsvp-ok-${wid}').style.display='block';
-  }).catch(()=>{
-    document.getElementById('rsvp-form-${wid}').style.display='none';
-    document.getElementById('rsvp-ok-${wid}').style.display='block';
-  });
-}
-<\/script>`;}
+    if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return `<div style="${ws}"><div id="rsvp-form-${wid}" style="padding:20px 4px;"><div style="text-align:center;margin-bottom:20px;"><div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div><div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div></div><input id="rn-${wid}" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/><input id="rg-${wid}" type="number" min="1" placeholder="Jumlah Tamu" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/><select id="ra-${wid}" style="width:100%;padding:10px 14px;background:${dk?"#1a1a1a":ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"><option value="">Konfirmasi Kehadiran ▾</option><option value="hadir">Insya Allah Hadir 🤍</option><option value="tidak">Tidak Dapat Hadir</option></select><textarea id="rm-${wid}" placeholder="Ucapan &amp; Doa..." rows="3" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:12px;"></textarea><button onclick="submitRSVP('${wid}')" style="width:100%;padding:12px;background:${acc};border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border-radius:${r}px;cursor:pointer;">Kirim Konfirmasi 💌</button></div><div id="rsvp-ok-${wid}" style="display:none;padding:60px 20px;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:40px;color:${acc};">✦</div><div style="font-family:'Playfair Display',serif;font-size:22px;color:${dk?"#fff":"#333"};margin-top:12px;">Terima Kasih</div><div style="font-size:13px;color:#888;margin-top:8px;font-family:'DM Sans',sans-serif;line-height:1.7;">Konfirmasi Anda telah kami terima.</div></div></div>`;}
     if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:inline-block;padding:9px 22px;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;z-index:${el.zIndex};text-align:center;padding:20px 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:13px 30px;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
-    if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"220px":"150px",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:20px;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>{const ps=(imagePathMap&&imagePathMap[src])||src;return`<div style="overflow:hidden;border-radius:${br};"><img src="${ps}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=`{%- for photo in photos %}<div style="overflow:hidden;border-radius:${br};"><img src="{{ photo_src(photo) }}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('{{ photo_src(photo) }}','${wid}')" loading="lazy"/></div>{%- endfor %}`;const imgs=statics||('{%- if photos %}'+jinja+'{%- else %}<div style="color:#555;text-align:center;padding:30px;font-size:12px;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>{%- endif %}');return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
-    if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}">
-  <div style="text-align:center;padding:16px 4px 12px;">
-    <div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div>
-    <div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div>
-  </div>
-  <div id="gb-chat-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 4px 12px;overflow-y:auto;max-height:calc(100% - 70px);">
-    {%- if rsvps %}
-    {%- for r in rsvps %}
-    <div style="display:flex;gap:8px;align-items:flex-start;">
-      <div style="width:32px;height:32px;border-radius:50%;background:${acc}22;border:1px solid ${acc}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:${acc};font-family:'Playfair Display',serif;font-weight:700;">{{ r.name[0]|upper }}</div>
-      <div style="flex:1;background:${dk?"rgba(255,255,255,.04)":"rgba(0,0,0,.04)"};border:1px solid ${dk?"rgba(255,255,255,.07)":"rgba(0,0,0,.07)"};border-radius:0 ${r}px ${r}px ${r}px;padding:10px 12px;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-          <span style="font-weight:600;font-size:13px;color:${acc};font-family:'DM Sans',sans-serif;">{{ r.name }}</span>
-          <span style="font-size:10px;color:#555;font-family:'DM Sans',sans-serif;">{{ r.attend == 'hadir' and '✓ Hadir' or '— Tidak Hadir' }}</span>
-        </div>
-        {%- if r.message %}<div style="font-size:12px;color:${ic};font-family:'DM Sans',sans-serif;line-height:1.6;">{{ r.message }}</div>{%- endif %}
-      </div>
-    </div>
-    {%- endfor %}
-    {%- else %}
-    <div style="color:#444;text-align:center;font-size:12px;padding:24px 0;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div>
-    {%- endif %}
-  </div>
-</div>`;}
+    if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"220px":"150px",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:20px;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>`<div style="overflow:hidden;border-radius:${br};"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=`{%- for photo in photos %}<div style="overflow:hidden;border-radius:${br};"><img src="{{ photo_src(photo) }}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('{{ photo_src(photo) }}','${wid}')" loading="lazy"/></div>{%- endfor %}`;const imgs=statics||('{%- if photos %}'+jinja+'{%- else %}<div style="color:#555;text-align:center;padding:30px;font-size:12px;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>{%- endif %}');return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
+    if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}"><div style="text-align:center;padding:20px 4px 12px;"><div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div><div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div></div><div id="gb-list-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 4px 12px;min-height:60px;"><div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div></div><div style="position:sticky;bottom:0;padding:10px 4px 4px;"><input id="gn-${wid}" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:7px;display:block;"/><textarea id="gm-${wid}" placeholder="Ucapan &amp; Doa..." rows="2" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:7px;"></textarea><button onclick="submitGB('${wid}')" style="width:100%;padding:11px;background:${acc};border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:${r}px;cursor:pointer;">Kirim Ucapan 💌</button></div></div>`;}
     if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital",sub=el.giftSubtitle||"Doa tulus Anda adalah hadiah terindah.",cbg=dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",cbd=dk?acc+"33":"rgba(0,0,0,.08)";return `<div style="${ws}padding:20px 4px;"><div style="text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:22px;color:${acc};margin-bottom:8px;">${tit}</div><div style="font-size:12px;color:#888;line-height:1.7;margin-bottom:20px;font-family:'DM Sans',sans-serif;">${sub}</div></div>{%- for gift in gifts %}<div style="background:${cbg};border:1px solid ${cbd};border-radius:${r}px;padding:20px 24px;margin-bottom:12px;">{%- if gift.bank_name %}<div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Transfer via</div><div style="font-family:'Playfair Display',serif;font-size:18px;color:${acc};margin-bottom:4px;">{{ gift.bank_name }}</div><div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:3px;margin:6px 0;">{{ gift.account_number }}</div><div style="font-size:12px;color:#888;">a/n {{ gift.account_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- elif gift.ewallet_type %}<div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">{{ gift.ewallet_type }}</div><div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:2px;margin:6px 0;">{{ gift.ewallet_number }}</div><div style="font-size:12px;color:#888;">a/n {{ gift.ewallet_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- endif %}</div>{%- endfor %}</div>`;}
     return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;height:${el.height||200}px;z-index:${el.zIndex};border:1px dashed ${acc}44;display:flex;align-items:center;justify-content:center;"><span style="color:${acc}66;font-size:12px;">${el.name}</span></div>`;
   };
 
-  const buildSec=(s,i)=>{const fm={contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"},_bgSrc=(imagePathMap&&imagePathMap[s.bgImage])||s.bgImage,bgs=s.bgImage?`background-image:url('${_bgSrc}');background-size:${fm[s.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${s.bg};`;return `\n<section class="section" id="sec-${i}" data-type="${s.type}" style="${bgs}">\n${s.elements.map(elToHTML).filter(Boolean).join("\n")}\n</section>`;};
+  const buildSec=(s,i)=>{const fm={contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"},bgs=s.bgImage?`background-image:url('${s.bgImage}');background-size:${fm[s.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${s.bg};`;return `\n<section class="section" id="sec-${i}" data-type="${s.type}" style="${bgs}">\n${s.elements.map(elToHTML).filter(Boolean).join("\n")}\n</section>`;};
 
   const cover=sections.find(s=>s.type==="cover"),nonCover=sections.filter(s=>s.type!=="cover"),hasBGM=!!(inv.music_url||"").trim(),groom=inv.groom_name||"Mempelai Pria",bride=inv.bride_name||"Mempelai Wanita";
   let coverHTML="";
@@ -171,7 +88,6 @@ function submitRSVP_${wid}(){
   const script=`
 const inv={groom_name:"{{inv.groom_name}}",bride_name:"{{inv.bride_name}}",maps_url:"{{inv.maps_url}}",countdown_date:"{{inv.countdown_date}}",music_url:"{{inv.music_url}}"};
 let cur=0,navLock=false;
-
 const secs=document.querySelectorAll('.section'),total=secs.length,dotsEl=document.getElementById('dots');
 secs.forEach((_,i)=>{const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);});
 function goTo(i){if(i<0||i>=total)return;cur=i;document.getElementById('track').style.transform='translateY(-'+cur*100+'dvh)';document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===cur));}
@@ -203,13 +119,11 @@ function openLightbox(src,id){const lb=document.getElementById('lb-'+id),img=doc
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#111;}
-#app{position:fixed;inset:0;overflow:hidden;display:flex;justify-content:center;align-items:stretch;background:#111;}
-#phone-wrap{position:relative;width:min(390px,100vw);height:100%;overflow:hidden;flex-shrink:0;}
+html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
+#app{position:fixed;inset:0;overflow:hidden;}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
 .section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;}
-#dots{position:fixed;right:calc(50% - 195px - 28px);top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
-@media(max-width:420px){#dots{right:6px;}}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}
 input,textarea,select{-webkit-user-select:text;user-select:text;}
@@ -218,12 +132,10 @@ ${animCSS}
 </head>
 <body>
 <div id="app">
-<div id="phone-wrap">
 ${coverHTML}
 <div id="dots"></div>
 <div id="track">
 ${nonCover.map((s,i)=>buildSec(s,i)).join("\n")}
-</div>
 </div>
 </div>
 ${bgmHTML}
@@ -297,7 +209,6 @@ function App(){
   const [projId,setProjId]=useState(()=>_draft.projectId||null);
   const [projName,setProjName]=useState(()=>_draft.projectName||"Proyek Baru");
   const [showProj,setShowProj]=useState(false);
-  const [clipboard,setClipboard]=useState(null);
   const cwRef=useRef(null),upRef=useRef(null),bgRef=useRef(null);
 
   const actSec=sections.find(s=>s.id===activeId);
@@ -326,8 +237,6 @@ function App(){
   const updEl=(id,patch)=>setSections(p=>p.map(s=>s.id===activeId?{...s,elements:s.elements.map(e=>e.id===id?{...e,...patch}:e)}:s));
   const delEl=id=>{setSections(p=>p.map(s=>s.id===activeId?{...s,elements:s.elements.filter(e=>e.id!==id)}:s));setSelId(null);};
   const dupEl=id=>{const el=actSec?.elements.find(e=>e.id===id);if(!el)return;const c={...el,id:uid(),x:el.x+16,y:el.y+16};setSections(p=>p.map(s=>s.id===activeId?{...s,elements:[...s.elements,c]}:s));setSelId(c.id);showT("Diduplikat");};
-  const copyEl=(id)=>{const el=actSec?.elements.find(e=>e.id===id);if(el)setClipboard({el:{...el},fromSecId:activeId});showT("Elemen disalin ✦");};
-  const pasteEl=()=>{if(!clipboard)return;const ne={...clipboard.el,id:uid(),x:clipboard.el.x+12,y:clipboard.el.y+12};setSections(p=>p.map(s=>s.id===activeId?{...s,elements:[...s.elements,ne]}:s));setSelId(ne.id);showT("Elemen ditempel");};
   const moveLayer=(id,dir)=>{setSections(p=>p.map(s=>{if(s.id!==activeId)return s;const a=[...s.elements],i=a.findIndex(e=>e.id===id),t=i+dir;if(t<0||t>=a.length)return s;[a[i],a[t]]=[a[t],a[i]];return{...s,elements:a.map((e,j)=>({...e,zIndex:j+1}))}}));};
 
   const handleUp=e=>{const files=[...(e.target.files||[])];files.forEach(f=>{const r=new FileReader();r.onload=ev=>addEl(makeImgEl(ev.target.result,f.name));r.readAsDataURL(f);});e.target.value="";showT(`${files.length} aset diupload`);};
@@ -337,60 +246,9 @@ function App(){
   // Drag
   const onDown=(e,id)=>{e.stopPropagation();setSelId(id);const el=actSec.elements.find(x=>x.id===id);setDrag({id,sx:e.clientX,sy:e.clientY,ox:el.x,oy:el.y});};
   useEffect(()=>{if(!drag)return;const onM=e=>updEl(drag.id,{x:Math.round(drag.ox+(e.clientX-drag.sx)/scale),y:Math.round(drag.oy+(e.clientY-drag.sy)/scale)});const onU=()=>setDrag(null);window.addEventListener("mousemove",onM);window.addEventListener("mouseup",onU);return()=>{window.removeEventListener("mousemove",onM);window.removeEventListener("mouseup",onU);};},[drag,scale]);
-  useEffect(()=>{const f=e=>{if(!selId)return;if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;const el=actSec?.elements.find(x=>x.id===selId);if(!el)return;const st=e.shiftKey?10:1;if(e.key==="ArrowLeft"){e.preventDefault();updEl(selId,{x:el.x-st});}if(e.key==="ArrowRight"){e.preventDefault();updEl(selId,{x:el.x+st});}if(e.key==="ArrowUp"){e.preventDefault();updEl(selId,{y:el.y-st});}if(e.key==="ArrowDown"){e.preventDefault();updEl(selId,{y:el.y+st});}if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();delEl(selId);}if((e.ctrlKey||e.metaKey)&&e.key==="d"){e.preventDefault();dupEl(selId);}
-      if((e.ctrlKey||e.metaKey)&&e.key==="c"){e.preventDefault();copyEl(selId);}};window.addEventListener("keydown",f);
-    const onPaste=e=>{if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key==="v"){e.preventDefault();pasteEl();}};
-    window.addEventListener("keydown",onPaste);
-    return()=>{window.removeEventListener("keydown",f);window.removeEventListener("keydown",onPaste);};},[selId,actSec,scale,clipboard]);
+  useEffect(()=>{const f=e=>{if(!selId)return;if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;const el=actSec?.elements.find(x=>x.id===selId);if(!el)return;const st=e.shiftKey?10:1;if(e.key==="ArrowLeft"){e.preventDefault();updEl(selId,{x:el.x-st});}if(e.key==="ArrowRight"){e.preventDefault();updEl(selId,{x:el.x+st});}if(e.key==="ArrowUp"){e.preventDefault();updEl(selId,{y:el.y-st});}if(e.key==="ArrowDown"){e.preventDefault();updEl(selId,{y:el.y+st});}if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();delEl(selId);}if((e.ctrlKey||e.metaKey)&&e.key==="d"){e.preventDefault();dupEl(selId);}};window.addEventListener("keydown",f);return()=>window.removeEventListener("keydown",f);},[selId,actSec,scale]);
 
-  const [themeCfg,setThemeCfg]=useState(()=>loadThemeConfig()||DEFAULT_THEME_CFG);
-  const [showTheme,setShowTheme]=useState(false);
-  useEffect(()=>{saveThemeConfig(themeCfg);},[themeCfg]);
-
-  const exportZIP=async()=>{
-    const tid=(themeCfg.id||"tema-baru").toLowerCase().replace(/[^a-z0-9_-]/g,"");
-    const themeDir=`static/themes/${tid}`;
-    // 1. Collect all base64 images
-    const imgList=collectImages(sections);
-    // 2. Build path map: base64 → server path
-    const pathMap={};
-    imgList.forEach(img=>{pathMap[img.base64]=`/${themeDir}/${img.filename}`;});
-    // 3. Build HTML with replaced paths
-    const html=buildHTML(sections,invData,pathMap);
-    // 4. Build theme JSON
-    const tagsArr=(themeCfg.tags||"").split(",").map(t=>t.trim()).filter(Boolean);
-    const demoPhotos=imgList.filter(img=>img.filename.startsWith("bg_sec0")).map(img=>`/${themeDir}/${img.filename}`);
-    const themeJSON=JSON.stringify({
-      id:tid,
-      name:themeCfg.name||"Tema Baru",
-      description:themeCfg.description||"",
-      preview_color:themeCfg.preview_color||(sections[0]?.bg||"#1a0e08"),
-      accent_color:themeCfg.accent_color||"#C4973A",
-      skeleton:tid,
-      tags:tagsArr,
-      demo_photos:demoPhotos.length?demoPhotos:[`/${themeDir}/demo.jpg`],
-      price:parseInt(themeCfg.price||25000),
-      price_label:`Rp. ${parseInt(themeCfg.price||25000).toLocaleString("id-ID")}`,
-      price_original:parseInt(themeCfg.price_original||50000),
-      price_note:themeCfg.price_note||""
-    },null,2);
-    // 5. Pack ZIP
-    const zip=new JSZip();
-    zip.file(`templates/themes/${tid}.html`, html);
-    zip.file(`themes/${tid}.json`, themeJSON);
-    // Add image files
-    const b64ToBlob=(b64,mime)=>{const bin=atob(b64.split(",")[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return arr;};
-    imgList.forEach(img=>{
-      try{zip.file(`${themeDir}/${img.filename}`,b64ToBlob(img.base64,img.mime));}catch(e){console.warn("Skip image",img.filename,e);}
-    });
-    // 6. Download
-    const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:6}});
-    const url=URL.createObjectURL(blob),a=document.createElement("a");
-    a.href=url;a.download=`${tid}.zip`;a.click();URL.revokeObjectURL(url);
-    showT(`ZIP ${tid}.zip berhasil diexport 🎉`);
-  };
-
-  const exportHTML=exportZIP;
+  const exportHTML=()=>{const html=buildHTML(sections,invData),blob=new Blob([html],{type:"text/html"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="undangan.html";a.click();URL.revokeObjectURL(url);showT("Export HTML berhasil 🎉");};
   const handleProjLoad=(pid,pn,ps,pd)=>{if(ps)ps.forEach(s=>s.elements?.forEach(el=>{if(el.id>_id)_id=el.id;}));setSections(ps||initSections);setInvData(pd||{});setProjId(pid);setProjName(pn||"Proyek Baru");setActiveId((ps||[])[0]?.id||1);setSelId(null);showT(`"${pn}" dimuat`);};
 
   // Canvas element renderer
@@ -410,8 +268,7 @@ function App(){
           return<div style={{fontSize:el.fontSize||24,fontFamily:`'${el.fontFamily||"Playfair Display"}',serif`,color:el.color||"#fff",textAlign:el.align||"center",fontStyle:el.fontStyle||"normal",fontWeight:el.fontWeight||400,letterSpacing:el.letterSpacing||0,lineHeight:el.lineHeight||1.4,whiteSpace:"pre-wrap",wordBreak:"break-word",textShadow:el.shadow?`0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,.5)"}`:"none",pointerEvents:"none"}}>{disp}</div>;
         })()}
         {el.type==="widget"&&<WidgetCanvas el={el} invData={invData}/>}
-  
-      {isSel&&<>
+        {isSel&&<>
           <div title="Resize lebar" onMouseDown={e=>{e.stopPropagation();const sw=e.clientX,ww=el.width||150;const mM=ev=>updEl(el.id,{width:Math.max(20,Math.round(ww+(ev.clientX-sw)/scale))});const mU=()=>{window.removeEventListener("mousemove",mM);window.removeEventListener("mouseup",mU);};window.addEventListener("mousemove",mM);window.addEventListener("mouseup",mU);}} style={{position:"absolute",right:-5,bottom:-5,width:12,height:12,background:"#C4973A",borderRadius:2,cursor:"se-resize",zIndex:1001}}/>
           {isW&&<div title="Resize tinggi" onMouseDown={e=>{e.stopPropagation();const sh=e.clientY,wh=el.height||400;const mM=ev=>updEl(el.id,{height:Math.max(80,Math.round(wh+(ev.clientY-sh)/scale))});const mU=()=>{window.removeEventListener("mousemove",mM);window.removeEventListener("mouseup",mU);};window.addEventListener("mousemove",mM);window.addEventListener("mouseup",mU);}} style={{position:"absolute",right:-5,bottom:10,width:12,height:12,background:"#7D9470",borderRadius:2,cursor:"s-resize",zIndex:1001}}/>}
           {!isW&&<>
@@ -429,7 +286,7 @@ function App(){
       <div style={{height:40,background:"#111",display:"flex",alignItems:"center",padding:"0 16px",gap:12,flexShrink:0,borderBottom:"1px solid #1a1a1a"}}>
         <span style={{color:"#C4973A",fontWeight:700,fontSize:13,fontFamily:"DM Sans,sans-serif"}}>👁 Preview</span>
         <div style={{flex:1}}/>
-        <button onClick={exportHTML} style={{padding:"5px 14px",background:"#C4973A",border:"none",color:"#000",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>⬇ Export ZIP</button>
+        <button onClick={exportHTML} style={{padding:"5px 14px",background:"#C4973A",border:"none",color:"#000",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>⬇ Export HTML</button>
         <button onClick={()=>setPreview(false)} style={{padding:"5px 14px",background:"#1e1e1e",border:"1px solid #333",color:"#aaa",borderRadius:3,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif"}}>✕ Tutup</button>
       </div>
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:"#080808"}}>
@@ -444,9 +301,8 @@ function App(){
   return(
     <div style={S.root}>
       {toast&&<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:toast.type==="err"?"#2a0e0e":"#1e2a1e",border:`1px solid ${toast.type==="err"?"#c55":"#7D9470"}`,color:toast.type==="err"?"#f88":"#aed6a0",padding:"8px 20px",borderRadius:6,fontSize:12,zIndex:9999,animation:"toast-in .3s ease",fontFamily:"DM Sans,sans-serif",whiteSpace:"nowrap"}}>{toast.m}</div>}
-      {showTheme&&<ThemeConfigModal cfg={themeCfg} setCfg={setThemeCfg} onClose={()=>setShowTheme(false)} sections={sections}/>}
       {showProj&&<ProjectManager sections={sections} invData={invData} projectId={projId} projectName={projName} onLoad={handleProjLoad} onClose={()=>setShowProj(false)}/>}
-      {showData&&<DataModal invData={invData} onClose={()=>setShowData(false)}/>}
+      {showData&&<DataModal invData={invData} setInvData={setInvData} onClose={()=>setShowData(false)}/>}
       {showFP&&selEl?.type==="text"&&<FontPicker current={selEl.fontFamily} search={fpSearch} setSearch={setFpSearch} onPick={f=>{updEl(selEl.id,{fontFamily:f});setShowFP(false);}} onClose={()=>setShowFP(false)}/>}
 
       {/* TOPBAR */}
@@ -455,12 +311,11 @@ function App(){
         <div style={{width:1,height:20,background:"#1e1e1e"}}/>
         <span style={{fontSize:11,color:"#3a3a3a",fontFamily:"DM Sans",maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{projName}</span>
         <div style={{flex:1}}/>
-        <Tbtn onClick={()=>setShowTheme(true)} col="#C4973A">🎨 Tema</Tbtn>
         <Tbtn onClick={()=>setShowProj(true)} col="#7D9470">📁 Proyek</Tbtn>
         <Tbtn onClick={()=>{const pid=saveProject(projId,projName,sections,invData);if(pid){setProjId(pid);showT("Tersimpan ✦");}}} col="#7D9470">💾 Simpan</Tbtn>
         <Tbtn onClick={()=>setShowData(true)} col="#5a7aaa">📋 Data</Tbtn>
         <Tbtn onClick={()=>setPreview(true)} col="#888">👁 Preview</Tbtn>
-        <button onClick={exportHTML} style={{...S.btnP,padding:"5px 16px",fontSize:12}}>⬇ Export ZIP</button>
+        <button onClick={exportHTML} style={{...S.btnP,padding:"5px 16px",fontSize:12}}>⬇ Export</button>
       </div>
 
       {/* BODY */}
@@ -510,10 +365,7 @@ function App(){
               </div>
               {actSec&&actSec.elements.length>0&&(
                 <div style={{borderTop:"1px solid #161616",paddingTop:8,flex:1,overflowY:"auto",minHeight:0}}>
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-                <div style={{fontSize:9,color:"#2a2a2a",letterSpacing:1,textTransform:"uppercase",fontFamily:"DM Sans,sans-serif"}}>Layers</div>
-                {clipboard&&<button onClick={pasteEl} style={{fontSize:9,padding:"2px 7px",background:"#1a2a1a",border:"1px solid #2a3a2a",color:"#7D9470",borderRadius:3,cursor:"pointer",fontFamily:"DM Sans,sans-serif"}}>⎘ Tempel</button>}
-              </div>
+                  <div style={{fontSize:9,color:"#2a2a2a",letterSpacing:1,textTransform:"uppercase",marginBottom:4,fontFamily:"DM Sans,sans-serif"}}>Layers</div>
                   {actSec.elements.slice().reverse().map((el,ri)=>{const tl=actSec.elements.length,oi=tl-1-ri;return(
                     <div key={el.id} onClick={()=>setSelId(el.id)} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 4px",cursor:"pointer",background:el.id===selId?"#191919":"transparent",borderLeft:`3px solid ${el.id===selId?"#7D9470":"transparent"}`,borderBottom:"1px solid #111"}}>
                       {el.type==="image"?<img src={el.src} style={{width:16,height:16,objectFit:"cover",borderRadius:2,flexShrink:0,border:"1px solid #222"}}/>:<span style={{width:16,height:16,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",color:"#555",flexShrink:0,background:"#161616",borderRadius:2}}>{el.type==="widget"?"⚙":"T"}</span>}
@@ -564,7 +416,7 @@ function App(){
               <button key={k} onClick={()=>setRtab(k)} style={{flex:1,padding:"7px 0",background:"none",border:"none",color:rtab===k?"#C4973A":"#333",borderBottom:`2px solid ${rtab===k?"#C4973A":"transparent"}`,cursor:"pointer",fontSize:10,letterSpacing:.8,textTransform:"uppercase",fontWeight:600,fontFamily:"DM Sans,sans-serif"}}>{l}</button>
             ))}
           </div>
-          {rtab==="element"&&(selEl?(selEl.type==="widget"?<WidgetProps el={selEl} upd={p=>updEl(selEl.id,p)} onDel={()=>delEl(selEl.id)} onDup={()=>dupEl(selEl.id)} onCopy={()=>copyEl(selEl.id)} onGallery={handleGallUp}/>:<ElProps el={selEl} upd={p=>updEl(selEl.id,p)} onDel={()=>delEl(selEl.id)} onDup={()=>dupEl(selEl.id)} onCopy={()=>copyEl(selEl.id)} onFwd={()=>{const e=actSec?.elements.find(x=>x.id===selId);if(e)updEl(selId,{zIndex:e.zIndex+1});}} onBwd={()=>{const e=actSec?.elements.find(x=>x.id===selId);if(e)updEl(selId,{zIndex:Math.max(1,e.zIndex-1)});}} invData={invData} onFP={()=>setShowFP(true)}/>):<div style={{padding:"20px 0",color:"#333",fontSize:12,textAlign:"center",lineHeight:1.8,fontFamily:"DM Sans,sans-serif"}}>Pilih elemen di canvas<br/>atau tambah di Assets.</div>)}
+          {rtab==="element"&&(selEl?(selEl.type==="widget"?<WidgetProps el={selEl} upd={p=>updEl(selEl.id,p)} onDel={()=>delEl(selEl.id)} onDup={()=>dupEl(selEl.id)} onGallery={handleGallUp}/>:<ElProps el={selEl} upd={p=>updEl(selEl.id,p)} onDel={()=>delEl(selEl.id)} onDup={()=>dupEl(selEl.id)} onFwd={()=>{const e=actSec?.elements.find(x=>x.id===selId);if(e)updEl(selId,{zIndex:e.zIndex+1});}} onBwd={()=>{const e=actSec?.elements.find(x=>x.id===selId);if(e)updEl(selId,{zIndex:Math.max(1,e.zIndex-1)});}} invData={invData} onFP={()=>setShowFP(true)}/>):<div style={{padding:"20px 0",color:"#333",fontSize:12,textAlign:"center",lineHeight:1.8,fontFamily:"DM Sans,sans-serif"}}>Pilih elemen di canvas<br/>atau tambah di Assets.</div>)}
           {rtab==="section"&&actSec&&<SecProps sec={actSec} upd={p=>updSec(actSec.id,p)} onBg={()=>bgRef.current?.click()} onClrBg={()=>updSec(actSec.id,{bgImage:undefined})}/>}
           {rtab==="data"&&<div style={{display:"flex",flexDirection:"column",gap:10,paddingTop:4}}>
             <div style={{fontSize:10,letterSpacing:1.5,textTransform:"uppercase",color:"#444",fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>📋 Data Undangan</div>
@@ -583,92 +435,10 @@ function App(){
 // ─── WidgetCanvas (canvas preview only) ───────────────────────────────────────
 function WidgetCanvas({el,invData}){
   const acc=el.accent||"#C4973A",r=el.radius||4,dk=(el.wStyle||"dark")==="dark",ib=dk?"rgba(255,255,255,.08)":"rgba(0,0,0,.06)",ic=dk?"#aaa":"#333",tc=dk?acc:"#333";
-  if(el.widgetType==="countdown"){
-    const ca=el.cdAccent||acc,lay=el.cdLayout||"cards";
-    const nums=[["99","HARI"],["12","JAM"],["30","MNT"],["45","DET"]];
-    if(lay==="flip")return(
-      <div style={{position:"absolute",inset:0,padding:"20px 8px",textAlign:"center",display:"flex",flexDirection:"column",justifyContent:"center"}}>
-        {el.title&&<div style={{fontFamily:"Playfair Display,serif",fontSize:15,color:ca,marginBottom:16}}>{el.title}</div>}
-        <div style={{display:"flex",gap:6,justifyContent:"center"}}>
-          {nums.map(([n,l])=>(
-            <div key={l} style={{position:"relative",width:64,height:72,borderRadius:6,background:dk?"#1a1a1a":"#f0ede8",boxShadow:"0 4px 14px rgba(0,0,0,.4)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-              <div style={{position:"absolute",top:"50%",left:0,right:0,height:1,background:dk?"rgba(0,0,0,.5)":"rgba(0,0,0,.15)"}}/>
-              <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:ca,lineHeight:1,fontWeight:700}}>{n}</div>
-              <div style={{fontSize:7,color:dk?"#555":"#999",textTransform:"uppercase",letterSpacing:1.5,fontFamily:"DM Sans,sans-serif"}}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-    if(lay==="minimal")return(
-      <div style={{position:"absolute",inset:0,padding:"20px 8px",textAlign:"center",display:"flex",flexDirection:"column",justifyContent:"center"}}>
-        {el.title&&<div style={{fontFamily:"Playfair Display,serif",fontSize:15,color:ca,marginBottom:12}}>{el.title}</div>}
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:0}}>
-          {nums.map(([n,l],i)=>(
-            <React.Fragment key={l}>
-              <div style={{textAlign:"center",padding:"0 8px"}}>
-                <div style={{fontFamily:"Playfair Display,serif",fontSize:38,color:ca,lineHeight:1}}>{n}</div>
-                <div style={{fontSize:8,color:dk?"#555":"#999",textTransform:"uppercase",letterSpacing:1.5,marginTop:2,fontFamily:"DM Sans,sans-serif"}}>{l}</div>
-              </div>
-              {i<3&&<div style={{fontFamily:"Playfair Display,serif",fontSize:30,color:ca,opacity:.4,marginBottom:12}}>:</div>}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    );
-    return(
-      <div style={{position:"absolute",inset:0,padding:"20px 8px",textAlign:"center"}}>
-        {el.title&&<div style={{fontFamily:"Playfair Display,serif",fontSize:15,color:ca,marginBottom:12}}>{el.title}</div>}
-        <div style={{display:"flex",gap:8,justifyContent:"center"}}>
-          {[["99","Hari"],["12","Jam"],["30","Mnt"],["45","Det"]].map(([n,l])=>(
-            <div key={l} style={{flex:1,background:dk?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)",borderRadius:8,padding:"12px 4px"}}>
-              <div style={{fontFamily:"Playfair Display,serif",fontSize:26,color:ca,lineHeight:1}}>{n}</div>
-              <div style={{fontSize:9,color:dk?"#666":"#999",textTransform:"uppercase",letterSpacing:1.5,marginTop:4,fontFamily:"DM Sans,sans-serif"}}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );}
+  if(el.widgetType==="countdown"){const ca=el.cdAccent||acc;return<div style={{position:"absolute",inset:0,padding:"20px 8px",textAlign:"center"}}>{el.title&&<div style={{fontFamily:"Playfair Display,serif",fontSize:15,color:ca,marginBottom:12}}>{el.title}</div>}<div style={{display:"flex",gap:8,justifyContent:"center"}}>{[["99","Hari"],["12","Jam"],["30","Mnt"],["45","Det"]].map(([n,l])=><div key={l} style={{flex:1,background:dk?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)",borderRadius:8,padding:"12px 4px"}}><div style={{fontFamily:"Playfair Display,serif",fontSize:26,color:ca,lineHeight:1}}>{n}</div><div style={{fontSize:9,color:dk?"#666":"#999",textTransform:"uppercase",letterSpacing:1.5,marginTop:4,fontFamily:"DM Sans,sans-serif"}}>{l}</div></div>)}</div></div>;}
   if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return<div style={{position:"absolute",inset:0,overflowY:"auto",padding:"16px 8px"}}><div style={{textAlign:"center",marginBottom:14}}><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:tc}}>{tit}</div><div style={{width:28,height:1,background:acc,opacity:.4,margin:"7px auto 0"}}/></div>{["Nama Anda","Jumlah Tamu"].map((ph,i)=><div key={i} style={{padding:"9px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:7}}>{ph}</div>)}<div style={{padding:"9px 12px",background:dk?"#1a1a1a":ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:7}}>Konfirmasi ▾</div><div style={{padding:"20px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:10}}>Ucapan &amp; Doa...</div><div style={{padding:"11px",background:acc,borderRadius:r,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:12,fontWeight:700,textAlign:"center"}}>Kirim 💌</div></div>;}
   if(el.widgetType==="maps"){const bt=el.mapsBtnText||"Buka di Google Maps";return<div style={{position:"absolute",inset:0}}><div style={{width:"100%",height:"100%",background:"#1a2a1a",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}><div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)",backgroundSize:"28px 28px"}}/><div style={{textAlign:"center",color:"#3a5a3a",fontSize:11,fontFamily:"DM Sans,sans-serif",zIndex:1}}>🗺<br/>Maps{el.mapsLayout==="embed"?" (Embed)":""}</div></div><div style={{position:"absolute",bottom:12,left:"50%",transform:"translateX(-50%)",display:"inline-block",padding:"7px 18px",background:acc,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:700,borderRadius:r,whiteSpace:"nowrap"}}>{bt}</div></div>;}
-  if(el.widgetType==="gallery"){
-    const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8;
-    const gStyle=el.galleryStyle||"grid";
-    const cols=lay==="1"?"1fr":lay==="3"?"1fr 1fr 1fr":"1fr 1fr";
-    const imgH=lay==="1"||shp==="portrait"?180:120;
-    const br=shp==="circle"?"50%":shp==="rounded"?"10px":"2px";
-    const DEMO_PHOTOS=["demo-photos/1772883688859.jpg","demo-photos/1772883848858.jpg","demo-photos/1772883916643.jpg","demo-photos/1772979323367~2.jpg","demo-photos/1772883766870.jpg","demo-photos/demo-282882.jpg"];
-    const photos=(el.galleryImages||[]).length>0?el.galleryImages:DEMO_PHOTOS;
-    const isDemo=(el.galleryImages||[]).length===0;
-    const polaroidStyle=gStyle==="polaroid"?{background:"#fff",padding:"6px 6px 22px",boxShadow:"0 3px 12px rgba(0,0,0,.4)",borderRadius:4}:{};
-    const renderPhoto=(src,i)=>(
-      <div key={i} style={{overflow:"hidden",borderRadius:br,background:"#1a1412",position:"relative",...polaroidStyle}}>
-        <img src={src} style={{width:"100%",height:imgH,objectFit:"cover",display:"block",borderRadius:gStyle==="polaroid"?2:br}} onError={e=>{e.target.style.display="none";}}/>
-        {gStyle==="polaroid"&&<div style={{height:16,background:"#fff"}}/>}
-        {isDemo&&<div style={{position:"absolute",bottom:gStyle==="polaroid"?6:2,right:2,background:"rgba(0,0,0,.6)",color:"#aaa",fontSize:7,padding:"1px 4px",borderRadius:2,fontFamily:"DM Sans,sans-serif"}}>demo</div>}
-      </div>
-    );
-    if(gStyle==="slide")return(
-      <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
-        {el.title&&<div style={{textAlign:"center",padding:`${gap}px 0 0`,fontFamily:"Playfair Display,serif",fontSize:15,color:acc}}>{el.title}</div>}
-        <div style={{display:"flex",gap,padding:gap,overflowX:"auto",scrollSnapType:"x mandatory",height:"100%",alignItems:"center"}}>
-          {photos.map((src,i)=>(
-            <div key={i} style={{flexShrink:0,scrollSnapAlign:"start",width:lay==="1"?"100%":lay==="3"?"33%":"48%",borderRadius:br,overflow:"hidden",background:"#1a1412"}}>
-              <img src={src} style={{width:"100%",height:imgH*1.4,objectFit:"cover",display:"block"}} onError={e=>{e.target.style.display="none";}}/>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-    return(
-      <div style={{position:"absolute",inset:0,overflow:"auto",padding:gap}}>
-        {el.title&&<div style={{textAlign:"center",marginBottom:gap,fontFamily:"Playfair Display,serif",fontSize:15,color:acc}}>{el.title}</div>}
-        <div style={{display:"grid",gridTemplateColumns:cols,gap}}>
-          {photos.map((src,i)=>renderPhoto(src,i))}
-        </div>
-        {isDemo&&<div style={{textAlign:"center",marginTop:4,fontSize:8,color:"#2a2a2a",fontFamily:"DM Sans,sans-serif"}}>foto demo · upload asli di panel Widget</div>}
-      </div>
-    );}
+  if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"1fr 1fr 1fr":"1fr 1fr",imgH=lay==="1"||shp==="portrait"?180:120,br=shp==="circle"?"50%":shp==="rounded"?"10px":"2px",photos=el.galleryImages||[];return<div style={{position:"absolute",inset:0,overflow:"auto",padding:gap}}>{el.title&&<div style={{textAlign:"center",marginBottom:gap,fontFamily:"Playfair Display,serif",fontSize:15,color:acc}}>{el.title}</div>}<div style={{display:"grid",gridTemplateColumns:cols,gap}}>{photos.length>0?photos.map((src,i)=><div key={i} style={{overflow:"hidden",borderRadius:br,background:"#1a1412"}}><img src={src} style={{width:"100%",height:imgH,objectFit:"cover",display:"block"}} onError={e=>{e.target.style.display="none";}}/></div>):<div style={{gridColumn:"1/-1",textAlign:"center",padding:20,color:"#333",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>📷 Upload foto di panel Widget</div>}</div></div>;}
   if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return<div style={{position:"absolute",inset:0,overflow:"auto",padding:"14px 8px"}}><div style={{textAlign:"center",marginBottom:12}}><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:tc}}>{tit}</div><div style={{width:28,height:1,background:acc,opacity:.4,margin:"7px auto 0"}}/></div><div style={{background:dk?"rgba(255,255,255,.03)":"rgba(0,0,0,.03)",border:`1px solid ${acc}22`,borderRadius:r,padding:12,marginBottom:10,color:"#444",fontFamily:"DM Sans,sans-serif",fontSize:11,textAlign:"center"}}>Belum ada ucapan</div><input placeholder="Nama Anda" style={{width:"100%",padding:"8px 12px",background:ib,border:`1px solid ${acc}44`,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:11,borderRadius:r,outline:"none",marginBottom:6,display:"block"}}/><textarea placeholder="Ucapan..." rows="2" style={{width:"100%",padding:"8px 12px",background:ib,border:`1px solid ${acc}44`,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:11,borderRadius:r,outline:"none",resize:"none",display:"block",marginBottom:7}}/><div style={{padding:"9px",background:acc,borderRadius:r,color:"#fff",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:700,textAlign:"center"}}>Kirim 💌</div></div>;}
   if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital";return<div style={{position:"absolute",inset:0,overflow:"auto",padding:"18px 8px"}}><div style={{textAlign:"center",marginBottom:14}}><div style={{fontFamily:"Playfair Display,serif",fontSize:17,color:acc}}>{tit}</div></div><div style={{background:dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",border:`1px solid ${acc}33`,borderRadius:r,padding:"16px",marginBottom:10}}><div style={{fontSize:10,color:"#888",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Transfer via</div><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:acc,marginBottom:4}}>BCA / OVO / GOPAY</div><div style={{fontSize:18,color:dk?"#fff":"#333",letterSpacing:3}}>1234 5678 90</div><div style={{marginTop:10,padding:"5px 14px",background:"transparent",border:`1px solid ${acc}55`,color:acc,fontSize:10,borderRadius:r,display:"inline-block"}}>Salin Nomor</div></div><div style={{fontSize:10,color:"#333",textAlign:"center",fontFamily:"DM Sans,sans-serif"}}>data dari DB saat export</div></div>;}
   return<div style={{position:"absolute",inset:0,border:`1.5px dashed ${acc}44`,display:"flex",alignItems:"center",justifyContent:"center",background:`${acc}08`,borderRadius:4}}><div style={{textAlign:"center",color:`${acc}77`,fontSize:11,fontFamily:"DM Sans,sans-serif"}}>{el.name}</div></div>;
@@ -747,7 +517,7 @@ function SecProps({sec,upd,onBg,onClrBg}){
 }
 
 // ─── WidgetProps ──────────────────────────────────────────────────────────────
-function WidgetProps({el,upd,onDel,onDup,onCopy,onGallery}){
+function WidgetProps({el,upd,onDel,onDup,onGallery}){
   const gRef=useRef(null),[gKey,setGKey]=useState(0);
   return(
     <div style={{display:"flex",flexDirection:"column",gap:11,paddingTop:4}}>
@@ -773,36 +543,21 @@ function WidgetProps({el,upd,onDel,onDup,onCopy,onGallery}){
       <Field label={`Z-Index — ${el.zIndex||10}`}><Sld value={el.zIndex||10} min={1} max={50} onChange={v=>upd({zIndex:v})}/></Field>
       <Field label={`Opacity — ${Math.round((el.opacity||1)*100)}%`}><Sld value={el.opacity||1} min={0} max={1} step={0.01} onChange={v=>upd({opacity:v})}/></Field>
       {el.widgetType==="maps"&&<><Div label="Maps"/><Field label="Mode"><div style={{display:"flex",gap:4}}>{[["embed","📍 Embed"],["button","🔗 Tombol"]].map(([v,l])=><button key={v} onClick={()=>upd({mapsLayout:v})} style={{flex:1,padding:"5px 0",background:(el.mapsLayout||"embed")===v?"#1a2a1a":"#181818",border:`1px solid ${(el.mapsLayout||"embed")===v?"#7D9470":"#252525"}`,color:(el.mapsLayout||"embed")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>{l}</button>)}</div></Field><Field label="Teks Tombol"><input value={el.mapsBtnText||"Buka di Google Maps"} onChange={e=>upd({mapsBtnText:e.target.value})} style={S.inp}/></Field><div style={{padding:"7px 9px",background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:4,fontSize:10,color:"#4a6a4a",fontFamily:"DM Sans,sans-serif",lineHeight:1.8}}>💡 Link URL → Data: <b style={{color:"#6a8a6a"}}>inv.maps_url</b><br/>Embed URL → Data: <b style={{color:"#6a8a6a"}}>inv.maps_embed</b><br/>Format embed: google.com/maps/embed?pb=...</div></>}
-      {el.widgetType==="gallery"&&<><Div label="Gallery"/>
-        <Field label="Style"><div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
-          {[["grid","Grid"],["slide","Slide"],["polaroid","Polaroid"],["masonry","Masonry"]].map(([v,l])=><button key={v} onClick={()=>upd({galleryStyle:v})} style={{flex:1,padding:"5px 2px",...boolBtn((el.galleryStyle||"grid")===v)}}>{l}</button>)}
-        </div></Field>
-        <Field label="Kolom"><div style={{display:"flex",gap:3}}>{[["1","1"],["2","2"],["3","3"]].map(([v,l])=><button key={v} onClick={()=>upd({galleryLayout:v})} style={{flex:1,padding:"5px 2px",...boolBtn((el.galleryLayout||"2")===v)}}>{l}</button>)}</div></Field>
-        <Field label="Bentuk"><div style={{display:"flex",gap:3}}>{[["kotak","Kotak"],["rounded","Bulat"],["circle","Lingkaran"]].map(([v,l])=><button key={v} onClick={()=>upd({galleryShape:v})} style={{flex:1,padding:"5px 2px",...boolBtn((el.galleryShape||"kotak")===v)}}>{l}</button>)}</div></Field>
-        <Field label={`Gap — ${el.galleryGap||8}px`}><Sld value={el.galleryGap||8} min={0} max={20} onChange={v=>upd({galleryGap:v})}/></Field>
-        <button onClick={()=>gRef.current?.click()} style={{...S.btnS,width:"100%",fontSize:11}}>📷 Upload Foto Gallery ({(el.galleryImages||[]).length} foto)</button>
-        {(el.galleryImages||[]).length>0&&<button onClick={()=>upd({galleryImages:[]})} style={{...S.btnS,width:"100%",fontSize:11,color:"#c55",borderColor:"#3a1515"}}>🗑 Hapus Semua Foto</button>}
-        <input key={gKey} ref={gRef} type="file" accept="image/*" multiple style={{display:"none"}} onChange={e=>{onGallery(e,el.id);setGKey(k=>k+1);}}/></>}
-      {el.widgetType==="countdown"&&<><Div label="Countdown"/>
-        <Field label="Layout"><div style={{display:"flex",gap:3}}>
-          {[["cards","Cards"],["flip","Flip"],["minimal","Minimal"]].map(([v,l])=><button key={v} onClick={()=>upd({cdLayout:v})} style={{flex:1,padding:"5px 2px",...boolBtn((el.cdLayout||"cards")===v)}}>{l}</button>)}
-        </div></Field>
-        <Field label="Warna Angka"><div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={el.cdAccent||el.accent||"#C4973A"} onChange={e=>upd({cdAccent:e.target.value})} style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/><input value={el.cdAccent||el.accent||"#C4973A"} onChange={e=>upd({cdAccent:e.target.value})} style={{...S.inp,flex:1,fontFamily:"monospace",fontSize:11}}/></div></Field>
-        <div style={{padding:"7px 9px",background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:4,fontSize:10,color:"#4a6a4a",fontFamily:"DM Sans,sans-serif",lineHeight:1.7}}>💡 Tanggal target di Data: <b style={{color:"#6a8a6a"}}>inv.countdown_date</b><br/>Format: 2025-07-12T08:00:00</div></>}
+      {el.widgetType==="gallery"&&<><Div label="Gallery"/><Field label="Layout"><div style={{display:"flex",gap:3}}>{[["1","1 Kolom"],["2","2 Kolom"],["3","3 Kolom"]].map(([v,l])=><button key={v} onClick={()=>upd({galleryLayout:v})} style={{flex:1,padding:"5px 2px",background:(el.galleryLayout||"2")===v?"#1a2a1a":"#181818",border:`1px solid ${(el.galleryLayout||"2")===v?"#7D9470":"#252525"}`,color:(el.galleryLayout||"2")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>{l}</button>)}</div></Field><Field label="Bentuk"><div style={{display:"flex",gap:3}}>{[["kotak","Kotak"],["rounded","Bulat"],["circle","Lingkaran"]].map(([v,l])=><button key={v} onClick={()=>upd({galleryShape:v})} style={{flex:1,padding:"5px 2px",background:(el.galleryShape||"kotak")===v?"#1a2a1a":"#181818",border:`1px solid ${(el.galleryShape||"kotak")===v?"#7D9470":"#252525"}`,color:(el.galleryShape||"kotak")===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>{l}</button>)}</div></Field><Field label={`Gap — ${el.galleryGap||8}px`}><Sld value={el.galleryGap||8} min={0} max={20} onChange={v=>upd({galleryGap:v})}/></Field><button onClick={()=>gRef.current?.click()} style={{...S.btnS,width:"100%",fontSize:11}}>📷 Upload Foto Gallery ({(el.galleryImages||[]).length} foto)</button>{(el.galleryImages||[]).length>0&&<button onClick={()=>upd({galleryImages:[]})} style={{...S.btnS,width:"100%",fontSize:11,color:"#c55",borderColor:"#3a1515"}}>🗑 Hapus Semua Foto</button>}<input key={gKey} ref={gRef} type="file" accept="image/*" multiple style={{display:"none"}} onChange={e=>{onGallery(e,el.id);setGKey(k=>k+1);}}/></>}
+      {el.widgetType==="countdown"&&<><Div label="Countdown"/><Field label="Warna Angka"><div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={el.cdAccent||el.accent||"#C4973A"} onChange={e=>upd({cdAccent:e.target.value})} style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/><input value={el.cdAccent||el.accent||"#C4973A"} onChange={e=>upd({cdAccent:e.target.value})} style={{...S.inp,flex:1,fontFamily:"monospace",fontSize:11}}/></div></Field><div style={{padding:"7px 9px",background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:4,fontSize:10,color:"#4a6a4a",fontFamily:"DM Sans,sans-serif",lineHeight:1.7}}>💡 Tanggal target di Data: <b style={{color:"#6a8a6a"}}>inv.countdown_date</b><br/>Format: 2025-07-12T08:00:00</div></>}
       {el.widgetType==="rsvp"&&<><Div label="RSVP"/><Field label="Judul Form"><input value={el.rsvpTitle||"Konfirmasi Kehadiran"} onChange={e=>upd({rsvpTitle:e.target.value})} style={S.inp}/></Field></>}
       {el.widgetType==="guestbook"&&<><Div label="Guestbook"/><Field label="Judul"><input value={el.gbTitle||"Buku Tamu"} onChange={e=>upd({gbTitle:e.target.value})} style={S.inp}/></Field></>}
       {el.widgetType==="gift"&&<><Div label="Amplop"/><Field label="Judul"><input value={el.giftTitle||"Amplop Digital"} onChange={e=>upd({giftTitle:e.target.value})} style={S.inp}/></Field><Field label="Subjudul"><input value={el.giftSubtitle||"Doa tulus Anda..."} onChange={e=>upd({giftSubtitle:e.target.value})} style={S.inp}/></Field><div style={{padding:"7px 9px",background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:4,fontSize:10,color:"#4a6a4a",fontFamily:"DM Sans,sans-serif"}}>💡 Data rekening dari DB Flask (tabel gifts)</div></>}
-      <div style={{display:"flex",gap:4,marginTop:4}}>
-        <button onClick={onCopy} title="Salin ke section lain (Ctrl+C)" style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#5a7aaa",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>⎘ Salin</button>
-        <button onClick={onDup} style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>Duplikat</button>
-        <button onClick={onDel} style={{flex:1,padding:"7px 0",background:"#1a0a0a",border:"1px solid #3a1515",color:"#c55",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>Hapus</button>
+      <div style={{display:"flex",gap:6,marginTop:4}}>
+        <button onClick={onDup} style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Duplikat</button>
+        <button onClick={onDel} style={{flex:1,padding:"7px 0",background:"#1a0a0a",border:"1px solid #3a1515",color:"#c55",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Hapus</button>
       </div>
     </div>
   );
 }
 
 // ─── ElProps ──────────────────────────────────────────────────────────────────
-function ElProps({el,upd,onDel,onDup,onCopy,onFwd,onBwd,invData,onFP}){
+function ElProps({el,upd,onDel,onDup,onFwd,onBwd,invData,onFP}){
   const PVARS=new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
   const isPhoto=el.isVar&&PVARS.has(el.varKey);
   return(
@@ -817,10 +572,7 @@ function ElProps({el,upd,onDel,onDup,onCopy,onFwd,onBwd,invData,onFP}){
           </div>
           {el.isVar&&<select value={el.varKey||""} onChange={e=>upd({varKey:e.target.value})} style={{...S.inp,cursor:"pointer",fontSize:11}}><option value="">— Pilih —</option>{DATA_VARS.map(v=><option key={v.key} value={v.key}>{v.label}</option>)}</select>}
         </Field>
-        {isPhoto&&<>
-          <Field label={`Tinggi — ${el.height||el.width||150}px`}><Sld value={el.height||el.width||150} min={40} max={CANVAS_H} onChange={v=>upd({height:v})}/></Field>
-          <Field label="Border Radius"><div style={{display:"flex",gap:4}}>{[["0","Kotak"],["12","Rounded"],["50%","Bulat"]].map(([v,l])=><button key={v} onClick={()=>upd({borderRadius:v})} style={{flex:1,padding:"4px 2px",...boolBtn(String(el.borderRadius)===v)}}>{l}</button>)}</div></Field>
-        </>} 
+        {isPhoto&&<><Field label={`Tinggi Foto — ${el.height||el.width||150}px`}><Sld value={el.height||el.width||150} min={40} max={CANVAS_H} onChange={v=>upd({height:v})}/></Field><Field label="Border Radius"><div style={{display:"flex",gap:4}}>{[["0","Kotak"],["12","Rounded"],["50%","Bulat"]].map(([v,l])=><button key={v} onClick={()=>upd({borderRadius:v})} style={{flex:1,padding:"4px 2px",background:String(el.borderRadius)===v?"#1a2a1a":"#181818",border:`1px solid ${String(el.borderRadius)===v?"#7D9470":"#252525"}`,color:String(el.borderRadius)===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>{l}</button>)}</div></Field></>}
         {!el.isVar&&<><Div label="Font"/>
           <Field label="Font"><button onClick={onFP} style={{...S.btnS,width:"100%",fontSize:12,fontFamily:`'${el.fontFamily||"Playfair Display"}',serif`,textAlign:"left",padding:"6px 10px"}}>{el.fontFamily||"Playfair Display"} ›</button></Field>
           <Field label={`Ukuran — ${el.fontSize||24}px`}><Sld value={el.fontSize||24} min={8} max={120} onChange={v=>upd({fontSize:v})}/></Field>
@@ -845,10 +597,9 @@ function ElProps({el,upd,onDel,onDup,onCopy,onFwd,onBwd,invData,onFP}){
       <Div label="Animasi"/>
       <Field label="Animasi"><select value={el.animation||"none"} onChange={e=>upd({animation:e.target.value})} style={{...S.inp,cursor:"pointer"}}>{ANIMATIONS.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></Field>
       {el.animation&&el.animation!=="none"&&(["sway","float","pulse","shimmer","bounce"].includes(el.animation)?<Field label={`Durasi — ${el.animDuration||4}s`}><Sld value={el.animDuration||4} min={0.5} max={12} step={0.5} onChange={v=>upd({animDuration:v})}/></Field>:<Field label={`Delay — ${el.animDelay||0}s`}><Sld value={el.animDelay||0} min={0} max={6} step={0.1} onChange={v=>upd({animDelay:v})}/></Field>)}
-      <div style={{display:"flex",gap:4,marginTop:4}}>
-        <button onClick={onCopy} title="Salin ke section lain (Ctrl+C)" style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#5a7aaa",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>⎘ Salin</button>
-        <button onClick={onDup} style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>Duplikat</button>
-        <button onClick={onDel} style={{flex:1,padding:"7px 0",background:"#1a0a0a",border:"1px solid #3a1515",color:"#c55",borderRadius:4,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>Hapus</button>
+      <div style={{display:"flex",gap:6,marginTop:4}}>
+        <button onClick={onDup} style={{flex:1,padding:"7px 0",background:"#181818",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Duplikat</button>
+        <button onClick={onDel} style={{flex:1,padding:"7px 0",background:"#1a0a0a",border:"1px solid #3a1515",color:"#c55",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Hapus</button>
       </div>
     </div>
   );
@@ -876,94 +627,6 @@ const S={
   btnS:{padding:"6px 12px",background:"#141414",border:"1px solid #222",color:"#666",borderRadius:4,cursor:"pointer",fontSize:12,fontFamily:"'DM Sans',sans-serif"},
   micro:{padding:"3px 6px",background:"#161616",border:"1px solid #222",color:"#555",borderRadius:3,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif",flexShrink:0},
 };
-
-
-// ─── ThemeConfigModal ─────────────────────────────────────────────────────────
-function ThemeConfigModal({cfg,setCfg,onClose,sections}){
-  const upd=patch=>setCfg(p=>({...p,...patch}));
-  const previewColor=sections[0]?.bg||cfg.preview_color||"#1a0e08";
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.85)",zIndex:9998,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div style={{background:"#111",border:"1px solid #222",borderRadius:8,width:500,maxWidth:"95vw",maxHeight:"85vh",display:"flex",flexDirection:"column",overflow:"hidden"}}>
-        <div style={{padding:"14px 18px",borderBottom:"1px solid #1e1e1e",display:"flex",alignItems:"center"}}>
-          <span style={{flex:1,fontWeight:700,fontSize:14,color:"#C4973A",fontFamily:"DM Sans,sans-serif"}}>🎨 Konfigurasi Tema</span>
-          <button onClick={onClose} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:20,lineHeight:1}}>✕</button>
-        </div>
-        <div style={{overflowY:"auto",flex:1,padding:"16px 18px",display:"flex",flexDirection:"column",gap:12}}>
-
-          <div style={{padding:"10px 12px",background:"#0f1a0f",border:"1px solid #1a3a1a",borderRadius:6,fontSize:11,color:"#4a7a4a",fontFamily:"DM Sans,sans-serif",lineHeight:1.8}}>
-            📦 Export ZIP akan menghasilkan:<br/>
-            <span style={{color:"#6a9a6a"}}>templates/themes/<b>{cfg.id||"tema-baru"}</b>.html</span><br/>
-            <span style={{color:"#6a9a6a"}}>themes/<b>{cfg.id||"tema-baru"}</b>.json</span><br/>
-            <span style={{color:"#6a9a6a"}}>static/themes/<b>{cfg.id||"tema-baru"}</b>/... (semua aset)</span>
-          </div>
-
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>ID Tema (lowercase, no spasi)</div>
-              <input value={cfg.id||""} onChange={e=>upd({id:e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g,"")})} placeholder="tema-baru" style={{...S.inp,fontFamily:"monospace",fontSize:12}}/>
-            </div>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Nama Tampil</div>
-              <input value={cfg.name||""} onChange={e=>upd({name:e.target.value})} placeholder="Nama Tema" style={S.inp}/>
-            </div>
-          </div>
-
-          <div>
-            <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Deskripsi</div>
-            <textarea value={cfg.description||""} onChange={e=>upd({description:e.target.value})} rows={2} placeholder="Deskripsi singkat tema..." style={{...S.inp,resize:"vertical"}}/>
-          </div>
-
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Accent Color</div>
-              <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                <input type="color" value={cfg.accent_color||"#C4973A"} onChange={e=>upd({accent_color:e.target.value})} style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4,flexShrink:0}}/>
-                <input value={cfg.accent_color||"#C4973A"} onChange={e=>upd({accent_color:e.target.value})} style={{...S.inp,fontFamily:"monospace",fontSize:11}}/>
-              </div>
-            </div>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Preview Color (auto dari section 0)</div>
-              <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                <div style={{width:36,height:28,background:previewColor,borderRadius:4,border:"1px solid #333",flexShrink:0}}/>
-                <input value={previewColor} readOnly style={{...S.inp,fontFamily:"monospace",fontSize:11,color:"#555",cursor:"default"}}/>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Tags (pisah dengan koma)</div>
-            <input value={cfg.tags||""} onChange={e=>upd({tags:e.target.value})} placeholder="luxury,dark,elegant,gold" style={S.inp}/>
-          </div>
-
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Harga (Rp)</div>
-              <input type="number" value={cfg.price||25000} onChange={e=>upd({price:parseInt(e.target.value)||0})} style={S.inp}/>
-            </div>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Harga Asli (coret)</div>
-              <input type="number" value={cfg.price_original||50000} onChange={e=>upd({price_original:parseInt(e.target.value)||0})} style={S.inp}/>
-            </div>
-            <div>
-              <div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>Catatan Harga</div>
-              <input value={cfg.price_note||""} onChange={e=>upd({price_note:e.target.value})} placeholder="" style={S.inp}/>
-            </div>
-          </div>
-
-          <div style={{padding:"10px 12px",background:"#141414",border:"1px solid #1e1e1e",borderRadius:6,fontSize:10,color:"#444",fontFamily:"DM Sans,sans-serif",lineHeight:1.8}}>
-            💡 Setelah export, extract ZIP di root folder Flask:<br/>
-            <span style={{color:"#555",fontFamily:"monospace"}}>cd /path/to/app && unzip {cfg.id||"tema-baru"}.zip</span><br/>
-            Semua file otomatis masuk ke tempat yang benar.
-          </div>
-        </div>
-        <div style={{padding:"12px 18px",borderTop:"1px solid #181818",display:"flex",gap:8}}>
-          <button onClick={onClose} style={{flex:1,padding:"9px",background:"#1a2a1a",border:"1px solid #2a3a2a",color:"#7D9470",borderRadius:4,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>✓ Simpan & Tutup</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>

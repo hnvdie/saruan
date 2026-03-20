@@ -57,9 +57,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
 .flash-msg.info{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.15);}
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem;margin-bottom:1.25rem;}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1rem 1.1rem;}
-.stat-num{font-size:1.5rem;font-weight:300;color:var(--ink);line-height:1;margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1.1rem 1.25rem;}
+.stat-num{font-size:1.7rem;font-weight:300;color:var(--ink);line-height:1;margin-bottom:.25rem;}
 .stat-lbl{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
 
 /* CARD */
@@ -129,11 +129,6 @@ tr:hover td{background:var(--bg);}
 .modal-label{display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.32rem;}
 
 .search-result-tag{font-size:.7rem;color:var(--muted);margin-bottom:1rem;padding:.45rem .75rem;background:var(--gold-bg);border:1px solid rgba(201,168,76,.15);border-radius:2px;}
-.filter-bar{padding:.45rem 1.75rem;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
-.chip{display:inline-flex;align-items:center;gap:.25rem;padding:.28rem .7rem;border:1px solid var(--border);border-radius:20px;font-size:.68rem;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none;}
-.chip input[type=radio]{display:none;}
-.chip:hover{border-color:var(--gold);color:var(--gold);}
-.chip-on{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);font-weight:400;}
 
 .badge.promo-on{background:var(--green-bg);color:var(--green);}
 .badge.promo-off{background:var(--red-bg);color:var(--red);}
@@ -141,12 +136,10 @@ tr:hover td{background:var(--bg);}
 .badge.promo-fix{background:var(--blue-bg);color:var(--blue);}
 select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;padding-right:2rem;}
 .promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;}
-@media(max-width:1100px){.stats-row{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:768px){
   .layout{grid-template-columns:1fr;}
   .sidebar{display:none;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
-  .filter-chips{display:none;}
 }
 </style>
 </head>
@@ -173,43 +166,15 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 <div class="main">
   <div class="topbar">
     <div class="topbar-title">Dashboard</div>
-    <form action="/admin" method="get" class="search-form" id="mainSearchForm">
+    <form action="/admin" method="get" class="search-form">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-input" name="q" id="mainSearchInput" type="text"
-          placeholder="Cari undangan atau tema..."
-          value="{{ search_q or search_qt or '' }}"
-          style="width:220px">
-        <input type="hidden" name="_filter" id="filterHidden" value="{{ request.args.get('_filter','inv') }}">
+        <input class="search-input" name="q" type="text" placeholder="Cari nama / slug / tema..." value="{{ search_q or '' }}">
       </div>
       <button type="submit" class="search-btn">Cari</button>
-      {% if search_q or search_qt %}<a href="/admin" class="search-clear" title="Reset">✕</a>{% endif %}
+      {% if search_q %}<a href="/admin" class="search-clear">✕</a>{% endif %}
     </form>
-    <a href="/admin/create" class="btn primary" style="white-space:nowrap">＋ Buat Undangan</a>
-  </div>
-  <!-- FILTER CHIPS — baris terpisah di bawah topbar -->
-  <div class="filter-bar">
-    <span style="font-size:.65rem;color:var(--muted);">Cari di:</span>
-    <form action="/admin" method="get" id="filterForm" style="display:contents">
-      <input type="hidden" name="q" id="filterQ" value="{{ search_q or search_qt or '' }}">
-      <label class="chip {% if request.args.get('_filter','inv') != 'theme' %}chip-on{% endif %}">
-        <input type="radio" name="_filter" value="inv"
-          {% if request.args.get('_filter','inv') != 'theme' %}checked{% endif %}
-          onchange="document.getElementById('filterQ').value=document.getElementById('mainSearchInput').value;this.form.submit()">
-        Undangan
-      </label>
-      <label class="chip {% if request.args.get('_filter') == 'theme' %}chip-on{% endif %}">
-        <input type="radio" name="_filter" value="theme"
-          {% if request.args.get('_filter') == 'theme' %}checked{% endif %}
-          onchange="document.getElementById('filterQ').value=document.getElementById('mainSearchInput').value;this.form.submit()">
-        Tema
-      </label>
-    </form>
-    {% if search_q or search_qt %}
-    <span style="font-size:.65rem;color:var(--muted);margin-left:.25rem;">
-      — <strong>{{ invitations|length if search_q else filtered_themes|length }}</strong> hasil untuk "<em>{{ search_q or search_qt }}</em>"
-    </span>
-    {% endif %}
+    <a href="/admin/create" class="btn primary">＋ Buat</a>
   </div>
 
   <div class="content">
@@ -220,51 +185,24 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       {% endfor %}
     {% endwith %}
 
-    {% if not search_q and not search_qt %}
+    {% if not search_q %}
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-num">Rp {{ '{:,}'.format(stats.total_revenue).replace(',','.') }}</div>
-        <div class="stat-lbl">Total Pendapatan</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ stats.orders_this_month }}</div>
-        <div class="stat-lbl">Order Bulan Ini</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="font-size:1.1rem;padding-top:.2rem" title="{{ stats.top_theme_id }}">{{ stats.top_theme_name or '—' }}</div>
-        <div class="stat-lbl">Tema Terlaris</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ stats.active_count }}<span style="font-size:1rem;color:var(--muted)"> / {{ stats.expired_count }}</span></div>
-        <div class="stat-lbl">Aktif / Expired</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ total_rsvp }}</div>
-        <div class="stat-lbl">Total RSVP</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ invitations|length }}</div>
-        <div class="stat-lbl">Total Undangan</div>
-      </div>
+      <div class="stat-card"><div class="stat-num">{{ invitations|length }}</div><div class="stat-lbl">Undangan</div></div>
+      <div class="stat-card"><div class="stat-num">{{ total_rsvp }}</div><div class="stat-lbl">Total RSVP</div></div>
+      <div class="stat-card"><div class="stat-num">{{ themes|length }}</div><div class="stat-lbl">Tema</div></div>
+      <div class="stat-card"><div class="stat-num">{{ invitations|selectattr('is_expired')|list|length }}</div><div class="stat-lbl">Expired</div></div>
     </div>
     {% endif %}
 
-    {% if search_q or search_qt %}
-    <div class="search-result-tag">
-      🔍
-      {% if search_qt %}{{ filtered_themes|length }} tema{% else %}{{ invitations|length }} undangan{% endif %}
-      untuk "<strong>{{ search_q or search_qt }}</strong>" —
-      <a href="/admin" style="color:var(--gold)">Reset</a>
-    </div>
+    {% if search_q %}
+    <div class="search-result-tag">🔍 {{ invitations|length }} hasil untuk "<strong>{{ search_q }}</strong>"</div>
     {% endif %}
 
-    <!-- UNDANGAN TABLE — hanya muncul saat search -->
-    {% if not search_qt and search_q %}
+    <!-- UNDANGAN TABLE -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Daftar Undangan
-          {% if search_q %}<span style="font-size:.68rem;color:var(--muted);font-weight:300;margin-left:.4rem">— {{ invitations|length }} hasil</span>{% endif %}
-        </div>
+        <div class="card-title">Daftar Undangan</div>
+        <a href="/admin/create" class="btn primary">＋ Buat Baru</a>
       </div>
       {% if invitations %}
       <div class="table-wrap">
@@ -314,22 +252,30 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       </div>
       {% endif %}
     </div>
-    {% endif %}
 
-    <!-- TEMA MANAGEMENT — hanya muncul saat search tema -->
-    {% if search_qt %}
+    <!-- TEMA MANAGEMENT -->
+    {% if not search_q %}
     <div class="card">
       <div class="card-head">
         <div>
-          <div class="card-title">Manajemen Tema
-            {% if search_qt %}<span style="font-size:.68rem;color:var(--muted);font-weight:300;margin-left:.4rem">— {{ filtered_themes|length }} hasil</span>{% endif %}
-          </div>
+          <div class="card-title">Manajemen Tema</div>
           <div class="card-sub">Atur harga &amp; foto katalog per tema</div>
         </div>
+        <form action="/admin" method="get" class="search-form" style="margin:0">
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input class="search-input" name="qt" type="text" placeholder="Cari nama tema..." value="{{ search_qt or '' }}" style="width:175px">
+          </div>
+          <button type="submit" class="search-btn">Cari</button>
+          {% if search_qt %}<a href="/admin" class="search-clear">✕</a>{% endif %}
+        </form>
       </div>
-      {% if search_qt and not filtered_themes %}
-      <div class="empty"><p>Tidak ada tema untuk "{{ search_qt }}"</p><small><a href="/admin" style="color:var(--gold)">Reset pencarian</a></small></div>
-      {% else %}
+      {% if search_qt %}
+      <div style="padding:.45rem 1.1rem .1rem;font-size:.7rem;color:var(--muted)">
+        🔍 {{ filtered_themes|length }} tema untuk "<strong>{{ search_qt }}</strong>"
+        {% if not filtered_themes %} — <a href="/admin" style="color:var(--gold)">Reset</a>{% endif %}
+      </div>
+      {% endif %}
       <div class="themes-grid">
         {% for theme in filtered_themes %}
         {% set fp = theme.get('demo_photos',[None])[0] %}
@@ -376,10 +322,11 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
         </div>
         {% endfor %}
       </div>
-      {% endif %}
     </div>
     {% endif %}
-    {% if not search_q and not search_qt %}
+
+    <!-- PROMO KODE MANAGEMENT -->
+    {% if not search_q %}
     <div class="card" id="promo-section">
       <div class="card-head">
         <div>

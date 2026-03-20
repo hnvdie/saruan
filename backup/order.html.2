@@ -73,15 +73,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .btn-submit:hover{opacity:.82;}
 .submit-note{font-size:.61rem;color:var(--muted);text-align:center;margin-top:.5rem;line-height:1.6;}
 @media(max-width:500px){.form-row-2,.pw-row{grid-template-columns:1fr;}}
-.promo-wrap{display:flex;gap:.5rem;align-items:flex-start;}
-.promo-wrap input{flex:1;}
-.btn-promo{padding:.52rem .9rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.7rem;letter-spacing:.05em;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
-.btn-promo:hover{opacity:.82;}
-.promo-msg{font-size:.65rem;margin-top:.3rem;line-height:1.5;}
-.promo-msg.ok{color:#2d8a4e;}
-.promo-msg.err{color:var(--red);}
-.promo-summary{background:#f0faf4;border:1px solid #b9dfc8;border-radius:3px;padding:.55rem .8rem;margin-top:.5rem;font-size:.68rem;color:#2d6b45;display:none;}
-.promo-toggle-link{font-size:.63rem;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
 </style>
 </head>
 <body>
@@ -206,35 +197,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
     </div>
 
-    <!-- 04 KODE PROMO 
-    <div class="form-section" id="promoSection">
-      <p style="margin-bottom:.5rem;"><a class="romo-toggle-link" onclick="togglePromo()">Punya kode promo? Klik di sini</a></p>
-      <div id="promoBox" style="display:none;">
-        <div class="promo-wrap">
-          <input type="text" id="promoInput" name="promo_code" placeholder="Masukkan kode promo"
-            style="text-transform:uppercase;" autocomplete="off"
-            oninput="this.value=this.value.toUpperCase()" value="{{ f.get('promo_code','') if f else '' }}">
-          <button type="button" class="btn-promo" onclick="applyPromo()">Terapkan</button>
-        </div>
-        <p class="promo-msg" id="promoMsg"></p>
-        <div class="promo-summary" id="promoSummary"></div>
-      </div>
-    </div> 
-    -->
-    <div class="form-section" id="promoSection">
-  <div class="fst">04 &mdash; Kode Promo <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--faint);font-size:.6rem;">(opsional)</span></div>
-  <div id="promoBox">
-    <div class="promo-wrap">
-      <input type="text" id="promoInput" name="promo_code" placeholder="Masukkan kode promo"
-        style="text-transform:uppercase;" autocomplete="off"
-        oninput="this.value=this.value.toUpperCase()" value="{{ f.get('promo_code','') if f else '' }}">
-      <button type="button" class="btn-promo" onclick="applyPromo()">Terapkan</button>
-    </div>
-    <p class="promo-msg" id="promoMsg"></p>
-    <div class="promo-summary" id="promoSummary"></div>
-  </div>
-</div>
-
     <!-- 05 BAYAR -->
     <div class="submit-area">
       <div class="pay-methods">
@@ -252,60 +214,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <script>
 const themeListBox = document.getElementById('themeListBox');
-// Harga tema — untuk kalkulasi diskon promo
-const THEME_PRICES = { {% for t in themes %}"{{ t.id }}": {{ t.price or 0 }}{% if not loop.last %}, {% endif %}{% endfor %} };
-
-function _getCurrentPrice(){
-  const tid = document.getElementById('themeIdInput');
-  return tid ? (THEME_PRICES[tid.value] || 0) : 0;
-}
-
-function togglePromo(){
-  const box = document.getElementById('promoBox');
-  if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
-}
-
-async function applyPromo(){
-  const input = document.getElementById('promoInput');
-  const msg   = document.getElementById('promoMsg');
-  const summ  = document.getElementById('promoSummary');
-  const code  = (input?.value || '').trim().toUpperCase();
-  if(!code){ msg.className='promo-msg err'; msg.textContent='Masukkan kode promo terlebih dahulu.'; return; }
-  msg.className='promo-msg'; msg.textContent='Memeriksa...';
-  summ.style.display='none';
-  try{
-    const res  = await fetch('/promo/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code, price: _getCurrentPrice()})});
-    const data = await res.json();
-    if(data.valid){
-      msg.className='promo-msg ok';
-      msg.textContent=data.message;
-      if(data.final_price === 0){
-        summ.innerHTML='✓ Harga menjadi <strong>Gratis</strong> setelah promo diterapkan.';
-      } else {
-        summ.innerHTML='✓ Harga setelah promo: <strong>Rp '+data.final_price.toLocaleString('id-ID')+'</strong>';
-      }
-      summ.style.display='block';
-    } else {
-      msg.className='promo-msg err';
-      msg.textContent=data.message;
-      input.value='';
-    }
-  } catch(e){
-    msg.className='promo-msg err';
-    msg.textContent='Gagal memeriksa kode. Coba lagi.';
-  }
-}
-
-// Buka promo box otomatis jika form di-rerender dengan kode promo (setelah error validasi)
-window.addEventListener('load',()=>{
-  const promoInput = document.getElementById('promoInput');
-  if(promoInput && promoInput.value){
-    const box = document.getElementById('promoBox');
-    if(box) box.style.display='block';
-    applyPromo();
-  }
-});
-
 function filterThemes(q){
   if(!themeListBox) return;
   const items = themeListBox.querySelectorAll('.tl-item');
@@ -336,13 +244,6 @@ function pickTheme(tid){
     if(sel && searchInput) searchInput.value=sel.querySelector('span')?.textContent||'';
     box.style.display='none';
   }
-  // Reset promo jika tema diganti (harga bisa beda)
-  const promoInput=document.getElementById('promoInput');
-  const promoMsg=document.getElementById('promoMsg');
-  const promoSumm=document.getElementById('promoSummary');
-  if(promoInput) promoInput.value='';
-  if(promoMsg){ promoMsg.className='promo-msg'; promoMsg.textContent=''; }
-  if(promoSumm) promoSumm.style.display='none';
 }
 window.addEventListener('load',()=>{
   const sel=document.querySelector('.tl-item.selected');

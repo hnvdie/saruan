@@ -57,9 +57,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
 .flash-msg.info{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.15);}
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem;margin-bottom:1.25rem;}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1rem 1.1rem;}
-.stat-num{font-size:1.5rem;font-weight:300;color:var(--ink);line-height:1;margin-bottom:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1.1rem 1.25rem;}
+.stat-num{font-size:1.7rem;font-weight:300;color:var(--ink);line-height:1;margin-bottom:.25rem;}
 .stat-lbl{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
 
 /* CARD */
@@ -129,24 +129,11 @@ tr:hover td{background:var(--bg);}
 .modal-label{display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.32rem;}
 
 .search-result-tag{font-size:.7rem;color:var(--muted);margin-bottom:1rem;padding:.45rem .75rem;background:var(--gold-bg);border:1px solid rgba(201,168,76,.15);border-radius:2px;}
-.filter-bar{padding:.45rem 1.75rem;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
-.chip{display:inline-flex;align-items:center;gap:.25rem;padding:.28rem .7rem;border:1px solid var(--border);border-radius:20px;font-size:.68rem;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none;}
-.chip input[type=radio]{display:none;}
-.chip:hover{border-color:var(--gold);color:var(--gold);}
-.chip-on{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);font-weight:400;}
 
-.badge.promo-on{background:var(--green-bg);color:var(--green);}
-.badge.promo-off{background:var(--red-bg);color:var(--red);}
-.badge.promo-pct{background:var(--gold-bg);color:var(--gold);}
-.badge.promo-fix{background:var(--blue-bg);color:var(--blue);}
-select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;padding-right:2rem;}
-.promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;}
-@media(max-width:1100px){.stats-row{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:768px){
   .layout{grid-template-columns:1fr;}
   .sidebar{display:none;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
-  .filter-chips{display:none;}
 }
 </style>
 </head>
@@ -159,8 +146,6 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   <div class="nav-sec">Undangan</div>
   <a href="/admin" class="nav-item active">◈ Dashboard</a>
   <a href="/admin/create" class="nav-item">＋ Buat Undangan</a>
-  <div class="nav-sec">Lainnya</div>
-  <a href="#promo-section" class="nav-item" onclick="document.getElementById('promo-section').scrollIntoView({behavior:'smooth'});return false;">🏷 Promo Kode</a>
   <div class="nav-sec">Publik</div>
   <a href="/" target="_blank" class="nav-item">⌂ Landing Page</a>
   <a href="/themes" target="_blank" class="nav-item">◑ Katalog Tema</a>
@@ -173,43 +158,15 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 <div class="main">
   <div class="topbar">
     <div class="topbar-title">Dashboard</div>
-    <form action="/admin" method="get" class="search-form" id="mainSearchForm">
+    <form action="/admin" method="get" class="search-form">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-input" name="q" id="mainSearchInput" type="text"
-          placeholder="Cari undangan atau tema..."
-          value="{{ search_q or search_qt or '' }}"
-          style="width:220px">
-        <input type="hidden" name="_filter" id="filterHidden" value="{{ request.args.get('_filter','inv') }}">
+        <input class="search-input" name="q" type="text" placeholder="Cari nama / slug / tema..." value="{{ search_q or '' }}">
       </div>
       <button type="submit" class="search-btn">Cari</button>
-      {% if search_q or search_qt %}<a href="/admin" class="search-clear" title="Reset">✕</a>{% endif %}
+      {% if search_q %}<a href="/admin" class="search-clear">✕</a>{% endif %}
     </form>
-    <a href="/admin/create" class="btn primary" style="white-space:nowrap">＋ Buat Undangan</a>
-  </div>
-  <!-- FILTER CHIPS — baris terpisah di bawah topbar -->
-  <div class="filter-bar">
-    <span style="font-size:.65rem;color:var(--muted);">Cari di:</span>
-    <form action="/admin" method="get" id="filterForm" style="display:contents">
-      <input type="hidden" name="q" id="filterQ" value="{{ search_q or search_qt or '' }}">
-      <label class="chip {% if request.args.get('_filter','inv') != 'theme' %}chip-on{% endif %}">
-        <input type="radio" name="_filter" value="inv"
-          {% if request.args.get('_filter','inv') != 'theme' %}checked{% endif %}
-          onchange="document.getElementById('filterQ').value=document.getElementById('mainSearchInput').value;this.form.submit()">
-        Undangan
-      </label>
-      <label class="chip {% if request.args.get('_filter') == 'theme' %}chip-on{% endif %}">
-        <input type="radio" name="_filter" value="theme"
-          {% if request.args.get('_filter') == 'theme' %}checked{% endif %}
-          onchange="document.getElementById('filterQ').value=document.getElementById('mainSearchInput').value;this.form.submit()">
-        Tema
-      </label>
-    </form>
-    {% if search_q or search_qt %}
-    <span style="font-size:.65rem;color:var(--muted);margin-left:.25rem;">
-      — <strong>{{ invitations|length if search_q else filtered_themes|length }}</strong> hasil untuk "<em>{{ search_q or search_qt }}</em>"
-    </span>
-    {% endif %}
+    <a href="/admin/create" class="btn primary">＋ Buat</a>
   </div>
 
   <div class="content">
@@ -220,51 +177,24 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       {% endfor %}
     {% endwith %}
 
-    {% if not search_q and not search_qt %}
+    {% if not search_q %}
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-num">Rp {{ '{:,}'.format(stats.total_revenue).replace(',','.') }}</div>
-        <div class="stat-lbl">Total Pendapatan</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ stats.orders_this_month }}</div>
-        <div class="stat-lbl">Order Bulan Ini</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" style="font-size:1.1rem;padding-top:.2rem" title="{{ stats.top_theme_id }}">{{ stats.top_theme_name or '—' }}</div>
-        <div class="stat-lbl">Tema Terlaris</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ stats.active_count }}<span style="font-size:1rem;color:var(--muted)"> / {{ stats.expired_count }}</span></div>
-        <div class="stat-lbl">Aktif / Expired</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ total_rsvp }}</div>
-        <div class="stat-lbl">Total RSVP</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">{{ invitations|length }}</div>
-        <div class="stat-lbl">Total Undangan</div>
-      </div>
+      <div class="stat-card"><div class="stat-num">{{ invitations|length }}</div><div class="stat-lbl">Undangan</div></div>
+      <div class="stat-card"><div class="stat-num">{{ total_rsvp }}</div><div class="stat-lbl">Total RSVP</div></div>
+      <div class="stat-card"><div class="stat-num">{{ themes|length }}</div><div class="stat-lbl">Tema</div></div>
+      <div class="stat-card"><div class="stat-num">{{ invitations|selectattr('is_expired')|list|length }}</div><div class="stat-lbl">Expired</div></div>
     </div>
     {% endif %}
 
-    {% if search_q or search_qt %}
-    <div class="search-result-tag">
-      🔍
-      {% if search_qt %}{{ filtered_themes|length }} tema{% else %}{{ invitations|length }} undangan{% endif %}
-      untuk "<strong>{{ search_q or search_qt }}</strong>" —
-      <a href="/admin" style="color:var(--gold)">Reset</a>
-    </div>
+    {% if search_q %}
+    <div class="search-result-tag">🔍 {{ invitations|length }} hasil untuk "<strong>{{ search_q }}</strong>"</div>
     {% endif %}
 
-    <!-- UNDANGAN TABLE — hanya muncul saat search -->
-    {% if not search_qt and search_q %}
+    <!-- UNDANGAN TABLE -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Daftar Undangan
-          {% if search_q %}<span style="font-size:.68rem;color:var(--muted);font-weight:300;margin-left:.4rem">— {{ invitations|length }} hasil</span>{% endif %}
-        </div>
+        <div class="card-title">Daftar Undangan</div>
+        <a href="/admin/create" class="btn primary">＋ Buat Baru</a>
       </div>
       {% if invitations %}
       <div class="table-wrap">
@@ -314,22 +244,30 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
       </div>
       {% endif %}
     </div>
-    {% endif %}
 
-    <!-- TEMA MANAGEMENT — hanya muncul saat search tema -->
-    {% if search_qt %}
+    <!-- TEMA MANAGEMENT -->
+    {% if not search_q %}
     <div class="card">
       <div class="card-head">
         <div>
-          <div class="card-title">Manajemen Tema
-            {% if search_qt %}<span style="font-size:.68rem;color:var(--muted);font-weight:300;margin-left:.4rem">— {{ filtered_themes|length }} hasil</span>{% endif %}
-          </div>
+          <div class="card-title">Manajemen Tema</div>
           <div class="card-sub">Atur harga &amp; foto katalog per tema</div>
         </div>
+        <form action="/admin" method="get" class="search-form" style="margin:0">
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input class="search-input" name="qt" type="text" placeholder="Cari nama tema..." value="{{ search_qt or '' }}" style="width:175px">
+          </div>
+          <button type="submit" class="search-btn">Cari</button>
+          {% if search_qt %}<a href="/admin" class="search-clear">✕</a>{% endif %}
+        </form>
       </div>
-      {% if search_qt and not filtered_themes %}
-      <div class="empty"><p>Tidak ada tema untuk "{{ search_qt }}"</p><small><a href="/admin" style="color:var(--gold)">Reset pencarian</a></small></div>
-      {% else %}
+      {% if search_qt %}
+      <div style="padding:.45rem 1.1rem .1rem;font-size:.7rem;color:var(--muted)">
+        🔍 {{ filtered_themes|length }} tema untuk "<strong>{{ search_qt }}</strong>"
+        {% if not filtered_themes %} — <a href="/admin" style="color:var(--gold)">Reset</a>{% endif %}
+      </div>
+      {% endif %}
       <div class="themes-grid">
         {% for theme in filtered_themes %}
         {% set fp = theme.get('demo_photos',[None])[0] %}
@@ -376,74 +314,6 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
         </div>
         {% endfor %}
       </div>
-      {% endif %}
-    </div>
-    {% endif %}
-    {% if not search_q and not search_qt %}
-    <div class="card" id="promo-section">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Manajemen Promo Kode</div>
-          <div class="card-sub">Buat & kelola kode diskon untuk pelanggan</div>
-        </div>
-        <button class="btn primary" onclick="openPromoModal()">＋ Tambah Promo</button>
-      </div>
-      {% if promo_codes %}
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Kode</th><th>Diskon</th><th>Penggunaan</th><th>Berlaku Hingga</th><th>Status</th><th>Aksi</th>
-          </tr></thead>
-          <tbody>
-          {% for p in promo_codes %}
-          <tr>
-            <td><span style="font-family:monospace;font-weight:400;font-size:.8rem;letter-spacing:.05em">{{ p.code }}</span></td>
-            <td>
-              {% if p.discount_type == 'percent' %}
-              <span class="badge promo-pct">{{ p.discount_value }}%</span>
-              {% else %}
-              <span class="badge promo-fix">Rp {{ '{:,}'.format(p.discount_value).replace(',','.') }}</span>
-              {% endif %}
-            </td>
-            <td>
-              <span style="font-weight:400">{{ p.used_count }}</span>
-              {% if p.max_uses %}<span style="color:var(--muted);font-size:.68rem"> / {{ p.max_uses }}</span>{% else %}<span style="color:var(--faint);font-size:.68rem"> / ∞</span>{% endif %}
-            </td>
-            <td style="font-size:.7rem;color:var(--muted)">{{ p.expires_at or '—' }}</td>
-            <td>
-              {% if p.is_active %}<span class="badge promo-on">● Aktif</span>
-              {% else %}<span class="badge promo-off">● Nonaktif</span>{% endif %}
-            </td>
-            <td>
-              <div style="display:flex;gap:.3rem;flex-wrap:wrap">
-                {% if p.is_active %}
-                <form method="post" action="/admin/promo/toggle/{{ p.code }}" style="display:inline">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                  <button type="submit" class="btn">Nonaktifkan</button>
-                </form>
-                {% else %}
-                <form method="post" action="/admin/promo/toggle/{{ p.code }}" style="display:inline">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                  <button type="submit" class="btn success">Aktifkan</button>
-                </form>
-                {% endif %}
-                <form method="post" action="/admin/promo/delete/{{ p.code }}" style="display:inline" onsubmit="return confirm('Hapus kode {{ p.code }}?')">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                  <button type="submit" class="btn danger">Hapus</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <div class="empty">
-        <p>Belum ada kode promo</p>
-        <small>Klik <strong>＋ Tambah Promo</strong> untuk membuat kode diskon pertama</small>
-      </div>
-      {% endif %}
     </div>
     {% endif %}
 
@@ -484,47 +354,6 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   </div>
 </div>
 
-<!-- PROMO MODAL -->
-<div class="modal-overlay" id="promoModal">
-  <div class="modal" style="max-width:440px;">
-    <h3>Tambah Kode Promo</h3>
-    <p style="margin-bottom:1rem;">Kode akan aktif segera setelah disimpan.</p>
-    <form method="post" action="/admin/promo/create">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-      <label class="modal-label">Kode Promo <span style="color:var(--red)">*</span></label>
-      <input class="modal-input" name="code" type="text" placeholder="cth: WEDDING20" required maxlength="30"
-        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" style="text-transform:uppercase;letter-spacing:.08em;">
-      <div class="promo-grid">
-        <div>
-          <label class="modal-label">Tipe Diskon <span style="color:var(--red)">*</span></label>
-          <select class="modal-input" name="discount_type" id="promoTypeSelect" onchange="togglePromoType()">
-            <option value="percent">Persen (%)</option>
-            <option value="fixed">Nominal (Rp)</option>
-          </select>
-        </div>
-        <div>
-          <label class="modal-label" id="promoValLabel">Nilai Diskon (%) <span style="color:var(--red)">*</span></label>
-          <input class="modal-input" name="discount_value" id="promoValInput" type="number" placeholder="20" min="1" required style="margin-bottom:0">
-        </div>
-      </div>
-      <div class="promo-grid">
-        <div>
-          <label class="modal-label">Maks. Penggunaan</label>
-          <input class="modal-input" name="max_uses" type="number" placeholder="∞ (kosongkan = unlimited)" min="1" style="margin-bottom:0">
-        </div>
-        <div>
-          <label class="modal-label">Berlaku Hingga</label>
-          <input class="modal-input" name="expires_at" type="date" style="margin-bottom:0">
-        </div>
-      </div>
-      <div class="modal-actions" style="margin-top:.75rem;">
-        <button type="button" class="btn" onclick="closeModal('promoModal')">Batal</button>
-        <button type="submit" class="btn primary">Simpan Promo</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <script>
 // DELETE
 function confirmDel(id, name){
@@ -534,25 +363,6 @@ function confirmDel(id, name){
 }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-
-// PROMO MODAL
-function openPromoModal(){
-  document.getElementById('promoModal').classList.add('open');
-}
-function togglePromoType(){
-  const t = document.getElementById('promoTypeSelect').value;
-  const lbl = document.getElementById('promoValLabel');
-  const inp = document.getElementById('promoValInput');
-  if(t === 'percent'){
-    lbl.textContent = 'Nilai Diskon (%) *';
-    inp.placeholder = '20';
-    inp.max = '100';
-  } else {
-    lbl.textContent = 'Nilai Diskon (Rp) *';
-    inp.placeholder = '50000';
-    inp.removeAttribute('max');
-  }
-}
 
 // PRICE MODAL
 function openPrice(id, name, price, label, orig){

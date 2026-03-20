@@ -684,17 +684,9 @@ def admin_logout():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    conn     = get_db()
-    q        = request.args.get('q','').strip()
-    qt       = request.args.get('qt','').strip()
-    _filter  = request.args.get('_filter','inv')
-
-    # Unified search — radio filter menentukan target pencarian
-    if q and _filter == 'theme':
-        qt = q; q = ''
-    elif q and _filter == 'inv':
-        qt = ''
-
+    conn   = get_db()
+    q      = request.args.get('q','').strip()
+    qt     = request.args.get('qt','').strip()  # query for themes
     if q:
         rows = conn.execute(
             "SELECT * FROM invitations WHERE is_active=1 AND "
@@ -710,49 +702,19 @@ def admin_dashboard():
         d['rsvp_count'] = conn.execute('SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?',(d['id'],)).fetchone()['c']
         d['is_expired'] = is_expired(d)
         invs.append(d)
-    total_rsvp  = conn.execute('SELECT COUNT(*) as c FROM rsvp').fetchone()['c']
+    total_rsvp = conn.execute('SELECT COUNT(*) as c FROM rsvp').fetchone()['c']
     promo_codes = conn.execute('SELECT * FROM promo_codes ORDER BY created_at DESC').fetchall()
-
-    # ── Statistik ─────────────────────────────────────────────────────────────
-    _rev = conn.execute("SELECT COALESCE(SUM(amount),0) as s FROM orders WHERE status='paid'").fetchone()
-    total_revenue = int(_rev['s'] or 0)
-
-    _month = datetime.now().strftime('%Y-%m')
-    _om = conn.execute(
-        "SELECT COUNT(*) as c FROM orders WHERE status='paid' AND created_at LIKE ?",
-        (f'{_month}%',)
-    ).fetchone()
-    orders_this_month = int(_om['c'] or 0)
-
-    _top = conn.execute(
-        "SELECT theme_id, COUNT(*) as c FROM orders WHERE status='paid' GROUP BY theme_id ORDER BY c DESC LIMIT 1"
-    ).fetchone()
-    top_theme_id   = _top['theme_id'] if _top else ''
-    top_theme_obj  = get_theme(top_theme_id) if top_theme_id else None
-    top_theme_name = (top_theme_obj.get('name') if top_theme_obj else top_theme_id) or '—'
-
-    all_inv = conn.execute('SELECT expires_at FROM invitations WHERE is_active=1').fetchall()
-    active_count  = sum(1 for i in all_inv if not is_expired(i))
-    expired_count = sum(1 for i in all_inv if is_expired(i))
-
-    stats = dict(
-        total_revenue=total_revenue,
-        orders_this_month=orders_this_month,
-        top_theme_id=top_theme_id,
-        top_theme_name=top_theme_name,
-        active_count=active_count,
-        expired_count=expired_count,
-    )
-    # ──────────────────────────────────────────────────────────────────────────
-
     conn.close()
     all_themes = get_all_themes()
-    filtered_themes = [t for t in all_themes if qt.lower() in t.get('name','').lower() or qt.lower() in t.get('id','').lower()] if qt else all_themes
+    if qt:
+        filtered_themes = [t for t in all_themes if qt.lower() in t.get('name','').lower() or qt.lower() in t.get('id','').lower()]
+    else:
+        filtered_themes = all_themes
     return render_template('admin/dashboard.html',
                            invitations=invs, themes=all_themes,
                            filtered_themes=filtered_themes,
                            total_rsvp=total_rsvp, search_q=q, search_qt=qt,
-                           promo_codes=promo_codes, stats=stats)
+                           promo_codes=promo_codes)
 
 # ─── ADMIN PROMO ROUTES ───────────────────────────────────────────────────────
 @app.route('/admin/promo/create', methods=['POST'])
