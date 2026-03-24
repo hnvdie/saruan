@@ -25,7 +25,7 @@ const ANIMATIONS=[{id:"none",label:"— Tidak ada —"},{id:"fade-in",label:"Fad
 const FONTS=["Playfair Display","DM Sans","Georgia","Times New Roman","Cormorant Garamond","Libre Baskerville","Lora","Merriweather","Montserrat","Raleway","Josefin Sans","Cinzel","Great Vibes","Dancing Script","Sacramento","Parisienne","Alex Brush","Allura","Tangerine","Italianno"];
 const SECTION_PRESETS=[{type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08"},{type:"blank",name:"✦ Halaman Kosong",bg:"#1a1a1a"},{type:"quran",name:"Ayat Quran",bg:"#FAF6EE"},{type:"couple",name:"Profil Mempelai",bg:"#1A100A"},{type:"lovestory",name:"Love Story",bg:"#F7EFE0"},{type:"event",name:"Detail Acara",bg:"#FAF6EE"},{type:"closing",name:"Closing",bg:"#1A100A"}];
 const WIDGET_DEFS=[{id:"countdown",label:"⏱ Countdown",h:180},{id:"rsvp",label:"📋 Form RSVP",h:520},{id:"maps",label:"🗺 Peta Lokasi",h:380},{id:"gallery",label:"🖼 Gallery",h:500},{id:"guestbook",label:"💌 Buku Tamu",h:480},{id:"gift",label:"💰 Amplop",h:400}];
-const DATA_VARS=[{key:"inv.groom_name",label:"Nama Mempelai Pria",example:"Ahmad Rizky"},{key:"inv.bride_name",label:"Nama Mempelai Wanita",example:"Siti Rahayu"},{key:"inv.groom_parents",label:"Nama Orang Tua Pria",example:"Bapak Hasan & Ibu Aminah"},{key:"inv.bride_parents",label:"Nama Orang Tua Wanita",example:"Bapak Yusuf & Ibu Fatimah"},{key:"inv.akad_date",label:"Tanggal Akad",example:"Sabtu, 12 Juli 2025"},{key:"inv.akad_time",label:"Waktu Akad",example:"08.00–10.00 WIB"},{key:"inv.akad_venue",label:"Tempat Akad",example:"Masjid Al-Ikhlas"},{key:"inv.akad_address",label:"Alamat Akad",example:"Jl. Mawar No. 12, Jakarta"},{key:"inv.resepsi_date",label:"Tanggal Resepsi",example:"Sabtu, 12 Juli 2025"},{key:"inv.resepsi_time",label:"Waktu Resepsi",example:"11.00–14.00 WIB"},{key:"inv.resepsi_venue",label:"Tempat Resepsi",example:"Gedung Serbaguna Barokah"},{key:"inv.resepsi_address",label:"Alamat Resepsi",example:"Jl. Melati No. 45, Jakarta"},{key:"inv.groom_photo_url",label:"Foto Mempelai Pria",example:"demo-photos/individual/groom.jpg"},{key:"inv.bride_photo_url",label:"Foto Mempelai Wanita",example:"demo-photos/individual/bride.jpg"},{key:"inv.maps_url",label:"Link Google Maps",example:"https://maps.google.com/?q=..."},{key:"inv.maps_embed",label:"Maps Embed URL",example:"https://www.google.com/maps/embed?pb=..."},{key:"inv.countdown_date",label:"Target Countdown",example:"2025-07-12T08:00:00"},{key:"inv.music_url",label:"URL File Musik",example:"static/music/lagu.mp3"},{key:"inv.love_story",label:"Cerita Love Story",example:"Kami pertama bertemu..."}];
+const DATA_VARS=[{key:"inv.groom_name",label:"Nama Mempelai Pria",example:"Ahmad Rizky"},{key:"inv.bride_name",label:"Nama Mempelai Wanita",example:"Siti Rahayu"},{key:"inv.groom_father",label:"Nama Ayah Pria",example:"Bapak Hasan"},{key:"inv.groom_mother",label:"Nama Ibu Pria",example:"Ibu Aminah"},{key:"inv.bride_father",label:"Nama Ayah Wanita",example:"Bapak Yusuf"},{key:"inv.bride_mother",label:"Nama Ibu Wanita",example:"Ibu Fatimah"},{key:"inv.akad_date",label:"Tanggal Akad",example:"Sabtu, 12 Juli 2025"},{key:"inv.akad_time",label:"Waktu Akad",example:"08.00–10.00 WIB"},{key:"inv.akad_venue",label:"Tempat Akad",example:"Masjid Al-Ikhlas"},{key:"inv.akad_address",label:"Alamat Akad",example:"Jl. Mawar No. 12, Jakarta"},{key:"inv.resepsi_date",label:"Tanggal Resepsi",example:"Sabtu, 12 Juli 2025"},{key:"inv.resepsi_time",label:"Waktu Resepsi",example:"11.00–14.00 WIB"},{key:"inv.resepsi_venue",label:"Tempat Resepsi",example:"Gedung Serbaguna Barokah"},{key:"inv.resepsi_address",label:"Alamat Resepsi",example:"Jl. Melati No. 45, Jakarta"},{key:"inv.groom_photo_url",label:"Foto Mempelai Pria",example:"/static/demo-photos/individual/groom.jpg"},{key:"inv.bride_photo_url",label:"Foto Mempelai Wanita",example:"/static/demo-photos/individual/bride.jpg"},{key:"inv.maps_url",label:"Link Google Maps",example:"https://maps.google.com/?q=..."},{key:"inv.maps_embed",label:"Maps Embed URL",example:"https://www.google.com/maps/embed?pb=..."},{key:"inv.countdown_date",label:"Target Countdown",example:"2025-07-12T08:00:00"},{key:"inv.music_url",label:"URL File Musik",example:"static/music/lagu.mp3"},{key:"inv.love_story",label:"Cerita Love Story",example:"Kami pertama bertemu..."}];
 
 let _id=200;
 const uid=()=>++_id;
@@ -37,131 +37,6 @@ function saveProject(pid,name,sections,invData){try{const ps=getProjects(),id=pi
 function deleteProject(id){try{localStorage.setItem(PROJECTS_KEY,JSON.stringify(getProjects().filter(p=>p.id!==id)));}catch(e){}}
 function saveDraft(sections,invData,projectId,projectName){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({sections,invData,projectId,projectName}));}catch(e){}}
 function loadDraft(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||"null")||{sections:null,invData:null,projectId:null,projectName:"Proyek Baru"};}catch(e){return{sections:null,invData:null,projectId:null,projectName:"Proyek Baru"};}}
-// ─── Server detection ─────────────────────────────────────────────────────────
-const SERVER_URL="http://localhost:8765";
-let _serverOnline=null;
-async function checkServer(){if(_serverOnline!==null)return _serverOnline;try{const r=await fetch(SERVER_URL+"/api/projects",{signal:AbortSignal.timeout(800)});_serverOnline=r.ok;}catch{_serverOnline=false;}return _serverOnline;}
-
-// ─── Image extraction helpers ─────────────────────────────────────────────────
-function isB64Img(s){return typeof s==="string"&&s.startsWith("data:image/");}
-function isDemo(s){return typeof s==="string"&&s.startsWith("demo-photos/");}
-function slugify(n){return(n||"untitled").trim().toLowerCase().replace(/[^a-z0-9\s_-]/g,"").replace(/\s+/g,"_")||"untitled";}
-
-// Collect all images referenced in sections
-function collectImages(sections){
-  const imgs=new Map(); // src -> {type, ext, id}
-  let c=0;
-  const reg=(src)=>{
-    if(!src||imgs.has(src)||src.startsWith("{{"))return;
-    const isb=isB64Img(src),isd=isDemo(src);
-    if(!isb&&!isd)return;
-    const ext=isb?(src.match(/data:image\/(\w+);/)||[])[1]||"jpg":"jpg";
-    imgs.set(src,{type:isb?"base64":"demo",ext,id:`img_${String(++c).padStart(4,"0")}`});
-  };
-  for(const s of sections){
-    if(s.bgImage)reg(s.bgImage);
-    for(const el of s.elements||[]){
-      if(el.type==="image")reg(el.src);
-      for(const g of el.galleryImages||[])reg(g);
-    }
-  }
-  return imgs;
-}
-
-// Produce sections clone with base64/demo src replaced by static path
-function stripSections(sections,imgMap,themeId){
-  return JSON.parse(JSON.stringify(sections)).map(s=>{
-    if(s.bgImage&&imgMap.has(s.bgImage)){
-      const m=imgMap.get(s.bgImage);s.bgImage=`static/themes/${themeId}/${m.id}.${m.ext}`;
-    }
-    for(const el of s.elements||[]){
-      if(el.type==="image"&&imgMap.has(el.src)){
-        const m=imgMap.get(el.src);el.src=`static/themes/${themeId}/${m.id}.${m.ext}`;
-      }
-      if(el.galleryImages){
-        el.galleryImages=el.galleryImages.map(g=>{
-          if(imgMap.has(g)){const m=imgMap.get(g);return`static/themes/${themeId}/${m.id}.${m.ext}`;}
-          return g;
-        });
-      }
-    }
-    return s;
-  });
-}
-
-// ─── Export to server (saves to projects/namaproyek/) ────────────────────────
-async function exportToServer(name,sections,invData,htmlStr,onProgress){
-  onProgress("Mengirim ke server...");
-  const themeId=slugify(name);
-  const res=await fetch(SERVER_URL+"/api/save",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({name,theme_id:themeId,sections,invData,html:htmlStr}),
-    signal:AbortSignal.timeout(30000)
-  });
-  const data=await res.json();
-  if(!data.ok)throw new Error(data.error||"Server error");
-  return data;
-}
-
-// ─── Export as ZIP (fallback, no server needed) ───────────────────────────────
-async function exportAsZip(name,sections,invData,htmlStr,onProgress){
-  onProgress("Mempersiapkan ZIP...");
-  // Dynamically load JSZip from CDN
-  if(!window.JSZip){
-    await new Promise((res,rej)=>{
-      const s=document.createElement("script");
-      s.src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-      s.onload=res;s.onerror=rej;document.head.appendChild(s);
-    });
-  }
-  const themeId=slugify(name);
-  const zip=new JSZip();
-  const imgMap=collectImages(sections);
-  const cleanSections=stripSections(sections,imgMap,themeId);
-
-  // Patch HTML: replace all base64/demo srcs with static paths
-  let htmlOut=htmlStr;
-  for(const[orig,m]of imgMap){
-    const newPath=`static/themes/${themeId}/${m.id}.${m.ext}`;
-    htmlOut=htmlOut.split(orig).join(newPath);
-  }
-
-  onProgress("Mengemas gambar...");
-  // Add images to zip
-  for(const[orig,m]of imgMap){
-    const fname=`${themeId}/static/themes/${themeId}/${m.id}.${m.ext}`;
-    if(m.type==="base64"){
-      const b64=orig.split(",")[1];
-      zip.file(fname,b64,{base64:true});
-    } else if(m.type==="demo"){
-      // Fetch from server's demo-photos endpoint
-      try{
-        const rel=orig.replace(/^demo-photos\//,"");
-        const r=await fetch(`${SERVER_URL}/demo-photos/${rel}`,{signal:AbortSignal.timeout(5000)});
-        if(r.ok){const buf=await r.arrayBuffer();zip.file(fname,buf);}
-      }catch{/* skip if server not available */}
-    }
-  }
-
-  onProgress("Menulis HTML & JSON...");
-  zip.file(`${themeId}/${themeId}.html`,htmlOut);
-  zip.file(`${themeId}/${themeId}.json`,JSON.stringify({
-    id:themeId,name,skeleton:themeId,
-    generated:new Date().toLocaleString("id-ID"),
-    inv_data_keys:Object.keys(invData),
-    assets:[...imgMap.values()].map(m=>`static/themes/${themeId}/${m.id}.${m.ext}`)
-  },null,2));
-
-  onProgress("Mengompres...");
-  const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download=`${themeId}.zip`;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),5000);
-  return {zipSize:blob.size,images:imgMap.size};
-}
-
 function exportJSON(name,sections,invData){const blob=new Blob([JSON.stringify({name,sections,invData},null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=(name||"project")+".json";a.click();URL.revokeObjectURL(url);}
 function importJSON(text,cb){try{const d=JSON.parse(text);if(d.sections){const pid=saveProject(null,d.name||"Import",d.sections,d.invData||{});cb(pid,d.name||"Import",d.sections,d.invData||{});}else alert("JSON tidak valid");}catch(e){alert("Gagal baca JSON");}}
 
@@ -179,8 +54,6 @@ function buildHTML(sections,invData){
   const animCSS=`@keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes slide-from-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}@keyframes slide-from-top{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-bottom{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}@keyframes zoom-in{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes rotate-in{from{opacity:0;transform:rotate(-14deg) scale(.88)}to{opacity:1;transform:none}}@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}@keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`;
   const ba=(anim,dur,delay)=>{if(!anim||anim==="none")return"";const inf=["sway","float","pulse","shimmer","bounce"].includes(anim);return inf?`animation:${anim} ${dur||4}s ease-in-out infinite;`:`animation:${anim} .8s cubic-bezier(.16,1,.3,1) ${delay||0}s both;`;};
   const PHOTO_VARS=new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
-  // For export: photo vars become Flask template vars {{ inv.groom_photo_url }}
-  // For preview in editor: uses demo-photos/individual/ local path
 
   const elToHTML=el=>{
     if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");return `<img src="${el.src}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};${animS}pointer-events:none;"/>`;}
@@ -188,7 +61,7 @@ function buildHTML(sections,invData){
       const animS=ba(el.animation,el.animDuration,el.animDelay),shd=el.shadow?`text-shadow:0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,.5)"};`:"";
       if(el.isVar&&el.varKey&&PHOTO_VARS.has(el.varKey)){const br=el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,h=el.height||el.width||150;return `<img src="{{${el.varKey}}}" alt="" style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width||150}px;height:${h}px;object-fit:cover;border-radius:${br};z-index:${el.zIndex};opacity:${el.opacity};pointer-events:none;"/>`;}
       const txt=el.isVar&&el.varKey?(rv(el.varKey)||`{{${el.varKey}}}`):el.text;
-      return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width||200}px;font-size:${el.fontSize||24}px;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);pointer-events:none;${shd}${animS}">${txt}</div>`;
+      return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width||200}px;font-size:${el.fontSize||24}px;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);${shd}${animS}">${txt}</div>`;
     }
     if(el.type==="widget")return widgetToHTML(el,inv);
     return"";
@@ -200,16 +73,16 @@ function buildHTML(sections,invData){
     if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return `<div style="${ws}"><div id="rsvp-form-${wid}" style="padding:20px 4px;"><div style="text-align:center;margin-bottom:20px;"><div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div><div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div></div><input id="rn-${wid}" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/><input id="rg-${wid}" type="number" min="1" placeholder="Jumlah Tamu" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"/><select id="ra-${wid}" style="width:100%;padding:10px 14px;background:${dk?"#1a1a1a":ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:8px;display:block;"><option value="">Konfirmasi Kehadiran ▾</option><option value="hadir">Insya Allah Hadir 🤍</option><option value="tidak">Tidak Dapat Hadir</option></select><textarea id="rm-${wid}" placeholder="Ucapan &amp; Doa..." rows="3" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:12px;"></textarea><button onclick="submitRSVP('${wid}')" style="width:100%;padding:12px;background:${acc};border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border-radius:${r}px;cursor:pointer;">Kirim Konfirmasi 💌</button></div><div id="rsvp-ok-${wid}" style="display:none;padding:60px 20px;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:40px;color:${acc};">✦</div><div style="font-family:'Playfair Display',serif;font-size:22px;color:${dk?"#fff":"#333"};margin-top:12px;">Terima Kasih</div><div style="font-size:13px;color:#888;margin-top:8px;font-family:'DM Sans',sans-serif;line-height:1.7;">Konfirmasi Anda telah kami terima.</div></div></div>`;}
     if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:inline-block;padding:9px 22px;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;z-index:${el.zIndex};text-align:center;padding:20px 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:13px 30px;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
     if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"220px":"150px",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:20px;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>`<div style="overflow:hidden;border-radius:${br};"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=`{%- for photo in photos %}<div style="overflow:hidden;border-radius:${br};"><img src="{{ photo_src(photo) }}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('{{ photo_src(photo) }}','${wid}')" loading="lazy"/></div>{%- endfor %}`;const imgs=statics||('{%- if photos %}'+jinja+'{%- else %}<div style="color:#555;text-align:center;padding:30px;font-size:12px;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>{%- endif %}');return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
-    if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}"><div style="text-align:center;padding:20px 4px 12px;"><div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div><div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div><div style="font-size:11px;color:#555;margin-top:8px;font-family:'DM Sans',sans-serif;">Ucapan dari tamu yang telah konfirmasi kehadiran</div></div><div id="gb-list-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 4px 12px;overflow-y:auto;height:calc(100% - 100px);"><div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div></div></div>`;}
+    if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}"><div style="text-align:center;padding:20px 4px 12px;"><div style="font-family:'Playfair Display',serif;font-size:20px;color:${tc};">${tit}</div><div style="width:32px;height:1px;background:${acc};opacity:.4;margin:8px auto 0;"></div></div><div id="gb-list-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 4px 12px;min-height:60px;"><div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div></div><div style="position:sticky;bottom:0;padding:10px 4px 4px;"><input id="gn-${wid}" placeholder="Nama Anda" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;margin-bottom:7px;display:block;"/><textarea id="gm-${wid}" placeholder="Ucapan &amp; Doa..." rows="2" style="width:100%;padding:10px 14px;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:13px;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:7px;"></textarea><button onclick="submitGB('${wid}')" style="width:100%;padding:11px;background:${acc};border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:${r}px;cursor:pointer;">Kirim Ucapan 💌</button></div></div>`;}
     if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital",sub=el.giftSubtitle||"Doa tulus Anda adalah hadiah terindah.",cbg=dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",cbd=dk?acc+"33":"rgba(0,0,0,.08)";return `<div style="${ws}padding:20px 4px;"><div style="text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:22px;color:${acc};margin-bottom:8px;">${tit}</div><div style="font-size:12px;color:#888;line-height:1.7;margin-bottom:20px;font-family:'DM Sans',sans-serif;">${sub}</div></div>{%- for gift in gifts %}<div style="background:${cbg};border:1px solid ${cbd};border-radius:${r}px;padding:20px 24px;margin-bottom:12px;">{%- if gift.bank_name %}<div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">Transfer via</div><div style="font-family:'Playfair Display',serif;font-size:18px;color:${acc};margin-bottom:4px;">{{ gift.bank_name }}</div><div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:3px;margin:6px 0;">{{ gift.account_number }}</div><div style="font-size:12px;color:#888;">a/n {{ gift.account_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- elif gift.ewallet_type %}<div style="font-size:10px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px;">{{ gift.ewallet_type }}</div><div id="acc-{{ loop.index }}" style="font-size:22px;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:2px;margin:6px 0;">{{ gift.ewallet_number }}</div><div style="font-size:12px;color:#888;">a/n {{ gift.ewallet_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:12px;padding:7px 20px;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:11px;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- endif %}</div>{%- endfor %}</div>`;}
     return `<div style="position:absolute;left:${el.x}px;top:${el.y}px;width:${el.width}px;height:${el.height||200}px;z-index:${el.zIndex};border:1px dashed ${acc}44;display:flex;align-items:center;justify-content:center;"><span style="color:${acc}66;font-size:12px;">${el.name}</span></div>`;
   };
 
-  const buildSec=(s,i)=>{const fm={contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"},bgs=s.bgImage?`background-image:url('${s.bgImage}');background-size:${fm[s.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${s.bg};`;return `\n<section class="section" id="sec-${i}" data-type="${s.type}" style="${bgs}">\n<div class="sec-inner">\n${s.elements.map(elToHTML).filter(Boolean).join("\n")}\n</div>\n</section>`;};
+  const buildSec=(s,i)=>{const fm={contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"},bgs=s.bgImage?`background-image:url('${s.bgImage}');background-size:${fm[s.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${s.bg};`;return `\n<section class="section" id="sec-${i}" data-type="${s.type}" style="${bgs}">\n${s.elements.map(elToHTML).filter(Boolean).join("\n")}\n</section>`;};
 
   const cover=sections.find(s=>s.type==="cover"),nonCover=sections.filter(s=>s.type!=="cover"),hasBGM=!!(inv.music_url||"").trim(),groom=inv.groom_name||"Mempelai Pria",bride=inv.bride_name||"Mempelai Wanita";
   let coverHTML="";
-  if(cover){const cs=cover,bgs=cs.bgImage?`background-image:url('${cs.bgImage}');background-size:${({contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"})[cs.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${cs.bg};`,els=cs.elements.map(elToHTML).filter(Boolean).join("\n"),ois=cs.openInviteStyle||{},posB=ois.posBottom!==undefined?ois.posBottom:80,posL=ois.posLeft,cen=posL==null,wrpS=cen?`position:absolute;bottom:${posB}px;left:0;right:0;text-align:center;z-index:500;`:`position:absolute;bottom:${posB}px;left:${posL}px;z-index:500;`,btnS=`display:inline-block;padding:${ois.paddingV||12}px ${ois.paddingH||30}px;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${ois.fontSize||16}px;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;coverHTML=`<div id="cover-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;transition:opacity .7s ease;${bgs}">\n<div class="sec-inner">\n${els}\n<div style="${wrpS}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>\n</div>\n</div>`;}
+  if(cover){const cs=cover,bgs=cs.bgImage?`background-image:url('${cs.bgImage}');background-size:${({contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"})[cs.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${cs.bg};`,els=cs.elements.map(elToHTML).filter(Boolean).join("\n"),ois=cs.openInviteStyle||{},posB=ois.posBottom!==undefined?ois.posBottom:80,posL=ois.posLeft,wrpS=posL!=null?`position:absolute;bottom:${posB}px;left:${posL}px;z-index:50;`:`position:absolute;bottom:${posB}px;left:0;right:0;text-align:center;z-index:50;`,btnS=`display:inline-block;padding:${ois.paddingV||12}px ${ois.paddingH||30}px;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${ois.fontSize||16}px;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;`;coverHTML=`<div id="cover-screen" style="position:absolute;inset:0;z-index:9000;transition:opacity .7s ease;${bgs}">\n${els}\n<div style="${wrpS}"><button id="openBtn" style="${btnS}" onclick="openInvitation()">${cs.openInviteText||"Buka Undangan"}</button></div>\n</div>`;}
   const bgmHTML=hasBGM?`<audio id="bgm" loop preload="none"><source src="{{inv.music_url}}" type="audio/mpeg"></audio>\n<button id="bgm-btn" onclick="toggleBGM()" style="position:fixed;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">&#9834;</button>`:"";
 
   const script=`
@@ -223,19 +96,18 @@ function coverVisible(){const c=document.getElementById('cover-screen');return c
 let sy=0;
 document.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
 document.addEventListener('touchend',e=>{if(coverVisible()||navLock)return;const dy=sy-e.changedTouches[0].clientY;if(Math.abs(dy)>60)safeGoTo(dy>0?cur+1:cur-1);});
-let wl=false,wAcc=0;
-document.addEventListener('wheel',e=>{if(coverVisible()||navLock)return;wAcc+=e.deltaY;if(wl)return;if(Math.abs(wAcc)<80)return;const dir=wAcc>0?1:-1;wAcc=0;wl=true;safeGoTo(cur+dir);setTimeout(()=>{wl=false;wAcc=0;},900);},{passive:true});
+let wl=false;
+document.addEventListener('wheel',e=>{if(coverVisible()||navLock)return;if(wl)return;wl=true;safeGoTo(e.deltaY>0?cur+1:cur-1);setTimeout(()=>wl=false,800);},{passive:true});
 document.addEventListener('keydown',e=>{if(coverVisible())return;if(e.key==='ArrowDown'||e.key==='PageDown')safeGoTo(cur+1);if(e.key==='ArrowUp'||e.key==='PageUp')safeGoTo(cur-1);});
-function openInvitation(){const c=document.getElementById('cover-screen');if(!c)return;c.style.opacity='0';c.style.pointerEvents='none';navLock=true;wAcc=0;setTimeout(()=>{c.style.display='none';if(total>0){dotsEl.style.display='flex';goTo(0);}},700);setTimeout(()=>{navLock=false;wAcc=0;},1600);}
-function applyScale(){var vw=window.innerWidth,s=Math.min(1,vw/390),offset=(vw-390*s)/2;document.querySelectorAll('.sec-inner').forEach(function(el){el.style.transformOrigin='top left';el.style.transform='translateX('+offset+'px) scale('+s+')';});}
-applyScale();window.addEventListener('resize',applyScale);
+function openInvitation(){const c=document.getElementById('cover-screen');if(!c)return;c.style.opacity='0';c.style.pointerEvents='none';navLock=true;setTimeout(()=>{c.style.display='none';dotsEl.style.display='flex';goTo(0);},700);setTimeout(()=>{navLock=false;},1400);}
 function updateCountdown(){const t=new Date(inv.countdown_date)-new Date();if(isNaN(t)||t<=0){['cd-days','cd-hours','cd-mins','cd-secs'].forEach(k=>{const e=document.getElementById(k);if(e)e.textContent='00';});return;}const d=Math.floor(t/86400000),h=Math.floor(t%86400000/3600000),m=Math.floor(t%3600000/60000),s=Math.floor(t%60000/1000),pad=n=>String(n).padStart(2,'0');[['cd-days',d],['cd-hours',h],['cd-mins',m],['cd-secs',s]].forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=pad(v);});}
 if(document.querySelector('.section')){updateCountdown();setInterval(updateCountdown,1000);}
 let bgmPlaying=false;
 function toggleBGM(){const a=document.getElementById('bgm');if(!a)return;bgmPlaying?(a.pause(),document.getElementById('bgm-btn').innerHTML='&#9834;',bgmPlaying=false):(a.play(),document.getElementById('bgm-btn').innerHTML='&#9646;&#9646;',bgmPlaying=true);}
+function submitRSVP(id){const n=document.getElementById('rn-'+id)?.value,a=document.getElementById('ra-'+id)?.value;if(!n||!a){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}const f=document.getElementById('rsvp-form-'+id),ok=document.getElementById('rsvp-ok-'+id);if(f)f.style.display='none';if(ok)ok.style.display='block';}
 const gbStore={};
-function submitRSVP(id){const n=document.getElementById('rn-'+id)?.value?.trim(),g=document.getElementById('rg-'+id)?.value,a=document.getElementById('ra-'+id)?.value,m=document.getElementById('rm-'+id)?.value?.trim();if(!n||!a){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}const f=document.getElementById('rsvp-form-'+id),ok=document.getElementById('rsvp-ok-'+id);if(f)f.style.display='none';if(ok)ok.style.display='block';if(m&&n){if(!gbStore._global)gbStore._global=[];gbStore._global.unshift({n,m,a});document.querySelectorAll('[id^="gb-list-"]').forEach(list=>{const wid=list.id.replace('gb-list-','');renderGB(wid);});}}
-function renderGB(id){const list=document.getElementById('gb-list-'+id);if(!list)return;const items=gbStore._global||[];const acc=list.closest('[style*="position:absolute"]')?.style?.getPropertyValue('--acc')||'#C4973A';list.innerHTML=items.length?items.map(g=>'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:12px;margin-bottom:6px;"><div style="font-weight:600;font-size:13px;color:#C4973A;margin-bottom:3px;">'+g.n+(g.a==='hadir'?' ✓':'')+'</div><div style="font-size:12px;color:#888;line-height:1.5;">'+g.m+'</div></div>').join(''):'<div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:\'DM Sans\',sans-serif;">Belum ada ucapan</div>';}
+function submitGB(id){const n=document.getElementById('gn-'+id)?.value?.trim(),m=document.getElementById('gm-'+id)?.value?.trim();if(!n||!m)return;if(!gbStore[id])gbStore[id]=[];gbStore[id].unshift({n,m});document.getElementById('gn-'+id).value='';document.getElementById('gm-'+id).value='';renderGB(id);}
+function renderGB(id){const list=document.getElementById('gb-list-'+id);if(!list)return;const items=gbStore[id]||[];list.innerHTML=items.length?items.map(g=>'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:12px;margin-bottom:6px;"><div style="font-weight:600;font-size:13px;color:#C4973A;margin-bottom:3px;">'+g.n+'</div><div style="font-size:12px;color:#888;">'+g.m+'</div></div>').join(''):'<div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:\\'DM Sans\\',sans-serif;">Belum ada ucapan</div>';}
 function openLightbox(src,id){const lb=document.getElementById('lb-'+id),img=document.getElementById('lb-img-'+id);if(!lb||!img)return;img.src=src;lb.style.display='flex';}`;
 
   return `<!DOCTYPE html>
@@ -251,7 +123,6 @@ html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-s
 #app{position:fixed;inset:0;overflow:hidden;}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
 .section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;}
-.sec-inner{position:absolute;top:0;left:0;width:390px;height:100%;transform-origin:top left;}
 #dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}
@@ -271,133 +142,6 @@ ${bgmHTML}
 <script>${script}<\/script>
 </body>
 </html>`;}
-// ─── ExportModal ──────────────────────────────────────────────────────────────
-function ExportModal({sections,invData,projName,onClose,buildHTMLFn}){
-  const [status,setStatus]=useState("idle"); // idle | checking | saving | done | err
-  const [msg,setMsg]=useState("");
-  const [result,setResult]=useState(null);
-  const [serverUp,setServerUp]=useState(null);
-
-  useEffect(()=>{
-    checkServer().then(up=>{setServerUp(up);});
-  },[]);
-
-  const progress=(m)=>setMsg(m);
-
-  const doExport=async(mode)=>{
-    setStatus("saving");setMsg("Membangun HTML...");
-    try{
-      const html=buildHTMLFn(sections,invData);
-      let res;
-      if(mode==="server"){
-        res=await exportToServer(projName,sections,invData,html,progress);
-        setResult({mode:"server",...res});
-      } else {
-        res=await exportAsZip(projName,sections,invData,html,progress);
-        setResult({mode:"zip",...res});
-      }
-      setStatus("done");
-    }catch(e){
-      setStatus("err");setMsg("Error: "+e.message);
-    }
-  };
-
-  const S2={
-    overlay:{position:"fixed",inset:0,background:"rgba(0,0,0,.88)",zIndex:9998,display:"flex",alignItems:"center",justifyContent:"center"},
-    box:{background:"#111",border:"1px solid #222",borderRadius:10,width:460,maxWidth:"95vw",overflow:"hidden"},
-    head:{padding:"14px 18px",borderBottom:"1px solid #1e1e1e",display:"flex",alignItems:"center"},
-    body:{padding:"20px 18px"},
-    btn:{padding:"12px 0",border:"none",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"DM Sans,sans-serif",width:"100%",marginBottom:10},
-  };
-
-  return(
-    <div style={S2.overlay} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div style={S2.box}>
-        <div style={S2.head}>
-          <span style={{flex:1,fontWeight:700,fontSize:14,color:"#C4973A",fontFamily:"DM Sans,sans-serif"}}>⬇ Export Proyek</span>
-          <button onClick={onClose} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:20,lineHeight:1}}>✕</button>
-        </div>
-        <div style={S2.body}>
-          {/* Project name */}
-          <div style={{marginBottom:16,padding:"10px 12px",background:"#0d0d0d",borderRadius:6,border:"1px solid #1e1e1e"}}>
-            <div style={{fontSize:10,color:"#444",letterSpacing:1,textTransform:"uppercase",fontFamily:"DM Sans,sans-serif",marginBottom:4}}>Proyek</div>
-            <div style={{fontSize:15,color:"#C4973A",fontFamily:"Playfair Display,serif"}}>{projName}</div>
-            <div style={{fontSize:10,color:"#333",fontFamily:"DM Sans,sans-serif",marginTop:2}}>theme_id: <span style={{color:"#555"}}>{slugify(projName)}</span></div>
-          </div>
-
-          {/* Server status */}
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16,fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:serverUp===null?"#555":serverUp?"#7D9470":"#c55",flexShrink:0,boxShadow:serverUp?"0 0 6px #7D9470":undefined}}/>
-            <span style={{color:serverUp===null?"#444":serverUp?"#7D9470":"#c55"}}>
-              {serverUp===null?"Mengecek server...":serverUp?"Server aktif di localhost:8765":"Server tidak aktif (gunakan ZIP)"}
-            </span>
-          </div>
-
-          {status==="idle"&&<>
-            {/* Option 1: Save to server */}
-            <button onClick={()=>doExport("server")} disabled={!serverUp} style={{...S2.btn,background:serverUp?"#1a2a1a":"#111",color:serverUp?"#9CD889":"#2a2a2a",border:`1px solid ${serverUp?"#2a4a2a":"#1e1e1e"}`}}>
-              💾 Simpan ke Folder projects/
-              {serverUp&&<div style={{fontSize:10,fontWeight:400,marginTop:3,color:"#6a8a6a"}}>projects/{slugify(projName)}/ — HTML + JSON + semua aset</div>}
-            </button>
-
-            {/* Option 2: Download ZIP */}
-            <button onClick={()=>doExport("zip")} style={{...S2.btn,background:"#1a1a2a",color:"#7a9aDD",border:"1px solid #2a2a3a"}}>
-              📦 Download sebagai ZIP
-              <div style={{fontSize:10,fontWeight:400,marginTop:3,color:"#5a6a8a"}}>Bisa dipakai tanpa server · HTML + aset terpisah</div>
-            </button>
-
-            {/* Option 3: Export draft JSON */}
-            <button onClick={()=>{exportJSON(projName,sections,invData);onClose();}} style={{...S2.btn,background:"#141414",color:"#555",border:"1px solid #1e1e1e",fontSize:12}}>
-              📋 Export Draft JSON
-              <div style={{fontSize:10,fontWeight:400,marginTop:3,color:"#333"}}>Simpan state editor — bisa di-import lagi nanti</div>
-            </button>
-          </>}
-
-          {status==="saving"&&(
-            <div style={{textAlign:"center",padding:"30px 0"}}>
-              <div style={{fontSize:24,marginBottom:12}}>⏳</div>
-              <div style={{color:"#C4973A",fontSize:13,fontFamily:"DM Sans,sans-serif"}}>{msg}</div>
-            </div>
-          )}
-
-          {status==="done"&&result&&(
-            <div style={{padding:"16px",background:"#0d1a0d",border:"1px solid #1a3a1a",borderRadius:8}}>
-              <div style={{color:"#9CD889",fontSize:15,fontFamily:"DM Sans,sans-serif",fontWeight:700,marginBottom:10}}>✓ Berhasil!</div>
-              {result.mode==="server"&&<>
-                <div style={{fontSize:11,color:"#5a8a5a",fontFamily:"DM Sans,sans-serif",lineHeight:2}}>
-                  📄 {result.structure?.html}<br/>
-                  📋 {result.structure?.json}<br/>
-                  🖼 {result.structure?.static} ({result.images_saved} gambar)<br/>
-                </div>
-                <div style={{marginTop:10,fontSize:10,color:"#3a5a3a",fontFamily:"DM Sans,sans-serif"}}>
-                  Tinggal <code style={{color:"#6a9a6a"}}>cp -r {result.path} ../your-flask/</code> atau langsung referensi dari sana.
-                </div>
-              </>}
-              {result.mode==="zip"&&<>
-                <div style={{fontSize:11,color:"#5a8a5a",fontFamily:"DM Sans,sans-serif"}}>
-                  ZIP berhasil didownload · {result.images||0} gambar dikemas
-                </div>
-                <div style={{marginTop:8,fontSize:10,color:"#3a5a3a",fontFamily:"DM Sans,sans-serif"}}>
-                  Extract lalu salin ke Flask: <code style={{color:"#6a9a6a"}}>projects/{slugify(projName)}/</code>
-                </div>
-              </>}
-              <button onClick={onClose} style={{...S2.btn,marginTop:14,marginBottom:0,background:"#C4973A",color:"#000",border:"none"}}>Tutup</button>
-            </div>
-          )}
-
-          {status==="err"&&(
-            <div style={{padding:"16px",background:"#1a0d0d",border:"1px solid #3a1a1a",borderRadius:8}}>
-              <div style={{color:"#f88",fontSize:13,fontFamily:"DM Sans,sans-serif",marginBottom:10}}>✗ Gagal</div>
-              <div style={{fontSize:11,color:"#8a5a5a",fontFamily:"DM Sans,sans-serif",wordBreak:"break-word"}}>{msg}</div>
-              <button onClick={()=>{setStatus("idle");setMsg("");}} style={{...S2.btn,marginTop:14,marginBottom:0,background:"#2a1a1a",color:"#c55",border:"1px solid #3a1515",fontSize:12}}>Coba Lagi</button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── ProjectManager Modal ─────────────────────────────────────────────────────
 function ProjectManager({sections,invData,projectId,projectName,onLoad,onClose}){
   const [ps,setPs]=useState(()=>getProjects());
@@ -465,7 +209,6 @@ function App(){
   const [projId,setProjId]=useState(()=>_draft.projectId||null);
   const [projName,setProjName]=useState(()=>_draft.projectName||"Proyek Baru");
   const [showProj,setShowProj]=useState(false);
-  const [showExport,setShowExport]=useState(false);
   const cwRef=useRef(null),upRef=useRef(null),bgRef=useRef(null);
 
   const actSec=sections.find(s=>s.id===activeId);
@@ -543,7 +286,7 @@ function App(){
       <div style={{height:40,background:"#111",display:"flex",alignItems:"center",padding:"0 16px",gap:12,flexShrink:0,borderBottom:"1px solid #1a1a1a"}}>
         <span style={{color:"#C4973A",fontWeight:700,fontSize:13,fontFamily:"DM Sans,sans-serif"}}>👁 Preview</span>
         <div style={{flex:1}}/>
-        <button onClick={()=>{setPreview(false);setShowExport(true);}} style={{padding:"5px 14px",background:"#C4973A",border:"none",color:"#000",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>⬇ Export</button>
+        <button onClick={exportHTML} style={{padding:"5px 14px",background:"#C4973A",border:"none",color:"#000",borderRadius:3,cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"DM Sans,sans-serif"}}>⬇ Export HTML</button>
         <button onClick={()=>setPreview(false)} style={{padding:"5px 14px",background:"#1e1e1e",border:"1px solid #333",color:"#aaa",borderRadius:3,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif"}}>✕ Tutup</button>
       </div>
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:"#080808"}}>
@@ -559,7 +302,6 @@ function App(){
     <div style={S.root}>
       {toast&&<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:toast.type==="err"?"#2a0e0e":"#1e2a1e",border:`1px solid ${toast.type==="err"?"#c55":"#7D9470"}`,color:toast.type==="err"?"#f88":"#aed6a0",padding:"8px 20px",borderRadius:6,fontSize:12,zIndex:9999,animation:"toast-in .3s ease",fontFamily:"DM Sans,sans-serif",whiteSpace:"nowrap"}}>{toast.m}</div>}
       {showProj&&<ProjectManager sections={sections} invData={invData} projectId={projId} projectName={projName} onLoad={handleProjLoad} onClose={()=>setShowProj(false)}/>}
-      {showExport&&<ExportModal sections={sections} invData={invData} projName={projName} buildHTMLFn={buildHTML} onClose={()=>setShowExport(false)}/>}
       {showData&&<DataModal invData={invData} setInvData={setInvData} onClose={()=>setShowData(false)}/>}
       {showFP&&selEl?.type==="text"&&<FontPicker current={selEl.fontFamily} search={fpSearch} setSearch={setFpSearch} onPick={f=>{updEl(selEl.id,{fontFamily:f});setShowFP(false);}} onClose={()=>setShowFP(false)}/>}
 
@@ -573,7 +315,7 @@ function App(){
         <Tbtn onClick={()=>{const pid=saveProject(projId,projName,sections,invData);if(pid){setProjId(pid);showT("Tersimpan ✦");}}} col="#7D9470">💾 Simpan</Tbtn>
         <Tbtn onClick={()=>setShowData(true)} col="#5a7aaa">📋 Data</Tbtn>
         <Tbtn onClick={()=>setPreview(true)} col="#888">👁 Preview</Tbtn>
-        <button onClick={()=>setShowExport(true)} style={{...S.btnP,padding:"5px 16px",fontSize:12}}>⬇ Export</button>
+        <button onClick={exportHTML} style={{...S.btnP,padding:"5px 16px",fontSize:12}}>⬇ Export</button>
       </div>
 
       {/* BODY */}
@@ -655,7 +397,6 @@ function App(){
                 {actSec.elements.map(renderEl)}
                 {actSec.type==="cover"&&(()=>{const ois=actSec.openInviteStyle||{},posB=ois.posBottom!==undefined?ois.posBottom:80,posL=ois.posLeft,cen=posL===null||posL===undefined;return(
                   <div style={{position:"absolute",...(cen?{bottom:posB,left:0,right:0,textAlign:"center"}:{bottom:posB,left:posL}),zIndex:50,cursor:"move"}} title="Drag pindah · Edit di tab Sec"
-                    onClick={e=>{e.stopPropagation();showT("Klik 👁 Preview untuk menguji tombol ini","ok");}}
                     onMouseDown={e=>{e.stopPropagation();const sy=e.clientY,sx=e.clientX,sb=posB,sl=posL!==null&&posL!==undefined?posL:CANVAS_W/2-60;const mM=ev=>{const nb=Math.round(Math.max(0,Math.min(CANVAS_H-40,sb-(ev.clientY-sy)/scale)));const nl=Math.round(sl+(ev.clientX-sx)/scale);updSec(actSec.id,{openInviteStyle:{...ois,posBottom:nb,posLeft:nl}});};const mU=()=>{window.removeEventListener("mousemove",mM);window.removeEventListener("mouseup",mU);};window.addEventListener("mousemove",mM);window.addEventListener("mouseup",mU);}}>
                     <div style={{display:"inline-block",padding:`${ois.paddingV||12}px ${ois.paddingH||30}px`,border:`${ois.borderWidth||1}px solid ${ois.color||"#C4973A"}`,color:ois.color||"#C4973A",background:ois.bgColor||"transparent",fontFamily:`'${ois.fontFamily||"Playfair Display"}',serif`,fontSize:ois.fontSize||16,borderRadius:ois.borderRadius||2,letterSpacing:1.5,textTransform:"uppercase",userSelect:"none"}}>
                       {actSec.openInviteText||"Buka Undangan"}
@@ -698,7 +439,7 @@ function WidgetCanvas({el,invData}){
   if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return<div style={{position:"absolute",inset:0,overflowY:"auto",padding:"16px 8px"}}><div style={{textAlign:"center",marginBottom:14}}><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:tc}}>{tit}</div><div style={{width:28,height:1,background:acc,opacity:.4,margin:"7px auto 0"}}/></div>{["Nama Anda","Jumlah Tamu"].map((ph,i)=><div key={i} style={{padding:"9px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:7}}>{ph}</div>)}<div style={{padding:"9px 12px",background:dk?"#1a1a1a":ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:7}}>Konfirmasi ▾</div><div style={{padding:"20px 12px",background:ib,border:`1px solid ${acc}44`,borderRadius:r,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:12,marginBottom:10}}>Ucapan &amp; Doa...</div><div style={{padding:"11px",background:acc,borderRadius:r,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:12,fontWeight:700,textAlign:"center"}}>Kirim 💌</div></div>;}
   if(el.widgetType==="maps"){const bt=el.mapsBtnText||"Buka di Google Maps";return<div style={{position:"absolute",inset:0}}><div style={{width:"100%",height:"100%",background:"#1a2a1a",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}><div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px)",backgroundSize:"28px 28px"}}/><div style={{textAlign:"center",color:"#3a5a3a",fontSize:11,fontFamily:"DM Sans,sans-serif",zIndex:1}}>🗺<br/>Maps{el.mapsLayout==="embed"?" (Embed)":""}</div></div><div style={{position:"absolute",bottom:12,left:"50%",transform:"translateX(-50%)",display:"inline-block",padding:"7px 18px",background:acc,color:"#000",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:700,borderRadius:r,whiteSpace:"nowrap"}}>{bt}</div></div>;}
   if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"1fr 1fr 1fr":"1fr 1fr",imgH=lay==="1"||shp==="portrait"?180:120,br=shp==="circle"?"50%":shp==="rounded"?"10px":"2px",photos=el.galleryImages||[];return<div style={{position:"absolute",inset:0,overflow:"auto",padding:gap}}>{el.title&&<div style={{textAlign:"center",marginBottom:gap,fontFamily:"Playfair Display,serif",fontSize:15,color:acc}}>{el.title}</div>}<div style={{display:"grid",gridTemplateColumns:cols,gap}}>{photos.length>0?photos.map((src,i)=><div key={i} style={{overflow:"hidden",borderRadius:br,background:"#1a1412"}}><img src={src} style={{width:"100%",height:imgH,objectFit:"cover",display:"block"}} onError={e=>{e.target.style.display="none";}}/></div>):<div style={{gridColumn:"1/-1",textAlign:"center",padding:20,color:"#333",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>📷 Upload foto di panel Widget</div>}</div></div>;}
-  if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return<div style={{position:"absolute",inset:0,overflow:"auto",padding:"14px 8px"}}><div style={{textAlign:"center",marginBottom:12}}><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:tc}}>{tit}</div><div style={{width:28,height:1,background:acc,opacity:.4,margin:"7px auto 0"}}/><div style={{fontSize:10,color:"#555",marginTop:6,fontFamily:"DM Sans,sans-serif"}}>Menampilkan ucapan dari RSVP</div></div><div style={{background:dk?"rgba(255,255,255,.03)":"rgba(0,0,0,.03)",border:`1px solid ${acc}22`,borderRadius:r,padding:12,marginBottom:8}}><div style={{color:acc,fontWeight:700,fontSize:12,fontFamily:"DM Sans,sans-serif",marginBottom:3}}>Tamu Pertama ✓</div><div style={{color:"#666",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Barakallahu fiikum, semoga langgeng</div></div><div style={{background:dk?"rgba(255,255,255,.03)":"rgba(0,0,0,.03)",border:`1px solid ${acc}22`,borderRadius:r,padding:12}}><div style={{color:acc,fontWeight:700,fontSize:12,fontFamily:"DM Sans,sans-serif",marginBottom:3}}>Tamu Kedua</div><div style={{color:"#666",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>Selamat menempuh hidup baru...</div></div></div>;}
+  if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return<div style={{position:"absolute",inset:0,overflow:"auto",padding:"14px 8px"}}><div style={{textAlign:"center",marginBottom:12}}><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:tc}}>{tit}</div><div style={{width:28,height:1,background:acc,opacity:.4,margin:"7px auto 0"}}/></div><div style={{background:dk?"rgba(255,255,255,.03)":"rgba(0,0,0,.03)",border:`1px solid ${acc}22`,borderRadius:r,padding:12,marginBottom:10,color:"#444",fontFamily:"DM Sans,sans-serif",fontSize:11,textAlign:"center"}}>Belum ada ucapan</div><input placeholder="Nama Anda" style={{width:"100%",padding:"8px 12px",background:ib,border:`1px solid ${acc}44`,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:11,borderRadius:r,outline:"none",marginBottom:6,display:"block"}}/><textarea placeholder="Ucapan..." rows="2" style={{width:"100%",padding:"8px 12px",background:ib,border:`1px solid ${acc}44`,color:ic,fontFamily:"DM Sans,sans-serif",fontSize:11,borderRadius:r,outline:"none",resize:"none",display:"block",marginBottom:7}}/><div style={{padding:"9px",background:acc,borderRadius:r,color:"#fff",fontFamily:"DM Sans,sans-serif",fontSize:11,fontWeight:700,textAlign:"center"}}>Kirim 💌</div></div>;}
   if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital";return<div style={{position:"absolute",inset:0,overflow:"auto",padding:"18px 8px"}}><div style={{textAlign:"center",marginBottom:14}}><div style={{fontFamily:"Playfair Display,serif",fontSize:17,color:acc}}>{tit}</div></div><div style={{background:dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",border:`1px solid ${acc}33`,borderRadius:r,padding:"16px",marginBottom:10}}><div style={{fontSize:10,color:"#888",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Transfer via</div><div style={{fontFamily:"Playfair Display,serif",fontSize:16,color:acc,marginBottom:4}}>BCA / OVO / GOPAY</div><div style={{fontSize:18,color:dk?"#fff":"#333",letterSpacing:3}}>1234 5678 90</div><div style={{marginTop:10,padding:"5px 14px",background:"transparent",border:`1px solid ${acc}55`,color:acc,fontSize:10,borderRadius:r,display:"inline-block"}}>Salin Nomor</div></div><div style={{fontSize:10,color:"#333",textAlign:"center",fontFamily:"DM Sans,sans-serif"}}>data dari DB saat export</div></div>;}
   return<div style={{position:"absolute",inset:0,border:`1.5px dashed ${acc}44`,display:"flex",alignItems:"center",justifyContent:"center",background:`${acc}08`,borderRadius:4}}><div style={{textAlign:"center",color:`${acc}77`,fontSize:11,fontFamily:"DM Sans,sans-serif"}}>{el.name}</div></div>;
 }
@@ -713,10 +454,7 @@ function DataModal({invData,setInvData,onClose}){
           <button onClick={onClose} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:20,lineHeight:1}}>✕</button>
         </div>
         <div style={{overflowY:"auto",flex:1,padding:"14px 18px",display:"flex",flexDirection:"column",gap:10}}>
-          {DATA_VARS.map(v=>{
-            const isParents=v.key.includes("_parents"),isPhoto=v.key.includes("_photo");
-            return<div key={v.key}><div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>{v.label}</div><input value={invData[v.key.replace("inv.","")]||""} onChange={e=>setInvData(p=>({...p,[v.key.replace("inv.","")]:e.target.value}))} placeholder={v.example} style={{...S.inp,fontSize:11}}/>{isParents&&<div style={{fontSize:9,color:"#2a4a2a",marginTop:3,fontFamily:"DM Sans,sans-serif"}}>💡 Format: "Nama Ayah &amp; Nama Ibu" (contoh: Bapak Hasan &amp; Ibu Aminah)</div>}{isPhoto&&<div style={{fontSize:9,color:"#2a3a4a",marginTop:3,fontFamily:"DM Sans,sans-serif"}}>💡 Untuk preview lokal gunakan path demo-photos/... · Saat export jadi {`{{inv.xxx}}`} otomatis</div>}</div>;
-          })}
+          {DATA_VARS.map(v=><div key={v.key}><div style={{fontSize:10,color:"#3a3a3a",marginBottom:3,fontFamily:"DM Sans,sans-serif"}}>{v.label}</div><input value={invData[v.key.replace("inv.","")]||""} onChange={e=>setInvData(p=>({...p,[v.key.replace("inv.","")]:e.target.value}))} placeholder={v.example} style={{...S.inp,fontSize:11}}/></div>)}
         </div>
         <div style={{padding:"10px 18px",borderTop:"1px solid #181818"}}><button onClick={onClose} style={{...S.btnP,width:"100%"}}>Tutup</button></div>
       </div>
