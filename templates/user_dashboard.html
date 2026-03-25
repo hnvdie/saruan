@@ -136,7 +136,7 @@ nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1p
   </div>
   {% endif %}
 
-  <!-- URL UNDANGAN -->
+  <!-- URL UNDANGAN 
   {% if not expired %}
   <div class="url-box">
     <a href="/i/{{ inv.slug }}" target="_blank" class="url-link">{{ site_name }}/i/{{ inv.slug }}</a>
@@ -144,6 +144,88 @@ nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1p
     <a href="/i/{{ inv.slug }}" target="_blank" class="btn" style="font-size:.58rem;padding:.3rem .6rem;">Lihat</a>
   </div>
   {% endif %}
+  -->
+
+
+{% if not expired %}
+<div class="url-box-container" style="background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+  
+  <label style="font-size: 0.75rem; color: #666;">Link Utama:</label>
+  <div class="url-box" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+    <input type="text" readonly value="{{ site_name }}/i/{{ inv.slug }}" id="main-url" style="flex: 1; background: #f9f9f9; border: 1px dashed #ccc; padding: 8px; border-radius: 6px; font-size: 0.8rem;">
+    <button class="btn" onclick="copyToClipboard('main-url')" style="padding: 8px 12px; font-size: 0.7rem;">Salin</button>
+  </div>
+
+  <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+  <label style="font-size: 0.75rem; color: #666;">Kirim ke Nama Tamu:</label>
+  <div style="margin-top: 5px;">
+    <input type="text" id="guest-name" placeholder="Ketik nama tamu (misal: Bpk. Samsudin)" 
+           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px;"
+           onkeyup="updateGuestLink()">
+    
+    <div id="result-container" style="display: none; background: #eef9f1; padding: 10px; border-radius: 8px; border: 1px solid #c3e6cb;">
+      <p style="font-size: 0.75rem; margin: 0 0 5px 0; color: #155724;">Link khusus untuk <strong id="display-name"></strong>:</p>
+      <code id="generated-url" style="display: block; font-size: 0.75rem; word-break: break-all; margin-bottom: 10px; color: #1e7e34;"></code>
+      
+      <div style="display: flex; gap: 5px;">
+        <button onclick="copyToClipboard('generated-url')" class="btn" style="flex: 1; background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;">Salin Link</button>
+        <button onclick="sendToWA()" class="btn" style="flex: 1; background: #25d366; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.75rem;">Kirim ke WA</button>
+      </div>
+
+     <div style="margin-top: 12px; display: flex; gap: 8px; align-items: flex-start; padding: 8px; background: #fff3cd; border-radius: 6px; border: 1px solid #ffeeba;">
+  <span style="font-size: 1rem;">⚠️</span>
+  <p style="font-size: 0.7rem; color: #856404; margin: 0; line-height: 1.3;">
+    <strong>Info:</strong> Fitur nama tamu otomatis ini sedang dalam pengembangan. 
+    Beberapa tema mungkin belum mendukung tampilan nama tamu di layar undangan.
+  </p>
+</div>
+
+
+    </div>
+  </div>
+</div>
+{% endif %}
+<br>
+
+<script>
+function updateGuestLink() {
+    const nameInput = document.getElementById('guest-name').value;
+    const resultContainer = document.getElementById('result-container');
+    const displayName = document.getElementById('display-name');
+    const generatedUrl = document.getElementById('generated-url');
+    
+    // Ambil base URL dari domain sekarang + slug
+    const baseUrl = window.location.origin + "/i/{{ inv.slug }}";
+
+    if (nameInput.trim().length > 0) {
+        resultContainer.style.display = 'block';
+        displayName.innerText = nameInput;
+        
+        // Buat link lengkapnya
+        const finalUrl = baseUrl + "?to=" + encodeURIComponent(nameInput);
+        generatedUrl.innerText = finalUrl;
+    } else {
+        resultContainer.style.display = 'none';
+    }
+}
+
+function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).innerText || document.getElementById(elementId).value;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Link berhasil disalin ke clipboard!");
+    });
+}
+
+function sendToWA() {
+    const name = document.getElementById('guest-name').value;
+    const url = document.getElementById('generated-url').innerText;
+    const pesan = `Halo ${name}, kami mengundang Anda untuk hadir di acara kami. Detail undangan dapat dilihat pada link berikut:\n\n${url}`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
+}
+</script>
+
 
   <!-- STATS -->
   <div class="db-grid">
