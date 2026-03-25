@@ -485,6 +485,13 @@ to{opacity:.7;transform:translateX(0)}
       <span>{{ inv.bride_name }}</span>
     </div>
     <p class="env-date-text">{{ inv.akad_date | format_date }}</p>
+{% if nama_tamu %}
+    <div class="guest-section" style="margin-bottom: 15px;">
+       <p style="font-size: 0.9em; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+       <h3 style="margin: 0; font-weight: bold;">{{ nama_tamu }}</h3>
+    </div>
+  {% endif %}
+
     <button class="env-cta" id="open-btn">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
       Buka Undangan

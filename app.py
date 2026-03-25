@@ -586,10 +586,15 @@ def view_invitation(slug):
     # Inject portrait photo URLs dari kolom groom_photo / bride_photo
     inv['groom_photo_url'] = f'/uploads/{inv["groom_photo"]}' if inv.get('groom_photo') else None
     inv['bride_photo_url'] = f'/uploads/{inv["bride_photo"]}' if inv.get('bride_photo') else None
+
+     # --- TAMBAHAN DI SINI ---
+    # Ambil nama tamu dari URL: ?to=Nama+Tamu
+    nama_tamu = request.args.get('to') 
+
     conn.close()
     html = render_template(f'themes/{inv["theme_id"]}.html',
                            inv=inv, theme=theme, rsvp_list=rsvps,
-                           gifts=gifts, photos=photos, is_preview=False)
+                           gifts=gifts, photos=photos, is_preview=False,nama_tamu=nama_tamu)
     # Inject OG tags dinamis — tanpa perlu ubah tiap file tema
     og  = _build_og_tags(inv, theme, list(photos), SITE_NAME)
     html = _inject_og(html, og)
