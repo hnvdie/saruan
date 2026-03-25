@@ -333,33 +333,102 @@ def get_demo_photos():
     return photos
 
 def extract_maps_embed_src(url: str) -> str:
-    """Convert Google Maps URL to embed src URL only (not full iframe), or return empty"""
+    """Convert berbagai format Google Maps URL ke embed src — TANPA network call.
+    Short URL (maps.app.goo.gl) dikembalikan kosong; resolve via endpoint AJAX terpisah."""
     if not url: return ''
     import urllib.parse
-
-    # Already a full iframe tag — extract the src URL from it
-    if url.strip().startswith('<iframe'):
+    url = url.strip()
+    if url.startswith('<iframe'):
         m = re.search(r'src=["\']([^"\']+)["\']', url)
         return m.group(1) if m else ''
-    # Already embed src URL
     if 'maps/embed' in url: return url
-    # Standard Google Maps share/search URL
+    if 'maps.app.goo.gl' in url or 'goo.gl/maps' in url:
+        return ''  # butuh resolve — ditangani endpoint AJAX
     try:
         parsed = urllib.parse.urlparse(url)
         params = urllib.parse.parse_qs(parsed.query)
-        q = params.get('q', [''])[0]
+        q = params.get('q', params.get('query', ['']))[0]
         if q:
             return f'https://maps.google.com/maps?q={urllib.parse.quote(q)}&output=embed&z=15'
-        # /place/Name/@lat,lng or /place/Name/
         if '/place/' in url:
-            place = url.split('/place/')[1].split('/')[0]
-            return f'https://maps.google.com/maps?q={place}&output=embed&z=15'
-        # any other google maps URL — append output=embed
-        if 'google.com/maps' in url or 'goo.gl/maps' in url:
+            coord = re.search(r'/@(-?\d+\.\d+),(-?\d+\.\d+)', url)
+            if coord:
+                return f'https://maps.google.com/maps?q={coord.group(1)},{coord.group(2)}&output=embed&z=16'
+            place = urllib.parse.unquote(url.split('/place/')[1].split('/')[0].replace('+', ' '))
+            return f'https://maps.google.com/maps?q={urllib.parse.quote(place)}&output=embed&z=15'
+        coord = re.search(r'/@(-?\d+\.\d+),(-?\d+\.\d+)', url)
+        if coord:
+            return f'https://maps.google.com/maps?q={coord.group(1)},{coord.group(2)}&output=embed&z=16'
+        ll = params.get('ll', [''])[0]
+        if ll and ',' in ll:
+            return f'https://maps.google.com/maps?q={urllib.parse.quote(ll)}&output=embed&z=15'
+        if 'google.com/maps' in url:
             sep = '&' if '?' in url else '?'
             return url + sep + 'output=embed'
     except: pass
     return ''
+
+
+# ── Maps resolve: rate limit store (terpisah, lebih ketat) ───────────────────
+# Maks 10 resolve per user (inv_id) per 10 menit — cegah abuse
+_MAPS_RL: dict = {}
+_MAPS_RL_WINDOW = 600   # 10 menit
+_MAPS_RL_MAX    = 10
+
+def _maps_rl_ok(inv_id: str) -> bool:
+    now = time.time()
+    _MAPS_RL[inv_id] = [t for t in _MAPS_RL.get(inv_id, []) if now - t < _MAPS_RL_WINDOW]
+    if len(_MAPS_RL[inv_id]) >= _MAPS_RL_MAX:
+        return False
+    _MAPS_RL[inv_id].append(now)
+    return True
+
+
+def _resolve_and_embed_maps(url: str, timeout: float = 4.0) -> str:
+    """Follow HTTP redirect untuk short URL lalu parse ke embed src.
+    Dijalankan di thread terpisah — tidak blocking Flask worker.
+    SSRF-safe: hanya follow redirect ke domain Google."""
+    import urllib.parse, http.client, ssl
+    # Whitelist domain yang boleh di-follow redirectnya
+    SAFE_DOMAINS = {
+        'maps.app.goo.gl', 'goo.gl', 'www.google.com',
+        'google.com', 'maps.google.com',
+    }
+    def _domain_ok(u: str) -> bool:
+        try:
+            h = urllib.parse.urlparse(u).netloc.lower().split(':')[0]
+            return any(h == d or h.endswith('.' + d) for d in SAFE_DOMAINS)
+        except: return False
+
+    if not _domain_ok(url): return ''
+
+    cur = url
+    seen: set = set()
+    for _ in range(6):
+        if cur in seen or not _domain_ok(cur): break
+        seen.add(cur)
+        try:
+            p = urllib.parse.urlparse(cur)
+            is_https = p.scheme == 'https'
+            host = p.netloc
+            path = (p.path or '/') + (('?' + p.query) if p.query else '')
+            ctx = ssl.create_default_context() if is_https else None
+            ConnCls = http.client.HTTPSConnection if is_https else http.client.HTTPConnection
+            c = ConnCls(host, timeout=timeout, **(({'context': ctx}) if is_https else {}))
+            c.request('HEAD', path, headers={
+                'User-Agent': 'Mozilla/5.0 (compatible; UndanganBot/1.0)',
+                'Accept': '*/*',
+            })
+            resp = c.getresponse()
+            loc  = resp.getheader('Location', '')
+            c.close()
+            if resp.status in (301, 302, 303, 307, 308) and loc:
+                cur = urllib.parse.urljoin(cur, loc)
+                continue
+            break
+        except Exception:
+            break
+    return extract_maps_embed_src(cur)
 
 def make_maps_iframe(src: str) -> str:
     """Wrap embed src URL into full iframe HTML"""
@@ -1250,6 +1319,45 @@ def user_login_required(f):
         return f(*a, **kw)
     return dec
 
+# Thread pool untuk resolve maps — maks 4 worker, tidak monopoli Flask threads
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+_maps_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix='maps-resolve')
+
+# ── /dashboard/maps-resolve ───────────────────────────────────────────────────
+@app.route('/dashboard/maps-resolve', methods=['POST'])
+@user_login_required
+def user_maps_resolve():
+    """AJAX: terima URL Google Maps → return embed src.
+    Non-blocking (ThreadPoolExecutor), rate-limited per user, SSRF-safe."""
+    inv_id = session['user_inv_id']
+
+    # Rate limit: 10 resolve per undangan per 10 menit
+    if not _maps_rl_ok(inv_id):
+        return jsonify({'ok': False, 'error': 'Terlalu banyak request. Tunggu beberapa menit.'}), 429
+
+    data = request.get_json() or {}
+    raw  = (data.get('url') or '').strip()[:500]
+    if not raw:
+        return jsonify({'ok': False, 'error': 'URL kosong'})
+
+    # Whitelist — hanya Google Maps
+    ALLOWED = ('google.com/maps', 'maps.google.com', 'maps.app.goo.gl', 'goo.gl/maps')
+    if not any(p in raw for p in ALLOWED):
+        return jsonify({'ok': False, 'error': 'Bukan URL Google Maps'})
+
+    # Jalankan resolve di thread terpisah, timeout 6 detik total
+    try:
+        future = _maps_executor.submit(_resolve_and_embed_maps, raw, 4.0)
+        embed  = future.result(timeout=6.0)
+    except FuturesTimeout:
+        return jsonify({'ok': False, 'error': 'Timeout saat memproses link. Coba lagi.'})
+    except Exception:
+        return jsonify({'ok': False, 'error': 'Gagal memproses URL'})
+
+    if embed:
+        return jsonify({'ok': True, 'embed': embed})
+    return jsonify({'ok': False, 'error': 'Format tidak dikenali. Coba copy URL dari browser saat buka Google Maps.'})
+
 # ── /promo/check ─────────────────────────────────────────────────────────────
 @app.route('/promo/check', methods=['POST'])
 def check_promo():
@@ -1791,7 +1899,8 @@ def user_edit():
                 resepsi_date, c['resepsi_time'],
                 c['resepsi_venue'], c['resepsi_address'],
                 c['maps_url'],
-                extract_maps_embed_src(c['maps_url']),
+                # Pakai embed yang sudah di-resolve JS (hidden field), fallback ke extract
+                sanitize_url(f.get('maps_embed', ''), 1000) or extract_maps_embed_src(c['maps_url']),
                 c['love_story'],
                 music_url_final,
                 music_file_final,

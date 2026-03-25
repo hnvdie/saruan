@@ -277,21 +277,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Lokasi Maps &amp; Lainnya</div></div>
       <div class="fs-body">
-        <div class="form-group" style="margin-bottom:.6rem;">
-          <label>URL Google Maps</label>
-          <input type="url" name="maps_url" id="mapsUrlInput"
-            value="{{ form.get('maps_url', inv.maps_url or '') }}"
-            placeholder="Paste link Google Maps dari mana saja..." maxlength="500">
-          <input type="hidden" name="maps_embed" id="mapsEmbedHidden"
-            value="{{ form.get('maps_embed', inv.maps_embed or '') }}">
-          <div id="mapsStatus" style="margin-top:.28rem;font-size:.6rem;display:none;line-height:1.5;"></div>
-          <div id="mapsPreview" style="margin-top:.4rem;border-radius:3px;overflow:hidden;display:none;">
-            <iframe id="mapsIframe" src="" width="100%" height="160"
-              style="border:0;display:block;" loading="lazy"></iframe>
-          </div>
-          <span class="form-note" style="margin-top:.25rem;display:block;">
-            Paste link Google Maps dari mana saja — short link, share dari app, atau URL browser. Otomatis diproses.
-          </span>
+        <div class="form-group" style="margin-bottom:.6rem;"><label>URL Google Maps</label>
+          <input type="url" name="maps_url" value="{{ form.get('maps_url', inv.maps_url or '') }}" placeholder="https://maps.google.com/..." maxlength="500">
+          <span class="form-note">Paste URL dari Google Maps — otomatis diembed di undangan.</span>
         </div>
         <div class="form-group" style="margin-bottom:.6rem;"><label>Kisah Cinta / Love Story</label>
           <textarea name="love_story" maxlength="2000" placeholder="Ceritakan bagaimana kalian bertemu...">{{ form.get('love_story', inv.love_story or '') }}</textarea>
@@ -668,84 +656,9 @@ function setGiftType(i, type, btn) {
 /* ═══════════════════════════════════════════════════════════════
    INIT — satu DOMContentLoaded, semua logic di sini
 ═══════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════
-   MAPS AUTO-RESOLVE
-═══════════════════════════════════════════════════════════════ */
-let _mapsTimer = null;
-
-function _mapsInit() {
-  // Tampilkan preview jika embed sudah ada dari server
-  const embed = document.getElementById('mapsEmbedHidden')?.value;
-  if (embed) _mapsShowPreview(embed);
-
-  const inp = document.getElementById('mapsUrlInput');
-  if (!inp) return;
-  inp.addEventListener('input', () => {
-    clearTimeout(_mapsTimer);
-    const val = inp.value.trim();
-    if (!val) { _mapsHide(); return; }
-    _mapsTimer = setTimeout(() => _mapsResolve(val), 900);
-  });
-}
-
-function _mapsResolve(url) {
-  const ALLOWED = ['google.com/maps','maps.google.com','maps.app.goo.gl','goo.gl/maps'];
-  if (!ALLOWED.some(p => url.includes(p))) {
-    _mapsStatus('⚠ Bukan URL Google Maps', 'var(--red)'); return;
-  }
-  _mapsStatus('⏳ Memproses...', 'var(--muted)');
-  fetch('/dashboard/maps-resolve', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({url})
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (d.ok) {
-      document.getElementById('mapsEmbedHidden').value = d.embed;
-      _mapsShowPreview(d.embed);
-      _mapsStatus('✓ Peta berhasil diproses', 'green');
-    } else {
-      document.getElementById('mapsEmbedHidden').value = '';
-      _mapsHide();
-      _mapsStatus('⚠ ' + (d.error || 'Gagal memproses'), 'var(--red)');
-    }
-  })
-  .catch(() => _mapsStatus('⚠ Koneksi gagal, coba lagi', 'var(--red)'));
-}
-
-function _mapsStatus(msg, color) {
-  const el = document.getElementById('mapsStatus');
-  if (!el) return;
-  el.textContent = msg; el.style.color = color; el.style.display = 'block';
-}
-function _mapsShowPreview(src) {
-  const wrap = document.getElementById('mapsPreview');
-  const fr   = document.getElementById('mapsIframe');
-  if (!wrap || !fr) return;
-  fr.src = src; wrap.style.display = 'block';
-}
-function _mapsHide() {
-  const wrap = document.getElementById('mapsPreview');
-  const fr   = document.getElementById('mapsIframe');
-  if (wrap) wrap.style.display = 'none';
-  if (fr)   fr.src = '';
-  const emb = document.getElementById('mapsEmbedHidden');
-  if (emb)  emb.value = '';
-  const st = document.getElementById('mapsStatus');
-  if (st)   st.style.display = 'none';
-}
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // Portrait: init visibilitas dari server
-  _mapsInit();
-  // Auto-resolve jika ada maps_url tapi embed belum tersimpan
-  const _mInp = document.getElementById('mapsUrlInput');
-  const _mEmb = document.getElementById('mapsEmbedHidden');
-  if (_mInp && _mInp.value.trim() && _mEmb && !_mEmb.value) _mapsResolve(_mInp.value.trim());
-
   initPortrait('imgGroom', 'emptyGroom');
   initPortrait('imgBride',  'emptyBride');
 

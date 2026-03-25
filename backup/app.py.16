@@ -1826,7 +1826,10 @@ def user_edit():
             conn.commit(); conn.close()
             return redirect(url_for('user_dashboard') + '?saved=1')
 
-    inv2 = dict(inv) if not errors else {**dict(inv), **dict(request.form)}
+    # Inject portrait URLs agar template bisa tampilkan foto yang sudah tersimpan
+    inv = dict(inv)
+    inv['groom_photo_url'] = f'/uploads/{inv["groom_photo"]}' if inv.get('groom_photo') else None
+    inv['bride_photo_url']  = f'/uploads/{inv["bride_photo"]}'  if inv.get('bride_photo')  else None
     return render_template('user_edit.html', inv=inv, photos=photos, gifts=gifts,
                            themes=themes, expired=expired, errors=errors, form=request.form if errors else {})
 
