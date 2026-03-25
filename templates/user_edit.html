@@ -10,7 +10,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--white:#fff;--off:#f8f7f5;--off2:#f2f0ec;--border:#e5e2db;--border2:#ede9e2;--ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--red:#c0392b;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+:root{
+  --white:#fff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--red:#c0392b;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
 body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
 a{text-decoration:none;color:inherit;}
 nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
@@ -36,7 +42,11 @@ nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1p
 .form-row-3{grid-template-columns:1fr 1fr 1fr;}
 .form-group{display:flex;flex-direction:column;gap:.2rem;}
 label{font-size:.63rem;color:var(--ink2);letter-spacing:.02em;}
-input[type=text],input[type=date],input[type=time],input[type=url],textarea,select{padding:.46rem .62rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.75rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s;width:100%;}
+input[type=text],input[type=date],input[type=time],input[type=url],textarea,select{
+  padding:.46rem .62rem;border:1px solid var(--border);border-radius:2px;
+  font-family:var(--sans);font-size:.75rem;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;width:100%;
+}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);}
 input::placeholder,textarea::placeholder{color:var(--faint);}
 input[disabled]{background:var(--off2);color:var(--muted);cursor:not-allowed;}
@@ -46,47 +56,64 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .check-row{display:flex;align-items:center;gap:.35rem;}
 .check-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--accent);}
 .check-row label{font-size:.68rem;cursor:pointer;margin-bottom:0;}
-/* THEME SELECTOR */
-.ts-wrap{position:relative;margin-bottom:.45rem;}
-.ts-input{width:100%;padding:.45rem .62rem .45rem 1.7rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.73rem;color:var(--ink);outline:none;transition:border-color .15s;}
-.ts-input:focus{border-color:var(--accent);}
-.ts-ico{position:absolute;left:.5rem;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--faint);pointer-events:none;}
-.tlist{border:1px solid var(--border);border-radius:2px;max-height:180px;overflow-y:auto;}
-.tl-item{padding:.42rem .7rem;font-size:.68rem;cursor:pointer;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;transition:background .12s;}
-.tl-item:last-child{border-bottom:none;}
-.tl-item:hover{background:var(--off);}
-.tl-item.selected{background:rgba(160,140,126,.1);color:var(--accent);}
-.tl-price{font-size:.6rem;color:var(--accent);}
-/* PHOTOS */
-.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.35rem;margin-bottom:.5rem;}
-.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
-.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.photo-del{position:absolute;top:.12rem;right:.12rem;width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;}
+
 /* PORTRAIT */
 .portrait-pair{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.5rem;}
 .portrait-box{border:1px solid var(--border);border-radius:3px;overflow:hidden;}
-.portrait-img{aspect-ratio:3/4;background:var(--off2);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--muted);}
-.portrait-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.portrait-img{
+  aspect-ratio:3/4;background:var(--off2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:var(--muted);overflow:hidden;position:relative;
+}
+/* img default hidden; JS adds .loaded to show */
+.portrait-img img{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;object-fit:cover;
+  display:none;
+}
+.portrait-img img.loaded{display:block;}
+.portrait-empty{font-size:.6rem;color:var(--muted);}
 .portrait-lbl{padding:.28rem .5rem;background:var(--off);border-top:1px solid var(--border);font-size:.58rem;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+.portrait-input{padding:.4rem .5rem;border-top:1px solid var(--border);}
+.portrait-input input[type=file]{font-size:.62rem;color:var(--muted);width:100%;}
+
+/* GALLERY */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.35rem;margin-bottom:.5rem;}
+.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-del{position:absolute;top:.12rem;right:.12rem;width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;line-height:1;}
+.drop-zone{border:2px dashed var(--border);border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:.5rem;}
+.drop-zone:hover{border-color:var(--accent);}
+
+/* MUSIC */
+.music-tab{padding:.22rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;cursor:pointer;font-family:var(--sans);background:none;color:var(--muted);transition:all .15s;}
+.music-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(160,140,126,.08);}
+.music-preview{display:none;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--off);border:1px solid var(--border);border-radius:2px;margin-bottom:.5rem;}
+.consent-box{border:1px solid var(--border2);border-radius:3px;padding:.65rem .75rem;margin-bottom:.45rem;background:var(--off);}
+
 /* GIFTS */
 .gift-item{border:1px solid var(--border2);border-radius:2px;padding:.6rem .7rem;margin-bottom:.45rem;}
 .gift-tabs{display:flex;gap:.22rem;margin-bottom:.5rem;}
 .gtab{padding:.18rem .5rem;border:1px solid var(--border);border-radius:2px;font-size:.57rem;cursor:pointer;color:var(--muted);background:none;font-family:var(--sans);transition:all .12s;}
 .gtab.active{border-color:var(--accent);color:var(--accent);background:rgba(160,140,126,.06);}
+
 /* SUBMIT */
 .submit-bar{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
 .btn-save{padding:.56rem 1.3rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
 .btn-save:hover{opacity:.82;}
 .btn-cancel{padding:.56rem .9rem;border:1px solid var(--border);color:var(--muted);border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:none;transition:all .2s;}
 .btn-cancel:hover{border-color:var(--ink);color:var(--ink);}
+
 @media(max-width:560px){.form-row-2,.form-row-3{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
+
 <nav>
   <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
   <a href="/dashboard" class="nav-back">&larr; Dashboard</a>
 </nav>
+
 <div class="wrap">
   <div class="page-head">
     <span class="page-label">Edit Undangan</span>
@@ -101,9 +128,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="error-box">{% for e in errors %}<p>• {{ e }}</p>{% endfor %}</div>
   {% endif %}
 
-  <form method="POST" action="/dashboard/edit" enctype="multipart/form-data">
+  <form id="mainForm" method="POST" action="/dashboard/edit" enctype="multipart/form-data">
 
-    <!-- TEMA -->
+    <!-- ── TEMA ─────────────────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Tema Undangan</div></div>
       <div class="fs-body">
@@ -120,12 +147,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           </div>
           <div style="font-size:.6rem;color:var(--faint);letter-spacing:.05em;">🔒 TERKUNCI</div>
         </div>
-        {# hidden input tetap dikirim supaya UPDATE tidak error, tapi backend ignore nilainya #}
         <input type="hidden" name="theme_id" value="{{ inv.theme_id }}">
       </div>
     </div>
 
-    <!-- MEMPELAI -->
+    <!-- ── DATA MEMPELAI ─────────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Data Mempelai</div></div>
       <div class="fs-body">
@@ -154,63 +180,61 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
     </div>
 
-    <!-- FOTO PORTRAIT -->
+    <!-- ── FOTO MEMPELAI (PORTRAIT) ──────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Foto Mempelai</div></div>
       <div class="fs-body">
         <div class="portrait-pair">
+
           <!-- PRIA -->
           <div class="portrait-box">
-            <div class="portrait-img" id="previewGroom">
-              {% if inv.groom_photo_url %}
-                <img src="{{ inv.groom_photo_url }}" alt="Foto Pria" id="imgGroom">
-              {% else %}
-                <img id="imgGroom" style="display:none;">
-                <span id="emptyGroom">Belum ada foto</span>
-              {% endif %}
+            <div class="portrait-img">
+              {# img selalu ada — JS yang kontrol visibilitas via class .loaded #}
+              <img id="imgGroom" {% if inv.groom_photo_url %}src="{{ inv.groom_photo_url }}"{% endif %} alt="Foto Pria">
+              <span class="portrait-empty" id="emptyGroom">Belum ada foto</span>
             </div>
             <div class="portrait-lbl">
               <span>Pria</span>
               {% if inv.groom_photo_url %}
-              <label style="cursor:pointer;color:var(--red);font-size:.55rem;">
-                <input type="checkbox" name="clear_groom_photo" id="clearGroom" value="1" style="width:11px;height:11px;" onchange="handleClear('groom',this.checked)"> Hapus
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;display:flex;align-items:center;gap:.2rem;">
+                <input type="checkbox" name="clear_groom_photo" id="clearGroom" value="1"
+                  style="width:11px;height:11px;" onchange="handleClear('groom',this.checked)"> Hapus
               </label>
               {% endif %}
             </div>
-            <div style="padding:.4rem .5rem;border-top:1px solid var(--border);">
-              <input type="file" name="groom_photo" accept="image/*" style="font-size:.62rem;color:var(--muted);width:100%;"
-                onchange="previewPortrait(this,'imgGroom','emptyGroom')">
+            <div class="portrait-input">
+              <input type="file" name="groom_photo" accept="image/jpeg,image/png,image/webp"
+                onchange="previewPortrait(this,'imgGroom','emptyGroom','clearGroom')">
             </div>
           </div>
+
           <!-- WANITA -->
           <div class="portrait-box">
-            <div class="portrait-img" id="previewBride">
-              {% if inv.bride_photo_url %}
-                <img src="{{ inv.bride_photo_url }}" alt="Foto Wanita" id="imgBride">
-              {% else %}
-                <img id="imgBride" style="display:none;">
-                <span id="emptyBride">Belum ada foto</span>
-              {% endif %}
+            <div class="portrait-img">
+              <img id="imgBride" {% if inv.bride_photo_url %}src="{{ inv.bride_photo_url }}"{% endif %} alt="Foto Wanita">
+              <span class="portrait-empty" id="emptyBride">Belum ada foto</span>
             </div>
             <div class="portrait-lbl">
               <span>Wanita</span>
               {% if inv.bride_photo_url %}
-              <label style="cursor:pointer;color:var(--red);font-size:.55rem;">
-                <input type="checkbox" name="clear_bride_photo" id="clearBride" value="1" style="width:11px;height:11px;" onchange="handleClear('bride',this.checked)"> Hapus
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;display:flex;align-items:center;gap:.2rem;">
+                <input type="checkbox" name="clear_bride_photo" id="clearBride" value="1"
+                  style="width:11px;height:11px;" onchange="handleClear('bride',this.checked)"> Hapus
               </label>
               {% endif %}
             </div>
-            <div style="padding:.4rem .5rem;border-top:1px solid var(--border);">
-              <input type="file" name="bride_photo" accept="image/*" style="font-size:.62rem;color:var(--muted);width:100%;"
-                onchange="previewPortrait(this,'imgBride','emptyBride')">
+            <div class="portrait-input">
+              <input type="file" name="bride_photo" accept="image/jpeg,image/png,image/webp"
+                onchange="previewPortrait(this,'imgBride','emptyBride','clearBride')">
             </div>
           </div>
+
         </div>
-        <div class="form-note">Maks. {{ 5 }}MB per foto. Format: JPG, PNG, WebP.</div>
+        <div class="form-note">Maks. 5MB per foto. Format: JPG, PNG, WebP.</div>
       </div>
     </div>
 
-    <!-- TANGGAL & TEMPAT -->
+    <!-- ── TANGGAL & TEMPAT ──────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Tanggal &amp; Tempat Acara</div></div>
       <div class="fs-body">
@@ -249,7 +273,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
     </div>
 
-    <!-- MAPS & LAINNYA -->
+    <!-- ── MAPS & LAINNYA ────────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Lokasi Maps &amp; Lainnya</div></div>
       <div class="fs-body">
@@ -260,46 +284,110 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="form-group" style="margin-bottom:.6rem;"><label>Kisah Cinta / Love Story</label>
           <textarea name="love_story" maxlength="2000" placeholder="Ceritakan bagaimana kalian bertemu...">{{ form.get('love_story', inv.love_story or '') }}</textarea>
         </div>
-        <div class="form-group"><label>URL Musik Latar</label>
-          <input type="url" name="music_url" value="{{ form.get('music_url', inv.music_url or '') }}" placeholder="https://..." maxlength="500">
-          <span class="form-note">Link langsung ke file .mp3 atau audio online.</span>
+
+        <!-- MUSIK LATAR -->
+        <div class="form-group">
+          <label>Musik Latar</label>
+          <div style="display:flex;gap:.3rem;margin-bottom:.5rem;">
+            <button type="button" id="btnModeUrl" class="music-tab" onclick="setMusicMode('url')">🔗 Paste URL</button>
+            <button type="button" id="btnModeUpload" class="music-tab" onclick="setMusicMode('upload')">⬆ Upload File</button>
+          </div>
+          <input type="hidden" name="music_mode" id="musicMode" value="{{ 'upload' if inv.music_file else 'url' }}">
+
+          <!-- URL Mode -->
+          <div id="musicUrlMode">
+            <input type="url" name="music_url" id="musicUrlInput"
+              value="{{ form.get('music_url', (inv.music_url or '') if not inv.music_file else '') }}"
+              placeholder="https://... (link langsung ke .mp3)" maxlength="500">
+            <span class="form-note">Paste link langsung ke file .mp3 atau audio online.</span>
+          </div>
+
+          <!-- Upload Mode -->
+          <div id="musicUploadMode">
+            {% if inv.music_file %}
+            <div id="existingMusicRow" style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--off);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;">
+              <span style="font-size:.65rem;color:var(--ink2);">🎵 {{ inv.music_file }}</span>
+              <button type="button" onclick="deleteExistingMusic()"
+                style="margin-left:auto;font-size:.58rem;color:var(--red);background:none;border:none;cursor:pointer;padding:0;">Hapus</button>
+            </div>
+            <input type="hidden" name="clear_music_file" id="clearMusicFile" value="">
+            {% endif %}
+
+            <div id="musicDropZone" class="drop-zone"
+              onclick="document.getElementById('musicFileInput').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="handleMusicDrop(event)">
+              <div id="musicDropLabel" style="font-size:.7rem;color:var(--muted);">Klik atau drag file audio ke sini</div>
+              <div style="font-size:.6rem;color:var(--faint);margin-top:.2rem;">MP3, OGG, WAV, M4A, AAC — maks. 15MB</div>
+            </div>
+            <input type="file" name="music_file" id="musicFileInput"
+              accept=".mp3,.ogg,.wav,.m4a,.aac,audio/mpeg,audio/ogg,audio/wav,audio/mp4,audio/aac"
+              style="display:none" onchange="handleMusicSelect(this)">
+
+            <div class="music-preview" id="musicPreview">
+              <span style="font-size:.75rem;">🎵</span>
+              <span id="musicPreviewName" style="font-size:.65rem;color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+              <span id="musicPreviewSize" style="font-size:.6rem;color:var(--muted);flex-shrink:0;"></span>
+              <button type="button" onclick="clearMusicPreview()"
+                style="font-size:.7rem;color:var(--red);background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;">✕</button>
+            </div>
+
+            <div class="consent-box" id="consentBox">
+              <label style="display:flex;gap:.5rem;align-items:flex-start;cursor:pointer;">
+                <input type="checkbox" id="musicConsent" name="music_consent" value="1"
+                  style="width:14px;height:14px;margin-top:.15rem;flex-shrink:0;accent-color:var(--accent);"
+                  {% if inv.music_file %}checked{% endif %}>
+                <span style="font-size:.65rem;color:var(--ink2);line-height:1.6;">
+                  Saya menyatakan memiliki <strong>hak atau izin</strong> untuk menggunakan musik ini, dan menyetujui
+                  <a href="/legal" target="_blank" style="color:var(--accent);text-decoration:underline;">Syarat &amp; Ketentuan</a>
+                  habarkita.com. Segala risiko pelanggaran hak cipta menjadi tanggung jawab saya.
+                </span>
+              </label>
+            </div>
+            <span class="form-note" style="color:var(--faint);">
+              Disarankan pakai musik bebas royalti:
+              <a href="https://pixabay.com/music/" target="_blank" style="color:var(--accent);">Pixabay Music</a>,
+              <a href="https://freemusicarchive.org" target="_blank" style="color:var(--accent);">Free Music Archive</a>.
+            </span>
+          </div>
         </div>
+
       </div>
     </div>
 
-    <!-- GALERI FOTO -->
+    <!-- ── GALERI FOTO ───────────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Galeri Foto</div></div>
       <div class="fs-body">
-        {# Foto yang sudah tersimpan #}
+
         {% if photos %}
         <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Foto Tersimpan</div>
         <div class="photo-grid" id="photoGrid">
           {% for p in photos %}
           <div class="photo-thumb" id="pt-{{ p.id }}">
-            <img src="{{ photo_src(p) }}" alt="foto">
-            <button type="button" class="photo-del" onclick="deletePhoto({{ p.id }}, this)" title="Hapus">&#x2715;</button>
+            <img src="{{ photo_src(p) }}" alt="foto" loading="lazy">
+            <button type="button" class="photo-del" onclick="deletePhoto({{ p.id }})" title="Hapus">&#x2715;</button>
           </div>
           {% endfor %}
         </div>
         {% endif %}
 
-        {# Upload baru #}
-        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;margin-top:{{ '.8rem' if photos else '0' }};">Upload Foto Baru</div>
+        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;{{ 'margin-top:.8rem;' if photos else '' }}">Upload Foto Baru</div>
 
-        {# Drop zone #}
-        <div id="dropZone" style="border:2px dashed var(--border);border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:.5rem;"
+        <div id="galleryDropZone" class="drop-zone"
           onclick="document.getElementById('photoInput').click()"
           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-          ondragleave="this.style.borderColor='var(--border)'"
-          ondrop="handleDrop(event)">
+          ondragleave="this.style.borderColor=''"
+          ondrop="handleGalleryDrop(event)">
           <div style="font-size:.7rem;color:var(--muted);">Klik atau drag foto ke sini</div>
           <div style="font-size:.6rem;color:var(--faint);margin-top:.2rem;">JPG, PNG, WebP — maks. 5MB per foto</div>
         </div>
-        <input type="file" id="photoInput" name="photos" accept="image/*" multiple style="display:none"
+        {# PENTING: input ini terpisah dari portrait. name="photos", multiple #}
+        <input type="file" id="photoInput" name="photos"
+          accept="image/jpeg,image/png,image/webp" multiple style="display:none"
           onchange="addPreviews(this.files)">
 
-        {# Preview grid foto baru (sebelum submit) #}
         <div id="newPhotoGrid" style="display:none;margin-bottom:.5rem;">
           <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Siap Diupload</div>
           <div class="photo-grid" id="newThumbs"></div>
@@ -309,7 +397,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
     </div>
 
-    <!-- AMPLOP DIGITAL -->
+    <!-- ── AMPLOP DIGITAL ────────────────────────────────────────────── -->
     <div class="form-section">
       <div class="fs-head"><div class="fs-title">Amplop Digital / Wedding Gift</div></div>
       <div class="fs-body">
@@ -318,8 +406,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div class="gift-item" id="gift-{{ i }}">
           <div style="font-size:.6rem;color:var(--muted);margin-bottom:.4rem;">Rekening/E-Wallet {{ i+1 }}</div>
           <div class="gift-tabs">
-            <button type="button" class="gtab {% if not g or g.bank_name %}active{% endif %}" onclick="setGiftType({{ i }},'bank',this)">Transfer Bank</button>
-            <button type="button" class="gtab {% if g and g.ewallet_type %}active{% endif %}" onclick="setGiftType({{ i }},'ewallet',this)">E-Wallet</button>
+            <button type="button" class="gtab {% if not g or g.bank_name %}active{% endif %}"
+              onclick="setGiftType({{ i }},'bank',this)">Transfer Bank</button>
+            <button type="button" class="gtab {% if g and g.ewallet_type %}active{% endif %}"
+              onclick="setGiftType({{ i }},'ewallet',this)">E-Wallet</button>
           </div>
           <input type="hidden" name="gift_{{ i }}_type" id="gtype_{{ i }}" value="{{ 'ewallet' if (g and g.ewallet_type) else 'bank' }}">
           <div id="gbank_{{ i }}" style="display:{{ 'none' if (g and g.ewallet_type) else 'block' }}">
@@ -356,114 +446,250 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <button type="submit" class="btn-save">Simpan Perubahan</button>
       <a href="/dashboard" class="btn-cancel">Batal</a>
     </div>
+
   </form>
 </div>
 
 <script>
-// ── Portrait preview ──────────────────────────────────────────────────────────
-function previewPortrait(input, imgId, emptyId){
-  const file = input.files[0];
-  if(!file) return;
-  const img = document.getElementById(imgId);
+/* ═══════════════════════════════════════════════════════════════
+   PORTRAIT
+   - img selalu ada di DOM dengan display:none (via CSS)
+   - JS tambahkan class .loaded untuk tampilkan
+   - previewPortrait: FileReader → src baru → .loaded
+   - handleClear: dim/undim foto saat checkbox hapus
+═══════════════════════════════════════════════════════════════ */
+function initPortrait(imgId, emptyId) {
+  const img   = document.getElementById(imgId);
   const empty = document.getElementById(emptyId);
+  // Pakai getAttribute agar tidak ter-resolve jadi window.location.href saat src kosong
+  const src = img ? img.getAttribute('src') : null;
+  if (!img || !src) return;
+  // src ada dari server — tunggu load
+  const show = () => {
+    img.classList.add('loaded');
+    if (empty) empty.style.display = 'none';
+  };
+  const hide = () => {
+    img.classList.remove('loaded');
+    if (empty) empty.style.display = '';
+  };
+  if (img.complete) {
+    img.naturalWidth > 0 ? show() : hide();
+  } else {
+    img.onload  = show;
+    img.onerror = hide;
+  }
+}
+
+function previewPortrait(input, imgId, emptyId, clearId) {
+  const file = input.files[0];
+  if (!file) return;
+  const img    = document.getElementById(imgId);
+  const empty  = document.getElementById(emptyId);
+  const clearCb = clearId ? document.getElementById(clearId) : null;
   const reader = new FileReader();
   reader.onload = e => {
     img.src = e.target.result;
-    img.style.display = 'block';
-    if(empty) empty.style.display = 'none';
+    img.classList.add('loaded');
+    img.style.opacity = '1';
+    if (empty)   empty.style.display  = 'none';
+    if (clearCb) clearCb.checked = false; // batalkan hapus jika upload baru
   };
   reader.readAsDataURL(file);
 }
 
-function handleClear(side, checked){
-  const imgId = side==='groom' ? 'imgGroom' : 'imgBride';
-  const emptyId = side==='groom' ? 'emptyGroom' : 'emptyBride';
-  const img = document.getElementById(imgId);
-  const empty = document.getElementById(emptyId);
-  if(checked){
-    if(img){ img.style.opacity='.3'; }
-  } else {
-    if(img){ img.style.opacity='1'; }
-  }
+function handleClear(side, checked) {
+  const img = document.getElementById(side === 'groom' ? 'imgGroom' : 'imgBride');
+  if (img) img.style.opacity = checked ? '.3' : '1';
 }
 
-// ── Gallery multi-upload preview ──────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════
+   GALLERY MULTI-UPLOAD
+   - stagedFiles hanya untuk gallery (name="photos")
+   - TIDAK menyentuh portrait input sama sekali
+   - removeStaged pakai index snapshot agar closure benar
+═══════════════════════════════════════════════════════════════ */
 let stagedFiles = new DataTransfer();
 
-function addPreviews(files){
-  for(const file of files){
-    if(!file.type.startsWith('image/')) continue;
-    stagedFiles.items.add(file);
+function addPreviews(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    stagedFiles.items.add(f);
   }
+  syncGalleryInput();
   renderPreviews();
-  // sync file input dengan staged files
-  document.getElementById('photoInput').files = stagedFiles.files;
 }
 
-function removeStaged(idx){
-  const dt = new DataTransfer();
+function syncGalleryInput() {
+  const inp = document.getElementById('photoInput');
+  if (inp) inp.files = stagedFiles.files;
+}
+
+function removeStaged(idx) {
+  const dt    = new DataTransfer();
   const files = stagedFiles.files;
-  for(let i=0;i<files.length;i++){
-    if(i!==idx) dt.items.add(files[i]);
+  for (let i = 0; i < files.length; i++) {
+    if (i !== idx) dt.items.add(files[i]);
   }
   stagedFiles = dt;
-  document.getElementById('photoInput').files = stagedFiles.files;
+  syncGalleryInput();
   renderPreviews();
 }
 
-function renderPreviews(){
-  const grid = document.getElementById('newThumbs');
-  const wrap = document.getElementById('newPhotoGrid');
+function renderPreviews() {
+  const grid  = document.getElementById('newThumbs');
+  const wrap  = document.getElementById('newPhotoGrid');
   const files = stagedFiles.files;
-  grid.innerHTML='';
-  if(files.length===0){ wrap.style.display='none'; return; }
-  wrap.style.display='block';
-  for(let i=0;i<files.length;i++){
-    const idx=i;
-    const div=document.createElement('div');
-    div.className='photo-thumb';
-    div.style.position='relative';
-    const img=document.createElement('img');
-    img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';
-    const reader=new FileReader();
-    reader.onload=e=>img.src=e.target.result;
+  grid.innerHTML = '';
+  if (files.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  for (let i = 0; i < files.length; i++) {
+    const idx    = i; // snapshot untuk closure
+    const thumb  = document.createElement('div');
+    thumb.className = 'photo-thumb';
+    const img    = document.createElement('img');
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
     reader.readAsDataURL(files[i]);
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='photo-del';
-    btn.innerHTML='&#x2715;';
-    btn.title='Batalkan';
-    btn.onclick=()=>removeStaged(idx);
-    div.appendChild(img);
-    div.appendChild(btn);
-    grid.appendChild(div);
+    const btn    = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'photo-del';
+    btn.innerHTML = '&#x2715;';
+    btn.title     = 'Batalkan';
+    btn.onclick   = () => removeStaged(idx);
+    thumb.appendChild(img);
+    thumb.appendChild(btn);
+    grid.appendChild(thumb);
   }
 }
 
-function handleDrop(e){
+function handleGalleryDrop(e) {
   e.preventDefault();
-  document.getElementById('dropZone').style.borderColor='var(--border)';
+  document.getElementById('galleryDropZone').style.borderColor = '';
   addPreviews(e.dataTransfer.files);
 }
 
-function setGiftType(i,type,btn){
-  document.getElementById('gtype_'+i).value=type;
-  document.getElementById('gbank_'+i).style.display=type==='bank'?'block':'none';
-  document.getElementById('gewallet_'+i).style.display=type==='ewallet'?'block':'none';
-  btn.closest('.gift-tabs').querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
+function deletePhoto(pid) {
+  if (!confirm('Hapus foto ini?')) return;
+  fetch('/dashboard/photo/delete/' + pid, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => { if (d.success) document.getElementById('pt-' + pid)?.remove(); });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MUSIK
+═══════════════════════════════════════════════════════════════ */
+function setMusicMode(mode) {
+  document.getElementById('musicMode').value = mode;
+  document.getElementById('musicUrlMode').style.display    = mode === 'url'    ? 'block' : 'none';
+  document.getElementById('musicUploadMode').style.display = mode === 'upload' ? 'block' : 'none';
+  document.querySelectorAll('.music-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(mode === 'url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active');
+  if (mode === 'upload') {
+    const u = document.getElementById('musicUrlInput');
+    if (u) u.value = '';
+  }
+}
+
+function handleMusicSelect(input) {
+  if (input.files[0]) showMusicPreview(input.files[0]);
+}
+
+function handleMusicDrop(e) {
+  e.preventDefault();
+  document.getElementById('musicDropZone').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['mp3','ogg','wav','m4a','aac'].includes(ext)) {
+    alert('Format tidak didukung. Gunakan MP3, OGG, WAV, M4A, atau AAC.');
+    return;
+  }
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  document.getElementById('musicFileInput').files = dt.files;
+  showMusicPreview(file);
+}
+
+function showMusicPreview(file) {
+  if (file.size > 15 * 1024 * 1024) {
+    alert('File terlalu besar. Maks. 15MB.');
+    document.getElementById('musicFileInput').value = '';
+    return;
+  }
+  document.getElementById('musicPreviewName').textContent = file.name;
+  document.getElementById('musicPreviewSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+  document.getElementById('musicPreview').style.display   = 'flex';
+  document.getElementById('musicDropLabel').textContent   = 'Ganti file';
+  document.getElementById('musicDropZone').style.borderColor = 'var(--accent)';
+}
+
+function clearMusicPreview() {
+  document.getElementById('musicFileInput').value            = '';
+  document.getElementById('musicPreview').style.display     = 'none';
+  document.getElementById('musicDropLabel').textContent     = 'Klik atau drag file audio ke sini';
+  document.getElementById('musicDropZone').style.borderColor = '';
+}
+
+function deleteExistingMusic() {
+  if (!confirm('Hapus file musik yang tersimpan?')) return;
+  const cf  = document.getElementById('clearMusicFile');
+  const row = document.getElementById('existingMusicRow');
+  const cb  = document.getElementById('musicConsent');
+  if (cf)  cf.value           = '1';
+  if (row) row.style.display  = 'none';
+  if (cb)  cb.checked         = false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GIFTS
+═══════════════════════════════════════════════════════════════ */
+function setGiftType(i, type, btn) {
+  document.getElementById('gtype_' + i).value           = type;
+  document.getElementById('gbank_' + i).style.display    = type === 'bank'    ? 'block' : 'none';
+  document.getElementById('gewallet_' + i).style.display = type === 'ewallet' ? 'block' : 'none';
+  btn.closest('.gift-tabs').querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
-function deletePhoto(pid, btn){
-  if(!confirm('Hapus foto ini?'))return;
-  fetch('/dashboard/photo/delete/'+pid,{method:'POST'})
-    .then(r=>r.json()).then(d=>{
-      if(d.success) document.getElementById('pt-'+pid)?.remove();
-    });
-}
-// Scroll selected theme into view
-window.addEventListener('load',()=>{
-  const sel=document.querySelector('.tl-item.selected');
-  if(sel) setTimeout(()=>sel.scrollIntoView({block:'nearest'}),100);
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT — satu DOMContentLoaded, semua logic di sini
+═══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Portrait: init visibilitas dari server
+  initPortrait('imgGroom', 'emptyGroom');
+  initPortrait('imgBride',  'emptyBride');
+
+  // Music: set tampilan awal sesuai mode tersimpan
+  const mode = document.getElementById('musicMode').value;
+  document.getElementById('musicUrlMode').style.display    = mode === 'url'    ? 'block' : 'none';
+  document.getElementById('musicUploadMode').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById(mode === 'url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active');
+
+  // Scroll tema terpilih ke tengah (jika ada daftar tema)
+  const sel = document.querySelector('.tl-item.selected');
+  if (sel) setTimeout(() => sel.scrollIntoView({ block: 'nearest' }), 100);
+
+  // Submit guard: cek consent musik sebelum kirim
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const mode = document.getElementById('musicMode').value;
+    if (mode !== 'upload') return;
+    const fileInput = document.getElementById('musicFileInput');
+    const hasNew    = fileInput && fileInput.files && fileInput.files.length > 0;
+    const row       = document.getElementById('existingMusicRow');
+    const hasExist  = row && row.style.display !== 'none';
+    const consent   = document.getElementById('musicConsent');
+    if ((hasNew || hasExist) && consent && !consent.checked) {
+      e.preventDefault();
+      const box = document.getElementById('consentBox');
+      box.style.outline = '2px solid var(--red)';
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { box.style.outline = ''; }, 2500);
+    }
+  });
+
 });
 </script>
 </body>

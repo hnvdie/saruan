@@ -22,16 +22,20 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 BASE_DIR        = Path(__file__).parent
 DB_PATH         = BASE_DIR / 'data' / 'undangan.db'
 UPLOAD_DIR           = BASE_DIR / 'static' / 'uploads' / 'invitations'
+MUSIC_UPLOAD_DIR     = BASE_DIR / 'static' / 'uploads' / 'music'
 THEMES_DIR           = BASE_DIR / 'themes'
 DEMO_PHOTOS_DIR      = BASE_DIR / 'static' / 'demo-photos'
 DEMO_PORTRAIT_DIR    = BASE_DIR / 'static' / 'demo-photos' / 'individual'  # groom.*/bride.* khusus preview
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+MUSIC_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 DEMO_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 DEMO_PORTRAIT_DIR.mkdir(parents=True, exist_ok=True)
 
-MAX_UPLOAD_MB   = 5
-ALLOWED_EXT     = {'jpg','jpeg','png','webp'}
+MAX_UPLOAD_MB        = 5
+ALLOWED_EXT          = {'jpg','jpeg','png','webp'}
+MAX_MUSIC_MB         = 15
+ALLOWED_MUSIC_EXT    = {'mp3','ogg','wav','m4a','aac'}
 MAX_PHOTOS      = 10
 SESSION_HOURS   = 8
 
@@ -241,6 +245,7 @@ def init_db():
         ('invitation_photos', 'is_url INTEGER DEFAULT 0'),
         ('invitations', 'groom_photo TEXT'),   # filename di UPLOAD_DIR
         ('invitations', 'bride_photo TEXT'),   # filename di UPLOAD_DIR
+        ('invitations', 'music_file TEXT'),    # filename di MUSIC_UPLOAD_DIR
     ]
     for table, coldef in migrations:
         try: c.execute(f'ALTER TABLE {table} ADD COLUMN {coldef}')
@@ -252,6 +257,11 @@ def allowed_file(fn): return '.' in fn and fn.rsplit('.',1)[1].lower() in ALLOWE
 def secure_name(fn):
     ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'jpg'
     return f'{uuid.uuid4().hex}.{ext}'
+
+def allowed_music(fn): return '.' in fn and fn.rsplit('.',1)[1].lower() in ALLOWED_MUSIC_EXT
+def secure_music_name(fn):
+    ext = fn.rsplit('.',1)[1].lower() if '.' in fn else 'mp3'
+    return f'music_{uuid.uuid4().hex}.{ext}'
 
 _THEME_DEFAULTS = {
     'name': '', 'description': '',
@@ -949,13 +959,16 @@ def admin_delete(inv_id):
     # Hapus file gallery
     for p in conn.execute('SELECT * FROM invitation_photos WHERE invitation_id=?',(inv_id,)).fetchall():
         delete_photo_file(dict(p))
-    # Hapus file portrait (groom_photo & bride_photo)
-    inv_row = conn.execute('SELECT groom_photo, bride_photo FROM invitations WHERE id=?',(inv_id,)).fetchone()
+    # Hapus file portrait + musik
+    inv_row = conn.execute('SELECT groom_photo, bride_photo, music_file FROM invitations WHERE id=?',(inv_id,)).fetchone()
     if inv_row:
         for col in ('groom_photo', 'bride_photo'):
             if inv_row[col]:
                 try: (UPLOAD_DIR / inv_row[col]).unlink(missing_ok=True)
                 except: pass
+        if inv_row['music_file']:
+            try: (MUSIC_UPLOAD_DIR / inv_row['music_file']).unlink(missing_ok=True)
+            except: pass
     # Cascade delete semua data + row undangan (hard delete supaya storage bersih)
     conn.execute('DELETE FROM rsvp WHERE invitation_id=?',(inv_id,))
     conn.execute('DELETE FROM gifts WHERE invitation_id=?',(inv_id,))
@@ -971,7 +984,7 @@ def _do_cleanup():
     try:
         conn = get_db()
         rows = conn.execute(
-            'SELECT id, groom_name, bride_name, expires_at, groom_photo, bride_photo '
+            'SELECT id, groom_name, bride_name, expires_at, groom_photo, bride_photo, music_file '
             'FROM invitations WHERE expires_at IS NOT NULL AND expires_at < ?', (cutoff,)
         ).fetchall()
         deleted = 0
@@ -985,6 +998,9 @@ def _do_cleanup():
                     if inv[col]:
                         try: (UPLOAD_DIR / inv[col]).unlink(missing_ok=True)
                         except: pass
+                if inv['music_file']:
+                    try: (MUSIC_UPLOAD_DIR / inv['music_file']).unlink(missing_ok=True)
+                    except: pass
                 conn.execute('DELETE FROM rsvp              WHERE invitation_id=?',(inv_id,))
                 conn.execute('DELETE FROM gifts             WHERE invitation_id=?',(inv_id,))
                 conn.execute('DELETE FROM invitation_photos WHERE invitation_id=?',(inv_id,))
@@ -1721,6 +1737,40 @@ def user_edit():
                     errors.append('Format tanggal tidak valid.')
 
         if not errors:
+            # Handle music: file upload takes priority over URL
+            music_url_final = c['music_url']
+            music_file_final = dict(inv).get('music_file') or None  # keep existing by default
+
+            music_mode = request.form.get('music_mode', 'url')
+            if music_mode == 'upload':
+                music_file = request.files.get('music_file')
+                if music_file and music_file.filename:
+                    if not allowed_music(music_file.filename):
+                        errors.append('Format musik tidak didukung. Gunakan MP3, OGG, WAV, M4A, atau AAC.')
+                    elif music_file.content_length and music_file.content_length > MAX_MUSIC_MB * 1024 * 1024:
+                        errors.append(f'File musik maks. {MAX_MUSIC_MB}MB.')
+                    else:
+                        if music_file_final:
+                            try: (MUSIC_UPLOAD_DIR / music_file_final).unlink(missing_ok=True)
+                            except: pass
+                        fname = secure_music_name(music_file.filename)
+                        music_file.save(str(MUSIC_UPLOAD_DIR / fname))
+                        music_file_final = fname
+                        music_url_final = f'/static/uploads/music/{fname}'
+                elif request.form.get('clear_music_file'):
+                    if music_file_final:
+                        try: (MUSIC_UPLOAD_DIR / music_file_final).unlink(missing_ok=True)
+                        except: pass
+                    music_file_final = None
+                    music_url_final = ''
+            else:
+                # URL mode — if user had an uploaded file and now switches to URL, clear the file
+                if music_file_final and c['music_url'] and not c['music_url'].startswith('/static/uploads/music/'):
+                    try: (MUSIC_UPLOAD_DIR / music_file_final).unlink(missing_ok=True)
+                    except: pass
+                    music_file_final = None
+
+        if not errors:
             conn = get_db()
             conn.execute('''UPDATE invitations SET
                 theme_id=?, groom_name=?, bride_name=?,
@@ -1728,7 +1778,7 @@ def user_edit():
                 show_parents=?,
                 akad_date=?, akad_time=?, akad_venue=?, akad_address=?,
                 resepsi_date=?, resepsi_time=?, resepsi_venue=?, resepsi_address=?,
-                maps_url=?, maps_embed=?, love_story=?, music_url=?,
+                maps_url=?, maps_embed=?, love_story=?, music_url=?, music_file=?,
                 expires_at=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=?''', (
                 tid,
@@ -1743,7 +1793,8 @@ def user_edit():
                 c['maps_url'],
                 extract_maps_embed_src(c['maps_url']),
                 c['love_story'],
-                c['music_url'],
+                music_url_final,
+                music_file_final,
                 _calc_expiry_capped(resepsi_date, inv['created_at']),
                 inv_id))
             # Gifts
@@ -1775,7 +1826,10 @@ def user_edit():
             conn.commit(); conn.close()
             return redirect(url_for('user_dashboard') + '?saved=1')
 
-    inv2 = dict(inv) if not errors else {**dict(inv), **dict(request.form)}
+    # Inject portrait URLs agar template bisa tampilkan foto yang sudah tersimpan
+    inv = dict(inv)
+    inv['groom_photo_url'] = f'/uploads/{inv["groom_photo"]}' if inv.get('groom_photo') else None
+    inv['bride_photo_url']  = f'/uploads/{inv["bride_photo"]}'  if inv.get('bride_photo')  else None
     return render_template('user_edit.html', inv=inv, photos=photos, gifts=gifts,
                            themes=themes, expired=expired, errors=errors, form=request.form if errors else {})
 
@@ -1789,6 +1843,21 @@ def user_delete_photo(pid):
     if photo:
         delete_photo_file(photo)
         conn.execute('DELETE FROM invitation_photos WHERE id=?', (pid,))
+        conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# ── /dashboard/music/delete ───────────────────────────────────────────────────
+@app.route('/dashboard/music/delete', methods=['POST'])
+@user_login_required
+def user_delete_music():
+    inv_id = session['user_inv_id']
+    conn = get_db()
+    inv = conn.execute('SELECT music_file FROM invitations WHERE id=?', (inv_id,)).fetchone()
+    if inv and inv['music_file']:
+        try: (MUSIC_UPLOAD_DIR / inv['music_file']).unlink(missing_ok=True)
+        except: pass
+        conn.execute('UPDATE invitations SET music_file=NULL, music_url=NULL WHERE id=?', (inv_id,))
         conn.commit()
     conn.close()
     return jsonify({'success': True})
