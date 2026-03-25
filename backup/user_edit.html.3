@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Edit Undangan — {{ site_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--off2:#f2f0ec;--border:#e5e2db;--border2:#ede9e2;--ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--red:#c0392b;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.nav-back{font-size:.67rem;color:var(--muted);transition:color .2s;}
+.nav-back:hover{color:var(--ink);}
+.wrap{max-width:760px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+.page-head{margin-bottom:1.2rem;padding-bottom:.9rem;border-bottom:1px solid var(--border);}
+.page-label{font-size:.56rem;letter-spacing:.45em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem;}
+.page-title{font-family:var(--serif);font-size:clamp(1.4rem,4vw,2rem);font-weight:300;}
+.page-title em{font-style:italic;color:var(--accent);}
+.error-box{background:#fff5f5;border:1px solid #f5c6c6;border-radius:3px;padding:.75rem 1rem;margin-bottom:1rem;}
+.error-box p{font-size:.7rem;color:var(--red);line-height:1.7;}
+.exp-lock{background:#fffbf0;border:1px solid #f5e0a0;border-radius:3px;padding:.6rem .9rem;margin-bottom:1rem;font-size:.7rem;color:#8a6d0a;line-height:1.5;}
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:.85rem;overflow:hidden;}
+.fs-head{padding:.6rem 1rem;border-bottom:1px solid var(--border);background:var(--off);}
+.fs-title{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.fs-body{padding:.9rem 1rem;}
+.form-row{display:grid;gap:.55rem;margin-bottom:.55rem;}
+.form-row:last-child{margin-bottom:0;}
+.form-row-2{grid-template-columns:1fr 1fr;}
+.form-row-3{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:.2rem;}
+label{font-size:.63rem;color:var(--ink2);letter-spacing:.02em;}
+input[type=text],input[type=date],input[type=time],input[type=url],textarea,select{padding:.46rem .62rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.75rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s;width:100%;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+input::placeholder,textarea::placeholder{color:var(--faint);}
+input[disabled]{background:var(--off2);color:var(--muted);cursor:not-allowed;}
+textarea{resize:vertical;min-height:75px;}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8a8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.7rem;}
+.form-note{font-size:.6rem;color:var(--muted);line-height:1.5;}
+.check-row{display:flex;align-items:center;gap:.35rem;}
+.check-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--accent);}
+.check-row label{font-size:.68rem;cursor:pointer;margin-bottom:0;}
+/* THEME SELECTOR */
+.ts-wrap{position:relative;margin-bottom:.45rem;}
+.ts-input{width:100%;padding:.45rem .62rem .45rem 1.7rem;border:1px solid var(--border);border-radius:2px;font-family:var(--sans);font-size:.73rem;color:var(--ink);outline:none;transition:border-color .15s;}
+.ts-input:focus{border-color:var(--accent);}
+.ts-ico{position:absolute;left:.5rem;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--faint);pointer-events:none;}
+.tlist{border:1px solid var(--border);border-radius:2px;max-height:180px;overflow-y:auto;}
+.tl-item{padding:.42rem .7rem;font-size:.68rem;cursor:pointer;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;transition:background .12s;}
+.tl-item:last-child{border-bottom:none;}
+.tl-item:hover{background:var(--off);}
+.tl-item.selected{background:rgba(160,140,126,.1);color:var(--accent);}
+.tl-price{font-size:.6rem;color:var(--accent);}
+/* PHOTOS */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.35rem;margin-bottom:.5rem;}
+.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-del{position:absolute;top:.12rem;right:.12rem;width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;}
+/* PORTRAIT */
+.portrait-pair{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.5rem;}
+.portrait-box{border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.portrait-img{aspect-ratio:3/4;background:var(--off2);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--muted);}
+.portrait-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.portrait-lbl{padding:.28rem .5rem;background:var(--off);border-top:1px solid var(--border);font-size:.58rem;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+/* GIFTS */
+.gift-item{border:1px solid var(--border2);border-radius:2px;padding:.6rem .7rem;margin-bottom:.45rem;}
+.gift-tabs{display:flex;gap:.22rem;margin-bottom:.5rem;}
+.gtab{padding:.18rem .5rem;border:1px solid var(--border);border-radius:2px;font-size:.57rem;cursor:pointer;color:var(--muted);background:none;font-family:var(--sans);transition:all .12s;}
+.gtab.active{border-color:var(--accent);color:var(--accent);background:rgba(160,140,126,.06);}
+/* SUBMIT */
+.submit-bar{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.btn-save{padding:.56rem 1.3rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
+.btn-save:hover{opacity:.82;}
+.btn-cancel{padding:.56rem .9rem;border:1px solid var(--border);color:var(--muted);border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:none;transition:all .2s;}
+.btn-cancel:hover{border-color:var(--ink);color:var(--ink);}
+@media(max-width:560px){.form-row-2,.form-row-3{grid-template-columns:1fr;}}
+.active-tab{border-color:var(--accent)!important;color:var(--accent)!important;background:rgba(160,140,126,.08)!important;}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+  <a href="/dashboard" class="nav-back">&larr; Dashboard</a>
+</nav>
+<div class="wrap">
+  <div class="page-head">
+    <span class="page-label">Edit Undangan</span>
+    <h1 class="page-title">{{ inv.groom_name }} <em>&amp;</em> {{ inv.bride_name }}</h1>
+  </div>
+
+  {% if expired %}
+  <div class="exp-lock">⚠ Dashboard sudah expired — tanggal acara tidak bisa diubah. Nama, tema, dan data lain masih bisa disimpan.</div>
+  {% endif %}
+
+  {% if errors %}
+  <div class="error-box">{% for e in errors %}<p>• {{ e }}</p>{% endfor %}</div>
+  {% endif %}
+
+  <form method="POST" action="/dashboard/edit" enctype="multipart/form-data">
+
+    <!-- TEMA -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Tema Undangan</div></div>
+      <div class="fs-body">
+        {%- set current_theme = themes | selectattr('id','equalto', inv.theme_id) | first | default(None) -%}
+        <div style="display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;background:var(--off);border:1px solid var(--border);border-radius:3px;">
+          {% if current_theme and current_theme.get('demo_photos') %}
+          <div style="width:44px;height:44px;border-radius:2px;overflow:hidden;flex-shrink:0;">
+            <img src="{{ current_theme.demo_photos[0] }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+          </div>
+          {% endif %}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.78rem;font-weight:400;">{{ current_theme.name if current_theme else inv.theme_id }}</div>
+            <div style="font-size:.63rem;color:var(--muted);margin-top:.1rem;">Tema tidak bisa diubah — hubungi admin jika perlu ganti tema.</div>
+          </div>
+          <div style="font-size:.6rem;color:var(--faint);letter-spacing:.05em;">🔒 TERKUNCI</div>
+        </div>
+        {# hidden input tetap dikirim supaya UPDATE tidak error, tapi backend ignore nilainya #}
+        <input type="hidden" name="theme_id" value="{{ inv.theme_id }}">
+      </div>
+    </div>
+
+    <!-- MEMPELAI -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Data Mempelai</div></div>
+      <div class="fs-body">
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Nama Panggilan Pria *</label>
+            <input type="text" name="groom_name" value="{{ form.get('groom_name', inv.groom_name) }}" required maxlength="100" placeholder="cth: Rizky"></div>
+          <div class="form-group"><label>Nama Panggilan Wanita *</label>
+            <input type="text" name="bride_name" value="{{ form.get('bride_name', inv.bride_name) }}" required maxlength="100" placeholder="cth: Alya"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Nama Lengkap Pria</label>
+            <input type="text" name="groom_full" value="{{ form.get('groom_full', inv.groom_full or '') }}" maxlength="200" placeholder="Nama lengkap beserta bin/binti"></div>
+          <div class="form-group"><label>Nama Lengkap Wanita</label>
+            <input type="text" name="bride_full" value="{{ form.get('bride_full', inv.bride_full or '') }}" maxlength="200" placeholder="Nama lengkap beserta bin/binti"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Orang Tua Pria</label>
+            <input type="text" name="groom_parents" value="{{ form.get('groom_parents', inv.groom_parents or '') }}" maxlength="300" placeholder="Bpk. Ahmad & Ibu Siti"></div>
+          <div class="form-group"><label>Orang Tua Wanita</label>
+            <input type="text" name="bride_parents" value="{{ form.get('bride_parents', inv.bride_parents or '') }}" maxlength="300" placeholder="Bpk. Hasan & Ibu Fatimah"></div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" name="show_parents" id="showParents" value="1" {{ 'checked' if (form.get('show_parents') if form else inv.show_parents) }}>
+          <label for="showParents">Tampilkan nama orang tua di undangan</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOTO PORTRAIT -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Foto Mempelai</div></div>
+      <div class="fs-body">
+        <div class="portrait-pair">
+          <!-- PRIA -->
+          <div class="portrait-box">
+            <div class="portrait-img" id="previewGroom">
+              {% if inv.groom_photo_url %}
+                <img src="{{ inv.groom_photo_url }}" alt="Foto Pria" id="imgGroom"
+                  onerror="this.style.display='none';document.getElementById('emptyGroom').style.display='';">
+                <span id="emptyGroom" style="display:none;">Belum ada foto</span>
+              {% else %}
+                <img id="imgGroom" style="display:none;">
+                <span id="emptyGroom">Belum ada foto</span>
+              {% endif %}
+            </div>
+            <div class="portrait-lbl">
+              <span>Pria</span>
+              {% if inv.groom_photo_url %}
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;">
+                <input type="checkbox" name="clear_groom_photo" id="clearGroom" value="1" style="width:11px;height:11px;" onchange="handleClear('groom',this.checked)"> Hapus
+              </label>
+              {% endif %}
+            </div>
+            <div style="padding:.4rem .5rem;border-top:1px solid var(--border);">
+              <input type="file" name="groom_photo" accept="image/*" style="font-size:.62rem;color:var(--muted);width:100%;"
+                onchange="previewPortrait(this,'imgGroom','emptyGroom')">
+            </div>
+          </div>
+          <!-- WANITA -->
+          <div class="portrait-box">
+            <div class="portrait-img" id="previewBride">
+              {% if inv.bride_photo_url %}
+                <img src="{{ inv.bride_photo_url }}" alt="Foto Wanita" id="imgBride"
+                  onerror="this.style.display='none';document.getElementById('emptyBride').style.display='';">
+                <span id="emptyBride" style="display:none;">Belum ada foto</span>
+              {% else %}
+                <img id="imgBride" style="display:none;">
+                <span id="emptyBride">Belum ada foto</span>
+              {% endif %}
+            </div>
+            <div class="portrait-lbl">
+              <span>Wanita</span>
+              {% if inv.bride_photo_url %}
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;">
+                <input type="checkbox" name="clear_bride_photo" id="clearBride" value="1" style="width:11px;height:11px;" onchange="handleClear('bride',this.checked)"> Hapus
+              </label>
+              {% endif %}
+            </div>
+            <div style="padding:.4rem .5rem;border-top:1px solid var(--border);">
+              <input type="file" name="bride_photo" accept="image/*" style="font-size:.62rem;color:var(--muted);width:100%;"
+                onchange="previewPortrait(this,'imgBride','emptyBride')">
+            </div>
+          </div>
+        </div>
+        <div class="form-note">Maks. {{ 5 }}MB per foto. Format: JPG, PNG, WebP.</div>
+      </div>
+    </div>
+
+    <!-- TANGGAL & TEMPAT -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Tanggal &amp; Tempat Acara</div></div>
+      <div class="fs-body">
+        <div style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;">Akad Nikah</div>
+        <div class="form-row form-row-3">
+          <div class="form-group"><label>Tanggal Akad</label>
+            <input type="date" name="akad_date" value="{{ form.get('akad_date', inv.akad_date or '') }}" {% if expired %}disabled{% endif %}></div>
+          <div class="form-group"><label>Jam</label>
+            <input type="time" name="akad_time" value="{{ form.get('akad_time', inv.akad_time or '') }}"></div>
+          <div class="form-group"><label>Tempat</label>
+            <input type="text" name="akad_venue" value="{{ form.get('akad_venue', inv.akad_venue or '') }}" placeholder="Nama masjid / gedung" maxlength="200"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:.75rem;">
+          <div class="form-group"><label>Alamat Akad</label>
+            <input type="text" name="akad_address" value="{{ form.get('akad_address', inv.akad_address or '') }}" placeholder="Alamat lengkap" maxlength="500"></div>
+        </div>
+        <div style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;">Resepsi</div>
+        <div class="form-row form-row-3">
+          <div class="form-group"><label>Tanggal Resepsi *</label>
+            <input type="date" name="resepsi_date" value="{{ form.get('resepsi_date', inv.resepsi_date or '') }}"
+              {% if expired %}disabled
+              {% else %}min="{{ now.strftime('%Y-%m-%d') }}" max="{{ (now.replace(year=now.year+1)).strftime('%Y-%m-%d') }}"{% endif %}
+              required></div>
+          <div class="form-group"><label>Jam</label>
+            <input type="time" name="resepsi_time" value="{{ form.get('resepsi_time', inv.resepsi_time or '') }}"></div>
+          <div class="form-group"><label>Tempat</label>
+            <input type="text" name="resepsi_venue" value="{{ form.get('resepsi_venue', inv.resepsi_venue or '') }}" placeholder="Nama gedung / ballroom" maxlength="200"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Alamat Resepsi</label>
+            <input type="text" name="resepsi_address" value="{{ form.get('resepsi_address', inv.resepsi_address or '') }}" placeholder="Alamat lengkap" maxlength="500"></div>
+        </div>
+        {% if not expired %}
+        <div class="form-note" style="margin-top:.2rem;">Dashboard expired 3 hari setelah tanggal resepsi. Maks. 1 tahun ke depan.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- MAPS & LAINNYA -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Lokasi Maps &amp; Lainnya</div></div>
+      <div class="fs-body">
+        <div class="form-group" style="margin-bottom:.6rem;"><label>URL Google Maps</label>
+          <input type="url" name="maps_url" value="{{ form.get('maps_url', inv.maps_url or '') }}" placeholder="https://maps.google.com/..." maxlength="500">
+          <span class="form-note">Paste URL dari Google Maps — otomatis diembed di undangan.</span>
+        </div>
+        <div class="form-group" style="margin-bottom:.6rem;"><label>Kisah Cinta / Love Story</label>
+          <textarea name="love_story" maxlength="2000" placeholder="Ceritakan bagaimana kalian bertemu...">{{ form.get('love_story', inv.love_story or '') }}</textarea>
+        </div>
+        <div class="form-group"><label>Musik Latar</label>
+
+          <!-- Toggle Mode -->
+          <div style="display:flex;gap:.3rem;margin-bottom:.5rem;">
+            <button type="button" id="btnModeUrl" onclick="setMusicMode('url')"
+              style="padding:.22rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;cursor:pointer;font-family:var(--sans);transition:all .15s;"
+              class="music-tab {% if not inv.music_file %}active-tab{% endif %}">🔗 Paste URL</button>
+            <button type="button" id="btnModeUpload" onclick="setMusicMode('upload')"
+              style="padding:.22rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;cursor:pointer;font-family:var(--sans);transition:all .15s;"
+              class="music-tab {% if inv.music_file %}active-tab{% endif %}">⬆ Upload File</button>
+          </div>
+          <input type="hidden" name="music_mode" id="musicMode" value="{{ 'upload' if inv.music_file else 'url' }}">
+
+          <!-- URL Mode -->
+          <div id="musicUrlMode" style="display:{{ 'none' if inv.music_file else 'block' }}">
+            <input type="url" name="music_url" id="musicUrlInput"
+              value="{{ form.get('music_url', inv.music_url or '') if not inv.music_file else '' }}"
+              placeholder="https://... (link langsung ke .mp3)" maxlength="500">
+            <span class="form-note">Paste link langsung ke file .mp3 atau audio online.</span>
+          </div>
+
+          <!-- Upload Mode -->
+          <div id="musicUploadMode" style="display:{{ 'block' if inv.music_file else 'none' }}">
+            {% if inv.music_file %}
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--off);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;">
+              <span style="font-size:.65rem;color:var(--ink2);">🎵 {{ inv.music_file }}</span>
+              <button type="button" onclick="deleteMusicFile()" style="margin-left:auto;font-size:.58rem;color:var(--red);background:none;border:none;cursor:pointer;padding:0;">Hapus</button>
+            </div>
+            <input type="hidden" name="clear_music_file" id="clearMusicFile" value="">
+            {% endif %}
+            <input type="file" name="music_file" id="musicFileInput" accept=".mp3,.ogg,.wav,.m4a,.aac"
+              style="font-size:.62rem;color:var(--muted);width:100%;">
+            <span class="form-note">Format: MP3, OGG, WAV, M4A, AAC — maks. 15MB.<br>
+              ⚠ <strong>Pastikan kamu memiliki hak untuk menggunakan musik ini.</strong> Dengan mengupload, kamu menyatakan bahwa file ini bebas hak cipta atau kamu telah mendapatkan izin dari pemegang hak.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- GALERI FOTO -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Galeri Foto</div></div>
+      <div class="fs-body">
+        {# Foto yang sudah tersimpan #}
+        {% if photos %}
+        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Foto Tersimpan</div>
+        <div class="photo-grid" id="photoGrid">
+          {% for p in photos %}
+          <div class="photo-thumb" id="pt-{{ p.id }}">
+            <img src="{{ photo_src(p) }}" alt="foto">
+            <button type="button" class="photo-del" onclick="deletePhoto({{ p.id }}, this)" title="Hapus">&#x2715;</button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Upload baru #}
+        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;margin-top:{{ '.8rem' if photos else '0' }};">Upload Foto Baru</div>
+
+        {# Drop zone #}
+        <div id="dropZone" style="border:2px dashed var(--border);border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:.5rem;"
+          onclick="document.getElementById('photoInput').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+          ondragleave="this.style.borderColor='var(--border)'"
+          ondrop="handleDrop(event)">
+          <div style="font-size:.7rem;color:var(--muted);">Klik atau drag foto ke sini</div>
+          <div style="font-size:.6rem;color:var(--faint);margin-top:.2rem;">JPG, PNG, WebP — maks. 5MB per foto</div>
+        </div>
+        <input type="file" id="photoInput" name="photos" accept="image/*" multiple style="display:none"
+          onchange="addPreviews(this.files)">
+
+        {# Preview grid foto baru (sebelum submit) #}
+        <div id="newPhotoGrid" style="display:none;margin-bottom:.5rem;">
+          <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Siap Diupload</div>
+          <div class="photo-grid" id="newThumbs"></div>
+        </div>
+
+        <span class="form-note">Total maks. 10 foto. Bisa pilih banyak sekaligus.</span>
+      </div>
+    </div>
+
+    <!-- AMPLOP DIGITAL -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Amplop Digital / Wedding Gift</div></div>
+      <div class="fs-body">
+        {% for i in range(4) %}
+        {% set g = gifts[i] if i < gifts|length else None %}
+        <div class="gift-item" id="gift-{{ i }}">
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:.4rem;">Rekening/E-Wallet {{ i+1 }}</div>
+          <div class="gift-tabs">
+            <button type="button" class="gtab {% if not g or g.bank_name %}active{% endif %}" onclick="setGiftType({{ i }},'bank',this)">Transfer Bank</button>
+            <button type="button" class="gtab {% if g and g.ewallet_type %}active{% endif %}" onclick="setGiftType({{ i }},'ewallet',this)">E-Wallet</button>
+          </div>
+          <input type="hidden" name="gift_{{ i }}_type" id="gtype_{{ i }}" value="{{ 'ewallet' if (g and g.ewallet_type) else 'bank' }}">
+          <div id="gbank_{{ i }}" style="display:{{ 'none' if (g and g.ewallet_type) else 'block' }}">
+            <div class="form-row form-row-2">
+              <div class="form-group"><label>Nama Bank</label>
+                <input type="text" name="gift_{{ i }}_bank_name" value="{{ g.bank_name if (g and g.bank_name) else '' }}" placeholder="BCA, BRI, Mandiri..." maxlength="50"></div>
+              <div class="form-group"><label>No. Rekening</label>
+                <input type="text" name="gift_{{ i }}_account_number" value="{{ g.account_number if (g and g.account_number) else '' }}" placeholder="0123456789" maxlength="50"></div>
+            </div>
+            <div class="form-group"><label>Atas Nama</label>
+              <input type="text" name="gift_{{ i }}_account_name" value="{{ g.account_name if (g and g.account_name) else '' }}" placeholder="Nama pemilik rekening" maxlength="100"></div>
+          </div>
+          <div id="gewallet_{{ i }}" style="display:{{ 'block' if (g and g.ewallet_type) else 'none' }}">
+            <div class="form-row form-row-2">
+              <div class="form-group"><label>Jenis E-Wallet</label>
+                <select name="gift_{{ i }}_ewallet_type">
+                  {% for ew in ['GoPay','OVO','Dana','ShopeePay','LinkAja'] %}
+                  <option value="{{ ew }}" {{ 'selected' if (g and g.ewallet_type == ew) }}>{{ ew }}</option>
+                  {% endfor %}
+                </select></div>
+              <div class="form-group"><label>Nomor / ID</label>
+                <input type="text" name="gift_{{ i }}_ewallet_number" value="{{ g.ewallet_number if (g and g.ewallet_number) else '' }}" placeholder="08xxxxxxxxxx" maxlength="50"></div>
+            </div>
+            <div class="form-group"><label>Atas Nama</label>
+              <input type="text" name="gift_{{ i }}_ewallet_name" value="{{ g.ewallet_name if (g and g.ewallet_name) else '' }}" placeholder="Nama akun e-wallet" maxlength="100"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-bar">
+      <button type="submit" class="btn-save">Simpan Perubahan</button>
+      <a href="/dashboard" class="btn-cancel">Batal</a>
+    </div>
+  </form>
+</div>
+
+<script>
+// ── Portrait preview ──────────────────────────────────────────────────────────
+function previewPortrait(input, imgId, emptyId){
+  const file = input.files[0];
+  if(!file) return;
+  const img = document.getElementById(imgId);
+  const empty = document.getElementById(emptyId);
+  const reader = new FileReader();
+  reader.onload = e => {
+    img.src = e.target.result;
+    img.style.display = 'block';
+    img.style.opacity = '1';
+    if(empty) empty.style.display = 'none';
+    // Kalau ada checkbox hapus, uncheck otomatis karena user upload baru
+    const side = imgId === 'imgGroom' ? 'groom' : 'bride';
+    const cb = document.getElementById('clear' + (side==='groom' ? 'Groom' : 'Bride'));
+    if(cb) cb.checked = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleClear(side, checked){
+  const imgId = side==='groom' ? 'imgGroom' : 'imgBride';
+  const emptyId = side==='groom' ? 'emptyGroom' : 'emptyBride';
+  const img = document.getElementById(imgId);
+  const empty = document.getElementById(emptyId);
+  if(checked){
+    if(img){ img.style.opacity='.3'; }
+  } else {
+    if(img){ img.style.opacity='1'; }
+  }
+}
+
+// ── Gallery multi-upload preview ──────────────────────────────────────────────
+let stagedFiles = new DataTransfer();
+
+function addPreviews(files){
+  for(const file of files){
+    if(!file.type.startsWith('image/')) continue;
+    stagedFiles.items.add(file);
+  }
+  renderPreviews();
+  // sync file input dengan staged files
+  document.getElementById('photoInput').files = stagedFiles.files;
+}
+
+function removeStaged(idx){
+  const dt = new DataTransfer();
+  const files = stagedFiles.files;
+  for(let i=0;i<files.length;i++){
+    if(i!==idx) dt.items.add(files[i]);
+  }
+  stagedFiles = dt;
+  document.getElementById('photoInput').files = stagedFiles.files;
+  renderPreviews();
+}
+
+function renderPreviews(){
+  const grid = document.getElementById('newThumbs');
+  const wrap = document.getElementById('newPhotoGrid');
+  const files = stagedFiles.files;
+  grid.innerHTML='';
+  if(files.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  for(let i=0;i<files.length;i++){
+    const idx=i;
+    const div=document.createElement('div');
+    div.className='photo-thumb';
+    div.style.position='relative';
+    const img=document.createElement('img');
+    img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';
+    const reader=new FileReader();
+    reader.onload=e=>img.src=e.target.result;
+    reader.readAsDataURL(files[i]);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='photo-del';
+    btn.innerHTML='&#x2715;';
+    btn.title='Batalkan';
+    btn.onclick=()=>removeStaged(idx);
+    div.appendChild(img);
+    div.appendChild(btn);
+    grid.appendChild(div);
+  }
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone').style.borderColor='var(--border)';
+  addPreviews(e.dataTransfer.files);
+}
+
+function setGiftType(i,type,btn){
+  document.getElementById('gtype_'+i).value=type;
+  document.getElementById('gbank_'+i).style.display=type==='bank'?'block':'none';
+  document.getElementById('gewallet_'+i).style.display=type==='ewallet'?'block':'none';
+  btn.closest('.gift-tabs').querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function deletePhoto(pid, btn){
+  if(!confirm('Hapus foto ini?'))return;
+  fetch('/dashboard/photo/delete/'+pid,{method:'POST'})
+    .then(r=>r.json()).then(d=>{
+      if(d.success) document.getElementById('pt-'+pid)?.remove();
+    });
+}
+// ── Music mode toggle ─────────────────────────────────────────────────────────
+function setMusicMode(mode){
+  document.getElementById('musicMode').value = mode;
+  document.getElementById('musicUrlMode').style.display  = mode==='url'    ? 'block' : 'none';
+  document.getElementById('musicUploadMode').style.display = mode==='upload' ? 'block' : 'none';
+  document.querySelectorAll('.music-tab').forEach(b => b.classList.remove('active-tab'));
+  document.getElementById(mode==='url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active-tab');
+  // Clear URL input when switching to upload
+  if(mode==='upload') document.getElementById('musicUrlInput') && (document.getElementById('musicUrlInput').value='');
+}
+
+function deleteMusicFile(){
+  if(!confirm('Hapus file musik yang tersimpan?')) return;
+  const cf = document.getElementById('clearMusicFile');
+  if(cf) cf.value='1';
+  // hide the existing file row
+  cf && cf.closest('div[style]') && (cf.closest('div[style]').style.display='none');
+}
+
+// Init active tab style on load
+document.addEventListener('DOMContentLoaded', () => {
+  const mode = document.getElementById('musicMode').value;
+  document.querySelectorAll('.music-tab').forEach(b => b.classList.remove('active-tab'));
+  document.getElementById(mode==='url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active-tab');
+});
+  const sel=document.querySelector('.tl-item.selected');
+  if(sel) setTimeout(()=>sel.scrollIntoView({block:'nearest'}),100);
+});
+</script>
+</body>
+</html>

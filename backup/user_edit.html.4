@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Edit Undangan — {{ site_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#fff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--red:#c0392b;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink);}
+.nav-logo span{color:var(--accent);}
+.nav-back{font-size:.67rem;color:var(--muted);transition:color .2s;}
+.nav-back:hover{color:var(--ink);}
+.wrap{max-width:760px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+.page-head{margin-bottom:1.2rem;padding-bottom:.9rem;border-bottom:1px solid var(--border);}
+.page-label{font-size:.56rem;letter-spacing:.45em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem;}
+.page-title{font-family:var(--serif);font-size:clamp(1.4rem,4vw,2rem);font-weight:300;}
+.page-title em{font-style:italic;color:var(--accent);}
+.error-box{background:#fff5f5;border:1px solid #f5c6c6;border-radius:3px;padding:.75rem 1rem;margin-bottom:1rem;}
+.error-box p{font-size:.7rem;color:var(--red);line-height:1.7;}
+.exp-lock{background:#fffbf0;border:1px solid #f5e0a0;border-radius:3px;padding:.6rem .9rem;margin-bottom:1rem;font-size:.7rem;color:#8a6d0a;line-height:1.5;}
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:.85rem;overflow:hidden;}
+.fs-head{padding:.6rem 1rem;border-bottom:1px solid var(--border);background:var(--off);}
+.fs-title{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.fs-body{padding:.9rem 1rem;}
+.form-row{display:grid;gap:.55rem;margin-bottom:.55rem;}
+.form-row:last-child{margin-bottom:0;}
+.form-row-2{grid-template-columns:1fr 1fr;}
+.form-row-3{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:.2rem;}
+label{font-size:.63rem;color:var(--ink2);letter-spacing:.02em;}
+input[type=text],input[type=date],input[type=time],input[type=url],textarea,select{
+  padding:.46rem .62rem;border:1px solid var(--border);border-radius:2px;
+  font-family:var(--sans);font-size:.75rem;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;width:100%;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+input::placeholder,textarea::placeholder{color:var(--faint);}
+input[disabled]{background:var(--off2);color:var(--muted);cursor:not-allowed;}
+textarea{resize:vertical;min-height:75px;}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8a8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.7rem;}
+.form-note{font-size:.6rem;color:var(--muted);line-height:1.5;}
+.check-row{display:flex;align-items:center;gap:.35rem;}
+.check-row input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--accent);}
+.check-row label{font-size:.68rem;cursor:pointer;margin-bottom:0;}
+
+/* PORTRAIT */
+.portrait-pair{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.5rem;}
+.portrait-box{border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.portrait-img{
+  aspect-ratio:3/4;background:var(--off2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:var(--muted);overflow:hidden;position:relative;
+}
+/* img default hidden; JS adds .loaded to show */
+.portrait-img img{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;object-fit:cover;
+  display:none;
+}
+.portrait-img img.loaded{display:block;}
+.portrait-empty{font-size:.6rem;color:var(--muted);}
+.portrait-lbl{padding:.28rem .5rem;background:var(--off);border-top:1px solid var(--border);font-size:.58rem;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+.portrait-input{padding:.4rem .5rem;border-top:1px solid var(--border);}
+.portrait-input input[type=file]{font-size:.62rem;color:var(--muted);width:100%;}
+
+/* GALLERY */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.35rem;margin-bottom:.5rem;}
+.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-del{position:absolute;top:.12rem;right:.12rem;width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;line-height:1;}
+.drop-zone{border:2px dashed var(--border);border-radius:4px;padding:1.2rem;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:.5rem;}
+.drop-zone:hover{border-color:var(--accent);}
+
+/* MUSIC */
+.music-tab{padding:.22rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;cursor:pointer;font-family:var(--sans);background:none;color:var(--muted);transition:all .15s;}
+.music-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(160,140,126,.08);}
+.music-preview{display:none;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--off);border:1px solid var(--border);border-radius:2px;margin-bottom:.5rem;}
+.consent-box{border:1px solid var(--border2);border-radius:3px;padding:.65rem .75rem;margin-bottom:.45rem;background:var(--off);}
+
+/* GIFTS */
+.gift-item{border:1px solid var(--border2);border-radius:2px;padding:.6rem .7rem;margin-bottom:.45rem;}
+.gift-tabs{display:flex;gap:.22rem;margin-bottom:.5rem;}
+.gtab{padding:.18rem .5rem;border:1px solid var(--border);border-radius:2px;font-size:.57rem;cursor:pointer;color:var(--muted);background:none;font-family:var(--sans);transition:all .12s;}
+.gtab.active{border-color:var(--accent);color:var(--accent);background:rgba(160,140,126,.06);}
+
+/* SUBMIT */
+.submit-bar{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.btn-save{padding:.56rem 1.3rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
+.btn-save:hover{opacity:.82;}
+.btn-cancel{padding:.56rem .9rem;border:1px solid var(--border);color:var(--muted);border-radius:2px;font-family:var(--sans);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:none;transition:all .2s;}
+.btn-cancel:hover{border-color:var(--ink);color:var(--ink);}
+
+@media(max-width:560px){.form-row-2,.form-row-3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+  <a href="/dashboard" class="nav-back">&larr; Dashboard</a>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="page-label">Edit Undangan</span>
+    <h1 class="page-title">{{ inv.groom_name }} <em>&amp;</em> {{ inv.bride_name }}</h1>
+  </div>
+
+  {% if expired %}
+  <div class="exp-lock">⚠ Dashboard sudah expired — tanggal acara tidak bisa diubah. Nama, tema, dan data lain masih bisa disimpan.</div>
+  {% endif %}
+
+  {% if errors %}
+  <div class="error-box">{% for e in errors %}<p>• {{ e }}</p>{% endfor %}</div>
+  {% endif %}
+
+  <form id="mainForm" method="POST" action="/dashboard/edit" enctype="multipart/form-data">
+
+    <!-- ── TEMA ─────────────────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Tema Undangan</div></div>
+      <div class="fs-body">
+        {%- set current_theme = themes | selectattr('id','equalto', inv.theme_id) | first | default(None) -%}
+        <div style="display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;background:var(--off);border:1px solid var(--border);border-radius:3px;">
+          {% if current_theme and current_theme.get('demo_photos') %}
+          <div style="width:44px;height:44px;border-radius:2px;overflow:hidden;flex-shrink:0;">
+            <img src="{{ current_theme.demo_photos[0] }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+          </div>
+          {% endif %}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.78rem;font-weight:400;">{{ current_theme.name if current_theme else inv.theme_id }}</div>
+            <div style="font-size:.63rem;color:var(--muted);margin-top:.1rem;">Tema tidak bisa diubah — hubungi admin jika perlu ganti tema.</div>
+          </div>
+          <div style="font-size:.6rem;color:var(--faint);letter-spacing:.05em;">🔒 TERKUNCI</div>
+        </div>
+        <input type="hidden" name="theme_id" value="{{ inv.theme_id }}">
+      </div>
+    </div>
+
+    <!-- ── DATA MEMPELAI ─────────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Data Mempelai</div></div>
+      <div class="fs-body">
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Nama Panggilan Pria *</label>
+            <input type="text" name="groom_name" value="{{ form.get('groom_name', inv.groom_name) }}" required maxlength="100" placeholder="cth: Rizky"></div>
+          <div class="form-group"><label>Nama Panggilan Wanita *</label>
+            <input type="text" name="bride_name" value="{{ form.get('bride_name', inv.bride_name) }}" required maxlength="100" placeholder="cth: Alya"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Nama Lengkap Pria</label>
+            <input type="text" name="groom_full" value="{{ form.get('groom_full', inv.groom_full or '') }}" maxlength="200" placeholder="Nama lengkap beserta bin/binti"></div>
+          <div class="form-group"><label>Nama Lengkap Wanita</label>
+            <input type="text" name="bride_full" value="{{ form.get('bride_full', inv.bride_full or '') }}" maxlength="200" placeholder="Nama lengkap beserta bin/binti"></div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group"><label>Orang Tua Pria</label>
+            <input type="text" name="groom_parents" value="{{ form.get('groom_parents', inv.groom_parents or '') }}" maxlength="300" placeholder="Bpk. Ahmad & Ibu Siti"></div>
+          <div class="form-group"><label>Orang Tua Wanita</label>
+            <input type="text" name="bride_parents" value="{{ form.get('bride_parents', inv.bride_parents or '') }}" maxlength="300" placeholder="Bpk. Hasan & Ibu Fatimah"></div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" name="show_parents" id="showParents" value="1" {{ 'checked' if (form.get('show_parents') if form else inv.show_parents) }}>
+          <label for="showParents">Tampilkan nama orang tua di undangan</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FOTO MEMPELAI (PORTRAIT) ──────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Foto Mempelai</div></div>
+      <div class="fs-body">
+        <div class="portrait-pair">
+
+          <!-- PRIA -->
+          <div class="portrait-box">
+            <div class="portrait-img">
+              {# img selalu ada — JS yang kontrol visibilitas via class .loaded #}
+              <img id="imgGroom" {% if inv.groom_photo_url %}src="{{ inv.groom_photo_url }}"{% endif %} alt="Foto Pria">
+              <span class="portrait-empty" id="emptyGroom">Belum ada foto</span>
+            </div>
+            <div class="portrait-lbl">
+              <span>Pria</span>
+              {% if inv.groom_photo_url %}
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;display:flex;align-items:center;gap:.2rem;">
+                <input type="checkbox" name="clear_groom_photo" id="clearGroom" value="1"
+                  style="width:11px;height:11px;" onchange="handleClear('groom',this.checked)"> Hapus
+              </label>
+              {% endif %}
+            </div>
+            <div class="portrait-input">
+              <input type="file" name="groom_photo" accept="image/jpeg,image/png,image/webp"
+                onchange="previewPortrait(this,'imgGroom','emptyGroom','clearGroom')">
+            </div>
+          </div>
+
+          <!-- WANITA -->
+          <div class="portrait-box">
+            <div class="portrait-img">
+              <img id="imgBride" {% if inv.bride_photo_url %}src="{{ inv.bride_photo_url }}"{% endif %} alt="Foto Wanita">
+              <span class="portrait-empty" id="emptyBride">Belum ada foto</span>
+            </div>
+            <div class="portrait-lbl">
+              <span>Wanita</span>
+              {% if inv.bride_photo_url %}
+              <label style="cursor:pointer;color:var(--red);font-size:.55rem;display:flex;align-items:center;gap:.2rem;">
+                <input type="checkbox" name="clear_bride_photo" id="clearBride" value="1"
+                  style="width:11px;height:11px;" onchange="handleClear('bride',this.checked)"> Hapus
+              </label>
+              {% endif %}
+            </div>
+            <div class="portrait-input">
+              <input type="file" name="bride_photo" accept="image/jpeg,image/png,image/webp"
+                onchange="previewPortrait(this,'imgBride','emptyBride','clearBride')">
+            </div>
+          </div>
+
+        </div>
+        <div class="form-note">Maks. 5MB per foto. Format: JPG, PNG, WebP.</div>
+      </div>
+    </div>
+
+    <!-- ── TANGGAL & TEMPAT ──────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Tanggal &amp; Tempat Acara</div></div>
+      <div class="fs-body">
+        <div style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;">Akad Nikah</div>
+        <div class="form-row form-row-3">
+          <div class="form-group"><label>Tanggal Akad</label>
+            <input type="date" name="akad_date" value="{{ form.get('akad_date', inv.akad_date or '') }}" {% if expired %}disabled{% endif %}></div>
+          <div class="form-group"><label>Jam</label>
+            <input type="time" name="akad_time" value="{{ form.get('akad_time', inv.akad_time or '') }}"></div>
+          <div class="form-group"><label>Tempat</label>
+            <input type="text" name="akad_venue" value="{{ form.get('akad_venue', inv.akad_venue or '') }}" placeholder="Nama masjid / gedung" maxlength="200"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:.75rem;">
+          <div class="form-group"><label>Alamat Akad</label>
+            <input type="text" name="akad_address" value="{{ form.get('akad_address', inv.akad_address or '') }}" placeholder="Alamat lengkap" maxlength="500"></div>
+        </div>
+        <div style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;">Resepsi</div>
+        <div class="form-row form-row-3">
+          <div class="form-group"><label>Tanggal Resepsi *</label>
+            <input type="date" name="resepsi_date" value="{{ form.get('resepsi_date', inv.resepsi_date or '') }}"
+              {% if expired %}disabled
+              {% else %}min="{{ now.strftime('%Y-%m-%d') }}" max="{{ (now.replace(year=now.year+1)).strftime('%Y-%m-%d') }}"{% endif %}
+              required></div>
+          <div class="form-group"><label>Jam</label>
+            <input type="time" name="resepsi_time" value="{{ form.get('resepsi_time', inv.resepsi_time or '') }}"></div>
+          <div class="form-group"><label>Tempat</label>
+            <input type="text" name="resepsi_venue" value="{{ form.get('resepsi_venue', inv.resepsi_venue or '') }}" placeholder="Nama gedung / ballroom" maxlength="200"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Alamat Resepsi</label>
+            <input type="text" name="resepsi_address" value="{{ form.get('resepsi_address', inv.resepsi_address or '') }}" placeholder="Alamat lengkap" maxlength="500"></div>
+        </div>
+        {% if not expired %}
+        <div class="form-note" style="margin-top:.2rem;">Dashboard expired 3 hari setelah tanggal resepsi. Maks. 1 tahun ke depan.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── MAPS & LAINNYA ────────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Lokasi Maps &amp; Lainnya</div></div>
+      <div class="fs-body">
+        <div class="form-group" style="margin-bottom:.6rem;"><label>URL Google Maps</label>
+          <input type="url" name="maps_url" value="{{ form.get('maps_url', inv.maps_url or '') }}" placeholder="https://maps.google.com/..." maxlength="500">
+          <span class="form-note">Paste URL dari Google Maps — otomatis diembed di undangan.</span>
+        </div>
+        <div class="form-group" style="margin-bottom:.6rem;"><label>Kisah Cinta / Love Story</label>
+          <textarea name="love_story" maxlength="2000" placeholder="Ceritakan bagaimana kalian bertemu...">{{ form.get('love_story', inv.love_story or '') }}</textarea>
+        </div>
+
+        <!-- MUSIK LATAR -->
+        <div class="form-group">
+          <label>Musik Latar</label>
+          <div style="display:flex;gap:.3rem;margin-bottom:.5rem;">
+            <button type="button" id="btnModeUrl" class="music-tab" onclick="setMusicMode('url')">🔗 Paste URL</button>
+            <button type="button" id="btnModeUpload" class="music-tab" onclick="setMusicMode('upload')">⬆ Upload File</button>
+          </div>
+          <input type="hidden" name="music_mode" id="musicMode" value="{{ 'upload' if inv.music_file else 'url' }}">
+
+          <!-- URL Mode -->
+          <div id="musicUrlMode">
+            <input type="url" name="music_url" id="musicUrlInput"
+              value="{{ form.get('music_url', (inv.music_url or '') if not inv.music_file else '') }}"
+              placeholder="https://... (link langsung ke .mp3)" maxlength="500">
+            <span class="form-note">Paste link langsung ke file .mp3 atau audio online.</span>
+          </div>
+
+          <!-- Upload Mode -->
+          <div id="musicUploadMode">
+            {% if inv.music_file %}
+            <div id="existingMusicRow" style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--off);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;">
+              <span style="font-size:.65rem;color:var(--ink2);">🎵 {{ inv.music_file }}</span>
+              <button type="button" onclick="deleteExistingMusic()"
+                style="margin-left:auto;font-size:.58rem;color:var(--red);background:none;border:none;cursor:pointer;padding:0;">Hapus</button>
+            </div>
+            <input type="hidden" name="clear_music_file" id="clearMusicFile" value="">
+            {% endif %}
+
+            <div id="musicDropZone" class="drop-zone"
+              onclick="document.getElementById('musicFileInput').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="handleMusicDrop(event)">
+              <div id="musicDropLabel" style="font-size:.7rem;color:var(--muted);">Klik atau drag file audio ke sini</div>
+              <div style="font-size:.6rem;color:var(--faint);margin-top:.2rem;">MP3, OGG, WAV, M4A, AAC — maks. 15MB</div>
+            </div>
+            <input type="file" name="music_file" id="musicFileInput"
+              accept=".mp3,.ogg,.wav,.m4a,.aac,audio/mpeg,audio/ogg,audio/wav,audio/mp4,audio/aac"
+              style="display:none" onchange="handleMusicSelect(this)">
+
+            <div class="music-preview" id="musicPreview">
+              <span style="font-size:.75rem;">🎵</span>
+              <span id="musicPreviewName" style="font-size:.65rem;color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+              <span id="musicPreviewSize" style="font-size:.6rem;color:var(--muted);flex-shrink:0;"></span>
+              <button type="button" onclick="clearMusicPreview()"
+                style="font-size:.7rem;color:var(--red);background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;">✕</button>
+            </div>
+
+            <div class="consent-box" id="consentBox">
+              <label style="display:flex;gap:.5rem;align-items:flex-start;cursor:pointer;">
+                <input type="checkbox" id="musicConsent" name="music_consent" value="1"
+                  style="width:14px;height:14px;margin-top:.15rem;flex-shrink:0;accent-color:var(--accent);"
+                  {% if inv.music_file %}checked{% endif %}>
+                <span style="font-size:.65rem;color:var(--ink2);line-height:1.6;">
+                  Saya menyatakan memiliki <strong>hak atau izin</strong> untuk menggunakan musik ini, dan menyetujui
+                  <a href="/legal" target="_blank" style="color:var(--accent);text-decoration:underline;">Syarat &amp; Ketentuan</a>
+                  habarkita.com. Segala risiko pelanggaran hak cipta menjadi tanggung jawab saya.
+                </span>
+              </label>
+            </div>
+            <span class="form-note" style="color:var(--faint);">
+              Disarankan pakai musik bebas royalti:
+              <a href="https://pixabay.com/music/" target="_blank" style="color:var(--accent);">Pixabay Music</a>,
+              <a href="https://freemusicarchive.org" target="_blank" style="color:var(--accent);">Free Music Archive</a>.
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── GALERI FOTO ───────────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Galeri Foto</div></div>
+      <div class="fs-body">
+
+        {% if photos %}
+        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Foto Tersimpan</div>
+        <div class="photo-grid" id="photoGrid">
+          {% for p in photos %}
+          <div class="photo-thumb" id="pt-{{ p.id }}">
+            <img src="{{ photo_src(p) }}" alt="foto" loading="lazy">
+            <button type="button" class="photo-del" onclick="deletePhoto({{ p.id }})" title="Hapus">&#x2715;</button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;{{ 'margin-top:.8rem;' if photos else '' }}">Upload Foto Baru</div>
+
+        <div id="galleryDropZone" class="drop-zone"
+          onclick="document.getElementById('photoInput').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+          ondragleave="this.style.borderColor=''"
+          ondrop="handleGalleryDrop(event)">
+          <div style="font-size:.7rem;color:var(--muted);">Klik atau drag foto ke sini</div>
+          <div style="font-size:.6rem;color:var(--faint);margin-top:.2rem;">JPG, PNG, WebP — maks. 5MB per foto</div>
+        </div>
+        {# PENTING: input ini terpisah dari portrait. name="photos", multiple #}
+        <input type="file" id="photoInput" name="photos"
+          accept="image/jpeg,image/png,image/webp" multiple style="display:none"
+          onchange="addPreviews(this.files)">
+
+        <div id="newPhotoGrid" style="display:none;margin-bottom:.5rem;">
+          <div style="font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem;">Siap Diupload</div>
+          <div class="photo-grid" id="newThumbs"></div>
+        </div>
+
+        <span class="form-note">Total maks. 10 foto. Bisa pilih banyak sekaligus.</span>
+      </div>
+    </div>
+
+    <!-- ── AMPLOP DIGITAL ────────────────────────────────────────────── -->
+    <div class="form-section">
+      <div class="fs-head"><div class="fs-title">Amplop Digital / Wedding Gift</div></div>
+      <div class="fs-body">
+        {% for i in range(4) %}
+        {% set g = gifts[i] if i < gifts|length else None %}
+        <div class="gift-item" id="gift-{{ i }}">
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:.4rem;">Rekening/E-Wallet {{ i+1 }}</div>
+          <div class="gift-tabs">
+            <button type="button" class="gtab {% if not g or g.bank_name %}active{% endif %}"
+              onclick="setGiftType({{ i }},'bank',this)">Transfer Bank</button>
+            <button type="button" class="gtab {% if g and g.ewallet_type %}active{% endif %}"
+              onclick="setGiftType({{ i }},'ewallet',this)">E-Wallet</button>
+          </div>
+          <input type="hidden" name="gift_{{ i }}_type" id="gtype_{{ i }}" value="{{ 'ewallet' if (g and g.ewallet_type) else 'bank' }}">
+          <div id="gbank_{{ i }}" style="display:{{ 'none' if (g and g.ewallet_type) else 'block' }}">
+            <div class="form-row form-row-2">
+              <div class="form-group"><label>Nama Bank</label>
+                <input type="text" name="gift_{{ i }}_bank_name" value="{{ g.bank_name if (g and g.bank_name) else '' }}" placeholder="BCA, BRI, Mandiri..." maxlength="50"></div>
+              <div class="form-group"><label>No. Rekening</label>
+                <input type="text" name="gift_{{ i }}_account_number" value="{{ g.account_number if (g and g.account_number) else '' }}" placeholder="0123456789" maxlength="50"></div>
+            </div>
+            <div class="form-group"><label>Atas Nama</label>
+              <input type="text" name="gift_{{ i }}_account_name" value="{{ g.account_name if (g and g.account_name) else '' }}" placeholder="Nama pemilik rekening" maxlength="100"></div>
+          </div>
+          <div id="gewallet_{{ i }}" style="display:{{ 'block' if (g and g.ewallet_type) else 'none' }}">
+            <div class="form-row form-row-2">
+              <div class="form-group"><label>Jenis E-Wallet</label>
+                <select name="gift_{{ i }}_ewallet_type">
+                  {% for ew in ['GoPay','OVO','Dana','ShopeePay','LinkAja'] %}
+                  <option value="{{ ew }}" {{ 'selected' if (g and g.ewallet_type == ew) }}>{{ ew }}</option>
+                  {% endfor %}
+                </select></div>
+              <div class="form-group"><label>Nomor / ID</label>
+                <input type="text" name="gift_{{ i }}_ewallet_number" value="{{ g.ewallet_number if (g and g.ewallet_number) else '' }}" placeholder="08xxxxxxxxxx" maxlength="50"></div>
+            </div>
+            <div class="form-group"><label>Atas Nama</label>
+              <input type="text" name="gift_{{ i }}_ewallet_name" value="{{ g.ewallet_name if (g and g.ewallet_name) else '' }}" placeholder="Nama akun e-wallet" maxlength="100"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-bar">
+      <button type="submit" class="btn-save">Simpan Perubahan</button>
+      <a href="/dashboard" class="btn-cancel">Batal</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   PORTRAIT
+   - img selalu ada di DOM dengan display:none (via CSS)
+   - JS tambahkan class .loaded untuk tampilkan
+   - previewPortrait: FileReader → src baru → .loaded
+   - handleClear: dim/undim foto saat checkbox hapus
+═══════════════════════════════════════════════════════════════ */
+function initPortrait(imgId, emptyId) {
+  const img   = document.getElementById(imgId);
+  const empty = document.getElementById(emptyId);
+  if (!img || !img.src || img.src === window.location.href) return;
+  // src ada dari server — tunggu load
+  const show = () => {
+    img.classList.add('loaded');
+    if (empty) empty.style.display = 'none';
+  };
+  const hide = () => {
+    img.classList.remove('loaded');
+    if (empty) empty.style.display = '';
+  };
+  if (img.complete) {
+    img.naturalWidth > 0 ? show() : hide();
+  } else {
+    img.onload  = show;
+    img.onerror = hide;
+  }
+}
+
+function previewPortrait(input, imgId, emptyId, clearId) {
+  const file = input.files[0];
+  if (!file) return;
+  const img    = document.getElementById(imgId);
+  const empty  = document.getElementById(emptyId);
+  const clearCb = clearId ? document.getElementById(clearId) : null;
+  const reader = new FileReader();
+  reader.onload = e => {
+    img.src = e.target.result;
+    img.classList.add('loaded');
+    img.style.opacity = '1';
+    if (empty)   empty.style.display  = 'none';
+    if (clearCb) clearCb.checked = false; // batalkan hapus jika upload baru
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleClear(side, checked) {
+  const img = document.getElementById(side === 'groom' ? 'imgGroom' : 'imgBride');
+  if (img) img.style.opacity = checked ? '.3' : '1';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GALLERY MULTI-UPLOAD
+   - stagedFiles hanya untuk gallery (name="photos")
+   - TIDAK menyentuh portrait input sama sekali
+   - removeStaged pakai index snapshot agar closure benar
+═══════════════════════════════════════════════════════════════ */
+let stagedFiles = new DataTransfer();
+
+function addPreviews(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    stagedFiles.items.add(f);
+  }
+  syncGalleryInput();
+  renderPreviews();
+}
+
+function syncGalleryInput() {
+  const inp = document.getElementById('photoInput');
+  if (inp) inp.files = stagedFiles.files;
+}
+
+function removeStaged(idx) {
+  const dt    = new DataTransfer();
+  const files = stagedFiles.files;
+  for (let i = 0; i < files.length; i++) {
+    if (i !== idx) dt.items.add(files[i]);
+  }
+  stagedFiles = dt;
+  syncGalleryInput();
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const grid  = document.getElementById('newThumbs');
+  const wrap  = document.getElementById('newPhotoGrid');
+  const files = stagedFiles.files;
+  grid.innerHTML = '';
+  if (files.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  for (let i = 0; i < files.length; i++) {
+    const idx    = i; // snapshot untuk closure
+    const thumb  = document.createElement('div');
+    thumb.className = 'photo-thumb';
+    const img    = document.createElement('img');
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.readAsDataURL(files[i]);
+    const btn    = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'photo-del';
+    btn.innerHTML = '&#x2715;';
+    btn.title     = 'Batalkan';
+    btn.onclick   = () => removeStaged(idx);
+    thumb.appendChild(img);
+    thumb.appendChild(btn);
+    grid.appendChild(thumb);
+  }
+}
+
+function handleGalleryDrop(e) {
+  e.preventDefault();
+  document.getElementById('galleryDropZone').style.borderColor = '';
+  addPreviews(e.dataTransfer.files);
+}
+
+function deletePhoto(pid) {
+  if (!confirm('Hapus foto ini?')) return;
+  fetch('/dashboard/photo/delete/' + pid, { method: 'POST' })
+    .then(r => r.json())
+    .then(d => { if (d.success) document.getElementById('pt-' + pid)?.remove(); });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MUSIK
+═══════════════════════════════════════════════════════════════ */
+function setMusicMode(mode) {
+  document.getElementById('musicMode').value = mode;
+  document.getElementById('musicUrlMode').style.display    = mode === 'url'    ? 'block' : 'none';
+  document.getElementById('musicUploadMode').style.display = mode === 'upload' ? 'block' : 'none';
+  document.querySelectorAll('.music-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(mode === 'url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active');
+  if (mode === 'upload') {
+    const u = document.getElementById('musicUrlInput');
+    if (u) u.value = '';
+  }
+}
+
+function handleMusicSelect(input) {
+  if (input.files[0]) showMusicPreview(input.files[0]);
+}
+
+function handleMusicDrop(e) {
+  e.preventDefault();
+  document.getElementById('musicDropZone').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['mp3','ogg','wav','m4a','aac'].includes(ext)) {
+    alert('Format tidak didukung. Gunakan MP3, OGG, WAV, M4A, atau AAC.');
+    return;
+  }
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  document.getElementById('musicFileInput').files = dt.files;
+  showMusicPreview(file);
+}
+
+function showMusicPreview(file) {
+  if (file.size > 15 * 1024 * 1024) {
+    alert('File terlalu besar. Maks. 15MB.');
+    document.getElementById('musicFileInput').value = '';
+    return;
+  }
+  document.getElementById('musicPreviewName').textContent = file.name;
+  document.getElementById('musicPreviewSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+  document.getElementById('musicPreview').style.display   = 'flex';
+  document.getElementById('musicDropLabel').textContent   = 'Ganti file';
+  document.getElementById('musicDropZone').style.borderColor = 'var(--accent)';
+}
+
+function clearMusicPreview() {
+  document.getElementById('musicFileInput').value            = '';
+  document.getElementById('musicPreview').style.display     = 'none';
+  document.getElementById('musicDropLabel').textContent     = 'Klik atau drag file audio ke sini';
+  document.getElementById('musicDropZone').style.borderColor = '';
+}
+
+function deleteExistingMusic() {
+  if (!confirm('Hapus file musik yang tersimpan?')) return;
+  const cf  = document.getElementById('clearMusicFile');
+  const row = document.getElementById('existingMusicRow');
+  const cb  = document.getElementById('musicConsent');
+  if (cf)  cf.value           = '1';
+  if (row) row.style.display  = 'none';
+  if (cb)  cb.checked         = false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GIFTS
+═══════════════════════════════════════════════════════════════ */
+function setGiftType(i, type, btn) {
+  document.getElementById('gtype_' + i).value           = type;
+  document.getElementById('gbank_' + i).style.display    = type === 'bank'    ? 'block' : 'none';
+  document.getElementById('gewallet_' + i).style.display = type === 'ewallet' ? 'block' : 'none';
+  btn.closest('.gift-tabs').querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT — satu DOMContentLoaded, semua logic di sini
+═══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Portrait: init visibilitas dari server
+  initPortrait('imgGroom', 'emptyGroom');
+  initPortrait('imgBride',  'emptyBride');
+
+  // Music: set tampilan awal sesuai mode tersimpan
+  const mode = document.getElementById('musicMode').value;
+  document.getElementById('musicUrlMode').style.display    = mode === 'url'    ? 'block' : 'none';
+  document.getElementById('musicUploadMode').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById(mode === 'url' ? 'btnModeUrl' : 'btnModeUpload').classList.add('active');
+
+  // Scroll tema terpilih ke tengah (jika ada daftar tema)
+  const sel = document.querySelector('.tl-item.selected');
+  if (sel) setTimeout(() => sel.scrollIntoView({ block: 'nearest' }), 100);
+
+  // Submit guard: cek consent musik sebelum kirim
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const mode = document.getElementById('musicMode').value;
+    if (mode !== 'upload') return;
+    const fileInput = document.getElementById('musicFileInput');
+    const hasNew    = fileInput && fileInput.files && fileInput.files.length > 0;
+    const row       = document.getElementById('existingMusicRow');
+    const hasExist  = row && row.style.display !== 'none';
+    const consent   = document.getElementById('musicConsent');
+    if ((hasNew || hasExist) && consent && !consent.checked) {
+      e.preventDefault();
+      const box = document.getElementById('consentBox');
+      box.style.outline = '2px solid var(--red)';
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { box.style.outline = ''; }, 2500);
+    }
+  });
+
+});
+</script>
+</body>
+</html>
