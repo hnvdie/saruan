@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <title>Legal — habarkita.com</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -218,15 +219,77 @@ footer{border-top:1px solid var(--border);padding:1.6rem 1.4rem;display:flex;ali
 
 </div><!-- /legal-wrap -->
 
+
+
+<style>
+/* FOOTER — ganti style footer yang lama */
+footer{
+  border-top:1px solid var(--border);
+  background:var(--off);
+  padding:1.6rem 1.4rem .9rem;
+}
+.footer-top{                                                                                                                                            display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1.2rem;                                                                                                                            padding-bottom:1.1rem;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:.85rem;
+}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--ink);}
+.footer-logo span{color:var(--accent);}
+.footer-tagline{font-size:.62rem;color:var(--faint);margin-top:.2rem;letter-spacing:.03em;}
+.footer-links{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;}
+.footer-links a{
+  font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;                                                                                                            }
+.footer-links a:hover{color:var(--accent);}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;                                                             }
+.footer-copy{font-size:.6rem;color:var(--faint);letter-spacing:.04em;}
+.footer-wa{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.6rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;
+}
+.footer-wa:hover{color:var(--green);}
+.footer-wa svg{width:13px;height:13px;fill:var(--green);}
+.footer-social {
+  margin-top: 15px;
+}
+</style>
+
 <footer>
-  <div class="footer-logo">habar<span>kita</span>.com</div>
-  <div class="footer-links">
-    <a href="/legal">Syarat &amp; Ketentuan</a>
-    <a href="/legal">Kebijakan Privasi</a>
-    <a href="/legal">Refund</a>
-    <a href="/legal">Tentang Kami</a>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">habar<span>kita</span>.com</div>
+      <div class="footer-tagline">Undangan Pernikahan Digital</div>
+
+      <!-- Social Media -->
+      <div class="footer-social">
+        <a href="https://instagram.com/habarkitacom" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com/@habarkita3" target="_blank">
+          <i class="fab fa-tiktok"></i>
+        </a>
+               <i> <small>follow us<small></i>
+<!--
+        <a href="https://facebook.com/username" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+-->
+      </div>
+
+    </div>
+
+    <div class="footer-links">
+      <a href="/legal">Syarat &amp; Ketentuan</a>
+      <a href="/legal?p=privacy">Kebijakan Privasi</a>
+      <a href="/legal?p=refund">Refund</a>
+      <a href="/legal?p=about">Tentang Kami</a>
+    </div>
   </div>
-  <div class="footer-copy">&copy; 2025 habarkita.com — Undangan Pernikahan Digital</div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
+  </div>
 </footer>
 
 

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 {# ── SEO ── #}
 <title>Katalog Tema Undangan Digital — {{ themes|length }}+ Tema Eksklusif | {{ site_name }}</title>
@@ -406,14 +407,38 @@ footer{
 }
 .footer-wa:hover{color:var(--green);}
 .footer-wa svg{width:13px;height:13px;fill:var(--green);}
+.footer-social {
+  margin-top: 15px;
+}
 </style>
+
+
+
 
 <footer>
   <div class="footer-top">
     <div>
       <div class="footer-logo">habar<span>kita</span>.com</div>
       <div class="footer-tagline">Undangan Pernikahan Digital</div>
+
+      <!-- Social Media -->
+      <div class="footer-social">
+        <a href="https://instagram.com/habarkitacom" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com/@habarkita3" target="_blank">
+          <i class="fab fa-tiktok"></i>
+        </a>
+               <i> <small>follow us<small></i>
+<!--
+        <a href="https://facebook.com/username" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+-->
+      </div>
+
     </div>
+
     <div class="footer-links">
       <a href="/legal">Syarat &amp; Ketentuan</a>
       <a href="/legal?p=privacy">Kebijakan Privasi</a>
@@ -425,8 +450,7 @@ footer{
   <div class="footer-bottom">
     <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
   </div>
-</footer> <!-- ✅ INI YANG KURANG -->
-
+</footer>
 
 
 
