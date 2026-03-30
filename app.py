@@ -17,6 +17,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.config['SUPPORT_EMAIL'] = os.environ.get('SUPPORT_EMAIL', '')
+app.config['SUPPORT_WA']    = os.environ.get('SUPPORT_WA', '')
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent

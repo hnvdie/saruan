@@ -155,8 +155,11 @@ footer{border-top:1px solid var(--border);padding:1.6rem 1.4rem;display:flex;ali
   <div class="section" id="t9"><div class="section-head"><span class="section-num">09</span><h2 class="section-title">Batasan Tanggung Jawab</h2></div><p>habarkita.com tidak bertanggung jawab atas kerugian tidak langsung atau konsekuensial; gangguan akses akibat faktor di luar kendali kami; kehilangan data akibat kesalahan Pengguna; serta Konten Pengguna yang melanggar hak pihak ketiga. Tanggung jawab maksimal kami tidak melebihi jumlah pembayaran Anda dalam 30 hari terakhir.</p></div>
   <div class="section" id="t10"><div class="section-head"><span class="section-num">10</span><h2 class="section-title">Perubahan Layanan</h2></div><p>habarkita.com berhak mengubah, memperbarui, atau menghentikan Layanan kapan saja. Syarat &amp; Ketentuan dapat diperbarui; perubahan berlaku sejak tanggal publikasi. Penggunaan Anda setelah perubahan diterbitkan merupakan persetujuan terhadap ketentuan yang diperbarui.</p></div>
   <div class="section" id="t11"><div class="section-head"><span class="section-num">11</span><h2 class="section-title">Hukum yang Berlaku</h2></div><p>Syarat &amp; Ketentuan ini tunduk pada hukum Republik Indonesia. Sengketa diselesaikan melalui musyawarah; jika tidak tercapai kesepakatan, melalui pengadilan yang berwenang di Indonesia.</p></div>
-  <div class="section" id="t12"><div class="section-head"><span class="section-num">12</span><h2 class="section-title">Kontak</h2></div><table class="info-table"><tr><td>
-WhatsApp</td><td><a href="#" style="color:var(--accent)">-</a></td></tr><tr><td>Email</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="177f767576657c7e63763978657076797e6d726557707a767e7b3974787a">[email&#160;protected]</a></td></tr><tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr></table></div>
+<div class="section" id="t12"><div class="section-head"><span class="section-num">12</span><h2 class="section-title">Kontak</h2></div><table class="info-table">
+  <tr><td>WhatsApp</td><td>{% if config.SUPPORT_WA %}<a href="https://wa.me/{{ config.SUPPORT_WA }}" style="color:var(--accent)">+{{ config.SUPPORT_WA }}</a>{% else %}-{% endif %}</td></tr>
+  <tr><td>Email</td><td>{% if config.SUPPORT_EMAIL %}<a href="mailto:{{ config.SUPPORT_EMAIL }}" style="color:var(--accent)">{{ config.SUPPORT_EMAIL }}</a>{% else %}-{% endif %}</td></tr>
+  <tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr>
+</table></div>
 </div>
 
 <!-- KEBIJAKAN PRIVASI -->
@@ -199,11 +202,18 @@ WhatsApp</td><td><a href="#" style="color:var(--accent)">-</a></td></tr><tr><td>
   <div class="section"><div class="section-head"><span class="section-num">05</span><h2 class="section-title">Keamanan Transaksi</h2></div><p>habarkita.com menggunakan Midtrans (bersertifikasi PCI-DSS, enkripsi 256-bit SSL). Kami tidak pernah meminta informasi sensitif (nomor kartu, PIN, OTP) melalui WhatsApp atau email.</p><div class="callout">Waspada penipuan yang mengatasnamakan habarkita.com. Transaksi resmi hanya melalui link pembayaran dari platform kami.</div></div>
 </div>
 
+
+
 <!-- TENTANG KAMI -->
 <div class="page-content" id="page-about">
   <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Tentang habarkita.com</h2></div><p>habarkita.com adalah platform undangan pernikahan digital yang memungkinkan pasangan membuat dan berbagi undangan elegan secara online. Hadir dengan misi menjadikan momen pernikahan semakin berkesan melalui teknologi digital yang mudah digunakan.</p><p>Dengan beragam tema eksklusif dan fitur interaktif — RSVP digital, amplop digital, galeri foto, countdown timer, dan love story — habarkita.com membantu Anda menyampaikan kabar bahagia kepada keluarga dan sahabat dengan cara yang modern dan berkesan.</p></div>
   <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Identitas Platform</h2></div><table class="info-table"><tr><td>Nama Platform</td><td>habarkita.com</td></tr><tr><td>Jenis Layanan</td><td>Undangan Pernikahan Digital (SaaS)</td></tr><tr><td>Wilayah Operasional</td><td>Indonesia</td></tr><tr><td>Mata Uang</td><td>Rupiah (IDR)</td></tr><tr><td>Hukum yang Berlaku</td><td>Hukum Republik Indonesia</td></tr></table></div>
-  <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Hubungi Kami</h2></div><table class="info-table"><tr><td>WhatsApp</td><td><a href="#" style="color:var(--accent)">-</a></td></tr><tr><td>Email</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0e666f6c6f7c65677a6f20617c696f6067746b7c4e69636f6762206d6163">[email&#160;protected]</a></td></tr><tr><td>Jam Operasional</td><td>Senin – Sabtu, 08.00 – 20.00 WIB</td></tr><tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr></table></div>
+  <div class="section"><div class="section-head"><span class="section-num">✦</span><h2 class="section-title">Hubungi Kami</h2></div><table class="info-table">
+    <tr><td>WhatsApp</td><td>{% if config.SUPPORT_WA %}<a href="https://wa.me/{{ config.SUPPORT_WA }}" style="color:var(--accent)">+{{ config.SUPPORT_WA }}</a>{% else %}-{% endif %}</td></tr>
+    <tr><td>Email</td><td>{% if config.SUPPORT_EMAIL %}<a href="mailto:{{ config.SUPPORT_EMAIL }}" style="color:var(--accent)">{{ config.SUPPORT_EMAIL }}</a>{% else %}-{% endif %}</td></tr>
+    <tr><td>Jam Operasional</td><td>Senin – Sabtu, 08.00 – 20.00 WIB</td></tr>
+    <tr><td>Respons</td><td>Maks. 1×24 jam hari kerja</td></tr>
+  </table></div>
 </div>
 
 </div><!-- /legal-wrap -->
