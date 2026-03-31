@@ -1,0 +1,62 @@
+{
+  "name": "Senja Abadi",
+  "description": "Seperti senja yang tak pernah benar-benar pergi — tema luxury cinematic dengan estetika gelap yang hangat, perpaduan emas tua, dusty rose, dan bayangan cokelat dalam yang memancarkan keanggunan abadi.",
+  "preview_color": "#C9A96E",
+  "accent_color": "#C4827A",
+  "tags": [
+    "Luxury",
+    "Cinematic",
+    "Dark",
+    "Romantic",
+    "Gold",
+    "Elegant",
+    "Modern"
+  ],
+  "demo_photos": [
+    "/static/themes/senjaabadi/demo_474e6d46.webp"
+  ],
+  "features": [
+    "Cinematic Envelope Opening Reveal — animasi buka undangan penuh ekspresi",
+    "Three.js 3D Particle System — ratusan partikel emas & dusty rose mengambang",
+    "4-Layer Mouse Parallax — kedalaman visual 3D mengikuti gerakan kursor",
+    "GSAP ScrollTrigger Parallax — tiap section bergerak di kecepatan berbeda",
+    "Countdown Timer Elegan — hitung mundur detik per detik dengan animasi flip angka",
+    "Foto Gallery Cinematic — lightbox full-screen + navigasi keyboard & sentuh",
+    "3D Tilt Foto Mempelai — efek kedalaman saat hover pada foto pengantin",
+    "RSVP Form Interaktif — kirim konfirmasi langsung dengan animasi sukses",
+    "Flip Card Hadiah Digital — kartu 3D flip untuk info rekening & e-wallet",
+    "Floating Music Player — pemutar musik elegan dengan ring pulse animation",
+    "Grain Film Overlay — tekstur sinematik untuk kedalaman visual",
+    "Fully Responsive — optimal di semua ukuran layar"
+  ],
+  "price": 20000,
+  "price_label": "Rp. 20.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "Dusk_Gold": "#C9A96E",
+    "Gold_Light": "#E8C99A",
+    "Gold_Dark": "#9B7A45",
+    "Deep_Cocoa": "#3A2A1E",
+    "Night_Cocoa": "#231710",
+    "Dusty_Rose": "#C4827A",
+    "Rose_Light": "#DBA9A3",
+    "Ivory_Veil": "#F7F0E8",
+    "Ivory_Dark": "#EDE4D6",
+    "Warm_Mist": "#8C7260"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "serif": "EB Garamond",
+    "sans": "Jost"
+  },
+  "id": "senjaabadi",
+  "skeleton": "senjaabadi",
+  "assets": {
+    "cover_webp": "static/themes/senjaabadi/cover.webp",
+    "cover_webp_recommended_size": "1080x1920px, maks 300KB (portrait). Format WebP kualitas 80. Gunakan foto prewedding dengan pencahayaan senja atau studio hangat untuk hasil terbaik.",
+    "threejs_cdn": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+    "gsap_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+    "gsap_scroll_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+  }
+}

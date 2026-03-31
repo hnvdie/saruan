@@ -1,0 +1,45 @@
+{
+  "id": "kitaceritananti",
+  "name": "Kita Cerita Nanti",
+  "description": "Kehangatan dusty rose bertemu krem linen yang lembut — seperti kenangan yang belum selesai diceritakan. Tema ini menyimpan keintiman, nostalgia, dan cinta yang tumbuh perlahan dalam setiap bingkainya.",
+  "preview_color": "#2c1a16",
+  "accent_color": "#c49a8a",
+  "skeleton": "kitaceritnanti",
+  "tags": [
+    "dusty rose",
+    "warm",
+    "romantic",
+    "nostalgic",
+    "cinematic",
+    "film"
+  ],
+  "demo_photos": [
+    "/static/themes/kitaceritananti/demo_df820392.jpg"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
+  "palette": {
+    "ink": "#2c1a16",
+    "charcoal": "#3d2520",
+    "graphite": "#6b3f38",
+    "silver": "#c49a8a",
+    "ash": "#e0c4b8",
+    "fog": "#edddd6",
+    "pearl": "#f5ece7",
+    "paper": "#fdf7f4"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "serif": "IM Fell English",
+    "sans": "Montserrat"
+  },
+  "features": [
+    "Palet dusty rose & krem hangat yang lembut dan romantis",
+    "Foto berbingkai dengan efek sepia hangat (bukan grayscale dingin)",
+    "Polaroid & film strip bernuansa warm-muted",
+    "Tiket pernikahan bergaya sinema dengan tone coklat kemerahan",
+    "Envelope intro dengan monogram berputar & curtain reveal"
+  ]
+}

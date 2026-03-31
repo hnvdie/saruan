@@ -18,9 +18,9 @@
   "demo_photos": [
     "/static/themes/merakbanjar/demo_ecc12f43.jpg"
   ],
-  "price": 40000,
-  "price_label": "Rp. 40.000",
-  "price_original": 60000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "teal": "#3d7d8c",

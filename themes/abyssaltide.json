@@ -19,9 +19,9 @@
   "demo_photos": [
     "/static/themes/abyssaltide/demo_a07b2b3e.jpg"
   ],
-  "price": 25,
-  "price_label": "Rp. 25.000",
-  "price_original": 30000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "abyss": "#040d1a",

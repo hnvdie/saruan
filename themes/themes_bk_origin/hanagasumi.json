@@ -1,0 +1,44 @@
+{
+  "id": "hanagasumi",
+  "name": "Hanagasumi",
+  "description": "花霞 — Flower Haze. Terinspirasi dari poster Jepang era Meiji yang dramatis dipadukan dengan keintiman kertas washi dan koi yang menari dalam dua lingkaran yin-yang. Satu layar penuh tanpa scroll — tamu geser card demi card seperti membuka lembaran buku cinta.",
+  "preview_color": "#9B2335",
+  "accent_color": "#C49A3C",
+  "skeleton": "hanagasumi",
+  "tags": [
+    "japanese",
+    "poster",
+    "modern",
+    "dramatic",
+    "koi",
+    "meiji",
+    "swipe"
+  ],
+  "demo_photos": [
+    "/static/themes/hanagasumi/demo_90da07cb.jpg"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
+  "palette": {
+    "washi": "#F5EFE0",
+    "sumi": "#1C1410",
+    "beni": "#9B2335",
+    "kincha": "#C49A3C",
+    "misty": "#D4C5A9",
+    "paper": "#EDE4CF"
+  },
+  "fonts": {
+    "display": "Shippori Mincho",
+    "serif": "IM Fell English",
+    "sans": "Noto Serif JP"
+  },
+  "features": [
+    "Single-screen swipe card — 12 kartu interaktif tanpa scroll",
+    "Envelope intro dramatis dengan curtain split kiri-kanan",
+    "Ambient petal rain animation sepanjang undangan dibuka",
+    "Polaroid gallery bertumpuk dengan hover effect dramatis",
+    "Countdown real-time & RSVP form dengan guestbook live"
+  ]
+}

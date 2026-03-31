@@ -1,0 +1,55 @@
+{
+  "name": "Cahaya Pudar",
+  "description": "Seperti cahaya sore yang perlahan memudar — romantis, puitis, dan penuh kenangan. Tema luxury cinematic dengan estetika dusky gold dan dusty rose yang membawa perasaan tak terlupakan.",
+  "preview_color": "#C9A96E",
+  "accent_color": "#6B4F3A",
+  "tags": [
+    "Luxury",
+    "Cinematic",
+    "Romantic",
+    "Gold",
+    "Elegant"
+  ],
+  "demo_photos": [
+    "/static/themes/cahayapudar/demo_2898d000.webp"
+  ],
+  "features": [
+    "Cinematic Envelope Opening Reveal dengan cover.webp",
+    "Swipe-feel Scroll Snapping Full-screen Sections",
+    "Floating Gold Particle Ambient System",
+    "Parallax Depth Layering pada setiap section",
+    "Cinematic Countdown Timer Luxury",
+    "Love Story Timeline Interaktif",
+    "Foto Gallery dengan Lightbox & 3D Tilt",
+    "RSVP Form dengan Animasi Konfirmasi",
+    "Hadiah Digital dengan Efek Flip Card",
+    "Floating Music Player Elegan"
+  ],
+  "price": 40000,
+  "price_label": "Rp. 40.000",
+  "price_original": 60000,
+  "price_note": "",
+  "palette": {
+    "Dusk_Gold": "#C9A96E",
+    "Deep_Cocoa": "#3A2A1E",
+    "Dusty_Rose": "#C4827A",
+    "Ivory_Veil": "#F7F0E8",
+    "Warm_Mist": "#8C7260",
+    "Soft_Ember": "#E8C99A"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "serif": "EB Garamond",
+    "sans": "Jost"
+  },
+  "id": "cahayapudar",
+  "skeleton": "cahayapudar",
+  "assets": {
+    "cover_webp": "static/themes/cahayapudar/cover.webp",
+    "cover_webp_recommended_size": "1080x1920px, maks 300KB (landscape: 1920x1080px). Format WebP dengan kualitas 80. Gunakan foto prewedding portrait untuk hasil terbaik.",
+    "gsap": "static/themes/cahayapudar/gsap.min.js",
+    "gsap_scroll": "static/themes/cahayapudar/ScrollTrigger.min.js",
+    "gsap_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+    "gsap_scroll_cdn": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+  }
+}

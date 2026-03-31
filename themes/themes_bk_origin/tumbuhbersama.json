@@ -1,0 +1,48 @@
+{
+  "name": "Tumbuh Bersama",
+  "description": "Perpaduan estetika sinema 90-an iconic dengan botanical floral organik — seolah undangan ini diambil dari gulungan film lawas yang hangat dan tumbuh subur dengan bunga. Setiap section terasa seperti still shot film yang bisa berdiri sendiri.",
+  "preview_color": "#4A2E1A",
+  "accent_color": "#C4973A",
+  "tags": [
+    "sinema",
+    "floral",
+    "vintage",
+    "botanical",
+    "romantis",
+    "hangat",
+    "90s"
+  ],
+  "demo_photos": [
+    "/static/themes/tumbuhbersama/demo_ddb7a1df.webp"
+  ],
+  "features": [
+    "Navigasi scroll fullscreen snap per section",
+    "Efek cinematic letterbox + grain texture pada setiap scene gelap",
+    "Film strip gallery scrolling otomatis dengan efek sprocket hole",
+    "Partikel kelopak bunga melayang (canvas animation) setelah undangan dibuka",
+    "SVG botanical inline — corner ornaments, vine, bloom — tanpa file eksternal"
+  ],
+  "price": 25000,
+  "price_label": "Rp 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "cream": "#F7EFE0",
+    "ivory": "#FAF6EE",
+    "rose": "#C8766A",
+    "rose_light": "#E8B4AC",
+    "sage": "#7D9470",
+    "brown": "#4A2E1A",
+    "gold": "#C4973A",
+    "dark": "#2A1A0E",
+    "film_black": "#0D0705",
+    "warm_gray": "#9B8E83"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "serif": "Lora",
+    "sans": "DM Sans"
+  },
+  "id": "tumbuhbersama",
+  "skeleton": "tumbuhbersama"
+}

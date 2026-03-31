@@ -1,0 +1,58 @@
+{
+  "id": "untilifoundyou",
+  "name": "Until I Found You",
+  "description": "Hangat, emosional, dan sinematik. Nuansa amber dawn dengan espresso gelap — seperti film indie yang membuat dada terasa penuh. Sebuah kisah tentang perjalanan panjang yang berakhir di satu orang yang terasa seperti rumah.",
+  "preview_color": "#c4542a",
+  "accent_color": "#d4a85a",
+  "skeleton": "untilifoundyou",
+  "tags": [
+    "cinematic",
+    "warm",
+    "emotional",
+    "amber",
+    "romantic",
+    "storytelling"
+  ],
+  "demo_photos": [
+    "/static/themes/untilifoundyou/demo_0b49ce6e.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "espresso": "#1a0e08",
+    "sienna": "#c4542a",
+    "gold": "#d4a85a",
+    "amber": "#e8c070",
+    "antique": "#faf4e8",
+    "dawn": "#f8e8c8"
+  },
+  "fonts": {
+    "serif": "Playfair Display",
+    "body": "Lora",
+    "hand": "Kalam",
+    "sans": "Jost"
+  },
+  "features": [
+    "typewriter_intro",
+    "film_strip_top_bottom",
+    "super8_vignette",
+    "warm_light_leaks",
+    "dust_motes_canvas",
+    "handwritten_letter_opening",
+    "bismillah_verse",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_cinematic_grade",
+    "cinema_frame_gallery",
+    "contact_sheet_strip",
+    "countdown_washi_tape",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music",
+    "film_grain_closing"
+  ]
+}

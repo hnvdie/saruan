@@ -1,0 +1,40 @@
+{
+  "id": "orizon",
+  "name": "Chronos Orizon",
+  "description": "Tema kinetik minimalis yang menggabungkan estetika arsitektur Cycladic dengan interaksi UI modern yang bersih.",
+  "preview_color": "#F8F9FA",
+  "accent_color": "#C5A36D",
+  "skeleton": "orizon",
+  "tags": [
+    "minimalist",
+    "kinetic",
+    "luxury",
+    "architectural",
+    "clean"
+  ],
+  "demo_photos": [
+    "/static/themes/orizon/demo_7981acb5.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "background": "#F8F9FA",
+    "text": "#1A1A1B",
+    "accent": "#C5A36D",
+    "secondary": "#2D4059"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "serif": "Cormorant Garamond",
+    "sans": "Montserrat"
+  },
+  "features": [
+    "Kinetic Background System",
+    "Architectural Arch Layout",
+    "Iris-Path Envelope Transition",
+    "Monochrome Parallax Hero",
+    "Clean Ticker Story Mode"
+  ]
+}

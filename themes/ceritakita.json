@@ -16,9 +16,9 @@
   "demo_photos": [
     "/static/themes/ceritakita/demo_f3974fc1.jpg"
   ],
-  "price": 25000,
-  "price_label": "Rp. 25.000",
-  "price_original": 50000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "linen": "#f7f0e4",

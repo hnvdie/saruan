@@ -1,0 +1,69 @@
+{
+  "id": "surga_alam",
+  "name": "Surga Alam",
+  "description": "Tema pernikahan yang memadukan keindahan alam tropis Indonesia dengan ornamen tradisional Bali-Jawa. Nuansa hutan hijau dalam (deep forest), emas antik, dan bunga-bunga tropis yang kaya warna menciptakan suasana taman surga yang romantis dan elegan. Gapura ukiran, gazebo Jawa, dan taman air menjadi inspirasi visual yang membuat undangan ini terasa seperti sebuah karya seni.",
+  "preview_color": "#2D4A2F",
+  "accent_color": "#C9943A",
+  "skeleton": "surga_alam",
+  "tags": [
+    "tradisional",
+    "tropis",
+    "Indonesia",
+    "Bali",
+    "Jawa",
+    "alam",
+    "forest",
+    "gold",
+    "elegant",
+    "romantic",
+    "ornamental",
+    "nature",
+    "botanical",
+    "cultural"
+  ],
+  "demo_photos": [
+    "/static/themes/surga_alam/demo_3b57014a.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "forest_deep": "#2D4A2F",
+    "forest_mid": "#3D6140",
+    "forest_light": "#5A7D5C",
+    "jade": "#4A7C6B",
+    "gold_antique": "#C9943A",
+    "gold_light": "#E8C46A",
+    "gold_pale": "#F0D98A",
+    "terracotta": "#A0522D",
+    "terracotta_light": "#C4713F",
+    "plum_deep": "#5C2D4A",
+    "plum_light": "#7A3D62",
+    "ivory": "#F5EFE0",
+    "ivory_dark": "#EDE3CC"
+  },
+  "fonts": {
+    "display": "Cinzel",
+    "serif": "Cormorant Garamond",
+    "sans": "Philosopher"
+  },
+  "features": [
+    "Cover fullscreen dengan efek split-reveal dramatis",
+    "Mandala ornamen berputar sebagai visual ayat Al-Quran",
+    "Foto couple sebagai hero — gradien into couple info",
+    "Portraits mempelai pria & wanita dalam split-screen",
+    "Love story dengan initial drop-cap dan tekstur perkamen",
+    "Countdown real-time dengan grid kaca berlapis",
+    "Event cards dengan aksen warna berbeda per acara",
+    "Google Maps embed terintegrasi",
+    "Gallery: feature photo + horizontal scroll strip",
+    "RSVP form dengan append real-time ke guestbook",
+    "Guestbook scrollable dengan animasi entry",
+    "Gift section: bank & e-wallet dengan copy button",
+    "Partikel kelopak bunga mengambang ambient",
+    "Music player floating dengan animasi pulse",
+    "Scroll reveal dengan variasi animasi per section",
+    "Closing poster fullscreen yang dramatis"
+  ]
+}

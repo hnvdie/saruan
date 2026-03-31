@@ -1,0 +1,22 @@
+{
+  "id": "lentera",
+  "name": "Lentera (Dark Ash)",
+  "description": "Tema gelap elegan dengan efek origami, latar abu-abu hitam, foto hero lebih jelas, aksen rose gold lembut.",
+  "preview_color": "#2a2a2a",
+  "accent_color": "#b76e79",
+  "skeleton": "fullpage_scroll",
+  "tags": [
+    "dark",
+    "modern",
+    "romantic",
+    "animated",
+    "soft"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "demo_photos": [
+    "/static/themes/lentera/demo_1b077984.jpg"
+  ],
+  "price_original": 50000,
+  "price_note": ""
+}

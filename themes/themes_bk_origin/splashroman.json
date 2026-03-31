@@ -1,0 +1,50 @@
+{
+  "name": "Splash Roman",
+  "description": "Kedalaman kolam yang tenang bertemu impresionisme Eropa — ripple yang meluas dari titik pertemuan dua jiwa. Gelembung naik perlahan dalam nuansa biru teal dalam, emas tua, dan krem sutra. Dramatis namun intim.",
+  "preview_color": "#0d2233",
+  "accent_color": "#c9a96e",
+  "tags": [
+    "dark",
+    "romantic",
+    "impresionisme",
+    "aquatic",
+    "elegant"
+  ],
+  "demo_photos": [
+    "/static/themes/splashroman/demo_c5cde57f.webp"
+  ],
+  "features": [
+    "Swipe card fullscreen — 12 scene sinematik",
+    "Envelope liquid curtain split dramatis",
+    "Partikel gelembung canvas animasi real-time",
+    "Ripple rings animasi dari titik pertemuan",
+    "Polaroid collage gallery foto bertumpuk",
+    "Countdown timer real-time hari-H",
+    "RSVP + Guestbook real-time",
+    "Gift section dengan copy nomor rekening",
+    "Music player floating dengan spinning ring",
+    "Google Maps embed + link"
+  ],
+  "price": 25000,
+  "price_label": "Rp 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "deep_ocean": "#0d2233",
+    "teal": "#1a4a5e",
+    "teal_bright": "#2a6e8a",
+    "cream": "#f5efe6",
+    "silk": "#ede4d8",
+    "gold": "#c9a96e",
+    "gold_light": "#e8c98a",
+    "blush": "#d4a0a0"
+  },
+  "fonts": {
+    "display": "Cormorant Infant",
+    "serif": "Cormorant Infant",
+    "sans": "Jost",
+    "arabic": "Noto Naskh Arabic"
+  },
+  "id": "splashroman",
+  "skeleton": "splashroman"
+}

@@ -1,0 +1,69 @@
+{
+  "name": "Bunga Tulis",
+  "description": "Undangan pernikahan bergaya minimalis botanical — seperti surat cinta ditulis tangan di atas kertas linen premium. Nuansa krem hangat, tinta cokelat tanah, dan ilustrasi ranting daun bergaya pen-art yang elegan. Bersih, tenang, dan penuh keanggunan.",
+  "preview_color": "#8B7355",
+  "accent_color": "#C4A882",
+  "tags": [
+    "minimalis",
+    "botanical",
+    "floral",
+    "elegan",
+    "krem",
+    "natural",
+    "modern",
+    "romantic",
+    "clean",
+    "warm",
+    "botanical-line-art",
+    "premium",
+    "simple"
+  ],
+  "demo_photos": [
+    "/static/themes/bungatulis/demo_0cb33edc.jpg"
+  ],
+  "features": [
+    "Opening overlay amplop bergaya surat — klik untuk buka undangan",
+    "Ilustrasi ranting daun SVG botanical di setiap pojok section",
+    "Partikel kelopak bunga jatuh ambient di canvas",
+    "Scroll snap antar section terasa seperti swipe halaman buku",
+    "Hero dengan tipografi besar Cormorant Garamond + Dancing Script",
+    "Ayat Al-Quran dengan Arabic watermark transparan di latar",
+    "Profil pasangan slide masuk dari kiri-kanan secara dramatis",
+    "Info acara dalam kartu dengan shadow offset dekoratif",
+    "Countdown real-time hari/jam/menit/detik",
+    "Kisah cinta dengan tanda kutip besar sebagai visual opener",
+    "Galeri foto horizontal scroll — tiap foto masuk stagger dengan rotasi & scale",
+    "Lightbox untuk buka foto galeri fullscreen",
+    "Google Maps embed terintegrasi",
+    "RSVP form kirim via fetch JSON ke Flask backend",
+    "Guestbook scrollable tampil live di bawah form RSVP",
+    "Gift section: filter None otomatis, ikon per jenis ewallet (GoPay, OVO, DANA, dll)",
+    "Tombol salin nomor rekening/ewallet",
+    "Music player floating dengan animasi ring pulse",
+    "Nav dots indikator section di sisi kanan layar",
+    "Animasi GSAP ScrollTrigger berbeda karakter per section — semakin epic ke bawah",
+    "Penutup dengan animasi scale + script font emosional"
+  ],
+  "price": 25000,
+  "price_label": "Rp 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "bg_warm": "#F7F4EF",
+    "bg_muted": "#EDE8DF",
+    "ink_deep": "#2C2A26",
+    "ink_soft": "#6B6660",
+    "accent_earth": "#8B7355",
+    "accent_gold": "#C4A882",
+    "white_warm": "#FDFCF9",
+    "border_linen": "#D4C9BA"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "script": "Dancing Script",
+    "sans": "Jost",
+    "arabic": "Amiri"
+  },
+  "id": "bungatulis",
+  "skeleton": "bungatulis"
+}

@@ -17,9 +17,9 @@
   "demo_photos": [
     "/static/themes/raudhah/demo_f9347364.jpg"
   ],
-  "price": 40000,
-  "price_label": "Rp. 40.000",
-  "price_original": 60000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "oud": "#3B2415",

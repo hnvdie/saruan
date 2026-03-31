@@ -1,0 +1,41 @@
+{
+  "id": "kalajingga",
+  "name": "Kala Jingga",
+  "description": "Sebuah ode untuk romansa klasik yang abadi. Mengusung estetika vintage dengan sentuhan hangat sinar matahari senja dan tekstur kertas organik yang intim.",
+  "preview_color": "#D27D46",
+  "accent_color": "#4A3728",
+  "skeleton": "kalajingga",
+  "tags": [
+    "Vintage",
+    "Warm",
+    "Heritage",
+    "Organic",
+    "Classic"
+  ],
+  "demo_photos": [
+    "/static/themes/kalajingga/demo_c129f269.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "Deep_Teak": "#4A3728",
+    "Amber_Sunlight": "#D27D46",
+    "Pressed_Paper": "#F4EDE3",
+    "Dried_Rose": "#A67B7D",
+    "Dusty_Clay": "#8C6A56"
+  },
+  "fonts": {
+    "display": "DM Serif Display",
+    "serif": "Crimson Text",
+    "sans": "Montserrat"
+  },
+  "features": [
+    "Dramatis Envelope Reveal (Vintage Postcard)",
+    "Ambient Light Dust Particle System",
+    "Asymmetric Organic Photo Collage",
+    "Interactive Wax Seal Button",
+    "Floating Vinyl Music Player"
+  ]
+}

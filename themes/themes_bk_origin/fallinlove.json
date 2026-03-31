@@ -1,0 +1,68 @@
+{
+  "name": "Fall In Love",
+  "description": "Tema undangan pernikahan eksklusif bergaya botanical romantic — perpaduan bunga-bunga lembut, bingkai emas geometris, dan tipografi mewah yang menghadirkan nuansa taman bunga Eropa di hari istimewamu. Setiap gulir halaman terasa seperti membalik lembaran buku cinta yang puitis.",
+  "preview_color": "#C99090",
+  "accent_color": "#8B5E70",
+  "tags": [
+    "Romantic",
+    "Floral",
+    "Botanical",
+    "Soft",
+    "Luxury",
+    "Gold"
+  ],
+  "demo_photos": [
+    "/static/themes/fallinlove/demo_b7bcbf30.webp"
+  ],
+  "features": [
+    "Cover Page Botanis dengan Animasi Kelopak Bunga Melayang",
+    "Transisi Buka Undangan dengan Efek Fade & Scale Sinematik",
+    "Full-Screen Scroll Snap Pages — Seperti Geser Kartu Vertikal",
+    "Bingkai Emas Geometris pada Cover & Section Pembuka",
+    "Pasangan Foto Mempelai dengan Bingkai Arch Elegan",
+    "Kartu Acara Akad & Resepsi dengan Detail Premium",
+    "Countdown Timer Hari Menuju Pernikahan",
+    "Peta Lokasi Terintegrasi",
+    "Galeri Foto dengan Lightbox Full-Screen",
+    "Timeline Kisah Cinta Interaktif",
+    "RSVP Form Modern dengan Konfirmasi Animasi",
+    "Hadiah Digital — Rekening & E-Wallet dengan Tombol Salin",
+    "Ucapan Tamu dengan Avatar Initial",
+    "Floating Music Player dengan Auto-Play",
+    "Nav Dots Navigasi Cepat Antar Halaman",
+    "Footer Penutup Botanis Mewah"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "Parchment": "#F7F0E8",
+    "Blush_Light": "#F2DEDA",
+    "Blush": "#E4BDB8",
+    "Rose": "#C99090",
+    "Mauve": "#8B5E70",
+    "Mauve_Dark": "#5C3A4A",
+    "Gold": "#C4A55A",
+    "Gold_Light": "#D8BE82",
+    "Gold_Pale": "#EFE3C5",
+    "Sage": "#7A8C72",
+    "Deep": "#3A2535"
+  },
+  "fonts": {
+    "script": "Great Vibes",
+    "display": "Cormorant Garamond",
+    "sans": "Raleway"
+  },
+  "id": "fallinlove",
+  "skeleton": "fallinlove",
+  "assets": {
+    "cover_webp": "static/themes/fallinlove/cover.webp",
+    "cover_webp_spec": "1080x1920px (portrait). Format WebP kualitas 80-85. Foto bunga/taman/prewedding portrait. Background blur/soft untuk efek maksimal. Maks 400KB.",
+    "floral_tl_webp": "static/themes/fallinlove/floral_tl.webp",
+    "floral_tl_spec": "PNG/WebP dengan background transparan. Dekorasi sudut bunga mawar + daun (pojok kiri atas). Ukuran 600x600px. Format WebP transparan. Warna preferensi: pink dusty rose, putih krem, hijau sage, aksen emas. Maks 150KB.",
+    "floral_bl_webp": "static/themes/fallinlove/floral_bl.webp",
+    "floral_bl_spec": "PNG/WebP dengan background transparan. Dekorasi sudut bunga mawar + daun (pojok kiri bawah). Ukuran 600x600px. Bisa sama dengan floral_tl diputar 180 derajat. Maks 150KB.",
+    "notes": "floral_tr dan floral_br dibuat otomatis oleh CSS transform (scaleX / scale(-1)) dari floral_tl dan floral_bl — cukup sediakan 2 asset floral saja. Jika tidak ada cover.webp, background akan fallback ke gradient parchment. Jika tidak ada floral assets, dekorasi sudut tidak ditampilkan (template tetap indah tanpa asset)."
+  }
+}

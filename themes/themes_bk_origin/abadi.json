@@ -1,0 +1,56 @@
+{
+  "name": "Abadi",
+  "description": "Agung, tak terbatas, dan penuh kemuliaan. Nuansa midnight navy dengan celestial silver dan ivory lunar — seperti bintang-bintang yang sinarnya menembus keabadian. Cinta yang melampaui ruang dan waktu.",
+  "preview_color": "#0b1228",
+  "accent_color": "#d4b86a",
+  "tags": [
+    "celestial",
+    "dark",
+    "elegant",
+    "timeless",
+    "luxury",
+    "starry"
+  ],
+  "demo_photos": [
+    "/static/themes/abadi/demo_f383ecfe.jpg"
+  ],
+  "features": [
+    "celestial_gate_intro",
+    "shooting_star",
+    "nebula_clouds",
+    "constellation_lines",
+    "multi_starfield_canvas",
+    "quran_verse_dark_panel",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_clear_night",
+    "gold_corner_gallery",
+    "radiant_burst_closing",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "void": "#04060f",
+    "night": "#070d1e",
+    "navy": "#0b1228",
+    "silver": "#c8cfe0",
+    "gold_star": "#d4b86a",
+    "burgundy": "#6b1a2a",
+    "ivory": "#f8f3ea"
+  },
+  "fonts": {
+    "title": "Cinzel Decorative",
+    "display": "Cinzel",
+    "serif": "Cormorant Garamond",
+    "sans": "Jost"
+  },
+  "id": "abadi",
+  "skeleton": "abadi"
+}

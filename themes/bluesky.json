@@ -28,9 +28,9 @@
     "love_story",
     "music"
   ],
-  "price": 30000,
-  "price_label": "Rp. 30.000",
-  "price_original": 50000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "ivory": "#f9f5ee",

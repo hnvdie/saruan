@@ -1,0 +1,61 @@
+{
+  "name": "Awan Kita",
+  "description": "Langit senja bergradasi lavender-rose-peach bertemu akar-akar pohon yang menjalar — perpaduan dunia langit dan bumi sebagai metafora dua jiwa yang menyatu. Animasi awan terbelah membuka undangan, diperindah partikel awan melayang dan tipografi kaligrafi elegan.",
+  "preview_color": "#c2a8e2",
+  "accent_color": "#c49650",
+  "tags": [
+    "cloud",
+    "romantic",
+    "dreamy",
+    "pastel",
+    "nature",
+    "tree",
+    "twilight",
+    "lavender"
+  ],
+  "demo_photos": [
+    "/static/themes/awankita/demo_e5c7cb1b.webp"
+  ],
+  "features": [
+    "Animasi awan terbelah saat Buka Undangan (cloud-parting reveal)",
+    "Scroll section fullscreen snap — touch, swipe, keyboard, wheel",
+    "Partikel awan melayang ambient (canvas, GPU-friendly)",
+    "Dekorasi akar & cabang pohon SVG organik di setiap section",
+    "Foto mempelai split-screen dengan animasi masuk kiri/kanan",
+    "Love story timeline scrollable",
+    "Countdown timer real-time hari/jam/menit/detik",
+    "Galeri foto polaroid berputar dengan hover efek",
+    "RSVP form + auto-append ke Guestbook",
+    "Gift section bank & e-wallet dengan tombol salin",
+    "Music player floating dengan toggle play/pause",
+    "Google Maps embed terintegrasi",
+    "Footer habarkita.com di setiap section",
+    "Fully responsive mobile 360px+ dan desktop 1024px+"
+  ],
+  "price": 25000,
+  "price_label": "Rp 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "lavender": "#c2a8e2",
+    "lavender_light": "#ede0ff",
+    "rose": "#e0a8c5",
+    "rose_light": "#fce0ee",
+    "peach": "#efbf96",
+    "peach_light": "#fde8d4",
+    "sky": "#a8c4e0",
+    "deep_purple": "#6a428a",
+    "earth": "#8a5c38",
+    "gold": "#c49650",
+    "text_dark": "#362440",
+    "text_mid": "#7a5a8a",
+    "cream": "#fdf7f4"
+  },
+  "fonts": {
+    "display": "Playfair Display",
+    "script": "Dancing Script",
+    "body": "Cormorant Garamond"
+  },
+  "id": "awankita",
+  "skeleton": "awankita"
+}

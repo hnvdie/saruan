@@ -12,11 +12,11 @@
     "floral",
     "animated"
   ],
-  "price": 25000,
-  "price_label": "Rp. 25.000",
+  "price": 60000,
+  "price_label": "Rp 60.000",
   "demo_photos": [
     "/static/themes/petalink/demo_f5cffcb0.jpg"
   ],
-  "price_original": 50000,
+  "price_original": 149000,
   "price_note": ""
 }

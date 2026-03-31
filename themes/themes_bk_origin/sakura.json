@@ -1,0 +1,22 @@
+{
+  "id": "sakura",
+  "name": "Sakura Dream",
+  "description": "Bunga sakura berjatuhan, nuansa Jepang yang lembut dan puitis",
+  "preview_color": "#fff0f5",
+  "accent_color": "#e8638c",
+  "skeleton": "storybook",
+  "tags": [
+    "light",
+    "japanese",
+    "floral",
+    "animated",
+    "soft"
+  ],
+  "demo_photos": [
+    "/static/themes/sakura/demo_2ea18edb.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": ""
+}

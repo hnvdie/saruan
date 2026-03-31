@@ -24,9 +24,9 @@
   "demo_photos": [
     "/static/themes/surga_alam/demo_3b57014a.jpg"
   ],
-  "price": 25000,
-  "price_label": "Rp. 25.000",
-  "price_original": 50000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "forest_deep": "#2D4A2F",

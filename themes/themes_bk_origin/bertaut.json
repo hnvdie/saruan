@@ -1,0 +1,83 @@
+{
+  "name": "Bertaut",
+  "description": "Bertaut — terjalin erat seperti akar dan tanah. Tema nature-luxury dengan estetika botanical soft yang hangat: linen putih, sage hijau, dan sentuhan tembaga natural. Setiap section hadir seperti lembaran buku cinta yang dibuka perlahan.",
+  "preview_color": "#A8B89A",
+  "accent_color": "#7A6652",
+  "tags": [
+    "Nature",
+    "Botanical",
+    "Soft Luxury",
+    "Elegant",
+    "Romantic"
+  ],
+  "demo_photos": [
+    "/static/themes/bertaut/demo_bb6a11d4.jpg"
+  ],
+  "features": [
+    "Opening Envelope — layar pembuka yang elegan sebelum undangan dibuka",
+    "Full-screen Swipe Scroll Snapping — navigasi vertikal layaknya membuka lembaran buku",
+    "Botanical Floating Leaves Ambient — daun-daun natural melayang di latar",
+    "Hero Section dengan foto portrait yang dramatis & overlay tekstur linen",
+    "Parallax Soft Depth pada setiap section",
+    "Countdown Timer dengan estetika tembaga natural",
+    "Love Story Timeline dengan animasi reveal",
+    "Foto Gallery Grid dengan efek hover botanis",
+    "RSVP Form minimalis elegan",
+    "Hadiah Digital dengan desain kartu premium",
+    "Floating Music Player dengan visual gelombang",
+    "Footer 'dibuat dengan ❤️ oleh habarkita.com'"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "Sage_Green": "#A8B89A",
+    "Deep_Moss": "#4A5C40",
+    "Warm_Linen": "#F4EFE6",
+    "Copper_Rose": "#C4957A",
+    "Earthy_Bark": "#7A6652",
+    "Mist_White": "#FAF8F4",
+    "Soft_Ivory": "#EDE8DF",
+    "Sage_Dark": "#2E3D28"
+  },
+  "fonts": {
+    "display": "Cormorant Garamond",
+    "script": "Dancing Script",
+    "body": "Lato"
+  },
+  "id": "bertaut",
+  "skeleton": "bertaut",
+  "assets": {
+    "cover_photo": {
+      "key": "cover_photo",
+      "label": "Foto Sampul (Header Utama)",
+      "description": "Foto prewedding portrait — digunakan sebagai hero image di section pertama setelah pembuka undangan.",
+      "recommended": "Format JPG/WebP, ukuran 1080×1350px (portrait 4:5) atau 1080×1920px. Maksimal 2MB. Gunakan foto dengan komposisi tengah supaya tidak terpotong di semua layar."
+    },
+    "gallery_photos": {
+      "key": "photos",
+      "label": "Foto Galeri (maks 10 foto)",
+      "description": "Koleksi foto prewedding untuk ditampilkan di section Galeri.",
+      "recommended": "Format JPG/WebP, min 800×800px. Maksimal 1MB per foto. Bisa portrait atau landscape."
+    },
+    "groom_photo": {
+      "key": "groom_photo",
+      "label": "Foto Mempelai Pria",
+      "description": "Foto individual mempelai pria untuk section pengenalan pasangan.",
+      "recommended": "Format JPG/WebP, ukuran 600×800px (portrait 3:4). Latar polos atau natural untuk hasil terbaik."
+    },
+    "bride_photo": {
+      "key": "bride_photo",
+      "label": "Foto Mempelai Wanita",
+      "description": "Foto individual mempelai wanita untuk section pengenalan pasangan.",
+      "recommended": "Format JPG/WebP, ukuran 600×800px (portrait 3:4). Latar polos atau natural untuk hasil terbaik."
+    },
+    "music": {
+      "key": "music_url",
+      "label": "Musik Latar (URL)",
+      "description": "URL langsung ke file MP3 untuk musik latar undangan. Bisa dari Google Drive (link langsung) atau server sendiri.",
+      "recommended": "Format MP3, durasi 3–5 menit, bitrate 128kbps. Pilih lagu instrumental romantis yang tenang."
+    }
+  }
+}

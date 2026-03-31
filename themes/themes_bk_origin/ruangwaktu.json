@@ -1,0 +1,53 @@
+{
+  "id": "ruangwaktu",
+  "name": "Ruang Waktu",
+  "description": "Misterius, nostalgik, dan penuh makna. Nuansa twilight gelap dengan amber dusk dan ungu lembut — seolah undangan datang dari sebuah momen abadi yang melampaui ruang dan waktu.",
+  "preview_color": "#1e1838",
+  "accent_color": "#d4924a",
+  "skeleton": "ruangwaktu",
+  "tags": [
+    "dark",
+    "romantic",
+    "mysterious",
+    "nostalgic",
+    "elegant",
+    "timeless"
+  ],
+  "demo_photos": [
+    "/static/themes/ruangwaktu/demo_64d1a4cd.jpg"
+  ],
+  "price": 25000,
+  "price_label": "Rp. 25.000",
+  "price_original": 50000,
+  "price_note": "",
+  "palette": {
+    "void": "#0c0a12",
+    "deep": "#14102a",
+    "dusk": "#1e1838",
+    "amber": "#d4924a",
+    "amber2": "#e8b56a",
+    "lilac": "#9d8ec0",
+    "parch": "#f0e8d8"
+  },
+  "fonts": {
+    "display": "Cinzel",
+    "serif": "Libre Baskerville",
+    "body": "Alegreya",
+    "sans": "Jost"
+  },
+  "features": [
+    "clock_portal_intro",
+    "starfield",
+    "floating_particles",
+    "quran_verse",
+    "center_vertical_timeline",
+    "schedule_timeline",
+    "hero_photo_clear_bg",
+    "asymmetric_gallery_hero",
+    "countdown",
+    "rsvp",
+    "gift",
+    "love_story",
+    "music"
+  ]
+}

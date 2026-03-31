@@ -1,0 +1,64 @@
+{
+  "id": "abyssaltide",
+  "name": "Abyssal Tide",
+  "description": "Tema yang terinspirasi dari kedalaman laut bioluminesen dan batik geometri Jawa. Atmosfer biru-hijau malam samudra, partikel cahaya hidup mengambang, ornamen batik konsentris sebagai benang merah visual. Dramatis, unik, dan tak terlupakan.",
+  "preview_color": "#00d4c8",
+  "accent_color": "#7fffd4",
+  "skeleton": "abyssaltide",
+  "tags": [
+    "dark",
+    "ocean",
+    "bioluminescent",
+    "batik",
+    "geometric",
+    "animated",
+    "cinematic",
+    "modern",
+    "premium"
+  ],
+  "demo_photos": [
+    "/static/themes/abyssaltide/demo_a07b2b3e.jpg"
+  ],
+  "price": 25,
+  "price_label": "Rp. 25.000",
+  "price_original": 30000,
+  "price_note": "",
+  "palette": {
+    "abyss": "#040d1a",
+    "deep": "#071428",
+    "midnight": "#0a1f3d",
+    "brine": "#0d2b52",
+    "glow": "#00d4c8",
+    "glow_dim": "#007f78",
+    "phosphor": "#7fffd4",
+    "salt": "#c8e8e6",
+    "pearl": "#e8f4f3",
+    "batik_gold": "#c9a84c",
+    "batik_rust": "#8b3a2a"
+  },
+  "fonts": {
+    "display": "Cinzel",
+    "serif": "Cormorant Garamond",
+    "sans": "DM Sans"
+  },
+  "features": [
+    "Envelope intro dengan iris transition dramatis",
+    "Sistem partikel bioluminesen real-time (canvas)",
+    "Overlay batik konsentris SVG pada cover",
+    "Hero dengan nama + efek glow blur",
+    "Ayat Al-Quran QS. Ar-Rum 21 — Arabic + terjemahan",
+    "Profil mempelai dengan foto diagonal clip",
+    "Film tape horizontal untuk love story",
+    "Event cards dengan gradient depth",
+    "Countdown timer real-time",
+    "Polaroid stack + film strip gallery",
+    "RSVP form terminal-style",
+    "Guestbook real-time append",
+    "Amplop digital bank + e-wallet dengan copy button",
+    "Closing poster fullscreen",
+    "Floating music player dengan animasi wave ripple",
+    "IntersectionObserver scroll animations — 6 varian efek",
+    "Mobile-first, max-width 480px",
+    "Pure CSS + JS — tanpa library eksternal"
+  ]
+}

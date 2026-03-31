@@ -17,9 +17,9 @@
   "demo_photos": [
     "/static/themes/sekarjagad/demo_bd90b12d.jpg"
   ],
-  "price": 40000,
-  "price_label": "Rp. 40.000",
-  "price_original": 60000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": "",
   "palette": {
     "terracotta": "#B5522A",

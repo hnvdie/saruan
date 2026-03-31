@@ -13,7 +13,6 @@
     "sakura",
     "luxury"
   ],
-
   "colors": {
     "primary": "#1a1614",
     "secondary": "#d4849a",
@@ -42,8 +41,8 @@
   "demo_photos": [
     "/static/themes/gerbangzen/demo_d23ddb91.jpg"
   ],
-  "price": 25000,
-  "price_label": "Rp. 25.000",
-  "price_original": 50000,
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
   "price_note": ""
 }
