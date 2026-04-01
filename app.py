@@ -1792,6 +1792,7 @@ def user_logout():
     return redirect(url_for('user_login'))
 
 # ── /dashboard ────────────────────────────────────────────────────────────────
+"""
 @app.route('/dashboard')
 @user_login_required
 def user_dashboard():
@@ -1805,6 +1806,67 @@ def user_dashboard():
     expired = is_expired(inv)
     return render_template('user_dashboard.html', inv=inv, theme=theme,
                            rsvp_count=rsvp_count, expired=expired)
+
+"""
+
+@app.route('/dashboard')
+@user_login_required
+def user_dashboard():
+    inv_id = session['user_inv_id']
+    conn = get_db()
+    inv = conn.execute('SELECT * FROM invitations WHERE id=?', (inv_id,)).fetchone()
+    if not inv:
+        conn.close()
+        session.pop('user_inv_id', None)
+        return redirect(url_for('user_login'))
+
+    rsvp_count = conn.execute(
+        'SELECT COUNT(*) as c FROM rsvp WHERE invitation_id=?', (inv_id,)
+    ).fetchone()['c']
+
+    conn.close()
+    theme   = get_theme(inv['theme_id']) or {'name': inv['theme_id']}
+    expired = is_expired(inv)
+    return render_template('user_dashboard.html', inv=inv, theme=theme,
+                           rsvp_count=rsvp_count, expired=expired)
+
+@app.route('/dashboard/rsvp')
+@user_login_required
+def user_rsvp():
+    inv_id = session['user_inv_id']
+    conn   = get_db()
+    inv    = conn.execute('SELECT * FROM invitations WHERE id=?', (inv_id,)).fetchone()
+    if not inv:
+        conn.close()
+        session.pop('user_inv_id', None)
+        return redirect(url_for('user_login'))
+    rsvp_list = conn.execute(
+        'SELECT * FROM rsvp WHERE invitation_id=? ORDER BY created_at DESC',
+        (inv_id,)
+    ).fetchall()
+    conn.close()
+    return render_template('user_rsvp.html', inv=inv, rsvp_list=rsvp_list)
+
+
+# ── GANTI: user_rsvp_delete() — redirect kembali ke rsvp page jika ?next=rsvp
+#    (Ganti seluruh fungsi yang sudah ada di sekitar baris 1838)
+@app.route('/dashboard/rsvp/delete/<int:rsvp_id>', methods=['POST'])
+@user_login_required
+def user_rsvp_delete(rsvp_id):
+    inv_id = session['user_inv_id']
+    conn   = get_db()
+    conn.execute(
+        'DELETE FROM rsvp WHERE id=? AND invitation_id=?',
+        (rsvp_id, inv_id)
+    )
+    conn.commit()
+    conn.close()
+    # Redirect kembali ke halaman asal (rsvp page atau dashboard)
+    if request.args.get('next') == 'rsvp':
+        return redirect(url_for('user_rsvp'))
+    return redirect(url_for('user_dashboard'))
+
+
 
 # ── /dashboard/edit ───────────────────────────────────────────────────────────
 @app.route('/dashboard/edit', methods=['GET', 'POST'])

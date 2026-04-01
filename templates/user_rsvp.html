@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RSVP — {{ inv.groom_name }} &amp; {{ inv.bride_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#fff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--accent-light:#d6c8be;--red:#c0392b;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* ── NAV ── */
+nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:.75rem;}
+.nav-username{font-size:.65rem;color:var(--muted);}
+.nav-logout{font-size:.62rem;color:var(--faint);transition:color .2s;}
+.nav-logout:hover{color:var(--red);}
+
+/* ── LAYOUT ── */
+.wrap{max-width:760px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+
+/* ── BACK LINK ── */
+.back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem;transition:color .15s;}
+.back-link:hover{color:var(--ink);}
+
+/* ── PAGE HEADER ── */
+.page-head{margin-bottom:1.3rem;}
+.page-names{font-family:var(--serif);font-size:clamp(1.4rem,4vw,2rem);font-weight:300;line-height:1.15;}
+.page-names em{font-style:italic;color:var(--accent);}
+.page-sub{font-size:.65rem;color:var(--muted);margin-top:.35rem;}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1.2rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:.75rem .9rem;}
+.stat-label{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
+.stat-val{font-family:var(--serif);font-size:1.5rem;font-weight:300;line-height:1;}
+.stat-sub{font-size:.6rem;color:var(--muted);margin-top:.15rem;}
+.s-hadir .stat-val{color:#2d8a4e;}
+.s-tidak .stat-val{color:var(--red);}
+.s-tamu  .stat-val{color:var(--accent);}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem;flex-wrap:wrap;}
+.search-wrap{flex:1;min-width:160px;position:relative;}
+.search-wrap input{
+  width:100%;padding:.42rem .65rem .42rem 1.9rem;
+  border:1px solid var(--border);border-radius:2px;
+  font-family:var(--sans);font-size:.72rem;color:var(--ink);
+  background:var(--white);outline:none;transition:border-color .15s;
+}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-icon{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);width:12px;height:12px;color:var(--faint);pointer-events:none;}
+.search-clear{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--faint);font-size:.9rem;line-height:1;padding:.15rem;display:none;}
+.search-clear.on{display:block;}
+
+.ftabs{display:flex;gap:.3rem;flex-shrink:0;}
+.ftab{padding:.35rem .7rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;background:var(--white);color:var(--muted);font-family:var(--sans);transition:all .15s;white-space:nowrap;}
+.ftab:hover{border-color:var(--ink);color:var(--ink);}
+.ftab.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+.ftab.on.fh{background:#2d8a4e;border-color:#2d8a4e;}
+.ftab.on.ft{background:var(--red);border-color:var(--red);}
+
+.btn-csv{padding:.38rem .75rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;background:var(--white);color:var(--muted);font-family:var(--sans);transition:all .15s;white-space:nowrap;}
+.btn-csv:hover{border-color:var(--ink);color:var(--ink);}
+
+/* ── RESULT LINE ── */
+.result-line{font-size:.63rem;color:var(--muted);margin-bottom:.65rem;min-height:1rem;}
+.result-line b{color:var(--ink2);font-weight:400;}
+
+/* ── RSVP CARDS ── */
+.rsvp-list{display:flex;flex-direction:column;gap:.5rem;}
+.rsvp-card{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .15s;}
+.rsvp-card:hover{border-color:var(--accent-light);}
+
+.card-top{display:flex;align-items:flex-start;gap:.7rem;padding:.75rem 1rem;}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--off2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:.95rem;color:var(--accent);flex-shrink:0;font-style:italic;user-select:none;}
+.card-main{flex:1;min-width:0;}
+.card-name{font-size:.8rem;color:var(--ink);font-weight:400;margin-bottom:.2rem;}
+.card-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+.card-date{font-size:.6rem;color:var(--faint);}
+
+.badge{display:inline-block;padding:.1rem .42rem;border-radius:2px;font-size:.55rem;letter-spacing:.07em;text-transform:uppercase;border:1px solid;}
+.bh{color:#2d8a4e;border-color:#b9dfc8;background:#f0faf4;}
+.bt{color:var(--red);border-color:#f5c6c6;background:#fff5f5;}
+.br{color:#8a6d0a;border-color:#f5e0a0;background:#fffbf0;}
+.bc{color:var(--muted);border-color:var(--border);background:var(--off);}
+
+.del-btn{background:none;border:none;cursor:pointer;padding:.25rem .35rem;color:var(--faint);font-size:.75rem;line-height:1;transition:color .15s;flex-shrink:0;margin-top:-.05rem;}
+.del-btn:hover{color:var(--red);}
+
+/* ── MESSAGE ── */
+.card-msg-wrap{padding:0 1rem .75rem calc(1rem + 32px + .7rem);}
+.card-msg{font-size:.7rem;color:var(--ink2);line-height:1.65;font-style:italic;}
+.card-msg::before{content:'\201C';font-family:var(--serif);font-size:1.2rem;color:var(--accent-light);line-height:0;position:relative;top:.22rem;margin-right:.1rem;}
+.card-msg.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.msg-more{background:none;border:none;cursor:pointer;font-size:.62rem;color:var(--accent);font-family:var(--sans);padding:0;margin-top:.3rem;display:block;transition:opacity .15s;}
+.msg-more:hover{opacity:.7;}
+
+/* ── PAGINATION ── */
+.pager{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:1.2rem;flex-wrap:wrap;}
+.pg{padding:.3rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.62rem;cursor:pointer;background:var(--white);color:var(--muted);font-family:var(--sans);transition:all .15s;min-width:2rem;text-align:center;}
+.pg:hover:not([disabled]){border-color:var(--ink);color:var(--ink);}
+.pg.cur{background:var(--ink);color:#fff;border-color:var(--ink);}
+.pg[disabled]{opacity:.3;cursor:default;}
+.pg-sep{font-size:.62rem;color:var(--faint);padding:0 .1rem;}
+.pg-info{font-size:.62rem;color:var(--muted);padding:0 .3rem;}
+
+/* ── EMPTY ── */
+.empty{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3rem 1.5rem;text-align:center;}
+.empty-ico{font-size:1.8rem;margin-bottom:.65rem;opacity:.4;}
+.empty-ttl{font-family:var(--serif);font-size:1.15rem;font-weight:300;color:var(--muted);margin-bottom:.35rem;}
+.empty-txt{font-size:.7rem;color:var(--faint);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:520px){
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .ftabs{overflow-x:auto;padding-bottom:.05rem;}
+  .card-msg-wrap{padding-left:1rem;}
+  .btn-csv{width:100%;}
+  .toolbar{gap:.45rem;}
+}
+@media(max-width:360px){
+  .stat-val{font-size:1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split(' ')[0] }}<span>{{ site_name.split(' ')[1] if ' ' in site_name else '' }}</span></a>
+  <div class="nav-right">
+    <span class="nav-username">{{ inv.user_username }}</span>
+    <a href="/logout" class="nav-logout">Keluar</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <a href="/dashboard" class="back-link">← Kembali ke Dashboard</a>
+
+  <div class="page-head">
+    <div class="page-names">{{ inv.groom_name }} <em>&amp;</em> {{ inv.bride_name }}</div>
+    <div class="page-sub">Konfirmasi kehadiran tamu undangan</div>
+  </div>
+
+  <!-- Stat cards -->
+  {% set n_hadir = rsvp_list | selectattr('attendance','equalto','hadir')       | list | length %}
+  {% set n_tidak = rsvp_list | selectattr('attendance','equalto','tidak_hadir') | list | length %}
+  {% set n_tamu  = rsvp_list | sum(attribute='guest_count') %}
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Total RSVP</div>
+      <div class="stat-val">{{ rsvp_list | length }}</div>
+      <div class="stat-sub">konfirmasi</div>
+    </div>
+    <div class="stat-card s-hadir">
+      <div class="stat-label">Hadir</div>
+      <div class="stat-val">{{ n_hadir }}</div>
+      <div class="stat-sub">konfirmasi hadir</div>
+    </div>
+    <div class="stat-card s-tidak">
+      <div class="stat-label">Tidak Hadir</div>
+      <div class="stat-val">{{ n_tidak }}</div>
+      <div class="stat-sub">tidak bisa hadir</div>
+    </div>
+    <div class="stat-card s-tamu">
+      <div class="stat-label">Est. Tamu</div>
+      <div class="stat-val">{{ n_tamu }}</div>
+      <div class="stat-sub">total orang</div>
+    </div>
+  </div>
+
+  {% if rsvp_list %}
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="6.5" cy="6.5" r="4"/><path d="M10.5 10.5l3 3"/>
+      </svg>
+      <input type="text" id="sq" placeholder="Cari nama atau pesan…" autocomplete="off" oninput="onSearch(this.value)">
+      <button class="search-clear" id="sc" onclick="clearSearch()">×</button>
+    </div>
+    <div class="ftabs">
+      <button class="ftab on"    onclick="setFilter('',this)">Semua</button>
+      <button class="ftab fh" onclick="setFilter('hadir',this)">Hadir</button>
+      <button class="ftab ft" onclick="setFilter('tidak_hadir',this)">Tidak</button>
+    </div>
+    <button class="btn-csv" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+
+  <div class="result-line" id="rl"></div>
+  <div class="rsvp-list"   id="rl-list"></div>
+  <div class="pager"       id="pager"></div>
+
+  {% else %}
+  <div class="empty">
+    <div class="empty-ico">💌</div>
+    <div class="empty-ttl">Belum ada RSVP</div>
+    <div class="empty-txt">Konfirmasi tamu akan muncul di sini setelah mereka mengisi form undangan.</div>
+  </div>
+  {% endif %}
+
+</div>
+
+{% if rsvp_list %}
+<script>
+const DATA = [
+  {% for r in rsvp_list -%}
+  {id:{{r.id}},name:{{r.guest_name|tojson}},att:{{r.attendance|tojson}},cnt:{{r.guest_count}},msg:{{(r.message or '')|tojson}},ts:{{(r.created_at or '')|tojson}}},
+  {%- endfor %}
+];
+
+const PER = 20;
+let fdata = [...DATA], page = 1, filter = '', query = '';
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');}
+
+function initials(n){return(n||'?').trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+function fmtDate(s){
+  if(!s)return'';
+  try{
+    const d=new Date(s.replace(' ','T'));
+    const mo=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+    return`${d.getDate()} ${mo[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}.${String(d.getMinutes()).padStart(2,'0')}`;
+  }catch{return s.slice(0,10);}
+}
+
+function badge(att){
+  if(att==='hadir')       return'<span class="badge bh">Hadir</span>';
+  if(att==='tidak_hadir') return'<span class="badge bt">Tidak Hadir</span>';
+  return`<span class="badge br">${esc(att)}</span>`;
+}
+
+function apply(){
+  const q=query.toLowerCase();
+  fdata=DATA.filter(r=>{
+    const mf=!filter||r.att===filter;
+    const mq=!q||r.name.toLowerCase().includes(q)||r.msg.toLowerCase().includes(q);
+    return mf&&mq;
+  });
+  page=1; render();
+}
+
+function render(){
+  const tot=fdata.length, pages=Math.max(1,Math.ceil(tot/PER));
+  page=Math.min(page,pages);
+  const sl=fdata.slice((page-1)*PER, page*PER);
+
+  // result line
+  document.getElementById('rl').innerHTML=
+    (query||filter)
+      ? `Menampilkan <b>${tot}</b> dari ${DATA.length} RSVP`
+      : `<b>${tot}</b> konfirmasi masuk`;
+
+  // cards
+  const list=document.getElementById('rl-list');
+  if(!sl.length){
+    list.innerHTML='<div class="empty" style="padding:2rem 1rem"><div class="empty-ico" style="font-size:1.3rem">🔍</div><div class="empty-ttl" style="font-size:1rem">Tidak ditemukan</div><div class="empty-txt">Coba kata kunci lain.</div></div>';
+  } else {
+    list.innerHTML=sl.map(r=>{
+      const hasMsg=r.msg&&r.msg.trim();
+      const long=r.msg&&r.msg.length>120;
+      return`<div class="rsvp-card">
+        <div class="card-top">
+          <div class="avatar">${initials(r.name)}</div>
+          <div class="card-main">
+            <div class="card-name">${esc(r.name)}</div>
+            <div class="card-meta">
+              ${badge(r.att)}
+              <span class="badge bc">👤 ${r.cnt} orang</span>
+              <span class="card-date">${fmtDate(r.ts)}</span>
+            </div>
+          </div>
+          <button class="del-btn" onclick="del(${r.id},'${esc(r.name)}')" title="Hapus">✕</button>
+        </div>
+        ${hasMsg?`<div class="card-msg-wrap">
+          <div class="card-msg${long?' clamp':''}" id="m${r.id}">${esc(r.msg)}</div>
+          ${long?`<button class="msg-more" id="mb${r.id}" onclick="toggleMsg(${r.id})">Lihat selengkapnya ↓</button>`:''}
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  // pager
+  const pg=document.getElementById('pager');
+  if(pages<=1){pg.innerHTML='';return;}
+  let h=`<button class="pg" onclick="go(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  let lo=Math.max(1,page-2), hi=Math.min(pages,page+2);
+  if(lo>1) h+=`<button class="pg" onclick="go(1)">1</button>${lo>2?'<span class="pg-sep">…</span>':''}`;
+  for(let p=lo;p<=hi;p++) h+=`<button class="pg${p===page?' cur':''}" onclick="go(${p})">${p}</button>`;
+  if(hi<pages) h+=`${hi<pages-1?'<span class="pg-sep">…</span>':''}<button class="pg" onclick="go(${pages})">${pages}</button>`;
+  h+=`<button class="pg" onclick="go(${page+1})" ${page===pages?'disabled':''}>›</button>`;
+  h+=`<span class="pg-info">${page} / ${pages}</span>`;
+  pg.innerHTML=h;
+}
+
+function go(p){page=p;render();window.scrollTo({top:0,behavior:'smooth'});}
+
+function onSearch(v){
+  query=v;
+  document.getElementById('sc').classList.toggle('on',v.length>0);
+  apply();
+}
+function clearSearch(){
+  document.getElementById('sq').value='';
+  query='';
+  document.getElementById('sc').classList.remove('on');
+  apply();
+}
+
+function setFilter(v,btn){
+  filter=v;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  apply();
+}
+
+function toggleMsg(id){
+  const el=document.getElementById('m'+id), mb=document.getElementById('mb'+id);
+  const c=el.classList.toggle('clamp');
+  mb.textContent=c?'Lihat selengkapnya ↓':'Sembunyikan ↑';
+}
+
+function del(id,name){
+  if(!confirm(`Hapus RSVP dari "${name}"?`))return;
+  const f=document.createElement('form');
+  f.method='POST'; f.action=`/dashboard/rsvp/delete/${id}?next=rsvp`;
+  document.body.appendChild(f); f.submit();
+}
+
+function exportCSV(){
+  const src=fdata.length<DATA.length?fdata:DATA;
+  const rows=[['No','Nama','Kehadiran','Jumlah Tamu','Pesan','Waktu']];
+  src.forEach((r,i)=>{
+    const al=r.att==='hadir'?'Hadir':r.att==='tidak_hadir'?'Tidak Hadir':r.att;
+    rows.push([i+1,r.name,al,r.cnt,r.msg,fmtDate(r.ts)]);
+  });
+  const csv=rows.map(row=>row.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='rsvp-{{ inv.slug }}.csv'; a.click();
+}
+
+render();
+</script>
+{% endif %}
+</body>
+</html>

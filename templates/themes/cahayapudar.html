@@ -1594,7 +1594,15 @@ body {
     </div>
 
     <div class="env-divider"></div>
-    <span class="env-invite-text">Menyampaikan kabar bahagia kepada</span>
+    <span class="env-invite-text">Menyampaikan kabar bahagia </span>
+
+
+{% if nama_tamu %}
+    <div class="guest-section" style="margin-bottom: 15px;">
+       <p style="font-size: 0.9em; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+       <h3 style="margin: 0; font-weight: bold;">{{ nama_tamu }}</h3>
+    </div>
+{% endif %}
 
     <button class="env-open-btn" id="envOpenBtn" onclick="openInvitation()">
       <div class="env-seal">
@@ -1604,12 +1612,15 @@ body {
     </button>
   </div>
 
+<!--
   {% if request.args.get('to') %}
   <div class="env-guest">
     <span class="env-guest-to">Kepada Yth.</span>
     <span class="env-guest-name">{{ request.args.get('to') }}</span>
   </div>
   {% endif %}
+-->
+
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -1685,6 +1696,7 @@ body {
       <span class="line"></span>
     </div>
   </div>
+
 
   <div class="hero-scroll-hint">
     <span class="scroll-hint-text">Geser ke bawah</span>

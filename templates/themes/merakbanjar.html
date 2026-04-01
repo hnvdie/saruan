@@ -906,10 +906,19 @@ section { padding: 5.5rem 1.8rem; position: relative; }
   <div class="i-photo" id="intro-bg"></div>
   <div class="i-dim"></div>
   <div class="i-body">
+	<br><br><br><br><br><br><br><br>
     <div class="i-date">Undangan Pernikahan</div>
     <div class="i-groom">{{ inv.groom_name }}</div>
     <span class="i-amp">&amp;</span>
     <div class="i-bride">{{ inv.bride_name }}</div>
+{% if nama_tamu %}
+    <div class="guest-section" style="margin-bottom: 15px;">
+       <p style="font-size: 0.9em; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+       <h3 style="margin: 0; font-weight: bold;">{{ nama_tamu }}</h3>
+    </div>
+{% endif %}
+
+	<br><br>
     <button class="i-btn" onclick="openInv()">Buka Undangan</button>
   </div>
   <div class="i-hint">✦ &nbsp; sentuh di mana saja &nbsp; ✦</div>
