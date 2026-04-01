@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 /* ─── ROOT VARIABLES ─── */
 :root {
   --sand:      #F5EDD8;
@@ -44,7 +47,10 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
   position: absolute; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M60 0 L120 60 L60 120 L0 60Z' fill='none' stroke='%23B89453' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M60 15 L105 60 L60 105 L15 60Z' fill='none' stroke='%23B89453' stroke-width='0.4' opacity='0.2'/%3E%3Ccircle cx='60' cy='60' r='20' fill='none' stroke='%23B89453' stroke-width='0.4' opacity='0.2'/%3E%3Cpath d='M60 0 L60 120 M0 60 L120 60' stroke='%23B89453' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E");
   background-size: 120px 120px;
-}
+} 
+
+
+
 
 #envelope-cover {
   position: absolute; inset: 0;
@@ -210,10 +216,12 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
   content: '';
   position: absolute;
   top: 0;
-  width: 3px;
+  width: 10px;
+  z-index:0;
   height: 100%;
-  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  background: linear-gradient(180deg, transparent);
 }
+
 #curtain-left::after  { right: 0; }
 #curtain-right::before{ left: 0; }
 
@@ -1488,7 +1496,13 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
     </div>
     <div class="env-date">{{ inv.akad_date | format_date }}</div>
     <div class="env-cta">
-      <div class="env-open-label">Anda Diundang</div>
+{% if nama_tamu %}
+    <div class="env-date guest-section" style="margin-bottom: 15px;">
+       <p style="font-size: 0.9em; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+       <h3 style="margin: 0; font-weight: bold;">{{ nama_tamu }}</h3>
+    </div>
+{% endif %}
+
       <div class="env-open-btn">
         <span>Buka Undangan</span>
         <span class="btn-arrow">→</span>
@@ -1555,7 +1569,9 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
 <!-- ── CARD 3: PROFILES ── -->
 <div class="card next" id="c3" data-card="3">
   <div class="profile-half">
-    {% if photos and photos|length > 1 %}
+    {% if inv.groom_photo_url %} 
+        <img src="{{ inv.groom_photo_url }}" alt="{{ inv.groom_name }}">
+    {% elif photos and photos|length > 1 %}
     <img src="{{ photo_src(photos[1]) }}" alt="{{ inv.groom_name }}">
     {% endif %}
     <span class="profile-arabesque">ب</span>
@@ -1570,11 +1586,13 @@ html, body { width: 100vw; height: 100vh; overflow: hidden; background: var(--ou
     </div>
   </div>
   <div class="profile-half">
-    {% if photos and photos|length > 2 %}
+    {% if inv.bride_photo_url %}
+    <img src="{{ inv.bride_photo_url }}" alt="{{ inv.bride_name }}">
+    {% elif photos and photos|length > 2 %}
     <img src="{{ photo_src(photos[2]) }}" alt="{{ inv.bride_name }}">
     {% endif %}
     <span class="profile-arabesque">ع</span>
-    <div class="profile-overlay">
+    <div class="profile-overlay" style="top:-10px">
       <div class="prof-label">Mempelai Wanita</div>
       <div class="prof-name">{{ inv.bride_name }}</div>
       <div class="prof-full">{{ inv.bride_full }}</div>
