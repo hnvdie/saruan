@@ -2117,22 +2117,387 @@ def _cli_edit_slug(username, new_slug):
     conn.commit(); conn.close()
     print(f'[OK] Slug "{username}": "{old}" -> "{clean}"  |  URL: /i/{clean}')
 
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PATCH app.py — Fitur Blog
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# LANGKAH PASANG:
+# 1. Install dependency:   pip install markdown
+#    Tambahkan ke requirements.txt:  markdown>=3.5
+#
+# 2. Tambahkan konstanta ini di blok CONFIG (setelah MUSIC_UPLOAD_DIR):
+#
+#    BLOG_UPLOAD_DIR = BASE_DIR / 'static' / 'uploads' / 'blog'
+#    BLOG_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+#
+# 3. Tambahkan import di atas file:
+#    import markdown as md_lib
+#
+# 4. Di fungsi init_db(), tambahkan SQL berikut ke dalam executescript (sebelum c.commit()):
+#
+#    CREATE TABLE IF NOT EXISTS blog_posts (
+#        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+#        slug        TEXT UNIQUE NOT NULL,
+#        title       TEXT NOT NULL,
+#        excerpt     TEXT,
+#        content_md  TEXT NOT NULL DEFAULT '',
+#        thumbnail   TEXT,
+#        author      TEXT DEFAULT 'Admin',
+#        published   INTEGER DEFAULT 0,
+#        views       INTEGER DEFAULT 0,
+#        created_at  TEXT DEFAULT CURRENT_TIMESTAMP,
+#        updated_at  TEXT DEFAULT CURRENT_TIMESTAMP
+#    );
+#
+# 5. Salin semua route di bawah ini ke app.py (taruh sebelum # ─── MAIN ───)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import markdown as md_lib
+
+BLOG_UPLOAD_DIR = BASE_DIR / 'static' / 'uploads' / 'blog'
+BLOG_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+BLOG_ALLOWED_EXT = {'jpg', 'jpeg', 'png', 'webp'}
+
+
+def _blog_secure_name(filename: str) -> str:
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+    return f'blog_{uuid.uuid4().hex[:12]}.{ext}'
+
+
+def _blog_allowed(filename: str) -> bool:
+    return '.' in filename and filename.rsplit('.', 1)[-1].lower() in BLOG_ALLOWED_EXT
+
+
+def _render_md(text: str) -> str:
+    """Konversi markdown ke HTML dengan ekstensi umum."""
+    return md_lib.markdown(
+        text or '',
+        extensions=['extra', 'nl2br', 'sane_lists', 'toc']
+    )
+
+
+# ── PUBLIC: /blog ─────────────────────────────────────────────────────────────
+@app.route('/blog')
+def blog_index():
+    conn  = get_db()
+    posts = conn.execute(
+        "SELECT id, slug, title, excerpt, thumbnail, author, views, created_at "
+        "FROM blog_posts WHERE published=1 ORDER BY created_at DESC"
+    ).fetchall()
+    conn.close()
+    return render_template('blog/index.html', posts=posts)
+
+
+# ── PUBLIC: /blog/<slug> ──────────────────────────────────────────────────────
+@app.route('/blog/<slug>')
+def blog_post(slug):
+    slug = re.sub(r'[^a-z0-9-]', '', slug.lower())
+    conn = get_db()
+    post = conn.execute(
+        "SELECT * FROM blog_posts WHERE slug=? AND published=1", (slug,)
+    ).fetchone()
+    if not post:
+        conn.close()
+        abort(404)
+    # Tambah view count
+    conn.execute("UPDATE blog_posts SET views=views+1 WHERE id=?", (post['id'],))
+    conn.commit()
+    # Ambil artikel terkait (3 terbaru, bukan artikel ini)
+    related = conn.execute(
+        "SELECT slug, title, thumbnail, created_at FROM blog_posts "
+        "WHERE published=1 AND id!=? ORDER BY created_at DESC LIMIT 3",
+        (post['id'],)
+    ).fetchall()
+    conn.close()
+    content_html = _render_md(post['content_md'])
+    return render_template('blog/post.html',
+                           post=post,
+                           content_html=content_html,
+                           related=related)
+
+
+# ── ADMIN: /admin/blog ────────────────────────────────────────────────────────
+@app.route('/admin/blog')
+@login_required
+def admin_blog_list():
+    conn  = get_db()
+    posts = conn.execute(
+        "SELECT id, slug, title, published, views, created_at, updated_at "
+        "FROM blog_posts ORDER BY created_at DESC"
+    ).fetchall()
+    conn.close()
+    return render_template('admin/blog_list.html', posts=posts)
+
+
+# ── ADMIN: /admin/blog/create ─────────────────────────────────────────────────
+@app.route('/admin/blog/create', methods=['GET', 'POST'])
+@login_required
+def admin_blog_create():
+    error = None
+    form  = {}
+    if request.method == 'POST':
+        form  = request.form
+        title = sanitize_text(form.get('title', ''), 200).strip()
+        slug  = re.sub(r'[^a-z0-9-]', '-',
+                       (form.get('slug', '') or _slugify(title)).lower().strip('-'))
+        slug  = re.sub(r'-{2,}', '-', slug)[:120]
+        excerpt    = sanitize_text(form.get('excerpt', ''), 400)
+        content_md = form.get('content_md', '')[:50000]
+        author     = sanitize_name(form.get('author', 'Admin'), 100) or 'Admin'
+        published  = 1 if form.get('published') else 0
+
+        if not title:
+            error = 'Judul wajib diisi.'
+        elif not slug or len(slug) < 3:
+            error = 'Slug tidak valid (min 3 karakter, huruf kecil/angka/strip).'
+        else:
+            # Handle thumbnail
+            thumb = None
+            f = request.files.get('thumbnail')
+            if f and f.filename:
+                if not _blog_allowed(f.filename):
+                    error = 'Format thumbnail tidak didukung (JPG/PNG/WEBP).'
+                else:
+                    fname = _blog_secure_name(f.filename)
+                    f.save(str(BLOG_UPLOAD_DIR / fname))
+                    thumb = fname
+
+            if not error:
+                conn = get_db()
+                try:
+                    conn.execute(
+                        "INSERT INTO blog_posts (slug, title, excerpt, content_md, thumbnail, author, published) "
+                        "VALUES (?,?,?,?,?,?,?)",
+                        (slug, title, excerpt, content_md, thumb, author, published)
+                    )
+                    conn.commit()
+                    flash(f'Artikel "{title}" berhasil disimpan! 🎉', 'success')
+                    return redirect(url_for('admin_blog_list'))
+                except sqlite3.IntegrityError:
+                    error = f'Slug "{slug}" sudah dipakai. Ganti slug-nya.'
+                finally:
+                    conn.close()
+
+    return render_template('admin/blog_form.html',
+                           mode='create', error=error, form=form)
+
+
+# ── ADMIN: /admin/blog/edit/<id> ──────────────────────────────────────────────
+@app.route('/admin/blog/edit/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def admin_blog_edit(post_id):
+    conn = get_db()
+    post = conn.execute("SELECT * FROM blog_posts WHERE id=?", (post_id,)).fetchone()
+    conn.close()
+    if not post:
+        abort(404)
+
+    error = None
+    form  = dict(post)  # pre-fill
+
+    if request.method == 'POST':
+        form       = request.form
+        title      = sanitize_text(form.get('title', ''), 200).strip()
+        slug       = re.sub(r'[^a-z0-9-]', '-',
+                            (form.get('slug', '') or '').lower().strip('-'))
+        slug       = re.sub(r'-{2,}', '-', slug)[:120]
+        excerpt    = sanitize_text(form.get('excerpt', ''), 400)
+        content_md = form.get('content_md', '')[:50000]
+        author     = sanitize_name(form.get('author', 'Admin'), 100) or 'Admin'
+        published  = 1 if form.get('published') else 0
+
+        if not title:
+            error = 'Judul wajib diisi.'
+        elif not slug or len(slug) < 3:
+            error = 'Slug tidak valid.'
+        else:
+            thumb = post['thumbnail']  # keep existing by default
+
+            # Hapus thumbnail lama jika diminta
+            if form.get('clear_thumbnail') and thumb:
+                try: (BLOG_UPLOAD_DIR / thumb).unlink(missing_ok=True)
+                except: pass
+                thumb = None
+
+            # Upload thumbnail baru
+            f = request.files.get('thumbnail')
+            if f and f.filename:
+                if not _blog_allowed(f.filename):
+                    error = 'Format thumbnail tidak didukung (JPG/PNG/WEBP).'
+                else:
+                    # Hapus lama jika ada
+                    if thumb:
+                        try: (BLOG_UPLOAD_DIR / thumb).unlink(missing_ok=True)
+                        except: pass
+                    fname = _blog_secure_name(f.filename)
+                    f.save(str(BLOG_UPLOAD_DIR / fname))
+                    thumb = fname
+
+            if not error:
+                conn = get_db()
+                try:
+                    conn.execute(
+                        "UPDATE blog_posts SET slug=?, title=?, excerpt=?, content_md=?, "
+                        "thumbnail=?, author=?, published=?, updated_at=CURRENT_TIMESTAMP "
+                        "WHERE id=?",
+                        (slug, title, excerpt, content_md, thumb, author, published, post_id)
+                    )
+                    conn.commit()
+                    flash(f'Artikel "{title}" berhasil diperbarui! ✓', 'success')
+                    return redirect(url_for('admin_blog_list'))
+                except sqlite3.IntegrityError:
+                    error = f'Slug "{slug}" sudah dipakai.'
+                finally:
+                    conn.close()
+
+    return render_template('admin/blog_form.html',
+                           mode='edit', post=dict(post), error=error, form=form)
+
+
+# ── ADMIN: /admin/blog/delete/<id> ────────────────────────────────────────────
+@app.route('/admin/blog/delete/<int:post_id>', methods=['POST'])
+@login_required
+def admin_blog_delete(post_id):
+    conn = get_db()
+    post = conn.execute("SELECT thumbnail FROM blog_posts WHERE id=?", (post_id,)).fetchone()
+    if post:
+        if post['thumbnail']:
+            try: (BLOG_UPLOAD_DIR / post['thumbnail']).unlink(missing_ok=True)
+            except: pass
+        conn.execute("DELETE FROM blog_posts WHERE id=?", (post_id,))
+        conn.commit()
+        flash('Artikel berhasil dihapus.', 'info')
+    conn.close()
+    return redirect(url_for('admin_blog_list'))
+
+
+# ── ADMIN: /admin/blog/toggle/<id> ───────────────────────────────────────────
+@app.route('/admin/blog/toggle/<int:post_id>', methods=['POST'])
+@login_required
+def admin_blog_toggle(post_id):
+    conn = get_db()
+    post = conn.execute("SELECT published, title FROM blog_posts WHERE id=?", (post_id,)).fetchone()
+    if post:
+        new = 0 if post['published'] else 1
+        conn.execute("UPDATE blog_posts SET published=? WHERE id=?", (new, post_id))
+        conn.commit()
+        label = 'dipublikasikan' if new else 'disembunyikan'
+        flash(f'Artikel "{post["title"]}" {label}.', 'success')
+    conn.close()
+    return redirect(url_for('admin_blog_list'))
+
+
+# ── HELPER: auto-slugify dari judul ──────────────────────────────────────────
+def _slugify(text: str) -> str:
+    import unicodedata
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
+    text = re.sub(r'[^\w\s-]', '', text.lower())
+    text = re.sub(r'[\s_-]+', '-', text).strip('-')
+    return text[:120]
+
+
+
+# ─── CLI: list-pending ────────────────────────────────────────────────────────
+def _cli_list_pending():
+    """Tampilkan undangan yang dibuat admin tapi belum punya user/pass."""
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, slug, groom_name, bride_name, theme_id, created_at "
+        "FROM invitations "
+        "WHERE (user_username IS NULL OR user_username = '') "
+        "   OR (user_pw_hash IS NULL OR user_pw_hash = '') "
+        "ORDER BY created_at DESC"
+    ).fetchall()
+    conn.close()
+    if not rows:
+        print('✓ Semua undangan sudah punya user/pass.')
+        return
+    print(f'\n{"NO":<4} {"SLUG":<30} {"MEMPELAI":<35} {"THEME":<20} {"DIBUAT":<12}')
+    print('─' * 105)
+    for i, r in enumerate(rows, 1):
+        mempelai = f'{r["groom_name"]} & {r["bride_name"]}'
+        print(f'{i:<4} {(r["slug"] or r["id"]):<30} {mempelai:<35} {r["theme_id"]:<20} {(r["created_at"] or "")[:10]}')
+    print(f'\nTotal: {len(rows)} undangan belum disetup user/pass.')
+    print('Gunakan: python app.py approve-user <slug_atau_id>\n')
+
+
+# ─── CLI: approve-user ────────────────────────────────────────────────────────
+def _cli_approve_user(inv_id_or_slug):
+    """Set username, password, dan payment_status=paid untuk undangan yang dibuat admin."""
+    import getpass
+    conn = get_db()
+    row = conn.execute(
+        'SELECT id, slug, groom_name, bride_name, user_username, payment_status '
+        'FROM invitations WHERE slug=? OR id=?',
+        (inv_id_or_slug, inv_id_or_slug)
+    ).fetchone()
+    if not row:
+        print(f'[ERROR] Undangan "{inv_id_or_slug}" tidak ditemukan.')
+        conn.close(); return
+
+    print(f'\nUndangan  : {row["groom_name"]} & {row["bride_name"]}')
+    print(f'Slug      : {row["slug"]}')
+    print(f'Status    : {row["payment_status"] or "belum set"}')
+    print(f'Username  : {row["user_username"] or "belum ada"}')
+    print()
+
+    while True:
+        uname = input('Username baru (huruf kecil/angka, min 4): ').strip().lower()
+        uname = re.sub(r'[^a-z0-9]', '', uname)
+        if len(uname) < 4:
+            print('[ERROR] Min 4 karakter.'); continue
+        conflict = conn.execute(
+            'SELECT id FROM invitations WHERE user_username=? AND id!=?',
+            (uname, row['id'])
+        ).fetchone()
+        if conflict:
+            print(f'[ERROR] Username "{uname}" sudah dipakai.'); continue
+        break
+
+    while True:
+        pw  = getpass.getpass('Password (min 8 karakter): ')
+        pw2 = getpass.getpass('Konfirmasi: ')
+        if len(pw) < 8: print('[ERROR] Min 8 karakter.'); continue
+        if pw != pw2:   print('[ERROR] Tidak cocok.'); continue
+        break
+
+    conn.execute(
+        'UPDATE invitations SET user_username=?, user_pw_hash=?, payment_status="paid" WHERE id=?',
+        (uname, hash_user_pw(pw), row['id'])
+    )
+    conn.commit(); conn.close()
+    print(f'\n[OK] User "{uname}" berhasil di-approve!')
+    print(f'     Login  : /login  →  username: {uname}')
+    print(f'     Undangan: /i/{row["slug"]}\n')
+
+
+
+# ─── MAIN ─────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     init_db()
     _ensure_user_columns()
 
-    _CLI = {'list-users', 'reset-password', 'edit-slug'}
+    _CLI = {'list-users', 'list-pending', 'reset-password', 'edit-slug', 'approve-user'}
     if len(sys.argv) > 1 and sys.argv[1] in _CLI:
         cmd = sys.argv[1]
         if cmd == 'list-users':
             _cli_list_users()
+        elif cmd == 'list-pending':
+            _cli_list_pending()
         elif cmd == 'reset-password':
             if len(sys.argv) < 3: print('Usage: python app.py reset-password <username>')
             else: _cli_reset_password(sys.argv[2])
         elif cmd == 'edit-slug':
             if len(sys.argv) < 4: print('Usage: python app.py edit-slug <username> <slug_baru>')
             else: _cli_edit_slug(sys.argv[2], sys.argv[3])
-        sys.exit(0)
+        elif cmd == 'approve-user':
+            if len(sys.argv) < 3: print('Usage: python app.py approve-user <slug_atau_inv_id>')
+            else: _cli_approve_user(sys.argv[2])
+        sys.exit(0)  # ← INI YANG PENTING, stop di sini kalau CLI mode
 
     # Server mode
     threading.Thread(target=_cleanup_loop, daemon=True, name='auto-cleanup').start()
@@ -2142,11 +2507,11 @@ if __name__ == '__main__':
     print(f'  reCAPTCHA: {"AKTIF" if RECAPTCHA_KEY else "nonaktif (set RECAPTCHA_SITE_KEY)"}')
     print(f'  Auto-cleanup: aktif (grace {CLEANUP_GRACE_DAYS} hari, tiap 24 jam)')
     print('─' * 50)
-    print('  Admin pw : python -c "from app import hash_pw; print(hash_pw(\'pw\'))"')
-    print('  CLI      : python app.py list-users')
-    print('             python app.py reset-password <username>')
-    print('             python app.py edit-slug <username> <slug_baru>')
+    print('  Admin pw  : python -c "from app import hash_pw; print(hash_pw(\'pw\'))"')
+    print('  CLI       : python app.py list-users')
+    print('              python app.py list-pending')
+    print('              python app.py approve-user <slug_atau_inv_id>')
+    print('              python app.py reset-password <username>')
+    print('              python app.py edit-slug <username> <slug_baru>')
     print('─' * 50)
     app.run(debug=False, port=5000)
-
-
