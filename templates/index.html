@@ -88,7 +88,7 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
 body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
 a{text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent;}
 
-/* NAV */
+/* NAV 
 nav{
   position:sticky;top:0;z-index:200;
   background:rgba(255,255,255,.97);backdrop-filter:blur(24px);
@@ -109,6 +109,21 @@ nav{
   color:var(--muted);transition:all .2s;
 }
 .nav-cta:hover{border-color:var(--ink);color:var(--ink);}
+*/
+
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;gap:.8rem;align-items:center;}
+.nav-link{font-size:.67rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;}
+.nav-link:hover,.nav-link.active{color:var(--ink);}
+.nav-cta{display:inline-flex;align-items:center;padding:.36rem .85rem;border-radius:2px;border:1px solid var(--border);font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.nav-cta:hover{border-color:var(--ink);color:var(--ink);}
+
+
+
 
 /* BANNER */
 .site-banner{width:100%;overflow:hidden;border-bottom:1px solid var(--border);background:var(--off);}
@@ -266,18 +281,30 @@ footer{
   .features-inner{grid-template-columns:1fr;}
   .steps{grid-template-columns:repeat(2,1fr);gap:1rem;}
   nav{padding:.7rem 1.1rem;}
-  .nav-link{display:none;}
 }
 </style>
 </head>
 <body class="no-select">
 
+
+
+<!--
 <nav>
   <a href="/" class="nav-logo">habar<span>kita</span>.com</a>
   <div class="nav-right">
         <a href="/themes" class="nav-link">Katalog Tema</a>
     <a href="/login" class="nav-cta">Login Dashboard</a>
 
+  </div>
+</nav>
+-->
+
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split('.')[0] }}<span>.{{ site_name.split('.')[1] if '.' in site_name else '' }}</span></a>
+  <div class="nav-right">
+    <a href="/themes" class="nav-link">Katalog Tema</a>
+    <a href="/blog"   class="nav-link active">Blog</a>
+    <a href="/login"  class="nav-cta">Login Dashboard</a>
   </div>
 </nav>
 

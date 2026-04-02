@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ post.title }} — {{ site_name }}</title>
+<meta name="description" content="{{ post.excerpt or post.title }}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://{{ site_name }}/blog/{{ post.slug }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{# ── Open Graph ── #}
+<meta property="og:type"        content="article">
+<meta property="og:url"         content="https://{{ site_name }}/blog/{{ post.slug }}">
+<meta property="og:site_name"   content="{{ site_name }}">
+<meta property="og:title"       content="{{ post.title }}">
+<meta property="og:description" content="{{ post.excerpt or post.title }}">
+{% if post.thumbnail %}
+<meta property="og:image"       content="https://{{ site_name }}/static/uploads/blog/{{ post.thumbnail }}">
+<meta property="og:image:alt"   content="{{ post.title }}">
+{% else %}
+<meta property="og:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
+{% endif %}
+<meta property="og:locale"      content="id_ID">
+<meta property="article:author" content="{{ post.author }}">
+<meta property="article:published_time" content="{{ post.created_at }}">
+
+{# ── Twitter Card ── #}
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="{{ post.title }}">
+<meta name="twitter:description" content="{{ post.excerpt or post.title }}">
+{% if post.thumbnail %}
+<meta name="twitter:image" content="https://{{ site_name }}/static/uploads/blog/{{ post.thumbnail }}">
+{% else %}
+<meta name="twitter:image" content="https://{{ site_name }}/static/themes/banner.jpg">
+{% endif %}
+
+{# ── Schema.org Article ── #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ (post.excerpt or post.title) | tojson }},
+  "author": {"@type": "Person", "name": {{ post.author | tojson }}},
+  "datePublished": {{ post.created_at | tojson }},
+  "dateModified": {{ post.updated_at | tojson }},
+  "publisher": {"@type": "Organization", "name": {{ site_name | tojson }}},
+  "url": "https://{{ site_name }}/blog/{{ post.slug }}"
+  {% if post.thumbnail %},"image": "https://{{ site_name }}/static/uploads/blog/{{ post.thumbnail }}"{% endif %}
+}
+</script>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#fff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--accent-light:#d6c8be;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+
+
+.promo-scroll-eyebrow{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;padding:0 1.4rem;}
+.promo-scroll-heading{font-family:var(--serif);font-size:1.05rem;font-weight:300;color:var(--ink);padding:0 1.4rem;margin-bottom:.2rem;}
+.promo-scroll-sub{font-size:.65rem;color:var(--muted);padding:0 1.4rem;margin-bottom:.9rem;line-height:1.6;}
+
+.promo-track{display:flex;gap:.7rem;overflow-x:auto;padding:.25rem 1.4rem .9rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:stretch;}
+.promo-track::-webkit-scrollbar{display:none;}
+
+.promo-card{flex:0 0 120px;min-width:120px;max-width:120px;scroll-snap-align:start;border:1px solid var(--border);border-radius:8px;background:var(--white);display:flex;flex-direction:column;overflow:hidden;cursor:pointer;}
+.promo-card *{min-width:0;}
+
+.promo-card-img{width:100%;height:110px;overflow:hidden;background:var(--off2);}
+.promo-card-img img{width:100%;height:100%;object-fit:contain;display:block;background:#fff;}
+.promo-card-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.4rem;color:var(--accent-light);}
+
+.promo-card-body{padding:.55rem;display:flex;flex-direction:column;gap:.25rem;}
+
+.promo-card-name{font-size:.72rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.promo-card-desc{font-size:.62rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;}
+
+.promo-card-tags{display:flex;gap:.25rem;flex-wrap:wrap;}
+.promo-card-tag{font-size:.48rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--border2);border-radius:2px;padding:.08rem .28rem;}
+
+.promo-card-price-wrap{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin-top:.15rem;}
+.promo-card-price{font-size:.68rem;color:var(--ink);}
+.promo-card-price-orig{font-size:.58rem;color:var(--faint);text-decoration:line-through;}
+
+.promo-card-btns{display:flex;gap:.3rem;margin-top:.4rem;}
+.promo-card-btns a,.promo-card-btns span{flex:1;min-width:0;text-align:center;padding:.32rem 0;border-radius:3px;font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+
+.promo-card-demo{border:1px solid var(--border);color:var(--muted);}
+.promo-card-order{background:var(--ink);color:#fff;}
+
+.promo-scroll-all{display:block;text-align:center;font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:.55rem;margin:0 1.4rem;border:1px solid var(--border);border-radius:3px;}
+
+
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;gap:.8rem;align-items:center;}
+.nav-link{font-size:.67rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;}
+.nav-link:hover,.nav-link.active{color:var(--ink);}
+.nav-cta{display:inline-flex;align-items:center;padding:.36rem .85rem;border-radius:2px;border:1px solid var(--border);font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.nav-cta:hover{border-color:var(--ink);color:var(--ink);}
+
+/* LAYOUT */
+.wrap{max-width:680px;margin:0 auto;padding:0 1.4rem;}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:.4rem;padding:1rem 0 .75rem;font-size:.62rem;color:var(--faint);}
+.breadcrumb a{color:var(--muted);transition:color .15s;}
+.breadcrumb a:hover{color:var(--ink);}
+.breadcrumb span{color:var(--faint);}
+
+/* ARTICLE HEADER */
+.article-header{padding-bottom:1.5rem;border-bottom:1px solid var(--border);margin-bottom:1.75rem;}
+.article-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem;}
+.meta-date{font-size:.6rem;color:var(--faint);}
+.meta-author{font-size:.6rem;color:var(--muted);}
+.meta-dot{width:2px;height:2px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+.meta-views{font-size:.6rem;color:var(--faint);}
+
+.article-title{font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.4rem);font-weight:300;line-height:1.2;margin-bottom:.75rem;}
+.article-excerpt{font-size:.8rem;color:var(--muted);line-height:1.9;font-style:italic;padding-left:.85rem;border-left:2px solid var(--accent-light);}
+
+/* THUMBNAIL */
+.article-thumb{margin-bottom:1.75rem;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.article-thumb img{width:100%;height:auto;display:block;max-height:420px;object-fit:cover;}
+
+/* MARKDOWN CONTENT */
+.article-body{line-height:1.9;color:var(--ink2);font-size:.82rem;padding-bottom:2.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+
+.article-body h1,.article-body h2{font-family:var(--serif);font-weight:300;color:var(--ink);margin:2rem 0 .75rem;}
+.article-body h1{font-size:1.7rem;}
+.article-body h2{font-size:1.35rem;padding-bottom:.4rem;border-bottom:1px solid var(--border2);}
+.article-body h3{font-size:1rem;font-weight:400;color:var(--ink);margin:1.5rem 0 .5rem;}
+.article-body h4{font-size:.85rem;font-weight:400;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:1.25rem 0 .4rem;}
+
+.article-body p{margin-bottom:1rem;}
+.article-body strong{font-weight:400;color:var(--ink);}
+.article-body em{font-style:italic;color:var(--accent);}
+
+.article-body a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--accent-light);}
+.article-body a:hover{color:var(--ink);}
+
+.article-body ul,.article-body ol{padding-left:1.4rem;margin-bottom:1rem;}
+.article-body li{margin-bottom:.35rem;}
+.article-body ul li::marker{color:var(--accent);}
+
+.article-body blockquote{margin:1.5rem 0;padding:.75rem 1rem;border-left:3px solid var(--accent-light);background:var(--off);border-radius:0 2px 2px 0;}
+.article-body blockquote p{margin:0;font-style:italic;color:var(--muted);font-size:.8rem;}
+
+.article-body code{background:var(--off2);padding:.1rem .35rem;border-radius:2px;font-size:.78rem;font-family:monospace;color:var(--accent);}
+.article-body pre{background:var(--off2);padding:1rem;border-radius:4px;overflow-x:auto;margin-bottom:1rem;border:1px solid var(--border);}
+.article-body pre code{background:none;padding:0;font-size:.77rem;}
+
+.article-body img{max-width:100%;border-radius:4px;margin:1rem 0;border:1px solid var(--border);}
+.article-body hr{border:none;border-top:1px solid var(--border);margin:1.75rem 0;}
+
+.article-body table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:.77rem;}
+.article-body th{background:var(--off);font-weight:400;text-align:left;padding:.45rem .65rem;border:1px solid var(--border);}
+.article-body td{padding:.4rem .65rem;border:1px solid var(--border2);}
+
+/* RELATED */
+.related-title{font-family:var(--serif);font-size:1.1rem;font-weight:300;color:var(--muted);margin-bottom:1rem;}
+.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:3rem;}
+.related-card{border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .2s;}
+.related-card:hover{border-color:var(--accent-light);}
+.related-thumb{aspect-ratio:16/9;overflow:hidden;background:var(--off2);}
+.related-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease;}
+.related-card:hover .related-thumb img{transform:scale(1.04);}
+.related-thumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.4rem;color:var(--accent-light);font-style:italic;}
+.related-body{padding:.55rem .7rem .7rem;}
+.related-date{font-size:.55rem;color:var(--faint);margin-bottom:.3rem;}
+.related-ttl{font-size:.73rem;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.related-card:hover .related-ttl{color:var(--accent);}
+
+/* FOOTER */
+footer{padding:1.1rem 1.4rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:.88rem;}
+.footer-logo span{color:var(--accent);}
+.footer-copy{font-size:.58rem;color:var(--faint);letter-spacing:.04em;}
+
+@media(max-width:560px){
+  .related-grid{grid-template-columns:1fr 1fr;}
+  .article-title{font-size:1.55rem;}
+}
+@media(max-width:380px){
+  .related-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split('.')[0] }}<span>.{{ site_name.split('.')[1] if '.' in site_name else '' }}</span></a>
+  <div class="nav-right">
+    <a href="/themes" class="nav-link">Katalog Tema</a>
+    <a href="/blog"   class="nav-link active">Blog</a>
+    <a href="/login"  class="nav-cta">Login Dashboard</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">Beranda</a>
+    <span>›</span>
+    <a href="/blog">Blog</a>
+    <span>›</span>
+    <span>{{ post.title | truncate(40) }}</span>
+  </div>
+
+  <!-- Article Header -->
+  <div class="article-header">
+    <div class="article-meta">
+      {% set d = post.created_at[:10] if post.created_at else '' %}
+      {% if d %}<span class="meta-date">{{ d }}</span><span class="meta-dot"></span>{% endif %}
+      {% if post.author %}<span class="meta-author">{{ post.author }}</span><span class="meta-dot"></span>{% endif %}
+      <span class="meta-views">{{ post.views }} views</span>
+    </div>
+    <h1 class="article-title">{{ post.title }}</h1>
+    {% if post.excerpt %}
+    <p class="article-excerpt">{{ post.excerpt }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Thumbnail -->
+  {% if post.thumbnail %}
+  <div class="article-thumb">
+    <img src="/static/uploads/blog/{{ post.thumbnail }}" alt="{{ post.title }}" loading="eager">
+  </div>
+  {% endif %}
+
+
+  <!-- Article Content -->
+  <div class="article-body">
+    {{ content_html | safe }}
+  </div>
+
+
+
+
+<style>
+/* Share Bar */
+.share-bar{padding:1.2rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem;}
+.share-label{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:.25rem;}
+.share-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .75rem;border:1px solid var(--border);border-radius:2px;font-size:.62rem;color:var(--muted);letter-spacing:.04em;transition:all .2s;cursor:pointer;background:none;}
+.share-btn:hover{border-color:var(--accent-light);color:var(--ink);}
+.share-btn i{font-size:.75rem;}
+.share-btn.copy-done{border-color:var(--accent);color:var(--accent);}
+</style>
+
+<!-- ── Share + Promo ── -->
+<div class="post-extras">
+
+  <!-- Share Bar -->
+  <div class="share-bar">
+    <span class="share-label">Bagikan</span>
+    <a class="share-btn" href="https://www.instagram.com/" target="_blank" rel="noopener">
+      <i class="fab fa-instagram"></i> Instagram
+    </a>
+    <a class="share-btn" id="share-wa" href="#" target="_blank" rel="noopener">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+    <a class="share-btn" id="share-fb" href="#" target="_blank" rel="noopener">
+      <i class="fab fa-facebook-f"></i> Facebook
+    </a>
+    <a class="share-btn" id="share-x" href="#" target="_blank" rel="noopener">
+      <i class="fab fa-x-twitter"></i> X
+    </a>
+    <button class="share-btn" id="copy-link" onclick="copyLink(this)">
+      <i class="fas fa-link"></i> Salin Link
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var url = encodeURIComponent(window.location.href);
+  var title = encodeURIComponent(document.title);
+  document.getElementById('share-wa').href = 'https://wa.me/?text='+title+'%20'+url;
+  document.getElementById('share-fb').href = 'https://www.facebook.com/sharer/sharer.php?u='+url;
+  document.getElementById('share-x').href  = 'https://twitter.com/intent/tweet?url='+url+'&text='+title;
+})();
+function copyLink(btn){
+  navigator.clipboard.writeText(window.location.href).then(function(){
+    btn.classList.add('copy-done');
+    btn.innerHTML='<i class="fas fa-check"></i> Tersalin!';
+    setTimeout(function(){
+      btn.classList.remove('copy-done');
+      btn.innerHTML='<i class="fas fa-link"></i> Salin Link';
+    },2000);
+  });
+}
+</script>
+
+
+
+
+
+<!-- Promo Horizontal Scroll — FINAL FIX -->
+<div class="promo-scroll-wrap">
+  <div class="promo-scroll-eyebrow">✨ Rekomendasi Tema</div>
+  <div class="promo-scroll-heading">Lagi nyiapin undangan?</div>
+  <div class="promo-scroll-sub">Geser untuk lihat tema — siap pakai, mulai Rp 60.000</div>
+
+  <div class="promo-track">
+
+    {% for theme in (themes | shuffle)[:5] %}
+    {% set t = theme %}
+    {% set tid = t.id | string %}
+    {% set name = t.name or tid %}
+    {% set desc = t.get('description') or '' %}
+    {% set dp = t.get('demo_photos') or [] %}
+    {% set first_img = dp[0] if dp else None %}
+    {% set tags = t.get('tags') or [] %}
+    {% set price = t.get('price') %}
+    {% set price_label = t.get('price_label') %}
+    {% set price_orig = t.get('price_original') %}
+
+    <!-- 🔥 FIX: pakai DIV bukan A -->
+    <div class="promo-card" onclick="window.location.href='/order?theme={{ tid }}'">
+
+      <div class="promo-card-img">
+        {% if first_img %}
+          <img src="{{ first_img }}" alt="{{ name }}">
+        {% else %}
+          <div class="promo-card-img-ph">✦</div>
+        {% endif %}
+      </div>
+
+      <div class="promo-card-body">
+
+        <div class="promo-card-name">{{ name }}</div>
+
+        {% if desc %}
+        <div class="promo-card-desc">
+          {{ desc[:60] ~ ('...' if desc|length > 60 else '') }}
+        </div>
+        {% endif %}
+
+        {% if tags %}
+        <div class="promo-card-tags">
+          {% for tag in tags[:2] %}
+            <span class="promo-card-tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="promo-card-price-wrap">
+          {% if price_label %}
+            <span class="promo-card-price">{{ price_label }}</span>
+          {% elif price %}
+            <span class="promo-card-price">
+              Rp {{ '{:,}'.format(price).replace(',','.') }}
+            </span>
+          {% endif %}
+
+          {% if price_orig and price and price_orig > price %}
+            <span class="promo-card-price-orig">
+              Rp {{ '{:,}'.format(price_orig).replace(',','.') }}
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="promo-card-btns">
+          <a href="/preview/{{ tid }}" target="_blank"
+             onclick="event.stopPropagation()"
+             class="promo-card-demo">Demo</a>
+
+          <span class="promo-card-order">Pesan</span>
+        </div>
+
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  <a href="/themes" class="promo-scroll-all">Lihat semua tema →</a>
+</div>
+
+<br>
+
+
+  <!-- Related Posts -->
+  {% if related %}
+  <div class="related-title">Artikel Lainnya</div>
+  <div class="related-grid">
+    {% for r in related %}
+    <a href="/blog/{{ r.slug }}" class="related-card">
+      <div class="related-thumb">
+        {% if r.thumbnail %}
+          <img src="/static/uploads/blog/{{ r.thumbnail }}" alt="{{ r.title }}" loading="lazy">
+        {% else %}
+          <div class="related-thumb-ph">♡</div>
+        {% endif %}
+      </div>
+      <div class="related-body">
+        <div class="related-date">{{ r.created_at[:10] if r.created_at else '' }}</div>
+        <div class="related-ttl">{{ r.title }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+/* FOOTER — ganti style footer yang lama */
+footer{
+  border-top:1px solid var(--border);
+  background:var(--off);
+  padding:1.6rem 1.4rem .9rem;
+}
+.footer-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1.2rem;
+  padding-bottom:1.1rem;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:.85rem;
+}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--ink);}
+.footer-logo span{color:var(--accent);}
+.footer-tagline{font-size:.62rem;color:var(--faint);margin-top:.2rem;letter-spacing:.03em;}
+.footer-links{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;}
+.footer-links a{
+  font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.footer-links a:hover{color:var(--accent);}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.footer-copy{font-size:.6rem;color:var(--faint);letter-spacing:.04em;}
+.footer-wa{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.6rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;
+}
+.footer-wa:hover{color:var(--green);}
+.footer-wa svg{width:13px;height:13px;fill:var(--green);}
+.footer-social {
+  margin-top: 15px;
+}
+
+</style>
+
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">habar<span>kita</span>.com</div>
+      <div class="footer-tagline">Undangan Pernikahan Digital</div>
+
+      <!-- Social Media -->
+      <div class="footer-social">
+        <a href="https://instagram.com/habarkitacom" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com/@habarkita3" target="_blank">
+          <i class="fab fa-tiktok"></i>
+        </a>
+               <i> <small>follow us<small></i>
+<!--
+        <a href="https://facebook.com/username" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+-->
+      </div>
+
+    </div>
+
+    <div class="footer-links">
+      <a href="/legal">Syarat &amp; Ketentuan</a>
+      <a href="/legal?p=privacy">Kebijakan Privasi</a>
+      <a href="/legal?p=refund">Refund</a>
+      <a href="/legal?p=about">Tentang Kami</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
+  </div>
+</footer>
+
+
+</body>
+</html>

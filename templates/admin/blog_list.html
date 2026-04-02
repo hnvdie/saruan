@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Blog — Admin</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--off2:#f2f0ec;--border:#e5e2db;--border2:#ede9e2;--ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--accent-light:#d6c8be;--red:#c0392b;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:.75rem;font-size:.65rem;color:var(--muted);}
+.nav-right a{transition:color .15s;}.nav-right a:hover{color:var(--ink);}
+.flash-bar{padding:.6rem 1.4rem;font-size:.7rem;border-bottom:1px solid var(--border);}
+.flash-success{background:#f0faf4;color:#2d8a4e;border-color:#b9dfc8;}
+.flash-info{background:var(--off);color:var(--muted);}
+.wrap{max-width:900px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.page-title{font-family:var(--serif);font-size:1.6rem;font-weight:300;}
+.page-title em{font-style:italic;color:var(--accent);}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem .9rem;border-radius:2px;font-size:.63rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;border:1px solid var(--border);color:var(--muted);background:var(--white);font-family:var(--sans);}
+.btn:hover{border-color:var(--ink);color:var(--ink);}
+.btn-primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+.btn-primary:hover{opacity:.82;}
+.btn-danger{color:var(--red);border-color:#f5c6c6;background:var(--white);}
+.btn-danger:hover{background:#fff5f5;border-color:var(--red);}
+.btn-sm{padding:.25rem .55rem;font-size:.58rem;}
+
+/* TABLE */
+.blog-table-wrap{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-align:left;padding:.55rem .9rem;border-bottom:1px solid var(--border);background:var(--off);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border2);}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover td{background:var(--off);}
+td{padding:.6rem .9rem;font-size:.72rem;color:var(--ink2);vertical-align:middle;}
+
+.td-title a{color:var(--ink);font-weight:400;transition:color .15s;}
+.td-title a:hover{color:var(--accent);}
+.td-slug{font-size:.63rem;color:var(--faint);font-family:monospace;}
+.td-actions{display:flex;align-items:center;gap:.35rem;white-space:nowrap;}
+
+.badge-pub{display:inline-block;padding:.1rem .42rem;border-radius:2px;font-size:.55rem;letter-spacing:.07em;text-transform:uppercase;border:1px solid #b9dfc8;background:#f0faf4;color:#2d8a4e;}
+.badge-draft{display:inline-block;padding:.1rem .42rem;border-radius:2px;font-size:.55rem;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--border);background:var(--off);color:var(--muted);}
+
+/* EMPTY */
+.empty{padding:3rem;text-align:center;color:var(--faint);}
+.empty p{font-size:.75rem;color:var(--muted);margin-top:.5rem;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/admin" class="nav-logo">Admin <span>Panel</span></a>
+  <div class="nav-right">
+    <a href="/admin">Dashboard</a>
+    <a href="/blog" target="_blank">Lihat Blog ↗</a>
+    <a href="/admin/logout">Keluar</a>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+  <div class="flash-bar flash-{{ cat }}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="wrap">
+  <div class="page-head">
+    <h1 class="page-title">Kelola <em>Blog</em></h1>
+    <a href="/admin/blog/create" class="btn btn-primary">+ Artikel Baru</a>
+  </div>
+
+  <div class="blog-table-wrap">
+    {% if posts %}
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Status</th>
+          <th>Views</th>
+          <th>Dibuat</th>
+          <th>Diperbarui</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in posts %}
+        <tr>
+          <td class="td-title" style="max-width:280px;">
+            <a href="/blog/{{ p.slug }}" target="_blank">{{ p.title }}</a>
+            <div class="td-slug">/blog/{{ p.slug }}</div>
+          </td>
+          <td>
+            {% if p.published %}
+              <span class="badge-pub">Publik</span>
+            {% else %}
+              <span class="badge-draft">Draft</span>
+            {% endif %}
+          </td>
+          <td>{{ p.views }}</td>
+          <td style="white-space:nowrap;color:var(--faint);font-size:.65rem;">{{ p.created_at[:10] if p.created_at else '—' }}</td>
+          <td style="white-space:nowrap;color:var(--faint);font-size:.65rem;">{{ p.updated_at[:10] if p.updated_at else '—' }}</td>
+          <td>
+            <div class="td-actions">
+              <a href="/admin/blog/edit/{{ p.id }}" class="btn btn-sm">Edit</a>
+              <form method="POST" action="/admin/blog/toggle/{{ p.id }}" style="display:inline;">
+                <button class="btn btn-sm" type="submit">
+                  {{ 'Sembunyikan' if p.published else 'Publikasikan' }}
+                </button>
+              </form>
+              <form method="POST" action="/admin/blog/delete/{{ p.id }}" style="display:inline;"
+                    onsubmit="return confirm('Hapus artikel ini? Tidak bisa dikembalikan.')">
+                <button class="btn btn-sm btn-danger" type="submit">Hapus</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <div style="font-size:1.8rem;opacity:.3;">✍️</div>
+      <p>Belum ada artikel. Buat artikel pertamamu!</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>

@@ -14,11 +14,16 @@ from flask import send_from_directory
 from dotenv import load_dotenv
 load_dotenv()
 
+import random
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.config['SUPPORT_EMAIL'] = os.environ.get('SUPPORT_EMAIL', '')
 app.config['SUPPORT_WA']    = os.environ.get('SUPPORT_WA', '')
+
+app.jinja_env.filters['shuffle'] = lambda x: random.sample(x, len(x))
+
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
@@ -2214,10 +2219,15 @@ def blog_post(slug):
     ).fetchall()
     conn.close()
     content_html = _render_md(post['content_md'])
+
+    content_html = _render_md(post['content_md'])
+    themes = get_all_themes()
     return render_template('blog/post.html',
                            post=post,
                            content_html=content_html,
-                           related=related)
+                           related=related,
+                           themes=themes,
+                           now=datetime.now())
 
 
 # ── ADMIN: /admin/blog ────────────────────────────────────────────────────────

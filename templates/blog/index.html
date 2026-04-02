@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Blog — {{ site_name }}</title>
+<meta name="description" content="Artikel seputar pernikahan, tips undangan digital, dan inspirasi dari {{ site_name }}.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://{{ site_name }}/blog">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta property="og:type"        content="website">
+<meta property="og:url"         content="https://{{ site_name }}/blog">
+<meta property="og:title"       content="Blog — {{ site_name }}">
+<meta property="og:description" content="Artikel seputar pernikahan, tips undangan digital, dan inspirasi dari {{ site_name }}.">
+<meta property="og:image"       content="https://{{ site_name }}/static/themes/banner.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#fff;--off:#f8f7f5;--off2:#f2f0ec;
+  --border:#e5e2db;--border2:#ede9e2;
+  --ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;
+  --accent:#a08c7e;--accent-light:#d6c8be;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;gap:.8rem;align-items:center;}
+.nav-link{font-size:.67rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;}
+.nav-link:hover,.nav-link.active{color:var(--ink);}
+.nav-cta{display:inline-flex;align-items:center;padding:.36rem .85rem;border-radius:2px;border:1px solid var(--border);font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.nav-cta:hover{border-color:var(--ink);color:var(--ink);}
+
+/* LAYOUT */
+.wrap{max-width:760px;margin:0 auto;padding:0 1.4rem;}
+
+/* PAGE HEADER */
+.blog-header{padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.blog-label{font-size:.55rem;letter-spacing:.45em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;display:block;}
+.blog-title{font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;line-height:1.15;margin-bottom:.5rem;}
+.blog-title em{font-style:italic;color:var(--accent);}
+.blog-desc{font-size:.75rem;color:var(--muted);line-height:1.9;max-width:420px;}
+
+/* POSTS GRID */
+.posts-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem 1.25rem;
+  padding:0 0 3rem;
+}
+
+/* POST CARD */
+.post-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:var(--white);transition:border-color .2s;}
+.post-card:hover{border-color:var(--accent-light);}
+
+.post-thumb{aspect-ratio:16/9;overflow:hidden;background:var(--off2);}
+.post-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;display:block;}
+.post-card:hover .post-thumb img{transform:scale(1.03);}
+.post-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2rem;color:var(--accent-light);font-style:italic;}
+
+.post-body{padding:.85rem 1rem 1rem;display:flex;flex-direction:column;flex:1;}
+.post-meta{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;}
+.post-date{font-size:.58rem;color:var(--faint);letter-spacing:.04em;}
+.post-author{font-size:.58rem;color:var(--muted);}
+.post-dot{width:2px;height:2px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+
+.post-title{font-family:var(--serif);font-size:1.05rem;font-weight:300;line-height:1.3;color:var(--ink);margin-bottom:.45rem;}
+.post-card:hover .post-title{color:var(--accent);}
+
+.post-excerpt{font-size:.68rem;color:var(--muted);line-height:1.75;flex:1;margin-bottom:.75rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+
+.post-read{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);transition:opacity .15s;}
+.post-card:hover .post-read{opacity:.7;}
+
+/* FEATURED (first post — full width) */
+.post-card.featured{grid-column:1/-1;flex-direction:row;}
+.post-card.featured .post-thumb{width:45%;aspect-ratio:auto;flex-shrink:0;}
+.post-card.featured .post-body{padding:1.1rem 1.25rem 1.25rem;}
+.post-card.featured .post-title{font-size:1.35rem;}
+.post-card.featured .post-excerpt{-webkit-line-clamp:4;}
+
+/* EMPTY */
+.blog-empty{padding:3rem 0;text-align:center;color:var(--faint);}
+.blog-empty .ico{font-size:2rem;margin-bottom:.75rem;}
+.blog-empty p{font-size:.75rem;color:var(--muted);}
+
+/* FOOTER */
+footer{padding:1.1rem 1.4rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:.88rem;}
+.footer-logo span{color:var(--accent);}
+.footer-copy{font-size:.58rem;color:var(--faint);letter-spacing:.04em;}
+
+@media(max-width:580px){
+  .posts-grid{grid-template-columns:1fr;gap:1rem;}
+  .post-card.featured{flex-direction:column;}
+  .post-card.featured .post-thumb{width:100%;aspect-ratio:16/9;}
+  .blog-header{padding:1.8rem 0 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">{{ site_name.split('.')[0] }}<span>.{{ site_name.split('.')[1] if '.' in site_name else '' }}</span></a>
+  <div class="nav-right">
+    <a href="/themes" class="nav-link">Katalog Tema</a>
+    <a href="/blog"   class="nav-link active">Blog</a>
+    <a href="/login"  class="nav-cta">Login Dashboard</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="blog-header">
+    <span class="blog-label">Artikel &amp; Tips</span>
+    <h1 class="blog-title">Inspirasi untuk <em>Hari Spesialmu</em></h1>
+<p class="blog-desc">
+Panduan pernikahan, inspirasi kehidupan rumah tangga, tips undangan digital, dan cerita dari pasangan yang telah mempercayai {{ site_name }}.
+</p>
+  </div>
+
+  {% if posts %}
+  <div class="posts-grid">
+    {% for post in posts %}
+    <a href="/blog/{{ post.slug }}" class="post-card {% if loop.first %}featured{% endif %}">
+      <div class="post-thumb">
+        {% if post.thumbnail %}
+          <img src="/static/uploads/blog/{{ post.thumbnail }}" alt="{{ post.title }}" loading="lazy">
+        {% else %}
+          <div class="post-thumb-placeholder">♡</div>
+        {% endif %}
+      </div>
+      <div class="post-body">
+        <div class="post-meta">
+          <span class="post-date">
+            {% set d = post.created_at[:10] if post.created_at else '' %}
+            {{ d | replace('-', ' ') if d else '' }}
+          </span>
+          {% if post.author %}
+          <span class="post-dot"></span>
+          <span class="post-author">{{ post.author }}</span>
+          {% endif %}
+          {% if post.views %}
+          <span class="post-dot"></span>
+          <span class="post-date">{{ post.views }} views</span>
+          {% endif %}
+        </div>
+        <h2 class="post-title">{{ post.title }}</h2>
+        {% if post.excerpt %}
+        <p class="post-excerpt">{{ post.excerpt }}</p>
+        {% endif %}
+        <span class="post-read">Baca Selengkapnya →</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="blog-empty">
+    <div class="ico">✍️</div>
+    <p>Belum ada artikel yang dipublikasikan.</p>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+/* FOOTER — ganti style footer yang lama */
+footer{
+  border-top:1px solid var(--border);
+  background:var(--off);
+  padding:1.6rem 1.4rem .9rem;
+}
+.footer-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:1.2rem;
+  padding-bottom:1.1rem;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:.85rem;
+}
+.footer-logo{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--ink);}
+.footer-logo span{color:var(--accent);}
+.footer-tagline{font-size:.62rem;color:var(--faint);margin-top:.2rem;letter-spacing:.03em;}
+.footer-links{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center;}
+.footer-links a{
+  font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.footer-links a:hover{color:var(--accent);}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.footer-copy{font-size:.6rem;color:var(--faint);letter-spacing:.04em;}
+.footer-wa{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.6rem;color:var(--muted);letter-spacing:.04em;transition:color .2s;
+}
+.footer-wa:hover{color:var(--green);}
+.footer-wa svg{width:13px;height:13px;fill:var(--green);}
+.footer-social {
+  margin-top: 15px;
+}
+
+</style>
+
+
+<style>
+/* BLOG INDEX — inspirasi banner */
+.blog-inspire{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:1.8rem 1.4rem;text-align:center;background:var(--off);
+}
+.blog-inspire-title{font-family:var(--serif);font-size:1.1rem;font-weight:300;margin-bottom:.35rem;}
+.blog-inspire-title em{font-style:italic;color:var(--accent);}
+.blog-inspire-sub{font-size:.67rem;color:var(--muted);margin-bottom:1rem;line-height:1.7;}
+.blog-inspire-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.55rem 1.25rem;border:1px solid var(--border);border-radius:2px;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.blog-inspire-btn:hover{border-color:var(--ink);color:var(--ink);}
+</style>
+
+<!-- Blog Index — Inspirasi Banner -->
+<div class="blog-inspire">
+  <div class="blog-inspire-title">Masih cari inspirasi <em>undangan impian</em>?</div>
+  <div class="blog-inspire-sub">Jelajahi tema digital elegan yang siap pakai — dari minimalis hingga mewah.</div>
+  <a href="/themes" class="blog-inspire-btn">Lihat Katalog Tema →</a>
+</div>
+
+
+
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">habar<span>kita</span>.com</div>
+      <div class="footer-tagline">Undangan Pernikahan Digital</div>
+
+      <!-- Social Media -->
+      <div class="footer-social">
+        <a href="https://instagram.com/habarkitacom" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com/@habarkita3" target="_blank">
+          <i class="fab fa-tiktok"></i>
+        </a>
+               <i> <small>follow us<small></i>
+<!--
+        <a href="https://facebook.com/username" target="_blank">
+          <i class="fab fa-facebook"></i>
+        </a>
+-->
+      </div>
+
+    </div>
+
+    <div class="footer-links">
+      <a href="/legal">Syarat &amp; Ketentuan</a>
+      <a href="/legal?p=privacy">Kebijakan Privasi</a>
+      <a href="/legal?p=refund">Refund</a>
+      <a href="/legal?p=about">Tentang Kami</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; {{ now.year }} {{ site_name }} — All rights reserved</div>
+  </div>
+</footer>
+
+
+</body>
+</html>

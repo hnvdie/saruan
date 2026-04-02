@@ -156,6 +156,8 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">{{ site_name }}<span> Admin</span><small>v3 · Dashboard</small></div>
+
+<!--
   <div class="nav-sec">Undangan</div>
   <a href="/admin" class="nav-item active">◈ Dashboard</a>
   <a href="/admin/create" class="nav-item">＋ Buat Undangan</a>
@@ -164,10 +166,21 @@ select.modal-input{appearance:none;background-image:url("data:image/svg+xml,%3Cs
   <div class="nav-sec">Publik</div>
   <a href="/" target="_blank" class="nav-item">⌂ Landing Page</a>
   <a href="/themes" target="_blank" class="nav-item">◑ Katalog Tema</a>
+-->
+<div class="nav-sec">Lainnya</div>
+<a href="#promo-section" class="nav-item" onclick="document.getElementById('promo-section').scrollIntoView({behavior:'smooth'});return false;">🏷 Promo Kode</a>
+<a href="/admin/blog" class="nav-item">✍ Kelola Blog</a>
+<div class="nav-sec">Publik</div>
+<a href="/" target="_blank" class="nav-item">⌂ Landing Page</a>
+<a href="/themes" target="_blank" class="nav-item">◑ Katalog Tema</a>
+<a href="/blog" target="_blank" class="nav-item">◎ Blog</a>
+
   <div class="sidebar-footer">
     <a href="/admin/logout" class="logout-link">⎋ Logout</a>
   </div>
 </aside>
+
+
 
 <!-- MAIN -->
 <div class="main">

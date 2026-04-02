@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ 'Edit' if mode=='edit' else 'Buat' }} Artikel — Admin</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#10084;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--white:#fff;--off:#f8f7f5;--off2:#f2f0ec;--border:#e5e2db;--border2:#ede9e2;--ink:#181818;--ink2:#2e2e2e;--muted:#8a8a8a;--faint:#c8c4bc;--accent:#a08c7e;--accent-light:#d6c8be;--red:#c0392b;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;}
+body{background:var(--off);color:var(--ink);font-family:var(--sans);font-weight:300;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+nav{background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:.78rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:var(--serif);font-size:1rem;font-style:italic;}
+.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:.75rem;font-size:.65rem;color:var(--muted);}
+.nav-right a{transition:color .15s;}.nav-right a:hover{color:var(--ink);}
+
+.wrap{max-width:900px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.page-title{font-family:var(--serif);font-size:1.6rem;font-weight:300;}
+.page-title em{font-style:italic;color:var(--accent);}
+
+.error-bar{background:#fff5f5;border:1px solid #f5c6c6;border-radius:4px;padding:.7rem 1rem;margin-bottom:1.2rem;font-size:.72rem;color:var(--red);}
+
+/* FORM LAYOUT */
+.form-grid{display:grid;grid-template-columns:1fr 280px;gap:1.1rem;align-items:start;}
+.form-main{display:flex;flex-direction:column;gap:.85rem;}
+.form-side{display:flex;flex-direction:column;gap:.85rem;}
+
+.card{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.card-head{padding:.6rem .9rem;border-bottom:1px solid var(--border);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.card-body{padding:.85rem .9rem;display:flex;flex-direction:column;gap:.6rem;}
+
+label{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.25rem;}
+
+input[type=text],input[type=email],textarea,select{
+  width:100%;padding:.42rem .65rem;
+  border:1px solid var(--border);border-radius:2px;
+  font-family:var(--sans);font-size:.75rem;color:var(--ink);
+  background:var(--white);outline:none;
+  transition:border-color .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+input[type=text]::placeholder,textarea::placeholder{color:var(--faint);}
+
+/* MARKDOWN EDITOR */
+.md-toolbar{display:flex;gap:.25rem;padding:.5rem .65rem;border-bottom:1px solid var(--border);background:var(--off);flex-wrap:wrap;}
+.md-btn{background:none;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:.65rem;color:var(--muted);font-family:var(--sans);padding:.18rem .45rem;transition:all .15s;line-height:1.4;}
+.md-btn:hover{border-color:var(--ink);color:var(--ink);}
+.md-editor{display:grid;grid-template-columns:1fr 1fr;min-height:420px;}
+.md-pane{display:flex;flex-direction:column;}
+.md-pane-label{font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);padding:.35rem .65rem;border-bottom:1px solid var(--border2);background:var(--off);}
+.md-pane:first-child{border-right:1px solid var(--border2);}
+textarea#content_md{
+  flex:1;resize:none;border:none;border-radius:0;padding:.75rem;
+  font-family:monospace;font-size:.77rem;line-height:1.7;min-height:400px;
+  background:var(--white);color:var(--ink2);
+}
+textarea#content_md:focus{border:none;outline:none;box-shadow:none;}
+.md-preview{flex:1;padding:.75rem;overflow-y:auto;font-size:.77rem;line-height:1.85;color:var(--ink2);background:var(--white);}
+
+/* Preview styling */
+.md-preview h1,.md-preview h2{font-family:var(--serif);font-weight:300;color:var(--ink);margin:1.2rem 0 .5rem;}
+.md-preview h1{font-size:1.4rem;}.md-preview h2{font-size:1.15rem;}
+.md-preview h3{font-size:.9rem;font-weight:400;margin:.9rem 0 .35rem;}
+.md-preview p{margin-bottom:.75rem;}
+.md-preview ul,.md-preview ol{padding-left:1.2rem;margin-bottom:.75rem;}
+.md-preview li{margin-bottom:.2rem;}
+.md-preview blockquote{padding:.5rem .75rem;border-left:3px solid var(--accent-light);background:var(--off);margin:.75rem 0;font-style:italic;color:var(--muted);font-size:.75rem;}
+.md-preview code{background:var(--off2);padding:.1rem .3rem;border-radius:2px;font-family:monospace;font-size:.75rem;}
+.md-preview pre{background:var(--off2);padding:.75rem;border-radius:2px;margin-bottom:.75rem;overflow-x:auto;}
+.md-preview pre code{background:none;padding:0;}
+.md-preview strong{font-weight:400;color:var(--ink);}
+.md-preview em{color:var(--accent);}
+.md-preview hr{border:none;border-top:1px solid var(--border);margin:1rem 0;}
+.md-preview img{max-width:100%;border-radius:2px;}
+
+/* Toggle view di mobile */
+.md-toggle{display:none;gap:.3rem;margin-bottom:.35rem;}
+.md-toggle button{flex:1;padding:.3rem;border:1px solid var(--border);border-radius:2px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:var(--white);color:var(--muted);font-family:var(--sans);}
+.md-toggle button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* THUMBNAIL PREVIEW */
+.thumb-preview{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:2px;border:1px solid var(--border);display:block;margin-bottom:.5rem;background:var(--off2);}
+.thumb-placeholder{width:100%;aspect-ratio:16/9;border-radius:2px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;font-family:var(--serif);font-size:1.5rem;color:var(--accent-light);font-style:italic;background:var(--off);}
+input[type=file]{font-size:.68rem;color:var(--muted);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem .9rem;border-radius:2px;font-size:.63rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;border:1px solid var(--border);color:var(--muted);background:var(--white);font-family:var(--sans);}
+.btn:hover{border-color:var(--ink);color:var(--ink);}
+.btn-primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+.btn-primary:hover{opacity:.82;}
+.form-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+
+/* PUBLISH TOGGLE */
+.pub-toggle{display:flex;align-items:center;gap:.6rem;cursor:pointer;}
+.pub-toggle input{width:auto;}
+.pub-label{font-size:.72rem;color:var(--ink2);}
+
+/* HINT TEXT */
+.hint{font-size:.62rem;color:var(--faint);margin-top:.2rem;line-height:1.5;}
+
+@media(max-width:720px){
+  .form-grid{grid-template-columns:1fr;}
+  .form-side{order:-1;}
+  .md-editor{grid-template-columns:1fr;}
+  .md-pane.preview-pane{display:none;}
+  .md-pane.preview-pane.show{display:flex;}
+  .md-pane.editor-pane.hide{display:none;}
+  .md-toggle{display:flex;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/admin" class="nav-logo">Admin <span>Panel</span></a>
+  <div class="nav-right">
+    <a href="/admin/blog">Kelola Blog</a>
+    <a href="/admin">Dashboard</a>
+    <a href="/admin/logout">Keluar</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1 class="page-title">{{ 'Edit' if mode=='edit' else 'Buat' }} <em>Artikel</em></h1>
+    <a href="/admin/blog" class="btn">← Kembali</a>
+  </div>
+
+  {% if error %}
+  <div class="error-bar">⚠ {{ error }}</div>
+  {% endif %}
+
+  <form method="POST"
+        action="{{ '/admin/blog/edit/'+post.id|string if mode=='edit' else '/admin/blog/create' }}"
+        enctype="multipart/form-data">
+  <div class="form-grid">
+
+    <!-- ── MAIN COLUMN ── -->
+    <div class="form-main">
+
+      <!-- Judul & Slug -->
+      <div class="card">
+        <div class="card-head">Informasi Artikel</div>
+        <div class="card-body">
+          <div>
+            <label for="title">Judul *</label>
+            <input type="text" id="title" name="title"
+                   value="{{ form.get('title', '') if form is mapping else form.title }}"
+                   placeholder="Contoh: 7 Tips Memilih Undangan Digital yang Elegan"
+                   oninput="autoSlug(this.value)" required>
+          </div>
+          <div>
+            <label for="slug">Slug (URL) *</label>
+            <input type="text" id="slug" name="slug"
+                   value="{{ form.get('slug', '') if form is mapping else form.slug }}"
+                   placeholder="tips-memilih-undangan-digital">
+            <div class="hint">Otomatis dari judul. URL: /blog/<strong id="slug-preview">...</strong></div>
+          </div>
+          <div>
+            <label for="excerpt">Ringkasan (untuk SEO & card preview)</label>
+            <textarea id="excerpt" name="excerpt" rows="2"
+                      placeholder="Satu atau dua kalimat singkat yang mendeskripsikan artikel ini...">{{ form.get('excerpt', '') if form is mapping else (form.excerpt or '') }}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Markdown Editor -->
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Konten Artikel (Markdown)</span>
+          <span style="font-size:.55rem;color:var(--faint);">Tempel markdown dari AI di sini</span>
+        </div>
+        <!-- Toolbar shortcuts -->
+        <div class="md-toolbar">
+          <button type="button" class="md-btn" onclick="ins('**','**')"><b>B</b></button>
+          <button type="button" class="md-btn" onclick="ins('*','*')"><i>I</i></button>
+          <button type="button" class="md-btn" onclick="insLine('## ')">H2</button>
+          <button type="button" class="md-btn" onclick="insLine('### ')">H3</button>
+          <button type="button" class="md-btn" onclick="insLine('- ')">List</button>
+          <button type="button" class="md-btn" onclick="insLine('> ')">Quote</button>
+          <button type="button" class="md-btn" onclick="ins('`','`')">Code</button>
+          <button type="button" class="md-btn" onclick="insLine('---')">HR</button>
+          <button type="button" class="md-btn" onclick="ins('[','](url)')">Link</button>
+          <button type="button" class="md-btn" onclick="ins('![alt](',')')">Img</button>
+        </div>
+        <!-- Mobile toggle -->
+        <div class="md-toggle" id="mdToggle">
+          <button type="button" class="on" onclick="showPane('editor')">✏ Edit</button>
+          <button type="button" onclick="showPane('preview')">👁 Preview</button>
+        </div>
+        <div class="md-editor">
+          <div class="md-pane editor-pane" id="editorPane">
+            <div class="md-pane-label">✏ Markdown</div>
+            <textarea id="content_md" name="content_md"
+                      oninput="updatePreview()"
+                      placeholder="Tulis atau tempel konten markdown artikel di sini...
+Contoh:
+## Apa itu Undangan Digital?
+Undangan digital adalah undangan yang dikirimkan melalui...
+">{{ form.get('content_md', '') if form is mapping else (form.content_md or '') }}</textarea>
+          </div>
+          <div class="md-pane preview-pane" id="previewPane">
+            <div class="md-pane-label">👁 Preview</div>
+            <div class="md-preview" id="mdPreview"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-main -->
+
+    <!-- ── SIDE COLUMN ── -->
+    <div class="form-side">
+
+      <!-- Publish -->
+      <div class="card">
+        <div class="card-head">Status Publikasi</div>
+        <div class="card-body">
+          <label class="pub-toggle">
+            <input type="checkbox" name="published" value="1"
+                   {{ 'checked' if (form.get('published') if form is mapping else (form.published if form else 0)) else '' }}>
+            <span class="pub-label">Publikasikan sekarang</span>
+          </label>
+          <div class="hint">Jika tidak dicentang, artikel tersimpan sebagai Draft dan tidak muncul di /blog.</div>
+          <div class="form-actions" style="margin-top:.5rem;">
+            <button type="submit" class="btn btn-primary">
+              {{ '💾 Simpan Perubahan' if mode=='edit' else '🚀 Simpan Artikel' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thumbnail -->
+      <div class="card">
+        <div class="card-head">Thumbnail</div>
+        <div class="card-body">
+          {% if mode=='edit' and post.get('thumbnail') %}
+            <img src="/static/uploads/blog/{{ post.thumbnail }}" class="thumb-preview" id="thumbPreview" alt="">
+            <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-bottom:.3rem;">
+              <input type="checkbox" name="clear_thumbnail" value="1">
+              <span class="hint" style="margin:0;">Hapus thumbnail</span>
+            </label>
+          {% else %}
+            <div class="thumb-placeholder" id="thumbPreview">♡</div>
+          {% endif %}
+          <input type="file" name="thumbnail" accept=".jpg,.jpeg,.png,.webp" onchange="previewThumb(this)">
+          <div class="hint">JPG / PNG / WEBP. Rasio 16:9 direkomendasikan.<br>Foto ini akan dipakai sebagai OG image saat artikel dibagikan ke WhatsApp/sosmed.</div>
+        </div>
+      </div>
+
+      <!-- Author -->
+      <div class="card">
+        <div class="card-head">Penulis</div>
+        <div class="card-body">
+          <input type="text" name="author"
+                 value="{{ form.get('author','Admin') if form is mapping else (form.author or 'Admin') }}"
+                 placeholder="Admin">
+        </div>
+      </div>
+
+      <!-- Markdown cheatsheet -->
+      <div class="card">
+        <div class="card-head">Markdown Cheatsheet</div>
+        <div class="card-body" style="gap:.3rem;">
+          {% for row in [
+            ('# Judul H1','## H2  ### H3'),
+            ('**tebal**','*miring*'),
+            ('- item list','1. numbered'),
+            ('> blockquote','`inline code`'),
+            ('---','garis horizontal'),
+            ('[teks](url)','link'),
+            ('![alt](url)','gambar'),
+          ] %}
+          <div style="display:flex;gap:.5rem;font-size:.63rem;font-family:monospace;color:var(--muted);border-bottom:1px solid var(--border2);padding:.2rem 0;">
+            <span style="flex:1;color:var(--accent);">{{ row[0] }}</span>
+            <span style="flex:1;">{{ row[1] }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div><!-- /form-side -->
+  </div><!-- /form-grid -->
+  </form>
+</div>
+
+<!-- marked.js untuk live preview -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script>
+// ── Live Preview ─────────────────────────────────────────────────────────────
+function updatePreview() {
+  const src = document.getElementById('content_md').value;
+  document.getElementById('mdPreview').innerHTML = marked.parse(src);
+}
+// Init preview on load
+document.addEventListener('DOMContentLoaded', function() {
+  updatePreview();
+  updateSlugPreview(document.getElementById('slug').value);
+});
+
+// ── Auto slug dari judul ─────────────────────────────────────────────────────
+let slugManuallyEdited = false;
+document.getElementById('slug').addEventListener('input', () => { slugManuallyEdited = true; updateSlugPreview(document.getElementById('slug').value); });
+
+function autoSlug(title) {
+  if (slugManuallyEdited) return;
+  const slug = title.toLowerCase()
+    .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
+    .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-{2,}/g,'-').replace(/^-|-$/g,'');
+  document.getElementById('slug').value = slug;
+  updateSlugPreview(slug);
+}
+
+function updateSlugPreview(slug) {
+  document.getElementById('slug-preview').textContent = slug || '...';
+}
+
+// ── Toolbar helpers ──────────────────────────────────────────────────────────
+function ins(before, after) {
+  const ta = document.getElementById('content_md');
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.slice(s, e);
+  ta.value = ta.value.slice(0, s) + before + sel + after + ta.value.slice(e);
+  ta.selectionStart = s + before.length;
+  ta.selectionEnd   = e + before.length;
+  ta.focus(); updatePreview();
+}
+function insLine(prefix) {
+  const ta = document.getElementById('content_md');
+  const s = ta.selectionStart;
+  const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
+  ta.value = ta.value.slice(0, lineStart) + prefix + ta.value.slice(lineStart);
+  ta.selectionStart = ta.selectionEnd = s + prefix.length;
+  ta.focus(); updatePreview();
+}
+
+// ── Thumbnail preview ────────────────────────────────────────────────────────
+function previewThumb(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const el = document.getElementById('thumbPreview');
+    el.outerHTML = `<img src="${e.target.result}" class="thumb-preview" id="thumbPreview" alt="">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── Mobile pane toggle ───────────────────────────────────────────────────────
+function showPane(pane) {
+  const ep = document.getElementById('editorPane');
+  const pp = document.getElementById('previewPane');
+  const btns = document.querySelectorAll('#mdToggle button');
+  if (pane === 'preview') {
+    ep.classList.add('hide'); pp.classList.add('show');
+    btns[0].classList.remove('on'); btns[1].classList.add('on');
+    updatePreview();
+  } else {
+    pp.classList.remove('show'); ep.classList.remove('hide');
+    btns[1].classList.remove('on'); btns[0].classList.add('on');
+  }
+}
+</script>
+
+</body>
+</html>
