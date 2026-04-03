@@ -2486,6 +2486,43 @@ def _cli_approve_user(inv_id_or_slug):
 
 
 
+@app.route('/robots.txt')
+def robots():
+    content = """User-agent: *
+Disallow: /preview/
+Disallow: /admin/
+Disallow: /i/
+Allow: /blog/
+Allow: /
+
+Sitemap: https://habarkita.com/sitemap.xml
+"""
+    return make_response(content, 200, {'Content-Type': 'text/plain'})
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    conn = get_db()
+    posts = conn.execute(
+        "SELECT slug, updated_at FROM blog_posts WHERE published=1 ORDER BY updated_at DESC"
+    ).fetchall()
+    conn.close()
+
+    urls = ['https://habarkita.com/', 'https://habarkita.com/blog/']
+    for p in posts:
+        urls.append(f'https://habarkita.com/blog/{p["slug"]}')
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for url in urls:
+        xml += f'  <url><loc>{url}</loc></url>\n'
+    xml += '</urlset>'
+
+    return make_response(xml, 200, {'Content-Type': 'application/xml'})
+
+
+
+
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     init_db()
