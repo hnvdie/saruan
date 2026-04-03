@@ -34,7 +34,8 @@ echo ""
 # ── 1. SYSTEM DEPENDENCIES ──────────────────────────────────────
 info "Install system dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y -qq python3 python3-pip nginx certbot python3-certbot-nginx openssl curl imagemagick
+# FIX: tambah dnsutils untuk perintah dig (dipakai cek domain di step SSL)
+sudo apt-get install -y -qq python3 python3-pip nginx certbot python3-certbot-nginx openssl curl imagemagick dnsutils
 success "System dependencies OK"
 
 # ── 2. PYTHON DEPENDENCIES ──────────────────────────────────────
@@ -143,17 +144,29 @@ server {
     return 444;
 }
 
-# ── HTTP → HTTPS redirect ───────────────────────────────────────
+# ── HTTP → HTTPS redirect (semua ke non-www) ───────────────────
 server {
     listen 80;
     server_name ${DOMAIN} ${DOMAIN_WWW};
-    return 301 https://\$host\$request_uri;
+    return 301 https://${DOMAIN}\$request_uri;
 }
 
-# ── Server utama ────────────────────────────────────────────────
+# ── FIX: www HTTPS → non-www redirect ─────────────────────────
+# Pakai dummy cert dulu — Certbot akan replace otomatis saat step SSL
 server {
     listen 443 ssl http2;
-    server_name ${DOMAIN} ${DOMAIN_WWW};
+    server_name ${DOMAIN_WWW};
+    ssl_certificate     /etc/nginx/ssl/dummy.crt;
+    ssl_certificate_key /etc/nginx/ssl/dummy.key;
+    return 301 https://${DOMAIN}\$request_uri;
+}
+
+# ── Server utama (non-www only) ─────────────────────────────────
+# FIX: server_name hanya DOMAIN, bukan DOMAIN_WWW
+# www sudah ditangani di block redirect di atas
+server {
+    listen 443 ssl http2;
+    server_name ${DOMAIN};
 
     # SSL — akan di-replace otomatis oleh Certbot
     ssl_certificate     /etc/nginx/ssl/dummy.crt;
