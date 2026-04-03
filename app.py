@@ -2214,7 +2214,7 @@ def blog_post(slug):
     # Ambil artikel terkait (3 terbaru, bukan artikel ini)
     related = conn.execute(
         "SELECT slug, title, thumbnail, created_at FROM blog_posts "
-        "WHERE published=1 AND id!=? ORDER BY created_at DESC LIMIT 3",
+        "WHERE published=1 AND id!=? ORDER BY created_at DESC LIMIT 4",
         (post['id'],)
     ).fetchall()
     conn.close()
