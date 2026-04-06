@@ -22,11 +22,10 @@ select option{background:#1a1a1a;color:#ddd;}textarea{resize:vertical;}
 const { useState, useRef, useEffect } = React;
 const CANVAS_W=390,CANVAS_H=844;
 const ANIMATIONS=[{id:"none",label:"— Tidak ada —"},{id:"fade-in",label:"Fade In"},{id:"slide-from-left",label:"Slide Kiri"},{id:"slide-from-right",label:"Slide Kanan"},{id:"slide-from-top",label:"Slide Atas"},{id:"slide-from-bottom",label:"Slide Bawah"},{id:"zoom-in",label:"Zoom In"},{id:"rotate-in",label:"Rotate In"},{id:"sway",label:"Sway"},{id:"float",label:"Float"},{id:"pulse",label:"Pulse"},{id:"shimmer",label:"Shimmer"},{id:"bounce",label:"Bounce"}];
-const OPEN_ANIMATIONS=[{id:"fade",label:"✦ Fade Out (klasik)"},{id:"slide-up",label:"↑ Slide Up"},{id:"slide-down",label:"↓ Slide Down"},{id:"zoom-out",label:"⊕ Zoom Out"},{id:"zoom-in-content",label:"⊙ Zoom In Content"},{id:"flip-3d",label:"🎴 3D Flip"},{id:"parallax-3d",label:"🌀 Parallax 3D"},{id:"curtain",label:"🎭 Curtain"},{id:"dissolve",label:"✦ Dissolve Bloom"},{id:"glitch",label:"⚡ Glitch"}];
 const FONTS=["Playfair Display","DM Sans","Georgia","Times New Roman","Cormorant Garamond","Libre Baskerville","Lora","Merriweather","Montserrat","Raleway","Josefin Sans","Cinzel","Great Vibes","Dancing Script","Sacramento","Parisienne","Alex Brush","Allura","Tangerine","Italianno"];
 const SECTION_PRESETS=[{type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08"},{type:"blank",name:"✦ Halaman Kosong",bg:"#1a1a1a"},{type:"quran",name:"Ayat Quran",bg:"#FAF6EE"},{type:"couple",name:"Profil Mempelai",bg:"#1A100A"},{type:"lovestory",name:"Love Story",bg:"#F7EFE0"},{type:"event",name:"Detail Acara",bg:"#FAF6EE"},{type:"closing",name:"Closing",bg:"#1A100A"}];
 const WIDGET_DEFS=[{id:"countdown",label:"⏱ Countdown",h:180},{id:"rsvp",label:"📋 Form RSVP",h:520},{id:"maps",label:"🗺 Peta Lokasi",h:380},{id:"gallery",label:"🖼 Gallery",h:500},{id:"guestbook",label:"💌 Buku Tamu",h:480},{id:"gift",label:"💰 Amplop",h:400}];
-const DATA_VARS=[{key:"inv.groom_name",label:"Nama Mempelai Pria",example:"Ahmad Rizky"},{key:"inv.bride_name",label:"Nama Mempelai Wanita",example:"Siti Rahayu"},{key:"inv.groom_parents",label:"Nama Orang Tua Pria",example:"Bapak Hasan & Ibu Aminah"},{key:"inv.bride_parents",label:"Nama Orang Tua Wanita",example:"Bapak Yusuf & Ibu Fatimah"},{key:"inv.akad_date",label:"Tanggal Akad",example:"Sabtu, 12 Juli 2025"},{key:"inv.akad_time",label:"Waktu Akad",example:"08.00–10.00 WIB"},{key:"inv.akad_venue",label:"Tempat Akad",example:"Masjid Al-Ikhlas"},{key:"inv.akad_address",label:"Alamat Akad",example:"Jl. Mawar No. 12, Jakarta"},{key:"inv.resepsi_date",label:"Tanggal Resepsi",example:"Sabtu, 12 Juli 2025"},{key:"inv.resepsi_time",label:"Waktu Resepsi",example:"11.00–14.00 WIB"},{key:"inv.resepsi_venue",label:"Tempat Resepsi",example:"Gedung Serbaguna Barokah"},{key:"inv.resepsi_address",label:"Alamat Resepsi",example:"Jl. Melati No. 45, Jakarta"},{key:"inv.groom_photo_url",label:"Foto Mempelai Pria",example:"demo-photos/individual/groom.jpg"},{key:"inv.bride_photo_url",label:"Foto Mempelai Wanita",example:"demo-photos/individual/bride.jpg"},{key:"inv.maps_url",label:"Link Google Maps",example:"https://maps.google.com/?q=..."},{key:"inv.countdown_date",label:"Target Countdown",example:"2025-07-12T08:00:00"},{key:"inv.music_url",label:"URL Musik (production)",example:"static/music/lagu.mp3",hint:"Musik otomatis diputar saat tamu membuka undangan. Isi URL di production server."},{key:"inv.love_story",label:"Cerita Love Story",example:"Kami pertama bertemu..."}];
+const DATA_VARS=[{key:"inv.groom_name",label:"Nama Mempelai Pria",example:"Ahmad Rizky"},{key:"inv.bride_name",label:"Nama Mempelai Wanita",example:"Siti Rahayu"},{key:"inv.groom_parents",label:"Nama Orang Tua Pria",example:"Bapak Hasan & Ibu Aminah"},{key:"inv.bride_parents",label:"Nama Orang Tua Wanita",example:"Bapak Yusuf & Ibu Fatimah"},{key:"inv.akad_date",label:"Tanggal Akad",example:"Sabtu, 12 Juli 2025"},{key:"inv.akad_time",label:"Waktu Akad",example:"08.00–10.00 WIB"},{key:"inv.akad_venue",label:"Tempat Akad",example:"Masjid Al-Ikhlas"},{key:"inv.akad_address",label:"Alamat Akad",example:"Jl. Mawar No. 12, Jakarta"},{key:"inv.resepsi_date",label:"Tanggal Resepsi",example:"Sabtu, 12 Juli 2025"},{key:"inv.resepsi_time",label:"Waktu Resepsi",example:"11.00–14.00 WIB"},{key:"inv.resepsi_venue",label:"Tempat Resepsi",example:"Gedung Serbaguna Barokah"},{key:"inv.resepsi_address",label:"Alamat Resepsi",example:"Jl. Melati No. 45, Jakarta"},{key:"inv.groom_photo_url",label:"Foto Mempelai Pria",example:"demo-photos/individual/groom.jpg"},{key:"inv.bride_photo_url",label:"Foto Mempelai Wanita",example:"demo-photos/individual/bride.jpg"},{key:"inv.maps_url",label:"Link Google Maps",example:"https://maps.google.com/?q=..."},{key:"inv.maps_embed",label:"Maps Embed URL",example:"https://www.google.com/maps/embed?pb=..."},{key:"inv.countdown_date",label:"Target Countdown",example:"2025-07-12T08:00:00"},{key:"inv.music_url",label:"URL File Musik",example:"static/music/lagu.mp3"},{key:"inv.love_story",label:"Cerita Love Story",example:"Kami pertama bertemu..."}];
 
 let _id=200;
 const uid=()=>++_id;
@@ -73,15 +72,15 @@ function collectImages(sections){
 function stripSections(sections,imgMap,themeId){
   return JSON.parse(JSON.stringify(sections)).map(s=>{
     if(s.bgImage&&imgMap.has(s.bgImage)){
-      const m=imgMap.get(s.bgImage);s.bgImage=`/static/themes/${themeId}/${m.id}.${m.ext}`;
+      const m=imgMap.get(s.bgImage);s.bgImage=`static/themes/${themeId}/${m.id}.${m.ext}`;
     }
     for(const el of s.elements||[]){
       if(el.type==="image"&&imgMap.has(el.src)){
-        const m=imgMap.get(el.src);el.src=`/static/themes/${themeId}/${m.id}.${m.ext}`;
+        const m=imgMap.get(el.src);el.src=`static/themes/${themeId}/${m.id}.${m.ext}`;
       }
       if(el.galleryImages){
         el.galleryImages=el.galleryImages.map(g=>{
-          if(imgMap.has(g)){const m=imgMap.get(g);return`/static/themes/${themeId}/${m.id}.${m.ext}`;}
+          if(imgMap.has(g)){const m=imgMap.get(g);return`static/themes/${themeId}/${m.id}.${m.ext}`;}
           return g;
         });
       }
@@ -124,7 +123,7 @@ async function exportAsZip(name,sections,invData,htmlStr,onProgress){
   // Patch HTML: replace all base64/demo srcs with static paths
   let htmlOut=htmlStr;
   for(const[orig,m]of imgMap){
-    const newPath=`/static/themes/${themeId}/${m.id}.${m.ext}`;
+    const newPath=`static/themes/${themeId}/${m.id}.${m.ext}`;
     htmlOut=htmlOut.split(orig).join(newPath);
   }
 
@@ -168,30 +167,17 @@ function importJSON(text,cb){try{const d=JSON.parse(text);if(d.sections){const p
 
 // ─── Element Factories ────────────────────────────────────────────────────────
 const makeTextEl=(text="Teks Baru",x=80,y=200)=>({id:uid(),type:"text",name:text.slice(0,20),text,x,y,fontSize:24,fontFamily:"Playfair Display",color:"#ffffff",align:"center",fontStyle:"normal",fontWeight:"400",letterSpacing:0,lineHeight:1.4,opacity:1,zIndex:10,animation:"none",animDelay:0,animDuration:4,rotation:0,width:250,shadow:false,shadowColor:"rgba(0,0,0,0.5)",shadowBlur:8,isVar:false,varKey:"",borderRadius:0,height:150});
-const makeImgEl=(src,name)=>({id:uid(),type:"image",name,src,x:20+Math.floor(Math.random()*40),y:20+Math.floor(Math.random()*40),width:150,height:0,rotation:0,opacity:1,zIndex:10,animation:"none",animDelay:0,animDuration:4,flipH:false,flipV:false});
+const makeImgEl=(src,name)=>({id:uid(),type:"image",name,src,x:20+Math.floor(Math.random()*40),y:20+Math.floor(Math.random()*40),width:150,rotation:0,opacity:1,zIndex:10,animation:"none",animDelay:0,animDuration:4,flipH:false,flipV:false});
 const makeWidgetEl=(widgetType)=>{const def=WIDGET_DEFS.find(w=>w.id===widgetType)||{h:400};return{id:uid(),type:"widget",widgetType,name:(def.label||widgetType),x:20,y:40,width:350,height:def.h,zIndex:10,opacity:1,accent:"#C4973A",radius:4,wStyle:"dark",title:"",mapsLayout:"embed",mapsBtnText:"Buka di Google Maps",galleryImages:[],galleryLayout:"2",galleryShape:"kotak",galleryGap:8,cdAccent:"#C4973A",rsvpTitle:"Konfirmasi Kehadiran",gbTitle:"Buku Tamu",giftTitle:"Amplop Digital",giftSubtitle:"Doa tulus Anda adalah hadiah terindah."};};
 
 const initSections=[{id:1,type:"cover",name:"Cover / Buka Undangan",bg:"#1a0e08",elements:[],openInviteText:"Buka Undangan",openInviteStyle:{fontSize:16,color:"#C4973A",fontFamily:"Playfair Display"}},{id:2,type:"quran",name:"Ayat Quran",bg:"#FAF6EE",elements:[]},{id:3,type:"couple",name:"Profil Mempelai",bg:"#1A100A",elements:[]},{id:4,type:"event",name:"Detail Acara",bg:"#FAF6EE",elements:[]},{id:5,type:"closing",name:"Closing",bg:"#1A100A",elements:[]}];
 
 // ─── Build Exported HTML ──────────────────────────────────────────────────────
-function buildHTML(sections,invData,mode){
-  // mode: "preview" (for editor iframe, uses real values) | "export" (for Flask, uses Jinja2 vars)
-  const isExport = mode==="export";
-  // Jinja2 tag builders - built via concat so Babel parser never sees {{ or {%
-  const J2o="{"+"{", J2c="}"+"}";  // {{ and }}
-  const JPo="{"+"%", JPc="%"+"}";  // {% and %}
-  const jinja_for_photo=JPo+"- for photo in photos "+JPc;
-  const jinja_photo_src=J2o+" photo_src(photo) "+J2c;
-  const jinja_endfor=JPo+"- endfor "+JPc;
-  const jinja_if_photos=JPo+"- if photos "+JPc;
-  const jinja_else=JPo+"- else "+JPc;
-  const jinja_endif=JPo+"- endif "+JPc;
-  const jinja_music=J2o+"inv.music_url"+J2c;
-
+function buildHTML(sections,invData){
   const inv=invData||{};
   const rv=k=>inv[k.replace("inv.","")]||"";
-  const animCSS=`@keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes slide-from-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}@keyframes slide-from-top{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-bottom{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}@keyframes zoom-in{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes rotate-in{from{opacity:0;transform:rotate(-14deg) scale(.88)}to{opacity:1;transform:none}}@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}@keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}@keyframes glitch-out{0%{transform:none;opacity:1;clip-path:inset(0 0 0 0)}10%{transform:translateX(-6px) skewX(-8deg);clip-path:inset(20% 0 40% 0)}20%{transform:translateX(6px) skewX(8deg);clip-path:inset(60% 0 10% 0)}30%{transform:translateX(-10px);clip-path:inset(0 0 80% 0)}40%{transform:translateX(8px) skewX(-12deg);clip-path:inset(40% 0 30% 0)}50%{transform:translateX(-4px);opacity:0.7;clip-path:inset(10% 0 60% 0)}60%{transform:translateX(12px) skewX(6deg);clip-path:inset(70% 0 5% 0)}80%{transform:translateX(-8px);opacity:0.3;clip-path:inset(90% 0 0% 0)}100%{transform:translateX(0);opacity:0;clip-path:inset(100% 0 0% 0)}}`;
-  const ba=(anim,dur,delay,forAttr=false)=>{if(!anim||anim==="none")return"";const inf=["sway","float","pulse","shimmer","bounce"].includes(anim);if(forAttr)return inf?"":'data-entry="1"';return inf?`animation:${anim} ${dur||4}s ease-in-out infinite;`:`animation:${anim} .8s cubic-bezier(.16,1,.3,1) ${delay||0}s both;`;};
+  const animCSS=`@keyframes fade-in{from{opacity:0}to{opacity:1}}@keyframes slide-from-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}@keyframes slide-from-top{from{opacity:0;transform:translateY(-32px)}to{opacity:1;transform:none}}@keyframes slide-from-bottom{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}@keyframes zoom-in{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}@keyframes rotate-in{from{opacity:0;transform:rotate(-14deg) scale(.88)}to{opacity:1;transform:none}}@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}@keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`;
+  const ba=(anim,dur,delay)=>{if(!anim||anim==="none")return"";const inf=["sway","float","pulse","shimmer","bounce"].includes(anim);return inf?`animation:${anim} ${dur||4}s ease-in-out infinite;`:`animation:${anim} .8s cubic-bezier(.16,1,.3,1) ${delay||0}s both;`;};
   const PHOTO_VARS=new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
   // For export: photo vars become Flask template vars {{ inv.groom_photo_url }}
   // For preview in editor: uses demo-photos/individual/ local path
@@ -202,15 +188,13 @@ function buildHTML(sections,invData,mode){
 
   const elToHTML=el=>{
     const lv=px(el.x),tv=py(el.y),wv=px(el.width||200);
-    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");const imgEntry=ba(el.animation,el.animDuration,el.animDelay,true);const hv=el.height?`height:${py(el.height)}vh;`:"";return `<img src="${el.src}" alt="" style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;${hv}transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};object-fit:cover;${animS}pointer-events:none;" ${imgEntry}/>`;}
+    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");return `<img src="${el.src}" alt="" style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};${animS}pointer-events:none;"/>`;}
     if(el.type==="text"){
       const animS=ba(el.animation,el.animDuration,el.animDelay),shd=el.shadow?`text-shadow:0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,.5)"};`:"";
-      if(el.isVar&&el.varKey&&PHOTO_VARS.has(el.varKey)){const br=el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,hv=py(el.height||el.width||150);
-        const photoSrc = isExport ? (J2o+el.varKey+J2c) : (rv(el.varKey)||"");
-        return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;height:${hv}%;z-index:${el.zIndex};opacity:${el.opacity};${animS}pointer-events:none;"><img src="${photoSrc}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:${br};display:block;"/></div>`;}
-      const txt=el.isVar&&el.varKey?(isExport?(J2o+el.varKey+J2c):(rv(el.varKey)||(J2o+el.varKey+J2c))):el.text;
-      const fs=el.fontSize||24;
-      return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;font-size:${fs}px;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);pointer-events:none;${shd}${animS}">${txt}</div>`;
+      if(el.isVar&&el.varKey&&PHOTO_VARS.has(el.varKey)){const br=el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,hv=py(el.height||el.width||150);return `<img src="{{${el.varKey}}}" alt="" style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;height:${hv}vh;object-fit:cover;border-radius:${br};z-index:${el.zIndex};opacity:${el.opacity};pointer-events:none;"/>`;}
+      const txt=el.isVar&&el.varKey?(rv(el.varKey)||`{{${el.varKey}}}`):el.text;
+      const fsv=+(el.fontSize||24)/390*100;
+      return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;font-size:${fsv.toFixed(3)}vw;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);pointer-events:none;${shd}${animS}">${txt}</div>`;
     }
     if(el.type==="widget")return widgetToHTML(el,inv);
     return"";
@@ -219,14 +203,14 @@ function buildHTML(sections,invData,mode){
   const widgetToHTML=(el,inv)=>{
     const acc=el.accent||"#C4973A",r=el.radius||4,dk=(el.wStyle||"dark")==="dark",ib=dk?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.06)",ic=dk?"#aaa":"#333",tc=dk?acc:"#333";
     const lv=px(el.x),tv=py(el.y),wv=px(el.width),hv=py(el.height);
-    const ws=`position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;height:${hv}%;z-index:${el.zIndex};opacity:${el.opacity};overflow-y:auto;`;
+    const ws=`position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;height:${hv}vh;z-index:${el.zIndex};opacity:${el.opacity};overflow-y:auto;`;
     const wid=el.id;
     if(el.widgetType==="countdown"){const ca=el.cdAccent||acc,tit=el.title?`<div style="font-family:'Playfair Display',serif;font-size:4.6vw;color:${ca};margin-bottom:16px;text-align:center;">${el.title}</div>`:"";return `<div style="${ws}padding:5vw 2vw;">${tit}<div style="display:flex;gap:2.5vw;justify-content:center;padding:0 2vw;">${[["cd-days","Hari"],["cd-hours","Jam"],["cd-mins","Mnt"],["cd-secs","Det"]].map(([cid,lbl])=>`<div style="flex:1;background:${dk?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"};border-radius:8px;padding:3.6vw 1vw;text-align:center;"><div id="${cid}" style="font-family:'Playfair Display',serif;font-size:7.7vw;color:${ca};line-height:1;">00</div><div style="font-size:2.3vw;color:${dk?"#666":"#999"};text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;font-family:'DM Sans',sans-serif;">${lbl}</div></div>`).join("")}</div></div>`;}
     if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return `<div style="${ws}"><div id="rsvp-form-${wid}" style="padding:5vw 1vw;"><div style="text-align:center;margin-bottom:5vw;"><div style="font-family:'Playfair Display',serif;font-size:5.1vw;color:${tc};">${tit}</div><div style="width:8vw;height:1px;background:${acc};opacity:.4;margin:2vw auto 0;"></div></div><input id="rn-${wid}" placeholder="Nama Anda" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"/><input id="rg-${wid}" type="number" min="1" placeholder="Jumlah Tamu" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"/><select id="ra-${wid}" style="width:100%;padding:2.6vw 3.6vw;background:${dk?"#1a1a1a":ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"><option value="">Konfirmasi Kehadiran ▾</option><option value="hadir">Insya Allah Hadir 🤍</option><option value="tidak">Tidak Dapat Hadir</option></select><textarea id="rm-${wid}" placeholder="Ucapan &amp; Doa..." rows="3" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:3vw;"></textarea><button onclick="submitRSVP('${wid}')" style="width:100%;padding:3vw;background:${acc};border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;cursor:pointer;touch-action:manipulation;">Kirim Konfirmasi 💌</button></div><div id="rsvp-ok-${wid}" style="display:none;padding:15vw 5vw;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:10vw;color:${acc};">✦</div><div style="font-family:'Playfair Display',serif;font-size:5.6vw;color:${dk?"#fff":"#333"};margin-top:12px;">Terima Kasih</div><div style="font-size:3.3vw;color:#888;margin-top:8px;font-family:'DM Sans',sans-serif;line-height:1.7;">Konfirmasi Anda telah kami terima.</div></div></div>`;}
-    if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:3.5vw;left:50%;transform:translateX(-50%);display:inline-block;padding:2.3vw 5.6vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3vw;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;z-index:${el.zIndex};text-align:center;padding:5% 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:3.3vw 7.7vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
-    if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"56vw":"38vw",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:5.1vw;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>`<div style="overflow:hidden;border-radius:${br};"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=jinja_for_photo+'<div style="overflow:hidden;border-radius:'+br+';"><img src="'+jinja_photo_src+'" style="width:100%;height:'+imgH+';object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox(\''+jinja_photo_src+"\',\'"+wid+"')" +' loading="lazy"/></div>'+jinja_endfor;const imgs=statics||(jinja_if_photos+jinja+jinja_else+'<div style="color:#555;text-align:center;padding:30px;font-size:3vw;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>'+jinja_endif);return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
+    if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:3.5vw;left:50%;transform:translateX(-50%);display:inline-block;padding:2.3vw 5.6vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3vw;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;z-index:${el.zIndex};text-align:center;padding:5vw 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:3.3vw 7.7vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
+    if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"56vw":"38vw",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:5.1vw;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>`<div style="overflow:hidden;border-radius:${br};"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=`{%- for photo in photos %}<div style="overflow:hidden;border-radius:${br};"><img src="{{ photo_src(photo) }}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('{{ photo_src(photo) }}','${wid}')" loading="lazy"/></div>{%- endfor %}`;const imgs=statics||('{%- if photos %}'+jinja+'{%- else %}<div style="color:#555;text-align:center;padding:30px;font-size:3vw;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>{%- endif %}');return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
     if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}"><div style="text-align:center;padding:5vw 1vw 3vw;"><div style="font-family:'Playfair Display',serif;font-size:5.1vw;color:${tc};">${tit}</div><div style="width:8vw;height:1px;background:${acc};opacity:.4;margin:2vw auto 0;"></div><div style="font-size:2.8vw;color:#555;margin-top:2vw;font-family:'DM Sans',sans-serif;">Ucapan dari tamu yang telah konfirmasi kehadiran</div></div><div id="gb-list-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 1vw 3vw;overflow-y:auto;height:calc(100% - 100px);"><div style="color:#444;text-align:center;font-size:3vw;padding:16px;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div></div></div>`;}
-    if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital",sub=el.giftSubtitle||"Doa tulus Anda adalah hadiah terindah.",cbg=dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",cbd=dk?acc+"33":"rgba(0,0,0,.08)";return `<div style="${ws}padding:5vw 1vw;"><div style="text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:5.6vw;color:${acc};margin-bottom:2vw;">${tit}</div><div style="font-size:3vw;color:#888;line-height:1.7;margin-bottom:5vw;font-family:'DM Sans',sans-serif;">${sub}</div></div>"+JPo+"- for gift in gifts "+JPc+"<div style="background:${cbg};border:1px solid ${cbd};border-radius:${r}px;padding:5vw 6vw;margin-bottom:3vw;">"+JPo+"- if gift.bank_name "+JPc+"<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">Transfer via</div><div style="font-family:'Playfair Display',serif;font-size:4.6vw;color:${acc};margin-bottom:1vw;">"+J2o+" gift.bank_name "+J2c+"</div><div id="acc-"+J2o+" loop.index "+J2c+"" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:3px;margin:1.5vw 0;">"+J2o+" gift.account_number "+J2c+"</div><div style="font-size:3vw;color:#888;">a/n "+J2o+" gift.account_name "+J2c+"</div><button onclick="(function(b){var t=document.getElementById('acc-"+J2o+" loop.index "+J2c+"');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>"+JPo+"- elif gift.ewallet_type "+JPc+"<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">"+J2o+" gift.ewallet_type "+J2c+"</div><div id="acc-"+J2o+" loop.index "+J2c+"" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:2px;margin:1.5vw 0;">"+J2o+" gift.ewallet_number "+J2c+"</div><div style="font-size:3vw;color:#888;">a/n "+J2o+" gift.ewallet_name "+J2c+"</div><button onclick="(function(b){var t=document.getElementById('acc-"+J2o+" loop.index "+J2c+"');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>"+JPo+"- endif "+JPc+"</div>"+JPo+"- endfor "+JPc+"</div>`;}
+    if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital",sub=el.giftSubtitle||"Doa tulus Anda adalah hadiah terindah.",cbg=dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",cbd=dk?acc+"33":"rgba(0,0,0,.08)";return `<div style="${ws}padding:5vw 1vw;"><div style="text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:5.6vw;color:${acc};margin-bottom:2vw;">${tit}</div><div style="font-size:3vw;color:#888;line-height:1.7;margin-bottom:5vw;font-family:'DM Sans',sans-serif;">${sub}</div></div>{%- for gift in gifts %}<div style="background:${cbg};border:1px solid ${cbd};border-radius:${r}px;padding:5vw 6vw;margin-bottom:3vw;">{%- if gift.bank_name %}<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">Transfer via</div><div style="font-family:'Playfair Display',serif;font-size:4.6vw;color:${acc};margin-bottom:1vw;">{{ gift.bank_name }}</div><div id="acc-{{ loop.index }}" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:3px;margin:1.5vw 0;">{{ gift.account_number }}</div><div style="font-size:3vw;color:#888;">a/n {{ gift.account_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- elif gift.ewallet_type %}<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">{{ gift.ewallet_type }}</div><div id="acc-{{ loop.index }}" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:2px;margin:1.5vw 0;">{{ gift.ewallet_number }}</div><div style="font-size:3vw;color:#888;">a/n {{ gift.ewallet_name }}</div><button onclick="(function(b){var t=document.getElementById('acc-{{ loop.index }}');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>{%- endif %}</div>{%- endfor %}</div>`;}
     return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;height:${hv}vh;z-index:${el.zIndex};border:1px dashed ${acc}44;display:flex;align-items:center;justify-content:center;"><span style="color:${acc}66;font-size:3vw;">${el.name}</span></div>`;
   };
 
@@ -245,184 +229,33 @@ function buildHTML(sections,invData,mode){
     const btnPV=+((ois.paddingV||12)/844*100).toFixed(3);
     const btnPH=+((ois.paddingH||30)/390*100).toFixed(3);
     const btnS=`display:inline-block;padding:${btnPV}vh ${btnPH}vw;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${btnFsVw}vw;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;
-    const openAnim=cs.openInviteStyle?.openAnim||"fade";
-    const curtainHTML=openAnim==="curtain"?`\n<div id="cover-curtain-top" style="position:absolute;top:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:top center;"></div>\n<div id="cover-curtain-bot" style="position:absolute;bottom:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:bottom center;"></div>`:"";
-    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
-  const bgmHTML="<audio id=\"bgm\" loop preload=\"auto\"><source src=\""+jinja_music+"\" type=\"audio/mpeg\"></audio>\n<button id=\"bgm-btn\" onclick=\"toggleBGM()\" style=\"position:absolute;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);\">&#9834;</button>";
+    coverHTML=`<div id="cover-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;transition:opacity .7s ease;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>\n</div>`;}
+  const bgmHTML=hasBGM?`<audio id="bgm" loop preload="none"><source src="{{inv.music_url}}" type="audio/mpeg"></audio>\n<button id="bgm-btn" onclick="toggleBGM()" style="position:fixed;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">&#9834;</button>`:"";
 
-  // Build JS inv object:
-  // export: placeholder strings replaced by server.py with real Jinja2 vars AFTER buildHTML
-  // preview: inline real values
-  const jsInv = isExport
-    ? `var inv={groom_name:"__INV_GROOM__",bride_name:"__INV_BRIDE__",maps_url:"__INV_MAPS__",countdown_date:"__INV_CD__",music_url:"__INV_MUSIC__"};`
-    : `var inv={groom_name:${JSON.stringify(inv.groom_name||"")},bride_name:${JSON.stringify(inv.bride_name||"")},maps_url:${JSON.stringify(inv.maps_url||"")},countdown_date:${JSON.stringify(inv.countdown_date||"")},music_url:${JSON.stringify(inv.music_url||"")}};`;
-
-  const script=`(function(){
-${jsInv}
-
-/* =========================================================
-   BUKA UNDANGAN
-   ========================================================= */
-function openInvitation(){
-  var cover=document.getElementById('cover-screen');
-  if(!cover)return;
-  var anim=(cover.dataset&&cover.dataset.openAnim)||'fade';
-  if(anim==='slide-up'){cover.style.transition='transform 0.8s cubic-bezier(.77,0,.175,1),opacity 0.6s ease';cover.style.transform='translateY(-100%)';cover.style.opacity='0';}
-  else if(anim==='slide-down'){cover.style.transition='transform 0.8s cubic-bezier(.77,0,.175,1),opacity 0.6s ease';cover.style.transform='translateY(100%)';cover.style.opacity='0';}
-  else if(anim==='zoom-out'){cover.style.transition='transform 0.7s cubic-bezier(.68,-.55,.27,1.55),opacity 0.5s ease';cover.style.transform='scale(1.18)';cover.style.opacity='0';}
-  else if(anim==='zoom-in-content'){cover.style.transition='transform 0.9s cubic-bezier(.16,1,.3,1),opacity 0.7s ease';cover.style.transform='scale(0.75)';cover.style.opacity='0';}
-  else if(anim==='flip-3d'){cover.style.transition='transform 0.9s cubic-bezier(.77,0,.175,1),opacity 0.4s ease 0.3s';cover.style.transformOrigin='center center';cover.style.transform='perspective(800px) rotateY(90deg)';cover.style.opacity='0';}
-  else if(anim==='parallax-3d'){cover.style.transition='transform 1.1s cubic-bezier(.16,1,.3,1),opacity 0.6s ease 0.2s';cover.style.transformOrigin='center bottom';cover.style.transform='perspective(600px) rotateX(15deg) translateY(-80px) scale(0.9)';cover.style.opacity='0';}
-  else if(anim==='curtain'){var h1=document.getElementById('cover-curtain-top'),h2=document.getElementById('cover-curtain-bot');if(h1&&h2){h1.style.transition='transform 0.7s cubic-bezier(.77,0,.175,1)';h1.style.transform='translateY(-100%)';h2.style.transition='transform 0.7s cubic-bezier(.77,0,.175,1)';h2.style.transform='translateY(100%)';}else{cover.style.transition='opacity 0.7s ease';cover.style.opacity='0';}}
-  else if(anim==='dissolve'){cover.style.transition='opacity 1.2s ease,filter 1.2s ease';cover.style.opacity='0';cover.style.filter='blur(14px) brightness(2.5)';}
-  else if(anim==='glitch'){cover.style.animation='glitch-out 0.6s steps(1,end) forwards';}
-  else{cover.style.transition='opacity 0.7s ease';cover.style.opacity='0';}
-  setTimeout(function(){
-    cover.style.display='none';
-    cover.style.pointerEvents='none';
-    NAV.activate();
-  },950);
-}
-window.openInvitation=openInvitation;
-
-/* =========================================================
-   VERTICAL NAVIGATION
-   ========================================================= */
-var NAV=(function(){
-  var cur=0,total=0,locked=false,gone=false,ty=0;
-
-  function track(){return document.getElementById('track');}
-  function dotsEl(){return document.getElementById('dots');}
-
-  function goTo(n){
-    if(n<0||n>=total)return;
-    cur=n;
-    var t=track();
-    if(t)t.style.transform='translateY('+(-cur*100)+'dvh)';
-    var dd=document.querySelectorAll('.dot');
-    for(var i=0;i<dd.length;i++)dd[i].classList.toggle('active',i===cur);
-  }
-
-  function go(n){
-    if(!gone||locked)return;
-    locked=true;
-    goTo(n);
-    setTimeout(function(){locked=false;},800);
-  }
-
-  function activate(){
-    gone=true;
-    var d=dotsEl();
-    if(d)d.style.display='flex';
-    document.body.classList.add('inv-open');
-    goTo(0);
-  }
-
-  function build(){
-    var secs=document.querySelectorAll('.section');
-    total=secs.length;
-    var d=dotsEl();
-    if(!d||!total)return;
-    d.innerHTML='';
-    for(var i=0;i<total;i++){
-      (function(idx){
-        var btn=document.createElement('button');
-        btn.className='dot'+(idx===0?' active':'');
-        btn.onclick=function(){go(idx);};
-        d.appendChild(btn);
-      })(i);
-    }
-  }
-
-  document.addEventListener('touchstart',function(e){ty=e.touches[0].clientY;},false);
-  document.addEventListener('touchend',function(e){
-    if(!gone||locked)return;
-    var dy=ty-e.changedTouches[0].clientY;
-    if(dy>50)go(cur+1);
-    else if(dy<-50)go(cur-1);
-  },false);
-
-  var wa=0,wt=null;
-  document.addEventListener('wheel',function(e){
-    if(!gone||locked)return;
-    clearTimeout(wt);
-    wa+=e.deltaY;
-    wt=setTimeout(function(){if(Math.abs(wa)>30)go(cur+(wa>0?1:-1));wa=0;},60);
-  },false);
-
-  document.addEventListener('keydown',function(e){
-    if(!gone)return;
-    if(e.key==='ArrowDown'||e.key==='PageDown')go(cur+1);
-    if(e.key==='ArrowUp'||e.key==='PageUp')go(cur-1);
-  },false);
-
-  return {build:build,activate:activate};
-})();
-
-/* =========================================================
-   UTILITIES
-   ========================================================= */
-var bgmOn=false;
-window.toggleBGM=function(){
-  var a=document.getElementById('bgm');if(!a)return;
-  var b=document.getElementById('bgm-btn');
-  if(!a.src||a.src==='about:blank'||a.src.endsWith('/'))return;
-  if(bgmOn){a.pause();if(b)b.innerHTML='&#9834;';bgmOn=false;}
-  else{a.play().catch(function(){});if(b)b.innerHTML='&#9646;&#9646;';bgmOn=true;}
-};
-
-var gbStore=[];
-window.submitRSVP=function(id){
-  var nEl=document.getElementById('rn-'+id),aEl=document.getElementById('ra-'+id),mEl=document.getElementById('rm-'+id);
-  var nv=nEl?nEl.value.trim():'',av=aEl?aEl.value:'',mv=mEl?mEl.value.trim():'';
-  if(!nv||!av){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}
-  var f=document.getElementById('rsvp-form-'+id),ok=document.getElementById('rsvp-ok-'+id);
-  if(f)f.style.display='none';
-  if(ok)ok.style.display='block';
-  if(mv&&nv){gbStore.unshift({n:nv,m:mv,a:av});document.querySelectorAll('[id^="gb-list-"]').forEach(function(el){window.renderGB(el.id.replace('gb-list-',''));});}
-};
-window.renderGB=function(id){
-  var list=document.getElementById('gb-list-'+id);if(!list)return;
-  var html='';
-  if(gbStore.length){
-    for(var i=0;i<gbStore.length;i++){
-      var g=gbStore[i];
-      html+='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:12px;margin-bottom:6px;">';
-      html+='<div style="font-weight:600;font-size:13px;color:#C4973A;margin-bottom:3px;">'+g.n+(g.a==='hadir'?' \u2713':'')+'</div>';
-      html+='<div style="font-size:12px;color:#888;line-height:1.5;">'+g.m+'</div></div>';
-    }
-  }else{
-    html='<div style="color:#444;text-align:center;font-size:12px;padding:16px;">Belum ada ucapan</div>';
-  }
-  list.innerHTML=html;
-};
-window.openLightbox=function(src,id){
-  var lb=document.getElementById('lb-'+id),img=document.getElementById('lb-img-'+id);
-  if(!lb||!img)return;img.src=src;lb.style.display='flex';
-};
-
-function tick(){
-  var ms=new Date(inv.countdown_date)-new Date();
-  if(isNaN(ms)||ms<=0){['cd-days','cd-hours','cd-mins','cd-secs'].forEach(function(k){var e=document.getElementById(k);if(e)e.textContent='00';});return;}
-  var d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);
-  var p=function(n){return('0'+n).slice(-2);};
-  [['cd-days',d],['cd-hours',h],['cd-mins',m],['cd-secs',s]].forEach(function(x){var e=document.getElementById(x[0]);if(e)e.textContent=p(x[1]);});
-}
-
-function scaleSecs(){
-    var sw=window.innerWidth,sh=window.innerHeight;
-    var scale=sw/390;
-    var els=document.querySelectorAll('.sec-inner');
-    for(var i=0;i<els.length;i++){
-      els[i].style.transform='scale('+scale+')';
-      els[i].style.transformOrigin='top left';
-    }
-  }
-  function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
-else{init();}
-
-})()`;
+  const script=`
+const inv={groom_name:"{{inv.groom_name}}",bride_name:"{{inv.bride_name}}",maps_url:"{{inv.maps_url}}",countdown_date:"{{inv.countdown_date}}",music_url:"{{inv.music_url}}"};
+let cur=0,navLock=false;
+const secs=document.querySelectorAll('.section'),total=secs.length,dotsEl=document.getElementById('dots');
+secs.forEach((_,i)=>{const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);});
+function goTo(i){if(i<0||i>=total)return;cur=i;document.getElementById('track').style.transform='translateY(-'+cur*100+'dvh)';document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===cur));}
+function safeGoTo(i){if(navLock)return;navLock=true;goTo(i);setTimeout(()=>navLock=false,850);}
+function coverVisible(){const c=document.getElementById('cover-screen');return c&&c.style.display!=='none'&&c.style.opacity!=='0'&&c.style.pointerEvents!=='none';}
+let sy=0;
+document.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{if(coverVisible()||navLock)return;const dy=sy-e.changedTouches[0].clientY;if(Math.abs(dy)>60)safeGoTo(dy>0?cur+1:cur-1);});
+let wl=false,wAcc=0;
+document.addEventListener('wheel',e=>{if(coverVisible()||navLock)return;wAcc+=e.deltaY;if(wl)return;if(Math.abs(wAcc)<80)return;const dir=wAcc>0?1:-1;wAcc=0;wl=true;safeGoTo(cur+dir);setTimeout(()=>{wl=false;wAcc=0;},900);},{passive:true});
+document.addEventListener('keydown',e=>{if(coverVisible())return;if(e.key==='ArrowDown'||e.key==='PageDown')safeGoTo(cur+1);if(e.key==='ArrowUp'||e.key==='PageUp')safeGoTo(cur-1);});
+function openInvitation(){const c=document.getElementById('cover-screen');if(!c)return;c.style.opacity='0';c.style.pointerEvents='none';navLock=true;wAcc=0;setTimeout(()=>{c.style.display='none';if(total>0){dotsEl.style.display='flex';goTo(0);}},700);setTimeout(()=>{navLock=false;wAcc=0;},1600);}
+// no scaling needed - coordinates are viewport-relative
+function updateCountdown(){const t=new Date(inv.countdown_date)-new Date();if(isNaN(t)||t<=0){['cd-days','cd-hours','cd-mins','cd-secs'].forEach(k=>{const e=document.getElementById(k);if(e)e.textContent='00';});return;}const d=Math.floor(t/86400000),h=Math.floor(t%86400000/3600000),m=Math.floor(t%3600000/60000),s=Math.floor(t%60000/1000),pad=n=>String(n).padStart(2,'0');[['cd-days',d],['cd-hours',h],['cd-mins',m],['cd-secs',s]].forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=pad(v);});}
+if(document.querySelector('.section')){updateCountdown();setInterval(updateCountdown,1000);}
+let bgmPlaying=false;
+function toggleBGM(){const a=document.getElementById('bgm');if(!a)return;bgmPlaying?(a.pause(),document.getElementById('bgm-btn').innerHTML='&#9834;',bgmPlaying=false):(a.play(),document.getElementById('bgm-btn').innerHTML='&#9646;&#9646;',bgmPlaying=true);}
+const gbStore={};
+function submitRSVP(id){const n=document.getElementById('rn-'+id)?.value?.trim(),g=document.getElementById('rg-'+id)?.value,a=document.getElementById('ra-'+id)?.value,m=document.getElementById('rm-'+id)?.value?.trim();if(!n||!a){alert('Mohon isi nama dan konfirmasi kehadiran.');return;}const f=document.getElementById('rsvp-form-'+id),ok=document.getElementById('rsvp-ok-'+id);if(f)f.style.display='none';if(ok)ok.style.display='block';if(m&&n){if(!gbStore._global)gbStore._global=[];gbStore._global.unshift({n,m,a});document.querySelectorAll('[id^="gb-list-"]').forEach(list=>{const wid=list.id.replace('gb-list-','');renderGB(wid);});}}
+function renderGB(id){const list=document.getElementById('gb-list-'+id);if(!list)return;const items=gbStore._global||[];const acc=list.closest('[style*="position:absolute"]')?.style?.getPropertyValue('--acc')||'#C4973A';list.innerHTML=items.length?items.map(g=>'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:12px;margin-bottom:6px;"><div style="font-weight:600;font-size:13px;color:#C4973A;margin-bottom:3px;">'+g.n+(g.a==='hadir'?' ✓':'')+'</div><div style="font-size:12px;color:#888;line-height:1.5;">'+g.m+'</div></div>').join(''):'<div style="color:#444;text-align:center;font-size:12px;padding:16px;font-family:\'DM Sans\',sans-serif;">Belum ada ucapan</div>';}
+function openLightbox(src,id){const lb=document.getElementById('lb-'+id),img=document.getElementById('lb-img-'+id);if(!lb||!img)return;img.src=src;lb.style.display='flex';}`;
 
   return `<!DOCTYPE html>
 <html lang="id">
@@ -430,21 +263,18 @@ else{init();}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Undangan ${groom} &amp; ${bride}</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Sacramento&family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&family=Raleway:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
 #app{position:fixed;inset:0;overflow:hidden;}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
-.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
-.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;}
+.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;}
+.sec-inner{position:absolute;inset:0;width:100%;height:100%;}
 #dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}
 input,textarea,select{-webkit-user-select:text;user-select:text;}
-/* Entry animations only play after invitation opened */
-.section [data-entry]{animation-play-state:paused!important;}
-.inv-open .section [data-entry]{animation-play-state:running!important;}
 ${animCSS}
 </style>
 </head>
@@ -455,7 +285,8 @@ ${coverHTML}
 <div id="track">
 ${nonCover.map((s,i)=>buildSec(s,i)).join("\n")}
 </div>
-</div>${bgmHTML}
+</div>
+${bgmHTML}
 <script>${script}<\/script>
 </body>
 </html>`;}
@@ -475,7 +306,7 @@ function ExportModal({sections,invData,projName,onClose,buildHTMLFn}){
   const doExport=async(mode)=>{
     setStatus("saving");setMsg("Membangun HTML...");
     try{
-      const html=buildHTMLFn(sections,invData,"export");
+      const html=buildHTMLFn(sections,invData);
       let res;
       if(mode==="server"){
         res=await exportToServer(projName,sections,invData,html,progress);
@@ -693,7 +524,7 @@ function App(){
   useEffect(()=>{if(!drag)return;const onM=e=>updEl(drag.id,{x:Math.round(drag.ox+(e.clientX-drag.sx)/scale),y:Math.round(drag.oy+(e.clientY-drag.sy)/scale)});const onU=()=>setDrag(null);window.addEventListener("mousemove",onM);window.addEventListener("mouseup",onU);return()=>{window.removeEventListener("mousemove",onM);window.removeEventListener("mouseup",onU);};},[drag,scale]);
   useEffect(()=>{const f=e=>{if(!selId)return;if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;const el=actSec?.elements.find(x=>x.id===selId);if(!el)return;const st=e.shiftKey?10:1;if(e.key==="ArrowLeft"){e.preventDefault();updEl(selId,{x:el.x-st});}if(e.key==="ArrowRight"){e.preventDefault();updEl(selId,{x:el.x+st});}if(e.key==="ArrowUp"){e.preventDefault();updEl(selId,{y:el.y-st});}if(e.key==="ArrowDown"){e.preventDefault();updEl(selId,{y:el.y+st});}if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();delEl(selId);}if((e.ctrlKey||e.metaKey)&&e.key==="d"){e.preventDefault();dupEl(selId);}};window.addEventListener("keydown",f);return()=>window.removeEventListener("keydown",f);},[selId,actSec,scale]);
 
-  const exportHTML=()=>{const html=buildHTML(sections,invData,"export"),blob=new Blob([html],{type:"text/html"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="undangan.html";a.click();URL.revokeObjectURL(url);showT("Export HTML berhasil 🎉");};
+  const exportHTML=()=>{const html=buildHTML(sections,invData),blob=new Blob([html],{type:"text/html"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="undangan.html";a.click();URL.revokeObjectURL(url);showT("Export HTML berhasil 🎉");};
   const handleProjLoad=(pid,pn,ps,pd)=>{if(ps)ps.forEach(s=>s.elements?.forEach(el=>{if(el.id>_id)_id=el.id;}));setSections(ps||initSections);setInvData(pd||{});setProjId(pid);setProjName(pn||"Proyek Baru");setActiveId((ps||[])[0]?.id||1);setSelId(null);showT(`"${pn}" dimuat`);};
 
   // Canvas element renderer
@@ -705,7 +536,7 @@ function App(){
     const PVARS=new Set(["inv.groom_photo_url","inv.bride_photo_url"]);
     return(
       <div key={el.id} onMouseDown={e=>onDown(e,el.id)} onClick={e=>{e.stopPropagation();setSelId(el.id);}} style={cs}>
-        {el.type==="image"&&<img src={el.src} style={{width:"100%",height:el.height?el.height:"auto",objectFit:"cover",display:"block",pointerEvents:"none"}} alt=""/>}
+        {el.type==="image"&&<img src={el.src} style={{width:"100%",display:"block",pointerEvents:"none"}} alt=""/>}
         {el.type==="text"&&(()=>{
           const acc=el.accent||"#C4973A";
           if(el.isVar&&PVARS.has(el.varKey)){const live=invData[el.varKey.replace("inv.","")],ex=DATA_VARS.find(v=>v.key===el.varKey)?.example||"",src=live||ex,h=el.height||el.width||150;return src?<img src={src} alt="" style={{width:"100%",height:h,objectFit:"cover",display:"block",borderRadius:el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,pointerEvents:"none"}} onError={e2=>{e2.target.style.opacity=0.2;}}/>:<div style={{width:"100%",height:h,background:"#1a1412",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#555",fontFamily:"DM Sans,sans-serif",textAlign:"center",padding:8}}><span>🖼 {el.varKey}<br/><span style={{opacity:.5,fontSize:9}}>set di Data</span></span></div>;}
@@ -726,15 +557,7 @@ function App(){
     );
   };
 
-  if(preview){
-    // Inject <base href> so relative paths like static/themes/xxx/img.jpg
-    // resolve from the local dev server instead of the iframe's srcdoc origin
-    const rawHtml=buildHTML(sections,invData,"preview");
-    const previewHtml=rawHtml.replace(
-      '<meta charset="UTF-8">',
-      `<meta charset="UTF-8">\n<base href="${SERVER_URL}/projects/${slugify(projName)}/">`
-    );
-    return(
+  if(preview){const html=buildHTML(sections,invData);return(
     <div style={{position:"fixed",inset:0,zIndex:9999,background:"#050505",display:"flex",flexDirection:"column"}}>
       <div style={{height:40,background:"#111",display:"flex",alignItems:"center",padding:"0 16px",gap:12,flexShrink:0,borderBottom:"1px solid #1a1a1a"}}>
         <span style={{color:"#C4973A",fontWeight:700,fontSize:13,fontFamily:"DM Sans,sans-serif"}}>👁 Preview</span>
@@ -745,7 +568,7 @@ function App(){
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:"#080808"}}>
         <div style={{width:390,height:"calc(100vh - 100px)",maxHeight:844,borderRadius:36,boxShadow:"0 0 0 8px #1a1a1a,0 32px 80px rgba(0,0,0,.9)",overflow:"hidden",flexShrink:0,position:"relative"}}>
           <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:120,height:28,background:"#1a1a1a",borderRadius:"0 0 16px 16px",zIndex:10}}/>
-          <iframe srcDoc={previewHtml} style={{width:"100%",height:"100%",border:"none"}} title="preview"/>
+          <iframe srcDoc={html} style={{width:"100%",height:"100%",border:"none"}} title="preview"/>
         </div>
       </div>
     </div>
@@ -968,16 +791,6 @@ function SecProps({sec,upd,onBg,onClrBg}){
         <Field label={`Font Size — ${sec.openInviteStyle?.fontSize||16}px`}><Sld value={sec.openInviteStyle?.fontSize||16} min={10} max={28} onChange={v=>upd({openInviteStyle:{...sec.openInviteStyle,fontSize:v}})}/></Field>
         <Field label={`Border Radius — ${sec.openInviteStyle?.borderRadius||2}px`}><Sld value={sec.openInviteStyle?.borderRadius||2} min={0} max={50} onChange={v=>upd({openInviteStyle:{...sec.openInviteStyle,borderRadius:v}})}/></Field>
         <Field label={`Posisi Bawah — ${sec.openInviteStyle?.posBottom||80}px`}><Sld value={sec.openInviteStyle?.posBottom||80} min={20} max={700} onChange={v=>upd({openInviteStyle:{...sec.openInviteStyle,posBottom:v}})}/></Field>
-        <Div label="Animasi Buka Undangan"/>
-        <Field label="Efek Transisi">
-          <select value={sec.openInviteStyle?.openAnim||"fade"} onChange={e=>upd({openInviteStyle:{...sec.openInviteStyle,openAnim:e.target.value}})} style={{...S.inp,cursor:"pointer",fontSize:11}}>
-            {OPEN_ANIMATIONS.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}
-          </select>
-        </Field>
-        <div style={{padding:"7px 9px",background:"#0f0f1a",border:"1px solid #1a1a2a",borderRadius:4,fontSize:10,color:"#4a4a6a",fontFamily:"DM Sans,sans-serif",lineHeight:1.7}}>
-          💡 Efek saat tamu tekan "Buka Undangan".<br/>
-          <span style={{color:"#6a6a8a"}}>3D Flip, Parallax, Curtain, Glitch = efek premium</span>
-        </div>
       </>}
     </div>
   );
@@ -1037,10 +850,10 @@ function ElProps({el,upd,onDel,onDup,onFwd,onBwd,invData,onFP}){
             <input type="checkbox" checked={!!el.isVar} onChange={e=>upd({isVar:e.target.checked})} style={{accentColor:"#C4973A"}}/>
             <span style={{fontSize:11,color:"#555",fontFamily:"DM Sans,sans-serif"}}>Pakai variabel</span>
           </div>
-          {el.isVar&&<select value={el.varKey||""} onChange={e=>upd({varKey:e.target.value})} style={{...S.inp,cursor:"pointer",fontSize:11}}><option value="">— Pilih —</option>{DATA_VARS.filter(v=>!["inv.maps_embed","inv.music_url","inv.love_story"].includes(v.key)).map(v=><option key={v.key} value={v.key}>{v.label}</option>)}</select>}
+          {el.isVar&&<select value={el.varKey||""} onChange={e=>upd({varKey:e.target.value})} style={{...S.inp,cursor:"pointer",fontSize:11}}><option value="">— Pilih —</option>{DATA_VARS.map(v=><option key={v.key} value={v.key}>{v.label}</option>)}</select>}
         </Field>
         {isPhoto&&<><Field label={`Tinggi Foto — ${el.height||el.width||150}px`}><Sld value={el.height||el.width||150} min={40} max={CANVAS_H} onChange={v=>upd({height:v})}/></Field><Field label="Border Radius"><div style={{display:"flex",gap:4}}>{[["0","Kotak"],["12","Rounded"],["50%","Bulat"]].map(([v,l])=><button key={v} onClick={()=>upd({borderRadius:v})} style={{flex:1,padding:"4px 2px",background:String(el.borderRadius)===v?"#1a2a1a":"#181818",border:`1px solid ${String(el.borderRadius)===v?"#7D9470":"#252525"}`,color:String(el.borderRadius)===v?"#9CD889":"#555",borderRadius:3,cursor:"pointer",fontSize:10,fontFamily:"DM Sans,sans-serif"}}>{l}</button>)}</div></Field></>}
-        {(!el.isVar||(!isPhoto&&el.isVar))&&<><Div label="Font"/>
+        {!el.isVar&&<><Div label="Font"/>
           <Field label="Font"><button onClick={onFP} style={{...S.btnS,width:"100%",fontSize:12,fontFamily:`'${el.fontFamily||"Playfair Display"}',serif`,textAlign:"left",padding:"6px 10px"}}>{el.fontFamily||"Playfair Display"} ›</button></Field>
           <Field label={`Ukuran — ${el.fontSize||24}px`}><Sld value={el.fontSize||24} min={8} max={120} onChange={v=>upd({fontSize:v})}/></Field>
           <Field label="Warna"><div style={{display:"flex",gap:8,alignItems:"center"}}><input type="color" value={el.color||"#ffffff"} onChange={e=>upd({color:e.target.value})} style={{width:36,height:28,border:"none",cursor:"pointer",padding:0,borderRadius:4}}/><input value={el.color||"#ffffff"} onChange={e=>upd({color:e.target.value})} style={{...S.inp,flex:1,fontFamily:"monospace",fontSize:11}}/></div></Field>
@@ -1054,8 +867,8 @@ function ElProps({el,upd,onDel,onDup,onFwd,onBwd,invData,onFP}){
       <Div label="Posisi"/>
       <Field label={`X — ${el.x}px`}><Sld value={el.x} min={-CANVAS_W} max={CANVAS_W} onChange={v=>upd({x:v})}/></Field>
       <Field label={`Y — ${el.y}px`}><Sld value={el.y} min={-CANVAS_H} max={CANVAS_H*1.5} onChange={v=>upd({y:v})}/></Field>
-      {el.type==="image"&&<><Field label={`Lebar — ${el.width}px`}><Sld value={el.width} min={10} max={CANVAS_W*1.5} onChange={v=>upd({width:v})}/></Field><Field label={`Tinggi (0=auto) — ${el.height||0}px`}><Sld value={el.height||0} min={0} max={CANVAS_H} onChange={v=>upd({height:v||undefined})}/></Field></>}
-      {el.type==="text"&&!isPhoto&&<Field label={`Lebar Box — ${el.width||200}px`}><Sld value={el.width||200} min={20} max={CANVAS_W} onChange={v=>upd({width:v})}/></Field>}
+      {el.type==="image"&&<Field label={`Lebar — ${el.width}px`}><Sld value={el.width} min={10} max={CANVAS_W*1.5} onChange={v=>upd({width:v})}/></Field>}
+      {el.type==="text"&&!el.isVar&&<Field label={`Lebar Box — ${el.width||200}px`}><Sld value={el.width||200} min={20} max={CANVAS_W} onChange={v=>upd({width:v})}/></Field>}
       <Field label={`Rotasi — ${el.rotation||0}°`}><Sld value={el.rotation||0} min={-180} max={180} onChange={v=>upd({rotation:v})}/></Field>
       {el.type==="image"&&<Field label="Flip"><div style={{display:"flex",gap:6}}><button onClick={()=>upd({flipH:!el.flipH})} style={{flex:1,padding:"5px 0",...boolBtn(el.flipH,"#4A90D9")}}>↔ H</button><button onClick={()=>upd({flipV:!el.flipV})} style={{flex:1,padding:"5px 0",...boolBtn(el.flipV,"#9B59B6")}}>↕ V</button></div></Field>}
       <Div label="Tampilan"/>

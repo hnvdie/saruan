@@ -115,7 +115,7 @@ def build_project(payload: dict) -> dict:
             img_map[src] = src
             return src
 
-        rel_path = f"/static/themes/{theme_id}/{fname}"
+        rel_path = f"static/themes/{theme_id}/{fname}"
         img_map[src] = rel_path
         return rel_path
 
@@ -146,20 +146,7 @@ def build_project(payload: dict) -> dict:
         if orig != new_path:
             html_out = html_out.replace(orig, new_path)
 
-    # ── 4. Ganti placeholder dengan Jinja2 template vars ─────────────────
-    # Placeholder dipakai agar buildHTML di JS tidak ada Jinja2/{{ }} syntax
-    # yang merusak Babel parser di editor
-    html_out = html_out.replace('"__INV_GROOM__"', '"{{ inv.groom_name|e }}"')
-    html_out = html_out.replace('"__INV_BRIDE__"', '"{{ inv.bride_name|e }}"')
-    html_out = html_out.replace('"__INV_MAPS__"', '"{{ inv.maps_url|e }}"')
-    html_out = html_out.replace('"__INV_CD__"', '"{{ inv.countdown_date|e }}"')
-    html_out = html_out.replace('"__INV_MUSIC__"', '"{{ inv.music_url|e }}"')
-    # Wrap seluruh <script> block dengan {% raw %}...{% endraw %}
-    # agar Jinja2 tidak mencoba parse JS code saat render
-    html_out = html_out.replace('<script>', '{% raw %}<script>', 1)
-    html_out = html_out.replace('</script>', '</script>{% endraw %}', 1)
-
-    # ── 5. Tulis .html ────────────────────────────────────────────────────
+    # ── 4. Tulis .html ────────────────────────────────────────────────────
     html_path = proj_dir / f"{theme_id}.html"
     html_path.write_text(html_out, encoding="utf-8")
 

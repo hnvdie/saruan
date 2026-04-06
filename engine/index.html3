@@ -202,15 +202,15 @@ function buildHTML(sections,invData,mode){
 
   const elToHTML=el=>{
     const lv=px(el.x),tv=py(el.y),wv=px(el.width||200);
-    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");const imgEntry=ba(el.animation,el.animDuration,el.animDelay,true);const hv=el.height?`height:${py(el.height)}vh;`:"";return `<img src="${el.src}" alt="" style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;${hv}transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};object-fit:cover;${animS}pointer-events:none;" ${imgEntry}/>`;}
+    if(el.type==="image"){const animS=ba(el.animation,el.animDuration,el.animDelay),flip=[el.flipH?"scaleX(-1)":"",el.flipV?"scaleY(-1)":""].filter(Boolean).join(" "),trx=[`rotate(${el.rotation||0}deg)`,flip].filter(Boolean).join(" ");const imgEntry=ba(el.animation,el.animDuration,el.animDelay,true);const hv=el.height?`height:${py(el.height)}vh;`:"";return `<img src="${el.src}" alt="" style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;${hv}transform:${trx||"none"};opacity:${el.opacity};z-index:${el.zIndex};object-fit:cover;${animS}pointer-events:none;" ${imgEntry}/>`;}
     if(el.type==="text"){
       const animS=ba(el.animation,el.animDuration,el.animDelay),shd=el.shadow?`text-shadow:0 2px ${el.shadowBlur||8}px ${el.shadowColor||"rgba(0,0,0,.5)"};`:"";
       if(el.isVar&&el.varKey&&PHOTO_VARS.has(el.varKey)){const br=el.borderRadius==="50%"?"50%":`${el.borderRadius||0}px`,hv=py(el.height||el.width||150);
         const photoSrc = isExport ? (J2o+el.varKey+J2c) : (rv(el.varKey)||"");
-        return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;height:${hv}%;z-index:${el.zIndex};opacity:${el.opacity};${animS}pointer-events:none;"><img src="${photoSrc}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:${br};display:block;"/></div>`;}
+        return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;height:${hv}vh;z-index:${el.zIndex};opacity:${el.opacity};${animS}pointer-events:none;"><img src="${photoSrc}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:${br};display:block;"/></div>`;}
       const txt=el.isVar&&el.varKey?(isExport?(J2o+el.varKey+J2c):(rv(el.varKey)||(J2o+el.varKey+J2c))):el.text;
-      const fs=el.fontSize||24;
-      return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;font-size:${fs}px;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);pointer-events:none;${shd}${animS}">${txt}</div>`;
+      const fsv=+(el.fontSize||24)/390*100;
+      return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;font-size:${fsv.toFixed(3)}vw;font-family:'${el.fontFamily||"Playfair Display"}',serif;color:${el.color||"#fff"};text-align:${el.align||"center"};font-style:${el.fontStyle||"normal"};font-weight:${el.fontWeight||400};letter-spacing:${el.letterSpacing||0}px;line-height:${el.lineHeight||1.4};opacity:${el.opacity||1};z-index:${el.zIndex||10};transform:rotate(${el.rotation||0}deg);pointer-events:none;${shd}${animS}">${txt}</div>`;
     }
     if(el.type==="widget")return widgetToHTML(el,inv);
     return"";
@@ -219,11 +219,11 @@ function buildHTML(sections,invData,mode){
   const widgetToHTML=(el,inv)=>{
     const acc=el.accent||"#C4973A",r=el.radius||4,dk=(el.wStyle||"dark")==="dark",ib=dk?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.06)",ic=dk?"#aaa":"#333",tc=dk?acc:"#333";
     const lv=px(el.x),tv=py(el.y),wv=px(el.width),hv=py(el.height);
-    const ws=`position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;height:${hv}%;z-index:${el.zIndex};opacity:${el.opacity};overflow-y:auto;`;
+    const ws=`position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;height:${hv}vh;z-index:${el.zIndex};opacity:${el.opacity};overflow-y:auto;`;
     const wid=el.id;
     if(el.widgetType==="countdown"){const ca=el.cdAccent||acc,tit=el.title?`<div style="font-family:'Playfair Display',serif;font-size:4.6vw;color:${ca};margin-bottom:16px;text-align:center;">${el.title}</div>`:"";return `<div style="${ws}padding:5vw 2vw;">${tit}<div style="display:flex;gap:2.5vw;justify-content:center;padding:0 2vw;">${[["cd-days","Hari"],["cd-hours","Jam"],["cd-mins","Mnt"],["cd-secs","Det"]].map(([cid,lbl])=>`<div style="flex:1;background:${dk?"rgba(255,255,255,.06)":"rgba(0,0,0,.06)"};border-radius:8px;padding:3.6vw 1vw;text-align:center;"><div id="${cid}" style="font-family:'Playfair Display',serif;font-size:7.7vw;color:${ca};line-height:1;">00</div><div style="font-size:2.3vw;color:${dk?"#666":"#999"};text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;font-family:'DM Sans',sans-serif;">${lbl}</div></div>`).join("")}</div></div>`;}
     if(el.widgetType==="rsvp"){const tit=el.title||el.rsvpTitle||"Konfirmasi Kehadiran";return `<div style="${ws}"><div id="rsvp-form-${wid}" style="padding:5vw 1vw;"><div style="text-align:center;margin-bottom:5vw;"><div style="font-family:'Playfair Display',serif;font-size:5.1vw;color:${tc};">${tit}</div><div style="width:8vw;height:1px;background:${acc};opacity:.4;margin:2vw auto 0;"></div></div><input id="rn-${wid}" placeholder="Nama Anda" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"/><input id="rg-${wid}" type="number" min="1" placeholder="Jumlah Tamu" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"/><select id="ra-${wid}" style="width:100%;padding:2.6vw 3.6vw;background:${dk?"#1a1a1a":ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;margin-bottom:2vw;display:block;"><option value="">Konfirmasi Kehadiran ▾</option><option value="hadir">Insya Allah Hadir 🤍</option><option value="tidak">Tidak Dapat Hadir</option></select><textarea id="rm-${wid}" placeholder="Ucapan &amp; Doa..." rows="3" style="width:100%;padding:2.6vw 3.6vw;background:${ib};border:1px solid ${acc}44;color:${ic};font-family:'DM Sans',sans-serif;font-size:3.3vw;border-radius:${r}px;outline:none;resize:none;display:block;margin-bottom:3vw;"></textarea><button onclick="submitRSVP('${wid}')" style="width:100%;padding:3vw;background:${acc};border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;cursor:pointer;touch-action:manipulation;">Kirim Konfirmasi 💌</button></div><div id="rsvp-ok-${wid}" style="display:none;padding:15vw 5vw;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:10vw;color:${acc};">✦</div><div style="font-family:'Playfair Display',serif;font-size:5.6vw;color:${dk?"#fff":"#333"};margin-top:12px;">Terima Kasih</div><div style="font-size:3.3vw;color:#888;margin-top:8px;font-family:'DM Sans',sans-serif;line-height:1.7;">Konfirmasi Anda telah kami terima.</div></div></div>`;}
-    if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:3.5vw;left:50%;transform:translateX(-50%);display:inline-block;padding:2.3vw 5.6vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3vw;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${lv}%;top:${tv}%;width:${wv}%;z-index:${el.zIndex};text-align:center;padding:5% 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:3.3vw 7.7vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
+    if(el.widgetType==="maps"){const em=inv.maps_embed||"",lk=inv.maps_url||"#",bt=el.mapsBtnText||"Buka di Google Maps";if(el.mapsLayout==="embed"&&em)return `<div style="${ws}border-radius:${r}px;overflow:hidden;"><iframe src="${em}" width="100%" height="100%" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe><a href="${lk}" target="_blank" rel="noopener" style="position:absolute;bottom:3.5vw;left:50%;transform:translateX(-50%);display:inline-block;padding:2.3vw 5.6vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3vw;font-weight:700;border-radius:${r}px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5);">${bt}</a></div>`;return `<div style="position:absolute;left:${lv}vw;top:${tv}vh;width:${wv}vw;z-index:${el.zIndex};text-align:center;padding:5vw 0;"><a href="${lk}" target="_blank" rel="noopener" style="display:inline-block;padding:3.3vw 7.7vw;background:${acc};color:#000;font-family:'DM Sans',sans-serif;font-size:3.3vw;font-weight:700;border-radius:${r}px;text-decoration:none;">${bt}</a></div>`;}
     if(el.widgetType==="gallery"){const lay=el.galleryLayout||"2",shp=el.galleryShape||"kotak",gap=el.galleryGap||8,cols=lay==="1"?"1fr":lay==="3"?"repeat(3,1fr)":"repeat(2,1fr)",br=shp==="circle"?"50%":shp==="rounded"?"12px":"2px",imgH=lay==="1"||shp==="portrait"?"56vw":"38vw",tit=el.title?`<div style="text-align:center;margin-bottom:${gap}px;font-family:'Playfair Display',serif;font-size:5.1vw;color:${acc};">${el.title}</div>`:"";const statics=(el.galleryImages||[]).map(src=>`<div style="overflow:hidden;border-radius:${br};"><img src="${src}" style="width:100%;height:${imgH};object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox('${src}','${wid}')"/></div>`).join("");const jinja=jinja_for_photo+'<div style="overflow:hidden;border-radius:'+br+';"><img src="'+jinja_photo_src+'" style="width:100%;height:'+imgH+';object-fit:cover;display:block;cursor:pointer;" onclick="openLightbox(\''+jinja_photo_src+"\',\'"+wid+"')" +' loading="lazy"/></div>'+jinja_endfor;const imgs=statics||(jinja_if_photos+jinja+jinja_else+'<div style="color:#555;text-align:center;padding:30px;font-size:3vw;font-family:\'DM Sans\',sans-serif;grid-column:1/-1;">Gallery akan tampil di sini</div>'+jinja_endif);return `<div style="${ws}padding:${gap}px;">${tit}<div style="display:grid;grid-template-columns:${cols};gap:${gap}px;">${imgs}</div></div><div id="lb-${wid}" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center;cursor:pointer;"><img id="lb-img-${wid}" style="max-width:90%;max-height:90%;object-fit:contain;"/></div>`;}
     if(el.widgetType==="guestbook"){const tit=el.title||el.gbTitle||"Buku Tamu";return `<div style="${ws}"><div style="text-align:center;padding:5vw 1vw 3vw;"><div style="font-family:'Playfair Display',serif;font-size:5.1vw;color:${tc};">${tit}</div><div style="width:8vw;height:1px;background:${acc};opacity:.4;margin:2vw auto 0;"></div><div style="font-size:2.8vw;color:#555;margin-top:2vw;font-family:'DM Sans',sans-serif;">Ucapan dari tamu yang telah konfirmasi kehadiran</div></div><div id="gb-list-${wid}" style="display:flex;flex-direction:column;gap:10px;padding:0 1vw 3vw;overflow-y:auto;height:calc(100% - 100px);"><div style="color:#444;text-align:center;font-size:3vw;padding:16px;font-family:'DM Sans',sans-serif;">Belum ada ucapan</div></div></div>`;}
     if(el.widgetType==="gift"){const tit=el.title||el.giftTitle||"Amplop Digital",sub=el.giftSubtitle||"Doa tulus Anda adalah hadiah terindah.",cbg=dk?"rgba(255,255,255,.04)":"rgba(255,255,255,.9)",cbd=dk?acc+"33":"rgba(0,0,0,.08)";return `<div style="${ws}padding:5vw 1vw;"><div style="text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:5.6vw;color:${acc};margin-bottom:2vw;">${tit}</div><div style="font-size:3vw;color:#888;line-height:1.7;margin-bottom:5vw;font-family:'DM Sans',sans-serif;">${sub}</div></div>"+JPo+"- for gift in gifts "+JPc+"<div style="background:${cbg};border:1px solid ${cbd};border-radius:${r}px;padding:5vw 6vw;margin-bottom:3vw;">"+JPo+"- if gift.bank_name "+JPc+"<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">Transfer via</div><div style="font-family:'Playfair Display',serif;font-size:4.6vw;color:${acc};margin-bottom:1vw;">"+J2o+" gift.bank_name "+J2c+"</div><div id="acc-"+J2o+" loop.index "+J2c+"" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:3px;margin:1.5vw 0;">"+J2o+" gift.account_number "+J2c+"</div><div style="font-size:3vw;color:#888;">a/n "+J2o+" gift.account_name "+J2c+"</div><button onclick="(function(b){var t=document.getElementById('acc-"+J2o+" loop.index "+J2c+"');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>"+JPo+"- elif gift.ewallet_type "+JPc+"<div style="font-size:2.6vw;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:2vw;">"+J2o+" gift.ewallet_type "+J2c+"</div><div id="acc-"+J2o+" loop.index "+J2c+"" style="font-size:5.6vw;font-family:'DM Sans',sans-serif;color:${dk?"#fff":"#333"};letter-spacing:2px;margin:1.5vw 0;">"+J2o+" gift.ewallet_number "+J2c+"</div><div style="font-size:3vw;color:#888;">a/n "+J2o+" gift.ewallet_name "+J2c+"</div><button onclick="(function(b){var t=document.getElementById('acc-"+J2o+" loop.index "+J2c+"');navigator.clipboard&&navigator.clipboard.writeText(t.textContent.trim());b.textContent='Disalin ✓';setTimeout(()=>b.textContent='Salin Nomor',2000);})(this)" style="margin-top:3vw;padding:1.8vw 5vw;background:transparent;border:1px solid ${acc}66;color:${acc};font-family:'DM Sans',sans-serif;font-size:2.8vw;border-radius:${r}px;cursor:pointer;">Salin Nomor</button>"+JPo+"- endif "+JPc+"</div>"+JPo+"- endfor "+JPc+"</div>`;}
@@ -247,7 +247,7 @@ function buildHTML(sections,invData,mode){
     const btnS=`display:inline-block;padding:${btnPV}vh ${btnPH}vw;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${btnFsVw}vw;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;
     const openAnim=cs.openInviteStyle?.openAnim||"fade";
     const curtainHTML=openAnim==="curtain"?`\n<div id="cover-curtain-top" style="position:absolute;top:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:top center;"></div>\n<div id="cover-curtain-bot" style="position:absolute;bottom:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:bottom center;"></div>`:"";
-    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
+    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
   const bgmHTML="<audio id=\"bgm\" loop preload=\"auto\"><source src=\""+jinja_music+"\" type=\"audio/mpeg\"></audio>\n<button id=\"bgm-btn\" onclick=\"toggleBGM()\" style=\"position:absolute;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);\">&#9834;</button>";
 
   // Build JS inv object:
@@ -298,7 +298,7 @@ var NAV=(function(){
     if(n<0||n>=total)return;
     cur=n;
     var t=track();
-    if(t)t.style.transform='translateY('+(-cur*100)+'dvh)';
+    var pw=document.getElementById('phone-wrap')||document.body;var ph=pw.offsetHeight||window.innerHeight;if(t)t.style.transform='translateY('+(-cur*ph)+'px)';
     var dd=document.querySelectorAll('.dot');
     for(var i=0;i<dd.length;i++)dd[i].classList.toggle('active',i===cur);
   }
@@ -314,7 +314,8 @@ var NAV=(function(){
     gone=true;
     var d=dotsEl();
     if(d)d.style.display='flex';
-    document.body.classList.add('inv-open');
+    var pw=document.getElementById('phone-wrap');
+    if(pw)pw.classList.add('inv-open');
     goTo(0);
   }
 
@@ -409,16 +410,7 @@ function tick(){
   [['cd-days',d],['cd-hours',h],['cd-mins',m],['cd-secs',s]].forEach(function(x){var e=document.getElementById(x[0]);if(e)e.textContent=p(x[1]);});
 }
 
-function scaleSecs(){
-    var sw=window.innerWidth,sh=window.innerHeight;
-    var scale=sw/390;
-    var els=document.querySelectorAll('.sec-inner');
-    for(var i=0;i<els.length;i++){
-      els[i].style.transform='scale('+scale+')';
-      els[i].style.transformOrigin='top left';
-    }
-  }
-  function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
+function init(){NAV.build();tick();setInterval(tick,1000);}
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
 else{init();}
 
@@ -433,27 +425,34 @@ else{init();}
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Sacramento&family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&family=Raleway:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
-#app{position:fixed;inset:0;overflow:hidden;}
+html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#111;}
+/* Desktop: phone-centered layout */
+#app{position:fixed;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+#phone-wrap{position:relative;width:100%;max-width:390px;height:100%;max-height:844px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.8);}
+@media(min-width:600px){
+  #phone-wrap{border-radius:24px;overflow:hidden;}
+  #app{background:#0a0a0a;}
+}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
-.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
-.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;}
-#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
+.section{width:100%;height:100%;overflow:hidden;position:relative;flex-shrink:0;}
+.sec-inner{position:absolute;inset:0;width:100%;height:100%;}
+#dots{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}
 input,textarea,select{-webkit-user-select:text;user-select:text;}
 /* Entry animations only play after invitation opened */
 .section [data-entry]{animation-play-state:paused!important;}
-.inv-open .section [data-entry]{animation-play-state:running!important;}
+#phone-wrap.inv-open .section [data-entry]{animation-play-state:running!important;}
 ${animCSS}
 </style>
 </head>
 <body>
-<div id="app">
+<div id="app"><div id="phone-wrap">
 ${coverHTML}
 <div id="dots"></div>
 <div id="track">
 ${nonCover.map((s,i)=>buildSec(s,i)).join("\n")}
+</div>
 </div>
 </div>${bgmHTML}
 <script>${script}<\/script>
