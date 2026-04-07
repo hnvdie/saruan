@@ -409,45 +409,23 @@ function tick(){
   [['cd-days',d],['cd-hours',h],['cd-mins',m],['cd-secs',s]].forEach(function(x){var e=document.getElementById(x[0]);if(e)e.textContent=p(x[1]);});
 }
 
-var IS_DESKTOP=window.innerWidth>=768;
-  function scaleSecs(){
+function scaleSecs(){
     var sw=window.innerWidth,sh=window.innerHeight;
-    IS_DESKTOP=sw>=768;
-    if(IS_DESKTOP){
-      // ── Desktop: scale phone-shell to fit viewport with padding ──
-      var shell=document.getElementById('phone-shell');
-      if(!shell)return;
-      // phone shell native size: 390 x 864 (390 + bezel top/bottom)
-      var SHELL_W=390,SHELL_H=864;
-      var padW=80,padH=60; // padding dari tepi viewport
-      var scaleW=(sw-padW)/SHELL_W;
-      var scaleH=(sh-padH)/SHELL_H;
-      var scale=Math.min(scaleW,scaleH,1); // max scale 1x, jangan zoom in
-      shell.style.width=SHELL_W+'px';
-      shell.style.height=SHELL_H+'px';
-      shell.style.transform='scale('+scale+')';
-      shell.style.transformOrigin='center center';
-      // sec-inner tidak perlu di-scale, sudah 390px fix sesuai phone shell
-      var els=document.querySelectorAll('.sec-inner');
-      for(var i=0;i<els.length;i++){
-        els[i].style.transform='none';
-      }
-      var cover=document.getElementById('cover-screen');
-      if(cover){var ci=cover.querySelector('.sec-inner');if(ci)ci.style.transform='none';}
-    } else {
-      // ── Mobile: scale sec-inner to fit screen ──
-      var shell2=document.getElementById('phone-shell');
-      if(shell2){shell2.style.transform='none';shell2.style.width='';shell2.style.height='';}
-      var scaleW2=sw/390;
-      var scaleH2=sh/844;
-      var scale2=Math.min(scaleW2,scaleH2);
-      var els2=document.querySelectorAll('.sec-inner');
-      for(var i=0;i<els2.length;i++){
-        els2[i].style.transform='scale('+scale2+')';
-        els2[i].style.transformOrigin='top center';
-      }
-      var cover2=document.getElementById('cover-screen');
-      if(cover2){var ci2=cover2.querySelector('.sec-inner');if(ci2){ci2.style.transform='scale('+scale2+')';ci2.style.transformOrigin='top center';}}
+    // Scale to fit width, but never exceed screen height (letterbox if needed)
+    var scaleW=sw/390;
+    var scaleH=sh/844;
+    var scale=Math.min(scaleW,scaleH);
+    var els=document.querySelectorAll('.sec-inner');
+    for(var i=0;i<els.length;i++){
+      // top center: scaled dari tengah atas → elemen tetap centered
+      els[i].style.transform='scale('+scale+')';
+      els[i].style.transformOrigin='top center';
+    }
+    // Also scale cover-screen sec-inner (same logic)
+    var cover=document.getElementById('cover-screen');
+    if(cover){
+      var ci=cover.querySelector('.sec-inner');
+      if(ci){ci.style.transform='scale('+scale+')';ci.style.transformOrigin='top center';}
     }
   }
   function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
@@ -479,31 +457,15 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
 /* Entry animations only play after invitation opened */
 .section [data-entry]{animation-play-state:paused!important;}
 .inv-open .section [data-entry]{animation-play-state:running!important;}
-/* ── DESKTOP PHONE MOCKUP ─────────────────────────────────── */
-@media(min-width:768px){
-  html,body{background:#1a1a2e;overflow:hidden;}
-  #desktop-stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 40%,#2a1f3d 0%,#0f0f1a 70%);}
-  #phone-shell{position:relative;background:#111;border-radius:50px;box-shadow:0 0 0 2px #333,0 0 0 4px #1a1a1a,0 30px 80px rgba(0,0,0,.8),0 0 40px rgba(196,151,58,.08);overflow:hidden;flex-shrink:0;}
-  #phone-shell::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:110px;height:28px;background:#000;border-radius:20px;z-index:99999;}
-  #phone-shell::after{content:'';position:absolute;top:120px;left:-3px;width:3px;height:60px;background:#222;border-radius:2px 0 0 2px;box-shadow:0 -72px 0 #222,0 80px 0 #222;}
-  #app{position:absolute;top:0;left:0;width:390px;height:844px;border-radius:44px;overflow:hidden;}
-  #cover-screen{width:390px!important;height:844px!important;border-radius:0;overflow:hidden;}
-  #dots{position:absolute;}
-  #bgm-btn{position:absolute!important;}
-}
 ${animCSS}
 </style>
 </head>
 <body>
-<div id="desktop-stage">
-<div id="phone-shell">
 <div id="app">
 ${coverHTML}
 <div id="dots"></div>
 <div id="track">
 ${nonCover.map((s,i)=>buildSec(s,i)).join("\n")}
-</div>
-</div>
 </div>
 </div>${bgmHTML}
 <script>${script}<\/script>
