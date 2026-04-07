@@ -235,19 +235,19 @@ function buildHTML(sections,invData,mode){
   const cover=sections.find(s=>s.type==="cover"),nonCover=sections.filter(s=>s.type!=="cover"),hasBGM=!!(inv.music_url||"").trim(),groom=inv.groom_name||"Mempelai Pria",bride=inv.bride_name||"Mempelai Wanita";
   let coverHTML="";
   if(cover){const cs=cover,bgs=cs.bgImage?`background-image:url('${cs.bgImage}');background-size:${({contain:"contain",fill:"100% 100%",center:"auto",cover:"cover"})[cs.bgFit||"cover"]||"cover"};background-position:center;background-repeat:no-repeat;`:`background:${cs.bg};`,els=cs.elements.map(elToHTML).filter(Boolean).join("\n"),ois=cs.openInviteStyle||{},posB=ois.posBottom!==undefined?ois.posBottom:80,posL=ois.posLeft,cen=posL==null;
-    // Convert canvas bottom (px from bottom of 844px) to vh
-    const btnBottomVh=+(posB/844*100).toFixed(3);
-    const btnLeftVw=cen?null:+(posL/390*100).toFixed(3);
+    // Button position in px within the 390x844 sec-inner (not vw/vh)
+    const btnBottomPx=posB;
+    const btnLeftPx=cen?null:posL;
     const btnWrapStyle=cen
-      ?`position:absolute;bottom:${btnBottomVh}vh;left:0;right:0;text-align:center;z-index:500;`
-      :`position:absolute;bottom:${btnBottomVh}vh;left:${btnLeftVw}vw;z-index:500;`;
-    const btnFsVw=+((ois.fontSize||16)/390*100).toFixed(3);
-    const btnPV=+((ois.paddingV||12)/844*100).toFixed(3);
-    const btnPH=+((ois.paddingH||30)/390*100).toFixed(3);
-    const btnS=`display:inline-block;padding:${btnPV}vh ${btnPH}vw;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${btnFsVw}vw;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;
+      ?`position:absolute;bottom:${btnBottomPx}px;left:0;right:0;text-align:center;z-index:500;`
+      :`position:absolute;bottom:${btnBottomPx}px;left:${btnLeftPx}px;z-index:500;`;
+    const btnFsPx=ois.fontSize||16;
+    const btnPV=ois.paddingV||12;
+    const btnPH=ois.paddingH||30;
+    const btnS=`display:inline-block;padding:${btnPV}px ${btnPH}px;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${btnFsPx}px;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;
     const openAnim=cs.openInviteStyle?.openAnim||"fade";
     const curtainHTML=openAnim==="curtain"?`\n<div id="cover-curtain-top" style="position:absolute;top:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:top center;"></div>\n<div id="cover-curtain-bot" style="position:absolute;bottom:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:bottom center;"></div>`:"";
-    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
+    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:50%;transform:translateX(-50%);width:390px;height:844px;z-index:9000;overflow:hidden;transform-origin:top center;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
   const bgmHTML="<audio id=\"bgm\" loop preload=\"auto\"><source src=\""+jinja_music+"\" type=\"audio/mpeg\"></audio>\n<button id=\"bgm-btn\" onclick=\"toggleBGM()\" style=\"position:absolute;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);\">&#9834;</button>";
 
   // Build JS inv object:
@@ -289,7 +289,7 @@ window.openInvitation=openInvitation;
    VERTICAL NAVIGATION
    ========================================================= */
 var NAV=(function(){
-  var cur=0,total=0,locked=false,gone=false,ty=0;
+  var cur=0,total=0,locked=false,gone=false,ty=0,secH=844;
 
   function track(){return document.getElementById('track');}
   function dotsEl(){return document.getElementById('dots');}
@@ -298,7 +298,7 @@ var NAV=(function(){
     if(n<0||n>=total)return;
     cur=n;
     var t=track();
-    if(t)t.style.transform='translateY('+(-cur*100)+'dvh)';
+    if(t)t.style.transform='translateX(-50%) translateY('+(-cur*secH)+'px)';
     var dd=document.querySelectorAll('.dot');
     for(var i=0;i<dd.length;i++)dd[i].classList.toggle('active',i===cur);
   }
@@ -316,6 +316,11 @@ var NAV=(function(){
     if(d)d.style.display='flex';
     document.body.classList.add('inv-open');
     goTo(0);
+  }
+
+  function resize(h){
+    if(h)secH=h;
+    if(gone)goTo(cur);
   }
 
   function build(){
@@ -356,7 +361,7 @@ var NAV=(function(){
     if(e.key==='ArrowUp'||e.key==='PageUp')go(cur-1);
   },false);
 
-  return {build:build,activate:activate};
+  return {build:build,activate:activate,resize:resize};
 })();
 
 /* =========================================================
@@ -411,25 +416,32 @@ function tick(){
 
 function scaleSecs(){
     var sw=window.innerWidth,sh=window.innerHeight;
-    // Scale to fit width, but never exceed screen height (letterbox if needed)
-    var scaleW=sw/390;
+    // Scale to fit both width and height. Mobile portrait: ~1. Desktop: scaled down, centered.
     var scaleH=sh/844;
-    var scale=Math.min(scaleW,scaleH);
+    var scaleW=sw/390;
+    var scale=Math.min(scaleH,scaleW);
+    var scaledH=Math.round(844*scale);
     var els=document.querySelectorAll('.sec-inner');
     for(var i=0;i<els.length;i++){
-      // top center: scaled dari tengah atas → elemen tetap centered
       els[i].style.transform='scale('+scale+')';
       els[i].style.transformOrigin='top center';
     }
-    // Also scale cover-screen sec-inner (same logic)
-    var cover=document.getElementById('cover-screen');
-    if(cover){
-      var ci=cover.querySelector('.sec-inner');
-      if(ci){ci.style.transform='scale('+scale+')';ci.style.transformOrigin='top center';}
+    // Resize all sections to match scaled height
+    document.querySelectorAll('.section').forEach(function(s){
+      s.style.height=scaledH+'px';
+    });
+    // Also fix cover-screen - scale it same way, keep centered
+    var coverScreen=document.getElementById('cover-screen');
+    if(coverScreen){
+      coverScreen.style.transform='translateX(-50%) scale('+scale+')';
+      coverScreen.style.transformOrigin='top center';
+      coverScreen.style.height='844px';
+      coverScreen.style.width='390px';
     }
+    // Notify NAV of new section height for correct scroll translation
+    if(window.NAV&&NAV.resize) NAV.resize(scaledH);
   }
-  function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
-  window.addEventListener('resize',scaleSecs);
+  function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);window.addEventListener('resize',scaleSecs);}
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
 else{init();}
 
@@ -445,11 +457,10 @@ else{init();}
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
-#app{position:fixed;inset:0;overflow:hidden;}
-#track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
-.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
-.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;overflow:hidden;}
-#cover-screen{display:flex;align-items:flex-start;justify-content:center;}
+#app{position:fixed;inset:0;overflow:hidden;display:flex;justify-content:center;}
+#track{position:absolute;top:0;left:50%;transform:translateX(-50%);width:390px;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
+.section{width:390px;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
+.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;}
 #dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}

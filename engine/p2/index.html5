@@ -411,25 +411,14 @@ function tick(){
 
 function scaleSecs(){
     var sw=window.innerWidth,sh=window.innerHeight;
-    // Scale to fit width, but never exceed screen height (letterbox if needed)
-    var scaleW=sw/390;
-    var scaleH=sh/844;
-    var scale=Math.min(scaleW,scaleH);
+    var scale=sw/390;
     var els=document.querySelectorAll('.sec-inner');
     for(var i=0;i<els.length;i++){
-      // top center: scaled dari tengah atas → elemen tetap centered
       els[i].style.transform='scale('+scale+')';
-      els[i].style.transformOrigin='top center';
-    }
-    // Also scale cover-screen sec-inner (same logic)
-    var cover=document.getElementById('cover-screen');
-    if(cover){
-      var ci=cover.querySelector('.sec-inner');
-      if(ci){ci.style.transform='scale('+scale+')';ci.style.transformOrigin='top center';}
+      els[i].style.transformOrigin='top left';
     }
   }
   function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
-  window.addEventListener('resize',scaleSecs);
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
 else{init();}
 
@@ -447,9 +436,8 @@ else{init();}
 html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
 #app{position:fixed;inset:0;overflow:hidden;}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
-.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
-.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;overflow:hidden;}
-#cover-screen{display:flex;align-items:flex-start;justify-content:center;}
+.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+.sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;}
 #dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
 .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}

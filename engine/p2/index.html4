@@ -247,7 +247,7 @@ function buildHTML(sections,invData,mode){
     const btnS=`display:inline-block;padding:${btnPV}vh ${btnPH}vw;background:${ois.bgColor||"transparent"};border:${ois.borderWidth||1}px solid ${ois.color||"#C4973A"};color:${ois.color||"#C4973A"};font-family:'${ois.fontFamily||"Playfair Display"}',serif;font-size:${btnFsVw}vw;border-radius:${ois.borderRadius||2}px;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;touch-action:manipulation;`;
     const openAnim=cs.openInviteStyle?.openAnim||"fade";
     const curtainHTML=openAnim==="curtain"?`\n<div id="cover-curtain-top" style="position:absolute;top:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:top center;"></div>\n<div id="cover-curtain-bot" style="position:absolute;bottom:0;left:0;width:100%;height:50%;z-index:1;pointer-events:none;background:inherit;background-image:inherit;background-size:inherit;background-position:bottom center;"></div>`:"";
-    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;${bgs}">\n<div class="sec-inner">\n${els}\n</div>\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>`;}
+    coverHTML=`<div id="cover-screen" data-open-anim="${openAnim}" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9000;overflow:hidden;display:flex;align-items:flex-start;justify-content:center;${bgs}">\n<div class="sec-inner">\n${els}\n<div style="${btnWrapStyle}"><button onclick="openInvitation()" style="${btnS}">${cs.openInviteText||"Buka Undangan"}</button></div>${curtainHTML}\n</div>\n</div>`;}
   const bgmHTML="<audio id=\"bgm\" loop preload=\"auto\"><source src=\""+jinja_music+"\" type=\"audio/mpeg\"></audio>\n<button id=\"bgm-btn\" onclick=\"toggleBGM()\" style=\"position:absolute;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(196,151,58,0.15);border:1px solid rgba(196,151,58,0.4);color:#C4973A;font-size:18px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);\">&#9834;</button>";
 
   // Build JS inv object:
@@ -298,7 +298,7 @@ var NAV=(function(){
     if(n<0||n>=total)return;
     cur=n;
     var t=track();
-    if(t)t.style.transform='translateY('+(-cur*100)+'dvh)';
+    var h=window._INV_SEC_H||(window.innerHeight);if(t)t.style.transform='translateY('+(-cur*h)+'px)';
     var dd=document.querySelectorAll('.dot');
     for(var i=0;i<dd.length;i++)dd[i].classList.toggle('active',i===cur);
   }
@@ -315,6 +315,7 @@ var NAV=(function(){
     var d=dotsEl();
     if(d)d.style.display='flex';
     document.body.classList.add('inv-open');
+    scaleSecs();
     goTo(0);
   }
 
@@ -411,25 +412,42 @@ function tick(){
 
 function scaleSecs(){
     var sw=window.innerWidth,sh=window.innerHeight;
-    // Scale to fit width, but never exceed screen height (letterbox if needed)
-    var scaleW=sw/390;
-    var scaleH=sh/844;
-    var scale=Math.min(scaleW,scaleH);
-    var els=document.querySelectorAll('.sec-inner');
-    for(var i=0;i<els.length;i++){
-      // top center: scaled dari tengah atas → elemen tetap centered
-      els[i].style.transform='scale('+scale+')';
-      els[i].style.transformOrigin='top center';
+    var isMobile=sw<=600;
+    var scale,secH;
+    if(isMobile){
+      // Mobile: fill full width, height proportional
+      scale=sw/390;
+      secH=Math.round(844*scale);
+    }else{
+      // Desktop: contained with padding, centered
+      scale=Math.min(sw/390,sh/844)*0.92;
+      secH=sh;
     }
-    // Also scale cover-screen sec-inner (same logic)
-    var cover=document.getElementById('cover-screen');
-    if(cover){
-      var ci=cover.querySelector('.sec-inner');
-      if(ci){ci.style.transform='scale('+scale+')';ci.style.transformOrigin='top center';}
+    var secs=document.querySelectorAll('.section');
+    for(var i=0;i<secs.length;i++){
+      secs[i].style.height=secH+'px';
+    }
+    var inners=document.querySelectorAll('.sec-inner');
+    for(var i=0;i<inners.length;i++){
+      inners[i].style.transform='scale('+scale+')';
+      inners[i].style.transformOrigin='top center';
+    }
+    // Store section height for goTo
+    window._INV_SEC_H=secH;
+    window._INV_SCALE=scale;
+    // On desktop, reposition dots to right edge of sec-inner
+    var dots=document.getElementById('dots');
+    if(dots){
+      if(!isMobile){
+        var scaledW=Math.round(390*scale);
+        var gap=Math.round((sw-scaledW)/2);
+        dots.style.right=Math.max(8,gap-20)+'px';
+      }else{
+        dots.style.right='14px';
+      }
     }
   }
   function init(){NAV.build();scaleSecs();tick();setInterval(tick,1000);}
-  window.addEventListener('resize',scaleSecs);
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}
 else{init();}
 
@@ -447,14 +465,12 @@ else{init();}
 html,body{width:100%;height:100%;overflow:hidden;-webkit-user-select:none;user-select:none;background:#000;}
 #app{position:fixed;inset:0;overflow:hidden;}
 #track{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform .65s cubic-bezier(.77,0,.175,1);}
-.section{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
+.section{width:100%;overflow:hidden;position:relative;display:flex;align-items:flex-start;justify-content:center;}
 .sec-inner{position:relative;width:390px;height:844px;flex-shrink:0;transform-origin:top center;overflow:hidden;}
-#cover-screen{display:flex;align-items:flex-start;justify-content:center;}
-#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:200;}
-.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;padding:0;transition:all .3s;}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:9100;transition:right .3s;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);border:none;cursor:pointer;padding:0;transition:all .3s;}
 .dot.active{background:#C4973A;transform:scale(1.8);}
 input,textarea,select{-webkit-user-select:text;user-select:text;}
-/* Entry animations only play after invitation opened */
 .section [data-entry]{animation-play-state:paused!important;}
 .inv-open .section [data-entry]{animation-play-state:running!important;}
 ${animCSS}
