@@ -2475,12 +2475,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initParticles();
   initCountdown();
   initDots();
-  {% if is_preview %}
+  // {% if is_preview %}
   // Preview mode: auto-open
-  setTimeout(() => {
-    openInvitation();
-  }, 800);
-  {% endif %}
+  // setTimeout(() => {
+  //  openInvitation();
+  // }, 800);
+  // {% endif %}
   setTimeout(initScrollAnimations, 100);
 });
 

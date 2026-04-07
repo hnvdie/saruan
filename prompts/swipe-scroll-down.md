@@ -42,6 +42,16 @@ RSVP POST: /rsvp/{{ inv.id }} — Body JSON: { name, attendance, count, message 
 
 Maps embed: gunakan {{ inv.maps_embed_html | safe }} — JANGAN buat <iframe> sendiri
 
+
+tambahkan juga ini cover buka undangan 
+{% if nama_tamu %}
+    <div class="guest-section" style="margin-bottom: 15px;">
+       <p style="font-size: 0.9em; margin-bottom: 5px;">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+       <h3 style="margin: 0; font-weight: bold;">{{ nama_tamu }}</h3>
+    </div>
+  {% endif %}
+
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## TEMA — TENTUKAN SENDIRI SEPENUHNYA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
