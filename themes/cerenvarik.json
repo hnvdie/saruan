@@ -1,0 +1,59 @@
+{
+  "name": "Ceren & Varık",
+  "description": "Template undangan pernikahan minimalis elegan dengan estetika kertas linen krem, tipografi skrip mewah, dan tata letak editorial. Terinspirasi dari desain undangan cetak premium gaya Eropa modern — bersih, tenang, dan berkelas.",
+  "preview_color": "#F5F0E8",
+  "accent_color": "#B8965A",
+  "tags": [
+    "minimalis",
+    "elegan",
+    "krem",
+    "emas",
+    "script",
+    "premium",
+    "linen",
+    "editorial",
+    "modern",
+    "klasik"
+  ],
+  "demo_photos": [
+    "/static/themes/cerenvarik/demo_f123e13d.png"
+  ],
+  "features": [
+    "Cover pembuka dengan foto full-screen",
+    "Nama tamu personal (nama_tamu)",
+    "Musik latar otomatis setelah buka undangan",
+    "Profil mempelai dengan foto portrait",
+    "Detail akad & resepsi",
+    "Love story dengan foto kolase editorial",
+    "Galeri kolase asimetris 4 foto",
+    "Google Maps embed",
+    "RSVP online dengan pesan ucapan",
+    "Daftar ucapan tamu",
+    "Kirim hadiah (transfer bank & e-wallet)",
+    "Salin nomor rekening 1-tap",
+    "Scroll reveal animasi",
+    "Responsive mobile-first",
+    "Footer habarkita.com"
+  ],
+  "price": 60000,
+  "price_label": "Rp 60.000",
+  "price_original": 149000,
+  "price_note": "",
+  "palette": {
+    "cream": "#F5F0E8",
+    "cream_dark": "#EDE6D6",
+    "white": "#FDFAF5",
+    "ink": "#1C1A17",
+    "ink_light": "#3D3830",
+    "ink_muted": "#7A7268",
+    "gold": "#B8965A",
+    "gold_light": "#D4B07A"
+  },
+  "fonts": {
+    "display": "Great Vibes",
+    "heading": "Cormorant Garamond",
+    "body": "Jost"
+  },
+  "id": "cerenvarik",
+  "skeleton": "cover → hero → bismillah → couple → events → love-story → gallery-collage → maps → rsvp → gift → closing"
+}
